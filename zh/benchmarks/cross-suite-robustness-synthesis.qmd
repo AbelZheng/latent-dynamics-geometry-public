@@ -1,0 +1,262 @@
+---
+title: "跨套件鲁棒性综合"
+lang: zh-CN
+comments: false
+object_type: benchmark
+maturity: L1
+status: stable
+domain: [latent-dynamics, dimensionality-reduction, graph-methods, robustness]
+tags: [benchmark, synthesis, applicability, failure-boundaries, scenario-target-coverage]
+prerequisites:
+- benchmarks/linear-gaussian-robustness.qmd
+- benchmarks/static-linear-latent-robustness.qmd
+- benchmarks/temporal-covariance-inference.qmd
+- benchmarks/demixing-rotational-robustness.qmd
+- benchmarks/nonlinear-graph-robustness.qmd
+related: []
+created: 2026-08-20
+updated: 2026-08-20
+---
+
+# 跨套件鲁棒性综合
+
+## 科学问题
+
+P4-U06 询问一个刻意非比较的问题：**五个稳定 Phase 4 合成基准对象中呈现哪些任务特定覆盖、适用性/失败模式与场景到适用目标映射？**
+
+本对象是清单与调和层。它不引入新生成器、拟合规程、参数选择、推断、恢复、评分度量、重复或科学结果。它不把源度量值复制进综合产物。不同度量永不被归一化、平均、合并或转换为排名。不产生方法胜者、普遍胜者、机制解释、因果结论或真实数据主张。
+
+## 真值
+
+P4-U06 没有新合成真值。真值保持定义在每个稳定源基准对象内部，且不跨任务合并：
+
+- 线性高斯推断的标量潜状态与观测；
+- 静态秩二公共信号、载荷与残差结构；
+- 时序潜轨迹、观测层与协方差先验；
+- 带标签解混效应与声明旋转生成器；
+- 弯曲重构真值与有限图/算子目标。
+
+这些真值对象具有不同数学类型。计数其声明目标族不使它们可通约，也不创造公共表现目标。
+
+## 生成
+
+P4-U06 **不执行数据生成或源方法重跑**。其解析科学输入只是五个稳定 Phase 4 源产物树各自的 `manifest.json`、`results.csv` 与 `diagnostics.json`。源 `summary.png` 是**仅完整性附件**：检查并记录其存在、字节数与声明哈希，但其像素、标签与绘制值不被解析或用作科学输入。综合前可执行要求 `maturity: L1`、`status: stable`、验证科学输入哈希、检查源状态词汇并把诊断状态计数与原始源行调和。
+
+验证稳定输入是：
+
+| 源基准 | 源行 | 解析科学输入 | 仅完整性附件 |
+|---|---:|---|---|
+| P4-U01 线性高斯鲁棒性 | 5,445 | manifest/results/diagnostics | summary PNG |
+| P4-U02 静态线性潜恢复 | 4,356 | manifest/results/diagnostics | summary PNG |
+| P4-U03 时序协方差与推断 | 3,960 | manifest/results/diagnostics | summary PNG |
+| P4-U04 解混与旋转投影 | 2,712 | manifest/results/diagnostics | summary PNG |
+| P4-U05 非线性重构与图几何 | 4,167 | manifest/results/diagnostics | summary PNG |
+
+这些源合计包含 20,640 个原始源行。该总数是清单计数，不是池化样本量或跨任务方法比较的分母。源文件摘要与字节数冻结在 P4-U06 清单中，使后续源漂移机器可检测。
+
+## 场景网格
+
+综合清单包含七个任务记录与 73 个声明场景记录。它保留源任务边界，而非构造新跨套件网格。
+
+| 任务 | 场景 | 重复 | 方法 | 度量 | 目标 | 源行 |
+|---|---:|---:|---:|---:|---:|---:|
+| 线性高斯推断 | 11 | 5 | 11 | 9 | 7 | 5,445 |
+| 静态线性潜恢复 | 11 | 4 | 9 | 11 | 13 | 4,356 |
+| 时序协方差与推断 | 12 | 3 | 11 | 10 | 6 | 3,960 |
+| 解混 | 9 | 3 | 8 | 7 | 7 | 1,512 |
+| 旋转 | 10 | 3 | 8 | 5 | 5 | 1,200 |
+| 非线性重构 | 7 | 3 | 5 | 7 | 7 | 735 |
+| 图几何/算子恢复 | 13 | 3 | 8 | 11 | 11 | 3,432 |
+
+某些计数表面相等是巧合。一个任务中的度量数对另一个任务中的度量数没有数值或科学等价。
+
+## 阴性对照与压力情形
+
+综合为 73 个源场景每个发出一个 `scenario_target_coverage` 行。每行清点源声明压力类与该场景中至少一个非 `inapplicable` 源行的**适用目标族**。这只是覆盖元数据。它不估计敏感性、效应大小、效应方向、鲁棒性、显著性或因果响应。
+
+| 任务 | 保留声明压力类 |
+|---|---|
+| 线性高斯推断 | 转移稳定性、噪声比、序列长度、缺失块、错误参数、重置边界失败、近单位根压力 |
+| 静态线性潜恢复 | 样本量、信号/特征值分离、异质或近零唯一性、相关残差、高干扰、离群值、预处理泄漏、参考 |
+| 时序协方差与推断 | 时间尺度分离、试次数、通道/时间掩码、变点、相关残差、泊松误设、相等核、对齐抖动、有信息缺失 |
+| 解混 | 平衡参考、近共线子空间、缺失/不等单元、标签洗牌、伪群体、平均失配、样本量 |
+| 旋转 | 干净旋转、对称衰减、时滞、公共输入、短弧、时间抖动、平滑/减法、非正交度量、协方差对照 |
+| 非线性重构 | 曲率、支撑族、样本/容量、干扰、支撑移位 |
+| 图几何 | 参考、间隙、捷径、密度、连通性、邻域大小、带宽、度量缩放 |
+
+阴性对照保持为命名源场景或方法。P4-U06 不重调它们、不把它们重新解读为普通竞争者，也不移除观测失败与不适用标签。
+
+## 重复与确定性种子
+
+不引入新重复或随机种子。任务清单中的重复数继承自稳定源产物：P4-U01 五个、P4-U02 四个、P4-U03–P4-U05 每任务三个。P4-U06 确定性来自规范解析、稳定字典行排序与字节可验证输出，而非新随机实验。
+
+综合不得把不同任务的源重复当作一个可交换样本。源 q10/中位数/q90 摘要不被导入。
+
+## 划分纪律
+
+训练、验证、测试、诊断、在线、回顾性与神谕边界保持源本地。P4-U06 在其自身划分纪律被验证后读取已完成源行；它不接收原始生成数组，也没有重拟合源方法的能力。
+
+源出处词汇被保留而非塌缩。它们包括测试、验证、拟合/场景/泄漏/架构诊断、训练设计、留出测试、测试扩展、训练诊断、神谕诊断与训练所选对照出处。跨套件的相似词语不蕴含相同数据访问。
+
+## 方法与信息集
+
+P4-U06 不添加方法。它逐任务清点源方法并保留源本地信息集标签：
+
+- **线性高斯推断：** 固定参考；若干在线历史；回顾性完整区间；神谕回顾性完整区间；以及显式无效跨序列历史。
+- **静态线性恢复：** 固定参考、仅训练、训练/验证、神谕参数与无效测试预处理集。
+- **时序协方差：** 静态观测、在线、回顾性与神谕回顾性集。
+- **解混：** 设计诊断、有监督训练、有监督训练/验证与置换标签对照。
+- **旋转：** 固定参考、训练拟合投影、已知输入拟合与所选置换条件对照。
+- **重构：** 训练/验证拟合后冻结测试恢复。
+- **图几何：** 训练图/算子诊断与带留出扩展的冻结训练图。
+
+这些标签作为清单调和，而非映射到单一有序信息访问尺度。特别地，在线、回顾性、神谕、诊断与故意无效对照不能像求解一个部署任务那样排名。
+
+### 显式方法、度量与目标词汇
+
+产物为每个不同任务本地词汇成员包含一个命名空间化 `method_member`、`metric_member` 与 `target_member` 清单行：**60 个方法成员行、60 个度量成员行与 56 个目标成员行**。名称不跨任务去重，因为相同表面词语可以具有不同角色或契约。
+
+| 任务 | 方法 | 度量 | 目标 |
+|---|---|---|---|
+| 线性高斯推断 | `stationary_mean`、`persistence`、`open_loop`、`known_kalman_filter`、`known_rts_smoother`、`batch_conditioning_oracle`、`selected_kalman_filter`、`selected_rts_smoother`、`misspecified_kalman_filter`、`misspecified_rts_smoother`、`false_continuation_filter` | `latent_rmse`、`interval_95_coverage`、`mean_posterior_variance`、`predictive_nll`、`inside_missing_block_rmse`、`outside_missing_block_rmse`、`selection_parameter_l1`、`oracle_mean_discrepancy`、`reset_first_state_abs_difference` | `point_state`、`online_state`、`retrospective_state`、`one_step_observation_prediction`、`selected_parameter_tuple`、`numerical_correctness_reference`、`boundary_reset_diagnostic` |
+| 静态线性潜恢复 | `mean`、`fixed_projection`、`random_projection`、`pca`、`ppca`、`fa_selected`、`proper_scaled_pca`、`leaked_scaled_pca_control`、`true_gaussian_reference` | `heldout_reconstruction_mse`、`latent_signal_reconstruction_mse`、`heldout_gaussian_nll`、`covariance_relative_frobenius`、`principal_subspace_angle_max_degrees`、`loading_subspace_angle_max_degrees`、`uniqueness_rmse`、`selected_validation_nll`、`optimizer_iterations`、`identification_applicable`、`preprocessing_test_poison_parameter_change` | `observed_coordinate_reconstruction`、`true_common_signal`、`observable_distribution`、`observable_covariance`、`population_principal_subspace`、`identified_true_common_loading_subspace`、`identified_diagonal_uniqueness`、`bounded_fa_selection`、`diagonal_fa_identification_applicability`、`contaminated_observed_coordinate_reconstruction`、`contaminated_observation_gaussian_score`、`nominal_clean_gaussian_covariance`、`preprocessing_leakage_diagnostic` |
+| 时序协方差与推断 | `mean_diagonal`、`static_factor`、`two_stage_pca_smooth`、`independent_channel_gp`、`known_gpfa`、`selected_gpfa`、`wrong_timescale_gpfa`、`wrong_ar_gpfa`、`ar_kalman_filter`、`ar_rts_smoother`、`exact_gaussian_oracle` | `marginal_nll_per_entry`、`masked_prediction_nll_per_entry`、`masked_prediction_rmse`、`latent_rmse`、`latent_90_coverage`、`loading_subspace_angle_degrees`、`timescale_l1`、`selected_combined_nll_per_entry`、`covariance_relative_frobenius`、`posterior_mean_oracle_max_abs` | `observation_distribution`、`masked_observation_prediction`、`latent_trajectory`、`loading_subspace`、`timescale_selection`、`numerical_posterior_oracle` |
+| 解混 | `condition_mean`、`pca`、`marginal_pca`、`selected_dpca`、`ridge_decoder`、`shuffled_dpca_control`、`shuffled_decoder_control`、`factorial_design_diagnostic` | `stimulus_marginal_nmse`、`decision_marginal_nmse`、`stimulus_subspace_angle_degrees`、`decision_subspace_angle_degrees`、`stimulus_decoding_accuracy`、`decision_decoding_accuracy`、`factorial_design_rank` | `stimulus_marginal_reconstruction`、`decision_marginal_reconstruction`、`stimulus_marginal_subspace`、`decision_marginal_subspace`、`stimulus_label_decoding`、`decision_label_decoding`、`factorial_design_identification` |
+| 旋转 | 覆盖 PCA/固定/随机平面、无限制/斜/对称/输入感知拟合与协方差对照的 8 个成员 | `plane_angle_degrees`、`angular_rate_abs_error`、`derivative_rmse`、`tangential_velocity_ratio`、`covariance_similarity` | `rotational_plane`、`angular_rate`、`heldout_derivative_prediction`、`plane_tangential_motion`、`condition_covariance_control` |
+| 非线性重构 | `mean`、`pca`、`linear_autoencoder`、`nonlinear_autoencoder`、`frozen_encoder` | `observed_reconstruction_mse`、`noiseless_signal_mse`、`code_variance`、`code_abs_spearman_truth`、`code_collision_rate`、`selected_validation_mse`、`parameter_count` | `observed_test_reconstruction`、`known_noiseless_test_signal`、`deterministic_test_code_activity`、`scoring_only_generator_parameter`、`scoring_only_generator_collision_diagnostic`、`validation_selection_diagnostic`、`architecture_diagnostic` |
+| 图几何/算子恢复 | `mean`、`pca`、`ambient_mds`、`isomap`、`graph_diagnostics`、`diffusion_maps`、`direct_operator`、`nystrom_extension` | `component_count`、`infinite_pair_rate`、`material_shortcut_rate`、`graph_distance_relative_rmse`、`mds_negative_eigenmass`、`heldout_coordinate_rmse`、`diffusion_eigenspace_angle_max_degrees`、`diffusion_truncation_relative_rmse`、`operator_row_sum_max_abs`、`direct_spectral_distance_max_abs`、`heldout_extension_rmse` | `finite_training_graph_connectivity_diagnostic`、`finite_training_graph_disconnection_diagnostic`、`known_hairpin_pairwise_arc_separation`、`known_hairpin_path_underestimation_diagnostic`、`classical_mds_euclideanity_diagnostic`、`scoring_aligned_known_hairpin_arc_length`、`l2_pi_cosine_sine_eigenspace_diagnostic`、`full_finite_operator_diffusion_distance`、`markov_operator_numerical_oracle`、`finite_operator_numerical_oracle`、`heldout_cosine_sine_extension_after_train_alignment` |
+
+精确完整字符串在 `results.csv` 的 `inventory` 行中权威；上方紧凑表记录其任务本地角色，不创建跨任务词汇层级。
+
+## 参数选择
+
+没有 P4-U06 参数选择。源所选超参数与选择诊断保留在其稳定源产物中。综合只记录方法、任务、场景、状态与声明词汇；它既不选择源方法，也不搜索跨套件工作点。
+
+## 推断
+
+没有 P4-U06 推断或恢复。源后验状态、重构、子空间、导数、嵌入与扩展不被重算，其度量值不被复制。可执行只构造清单、适用性/失败模式与场景目标覆盖行。
+
+## 评分
+
+P4-U06 没有公共科学得分。其四种记录类型是：
+
+1. `inventory` —— 任务特定计数加显式方法、度量、目标、信息集与出处词汇成员；
+2. `applicability_pattern` —— 原始笛卡尔方法 × 度量 × 重复行上的任务/场景/方法适用性；
+3. `failure_pattern` —— 两个单独命名的失败标签比例，带精确分母；以及
+4. `scenario_target_coverage` —— 场景级适用目标族清单，无源度量值或效应。
+
+对固定任务/场景/方法组，定义
+
+- $N_{all}$：所有原始笛卡尔度量 × 重复行；
+- $N_{app}=N_{ok}+N_{invalid}+N_{nonconvergence}$：状态非 `inapplicable` 的行；以及
+- $N_{fail}=N_{invalid}+N_{nonconvergence}$。
+
+产物报告：
+
+- 适用性率 $N_{app}/N_{all}$；
+- **原始笛卡尔失败标签比例** $N_{fail}/N_{all}$；以及
+- **条件失败率** $N_{fail}/N_{app}$。
+
+当 $N_{app}=0$ 时条件率数学上未定义。该行以 `status: inapplicable`、空白序列化分母/率字段与无捏造零保留。有 **104** 个此类零适用分母行；其他 **539** 个条件率行具有显式正分母。全部 643 个原始笛卡尔失败标签比例行保留其非零 $N_{all}$ 分母。
+
+这些比例描述源标签与笛卡尔设计，而非归一化方法表现。它们不得作为排行榜比较。高 `inapplicable` 比例可以是窄类型度量的正确结果。
+
+## 失效与适用性标签
+
+共享词汇如下调和：
+
+| 标签 | 跨套件解读 |
+|---|---|
+| `ok` | 源行声明计算完成且适用；它不意味一般科学正确。 |
+| `inapplicable` | 方法/度量/场景目标在源契约下未定义；它被保留，而非当作缺失或零。 |
+| `invalid` | 声明的设计、信息集、辨识或有限值条件失败。 |
+| `nonconvergence` | 有界数值/优化规程未满足其源完成规则。 |
+
+任务特定状态组成是：
+
+| 任务 | `ok` | `inapplicable` | `invalid` | `nonconvergence` | 分母 |
+|---|---:|---:|---:|---:|---:|
+| 线性高斯推断 | 1,515 | 3,930 | 0 | 0 | 5,445 |
+| 静态线性潜恢复 | 1,260 | 3,044 | 0 | 52 | 4,356 |
+| 时序协方差与推断 | 2,049 | 1,911 | 0 | 0 | 3,960 |
+| 解混 | 567 | 891 | 54 | 0 | 1,512 |
+| 旋转 | 474 | 726 | 0 | 0 | 1,200 |
+| 非线性重构 | 690 | 45 | 0 | 0 | 735 |
+| 图几何/算子恢复 | 299 | 3,133 | 0 | 0 | 3,432 |
+
+稳定输入中唯一自然失败标签是静态线性恢复中的 52 个有界 FA `nonconvergence` 行与解混中的 54 个缺失单元设计秩 `invalid` 行。其含义保持源特定。另一任务中自然失败缺失不是方法族普遍鲁棒的证据；源验证器通过故障注入单独演练失败路由。
+
+## 产物契约
+
+综合产物目录限于：
+
+```text
+manifest.json
+results.csv
+diagnostics.json
+summary.png
+```
+
+权威产物包含 **2,308** 个完整规范综合行：
+
+- 306 个 `inventory` 行，包括 60 个方法、60 个度量与 56 个目标成员；
+- 643 个 `applicability_pattern` 行；
+- 1,286 个 `failure_pattern` 行：643 个原始笛卡尔比例与 643 个条件率；以及
+- 73 个 `scenario_target_coverage` 行。
+
+清单记录五个稳定源树、所有源内容哈希与字节数、17 字段原始 schema、字典序 `row_key` 排序、运行时、命令与对源方法重跑、导入度量值、跨任务归一化/平均、得分、排名与胜者的显式禁止。
+
+## 结果
+
+综合确认跨五个稳定基准对象与七个独立任务的覆盖。任务清单跨越 73 个命名场景与 20,640 个源行，而综合本身包含 2,308 个清单/模式/覆盖行。这些只是覆盖计数。
+
+场景目标覆盖清单显示 Phase 4 刻意演练不同种类边界，而非一个重复基准模板：时间稳定性与重置；静态辨识与残差规格；协方差、缺失与观测族误设；标签/设计与旋转对照；非线性支撑/容量；以及有限图连通性、捷径、带宽与度量依赖。覆盖行陈述每个场景中哪些目标族适用；它们不陈述效应大小、方向、敏感性或鲁棒性结果。
+
+任务特定状态表还演示为什么池化率会误导。图几何具有许多刻意类型化方法–度量对，因此许多 `inapplicable` 行，而重构具有更稠密适用性设计。解混的 `invalid` 行编码缺失单元设计失败；静态恢复的 `nonconvergence` 行编码有界 FA 优化。那些标签不是可互换损失。
+
+![P4-U06 跨套件覆盖清单](../../benchmarks/artifacts/cross-suite-robustness-synthesis/summary.png)
+
+图使用每个任务自身源行分母显示场景/方法/度量清单计数与任务特定状态组成。它不包含源度量值、池化得分、归一化排名或胜者。
+
+## 解读界限
+
+- 清单量不是科学质量、成熟度或方法优越性的证据。
+- 场景数不是难度或证据权重的可比度量。
+- 适用性与两个失败标签比例以每个任务的方法-度量-重复笛卡尔设计及其显式命名分母为条件。
+- 场景目标覆盖条目记录适用目标族覆盖，而非敏感性、效应大小、方向、显著性或因果归因。
+- `ok` 是计算/状态标签，不是模型正确性、可辨识性、机制、因果性或真实数据迁移的证明。
+- `inapplicable`、`invalid` 与 `nonconvergence` 具有不同含义，永不被组合为普遍惩罚。
+- 没有结果支持普遍胜者、跨任务方法排名、公共潜生成器、流形/拓扑恢复、生物有效性或 Phase 5 就绪。
+- 本综合不取代阅读源基准对象、其原始行、产物、审查记录与解读界限。
+
+## 可复现性
+
+从仓库根目录用清单记录运行时运行：
+
+```bash
+/Users/bytedance/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3 benchmarks/cross-suite-robustness-synthesis.py --generate
+/Users/bytedance/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3 benchmarks/cross-suite-robustness-synthesis.py --generate --resume
+/Users/bytedance/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3 benchmarks/cross-suite-robustness-synthesis.py --verify
+```
+
+验证器检查稳定源状态；源清单/内容哈希；源诊断/原始行状态调和；精确四产物清单；2,308 个唯一规范行；无源度量值与排名/得分/胜者字段；显式分母；逐字节相同干净与反转顺序生成；有效部分恢复；拒绝损坏、重复、未知与不完整恢复行；源内容漂移拒绝；以及非稳定源清单拒绝。
+
+## 审查记录
+
+独立科学与实现审查员是只读且独立于执行者。其初始审查在诚实场景目标覆盖术语、原始对条件失败分母、命名空间化方法/度量/目标清单与科学输入对完整性附件边界上返回 `REVISE`。有界修正轮次只处理那些发现；聚焦科学与实现复审都返回 `PASS`，无未解决发现。
+
+已接受验证记录包括 63 对象结构验证、33 仓库测试、综合验证器与对抗源检查、目标/索引渲染、工作流验证与 `git diff --check`。记录的审查决定随后授权机械晋升到 `L1/stable`。稳定状态记录该声明合成基准对象的有界验收；它不扩大其证据、信息集、目标或解读边界。
+
+## 成熟度检查表
+
+- [x] 只读取五个验证 `L1/stable` Phase 4 产物树。
+- [x] 不引入新生成器、重复、选择、推断、恢复或科学得分。
+- [x] 保留七个任务边界与源本地信息集/出处。
+- [x] 调和四个状态标签而不把它们当作一个损失。
+- [x] 记录带精确源行分母的任务/场景/方法/度量清单。
+- [x] 记录 73 个场景目标覆盖行，不蕴含敏感性或导入效应大小。
+- [x] 不产生度量归一化、跨任务聚合、得分、排名、胜者或机制推断。
+- [x] 输出限于四个确定性字节可验证产物。
+- [x] 聚焦科学复审通过。
+- [x] 聚焦实现复审通过。
+- [x] 只有两个复审与验证都通过后，才发生机械 `L1/stable` 晋升。
