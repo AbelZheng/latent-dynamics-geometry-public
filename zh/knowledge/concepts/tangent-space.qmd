@@ -1,0 +1,219 @@
+---
+title: "切空间"
+lang: zh-CN
+comments: false
+object_type: concept
+maturity: L2
+status: stable
+domain: [geometry, dynamics]
+tags: [tangent-space, local-linearization, tangent-vector]
+prerequisites:
+- knowledge/concepts/manifold.qmd
+- knowledge/concepts/linear-subspace.qmd
+related:
+- knowledge/concepts/vector-field.qmd
+- knowledge/concepts/embedding.qmd
+- knowledge/concepts/riemannian-metric.qmd
+created: 2026-08-18
+updated: 2026-08-18
+---
+
+# 切空间
+
+## 一句话定义
+
+**切空间** $T_pM$ 是光滑流形 $M$ 在点 $p$ 处可用的一阶方向向量空间。
+
+## 为什么这个概念重要
+
+切空间是速度、导数、向量场与黎曼内积的局部线性舞台。它在一处近似一阶行为；它不是流形本身。
+
+## 直觉
+
+在球面上的某点，切平面包含球面上曲线可以移动的瞬时方向。球面在二阶上离开该平面。
+
+## 形式化定义
+
+设 $M$ 是光滑 $n$ 流形，$p\in M$。
+
+### 曲线速度定义
+
+考虑满足 $\gamma(0)=p$ 的光滑曲线 $\gamma:(-\epsilon,\epsilon)\to M$。当在包含 $p$ 的某个——从而每个——坐标卡 $(U,x)$ 中
+
+$$
+\left.\frac{d}{dt}\right|_{0}x(\gamma_1(t))
+=
+\left.\frac{d}{dt}\right|_{0}x(\gamma_2(t)).
+$$
+
+时，两条曲线在 $p$ 处切等价。切向量是等价类 $[\gamma]$，切空间 $T_pM$ 是此类集合，向量空间运算在坐标中诱导。Mrowka 给出等价的坐标卡代表构造 [@Mrowka2004, sec. 7.2]。
+
+### 导子定义
+
+等价地，$p$ 处的切向量是光滑函数芽上的线性映射
+
+$$
+v:C^\infty_p(M)\to\mathbb R
+$$
+
+满足莱布尼茨法则
+
+$$
+v(fg)=f(p)v(g)+g(p)v(f).
+$$
+
+对曲线代表，
+
+$$
+v(f)
+=
+\left.\frac{d}{dt}\right|_{0}f(\gamma(t)).
+$$
+
+曲线速度与导子描述定义典范同构的切空间 [@Lee1997, ch. 2]。本概念陈述该等价，但推迟其证明。
+
+### 坐标与基变换
+
+坐标卡 $x=(x^1,\ldots,x^n)$ 提供坐标基
+
+$$
+\left.\frac{\partial}{\partial x^1}\right|_p,
+\ldots,
+\left.\frac{\partial}{\partial x^n}\right|_p,
+$$
+
+因此每个 $v\in T_pM$ 具有分量
+
+$$
+v
+=
+v^i\left.\frac{\partial}{\partial x^i}\right|_p.
+$$
+
+从而 $\dim T_pM=n$。在另一个坐标卡 $y=(y^1,\ldots,y^n)$ 下，
+
+$$
+v'^a
+=
+\frac{\partial y^a}{\partial x^i}(p)v^i,
+$$
+
+且
+
+$$
+\left.\frac{\partial}{\partial x^i}\right|_p
+=
+\frac{\partial y^a}{\partial x^i}(p)
+\left.\frac{\partial}{\partial y^a}\right|_p.
+$$
+
+分量变化，而本征切向量不变。
+
+### 光滑映射的微分
+
+对光滑映射 $f:M\to N$，$p$ 处的微分是线性映射
+
+$$
+df_p:T_pM\to T_{f(p)}N.
+$$
+
+使用曲线代表，
+
+$$
+df_p([\gamma])=[f\circ\gamma].
+$$
+
+使用导子，
+
+$$
+(df_pv)(g)=v(g\circ f).
+$$
+
+在坐标中，$df_p$ 的矩阵是雅可比 $[\partial f^a/\partial x^i]_p$ [@Mrowka2004, sec. 7.2]。
+
+### 嵌入切空间
+
+如果 $i:M\hookrightarrow\widetilde M$ 是光滑嵌入，$di_p$ 把 $T_pM$ 识别为 $T_{i(p)}\widetilde M$ 的线性子空间。对 $\mathbb R^D$ 中的嵌入流形，这给出熟悉的外围切平面。该表示子空间依赖嵌入，而抽象 $T_pM$ 是本征的。拟合到数据的任意外围子空间不自动是本征切空间的像。
+
+### 切丛与向量场
+
+切丛是不交并
+
+$$
+TM=\bigsqcup_{p\in M}T_pM
+$$
+
+连同其相容光滑丛结构。光滑向量场是满足 $X(p)\in T_pM$ 的光滑截面 $X:M\to TM$。丛构造证明与联络理论被推迟。
+
+## 核心记号
+
+- $T_pM$：$p$ 处的切空间。
+- $v\in T_pM$：切向量。
+- $[\gamma]$：穿过 $p$ 的曲线等价类。
+- $v(f)$：光滑函数芽的导子。
+- $\partial/\partial x^i|_p$：坐标诱导的切基。
+- $v^i$：坐标卡中的切向量分量。
+- $df_p:T_pM\to T_{f(p)}N$：光滑映射的微分/前推。
+- $TM=\bigsqcup_{p\in M}T_pM$：切丛。
+
+## 前置知识
+
+[Manifold](manifold.qmd) 提供坐标卡与光滑曲线。[Linear Subspace](linear-subspace.qmd) 提供向量空间语言。
+
+## 与相邻概念的关系
+
+| 概念 | 区别 |
+|---|---|
+| **流形** | 点的非线性空间；$T_pM$ 是附着的一个局部向量空间。 |
+| **外围空间** | 嵌入微分把 $T_pM$ 表示为外围切空间的子空间；本征切空间不由外围坐标单独定义。 |
+| **微分 / 雅可比** | $df_p$ 在流形之间映射切向量。坐标雅可比是其矩阵表示，不是本征映射本身。 |
+| **切丛** | 所有切空间的光滑组织并集；它不是单一向量空间，因为不同点的纤维不同。 |
+| **向量场** | 给每个点赋予一个切向量，而非描述一个切空间。 |
+| **局部 PCA 平面** | 在额外采样与噪声假设下可能近似切空间的统计估计。 |
+
+## 这并不蕴含
+
+切空间并不蕴含全局平坦性、不同点之间的典范识别、唯一外围方向、度量或内积、从稀疏样本的准确估计、远离 $p$ 的有效性，或局部线性动力学全局延拓。
+
+## 最小示例
+
+对 $S^1\subset\mathbb R^2$ 与 $p=(1,0)$，
+
+$$
+T_pS^1=\{(0,a):a\in\mathbb R\}.
+$$
+
+这条竖线捕获 $p$ 处的瞬时运动，但不是整个圆。
+
+## 神经科学 / 行为相关性
+
+局部切估计可以描述状态附近的神经或行为变异方向。其解读依赖邻域尺度，并应与更简单的局部线性零模型比较。
+
+## 对 LDG 的意义
+
+在 L2 阶段，切空间连接本征曲线/导子定义、坐标表示、微分、嵌入子空间、向量场与后续黎曼几何，而不把局部线性化当作全局结构。
+
+## 开放问题
+
+- 可靠切估计需要多少样本？
+- $T_pM$ 中的不确定性应如何传播到动力学？
+- 切估计何时跨条件光滑变化？
+
+## 参考文献
+
+- Mrowka 提供经核查的坐标卡等价、坐标基、微分映射与切丛构造 [@Mrowka2004, sec. 7.2]。
+- Lee 提供经核查的曲线/导子等价、嵌入子流形切表示与切丛语境 [@Lee1997, ch. 2]。
+- 丛证明、联络与统计切估计算法被有意推迟。
+
+## 成熟度检查表
+
+- [x] 通过曲线速度与坐标卡定义切向量。
+- [x] 区分局部切空间、流形、外围空间与估计局部平面。
+- [x] 包含显式圆示例。
+- [x] 陈述本征曲线等价与导子定义。
+- [x] 类型化坐标基、分量变换与 $\dim T_pM=\dim M$。
+- [x] 本征地与在坐标中定义微分 $df_p$。
+- [x] 区分本征与嵌入切空间以及任意外围子空间。
+- [x] 关联切丛与向量场，同时推迟丛理论。
+- [x] 陈述切估计的经验尺度、采样、噪声与流形假设界限。
+- [x] 独立 L2 科学审查完成，在记录的审查决定下为 PASS。

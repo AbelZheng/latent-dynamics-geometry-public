@@ -1,0 +1,101 @@
+---
+title: "流形"
+lang: zh-CN
+comments: false
+object_type: concept
+maturity: L1
+status: stable
+domain: [geometry, topology]
+tags: [manifold, local-coordinates, atlas]
+prerequisites:
+- knowledge/concepts/embedding.qmd
+- knowledge/concepts/intrinsic-dimension.qmd
+related:
+- knowledge/concepts/state-space.qmd
+- knowledge/concepts/linear-subspace.qmd
+created: 2026-08-18
+updated: 2026-08-18
+---
+
+# 流形
+
+## 一句话定义
+
+**光滑流形**是由欧氏坐标局部描述的空间，其重叠坐标系光滑地变化。
+
+## 为什么这个概念重要
+
+流形允许全局弯曲或拓扑非平凡的空间支持局部微积分。它们为潜状态空间提供一种可能模型，但有限数据或非线性可视化并不确立该模型。
+
+## 直觉
+
+球面无法被一个无畸变平面坐标系覆盖，但每个足够小的斑块看起来都像 $\mathbb R^2$ 的开斑块。相容斑块构成图册。
+
+## 形式化定义
+
+$n$ 维光滑流形 $M$ 是豪斯多夫、第二可数拓扑空间，配备覆盖 $M$ 的坐标卡图册 $(U_\alpha,\varphi_\alpha)$，其中
+
+$$
+\varphi_\alpha:U_\alpha\to\varphi_\alpha(U_\alpha)\subseteq\mathbb R^n
+$$
+
+是同胚到 $\mathbb R^n$ 开子集，且重叠卡之间的转移映射光滑。Mrowka 给出这一坐标卡与图册定义 [@Mrowka2004, sec. 1]。
+
+这是本征定义：流形不必先作为欧氏空间的子集给出。嵌入是把它表示在外围空间中的一种方式。
+
+## 核心记号
+
+- $M$：流形。
+- $n=\dim M$：流形维数。
+- $(U,\varphi)$：坐标卡。
+- $\varphi(p)\in\mathbb R^n$：$p$ 的局部坐标。
+- $\varphi_\beta\circ\varphi_\alpha^{-1}$：转移映射。
+
+## 前置知识
+
+[Embedding](embedding.qmd) 区分本征空间与其一种表示。[Intrinsic Dimension](intrinsic-dimension.qmd) 在流形模型下提供局部坐标数目。
+
+**假定背景：** 开集、连续性与初等拓扑；专门的拓扑概念出现在主线之后。
+
+## 与相邻概念的关系
+
+| 概念 | 区别 |
+|---|---|
+| **线性子空间** | 对线性组合全局封闭；流形可以是弯曲的且只局部欧氏。 |
+| **嵌入流形** | 作为外围空间中合适正则子集表示的流形。 |
+| **点云** | 有限样本本身不提供坐标卡、拓扑或光滑转移。 |
+| **拓扑** | 提供连续性与邻域结构；光滑流形额外具有相容可微坐标卡。 |
+
+## 这并不蕴含
+
+流形主张并不蕴含黎曼度量、已知拓扑、低曲率、全局欧氏坐标、唯一维数估计、忠实采样或生物机制。
+
+## 最小示例
+
+圆 $S^1$ 是一维流形。它需要不止一个普通实值坐标卡，尽管它可以嵌入 $\mathbb R^2$。
+
+## 神经科学 / 行为相关性
+
+神经或行为状态可能被建模为靠近流形。此类主张需要降维之外的证据：局部坐标一致性、尺度分析、采样充分性以及与更简单子空间的比较。
+
+## 对 LDG 的意义
+
+流形确立之后可以定义切空间、黎曼度量、测地线与本征曲率的对象。
+
+## 开放问题
+
+- 哪些数据能把流形与条件特定子空间区分开？
+- 在什么尺度上坐标卡假设站得住脚？
+- 应如何建模远离候选流形的噪声？
+
+## 参考文献
+
+- Mrowka 提供经核查的坐标卡、图册与光滑流形定义 [@Mrowka2004, sec. 1]。
+- Whitney 提供经典嵌入语境 [@Whitney1936]。
+
+## 成熟度检查表
+
+- [x] 定义局部欧氏坐标卡与光滑转移。
+- [x] 区分本征流形与外围嵌入。
+- [x] 陈述可视化与低维不证明流形。
+- [x] 独立有界审查已完成；初步发现已被修正，聚焦复审通过。
