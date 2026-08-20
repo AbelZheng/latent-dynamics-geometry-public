@@ -1,0 +1,25 @@
+---
+title: "Benchmarks"
+---
+
+Benchmark Objects compare method applicability, robustness, and failure
+boundaries on predeclared synthetic tasks with known ground truth. Results are
+task-, metric-, and information-set-specific; this section is not a universal
+leaderboard.
+
+
+## Phase 4 status
+
+Phase 4 is complete under the recorded review decision. P4-U01 through P4-U06 are independently
+reviewed `L1/stable`; P4-U07 passed two independent integration Red Teams and
+full milestone validation. Stable status is bounded by each object's declared
+synthetic scenarios, targets, information sets, failure labels, and
+interpretation limits. Phase 5 has not begun.
+
+
+- [P4-U01 — Linear-Gaussian Robustness Benchmark](linear-gaussian-robustness.qmd) — bounded scalar LGSSM scenarios comparing simple references, filtering, smoothing, direct conditioning, and finite-grid selected inference. *(L1, stable)*
+- [P4-U02 — Static Linear Latent Recovery Benchmark](static-linear-latent-robustness.qmd) — bounded static rank-two scenarios comparing projection references, PCA, PPCA, diagonal-noise FA, and a known-parameter Gaussian reference with metric-specific provenance and non-pooled targets. *(L1, stable)*
+- [P4-U03 — Temporal Covariance and Inference Benchmark](temporal-covariance-inference.qmd) — benchmark-local temporal-covariance implementation grounded in the stable Phase 3 design, comparing static and two-stage references, known/selected GPFA, wrong covariance priors, online Kalman filtering, retrospective smoothing, and applicability-limited Gaussian oracles. *(L1, stable)*
+- [P4-U04 — Demixing and Rotational Projection Robustness Benchmark](demixing-rotational-robustness.qmd) — separate demixing and rotational tasks with rank-gated marginal recovery, within-cell pseudo-population and label controls, selected covariance-matched rotational controls, target-specific failures and no cross-task score. *(L1, stable)*
+- [P4-U05 — Nonlinear Reconstruction and Graph Geometry Robustness Benchmark](nonlinear-graph-robustness.qmd) — separate bounded nonlinear-reconstruction and finite graph/operator tasks covering curvature, Gaussian and support-shift controls, graph connectivity/shortcut/density/bandwidth/metric sensitivity, frozen held-out extension, and explicit non-manifold interpretation limits. *(L1, stable)*
+- [P4-U06 — Cross-Suite Robustness Synthesis](cross-suite-robustness-synthesis.qmd) — stable-artifact-only inventory of seven Phase 4 tasks, reconciling source-local vocabularies, explicit vocabulary inventories, denominator-specific applicability/failure-label patterns and scenario-target coverage without importing metric values, pooling scores, ranking methods or naming a winner. *(L1, stable)*

@@ -1,0 +1,21 @@
+---
+title: "Methods"
+---
+
+Method Objects organize methods around the problem solved, assumptions, learned and fixed quantities, representations of time and geometry, failure modes, baselines, and evaluation.
+
+## Current method library
+
+- [Principal Component Analysis](principal-component-analysis.qmd) — canonical static linear Euclidean baseline. *(L2, stable)*
+- [Factor Analysis](factor-analysis.qmd) — static probabilistic low-rank-plus-diagonal covariance baseline. *(L2, stable)*
+- [Isomap](isomap.qmd) — graph-shortest-path and classical-MDS geometry baseline. *(L2, stable)*
+- [Diffusion Maps](diffusion-maps.qmd) — affinity-operator and diffusion-distance spectral baseline. *(L2, stable)*
+- [Demixed Principal Component Analysis](demixed-principal-component-analysis.qmd) — label-dependent marginal reconstruction baseline. *(L2, stable)*
+- [Discrete-Time Linear-Gaussian State-Space Model](linear-gaussian-state-space-model.qmd) — probabilistic temporal latent baseline. *(L2, stable)*
+- [Bounded Autoencoder Baseline](autoencoder-baseline.qmd) — deterministic nonlinear reconstruction baseline. *(L2, stable)*
+- [Kalman Filtering](kalman-filtering.qmd) — online current-state inference for a fixed discrete-time linear-Gaussian state-space model. *(L2, stable)*
+- [jPCA](jpca.qmd) — PCA-reduced, derivative-fitted skew-symmetric rotational projection method. *(L2, stable)*
+- [Fixed-Interval Kalman Smoothing](kalman-smoothing.qmd) — retrospective full-interval state and path inference for a fixed LGSSM. *(L2, stable)*
+- [Gaussian-Process Factor Analysis](gaussian-process-factor-analysis.qmd) — FA observation layer with covariance-prior retrospective latent trajectories. *(L2, stable)*
+
+Stable status records bounded owner acceptance under the declared evidence and non-implication limits; it is not a claim of universal empirical validity. Objects labeled `review` have completed the scientific draft and evidence stage but have not yet crossed their object-specific acceptance gate.

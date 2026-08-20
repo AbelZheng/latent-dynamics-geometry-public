@@ -1,0 +1,26 @@
+---
+title: "Latent Dynamics & Geometry"
+---
+
+LDG is a version-controlled research-methodology knowledge system for latent states, dynamical systems, neural and behavioral dynamics, representation geometry, topology, dimensionality reduction, and multimodal modeling.
+
+Its intended progression is:
+
+```text
+Concept → Mathematical understanding → Method → Executable toy model
+        → Benchmark → Laboratory data → Open methodological question
+```
+
+This public site presents the scientific layer of the project: definitions, mathematical foundations, method descriptions, executable toy models, paper notes, and research questions. Internal planning and operational materials are intentionally not part of the published site.
+
+## Start here
+
+- [Concepts](knowledge/concepts/index.qmd) define the vocabulary for dynamics, latent variables, geometry, topology, and dimensionality.
+- [Methods](knowledge/methods/index.qmd) state each method's problem, assumptions, learned and fixed quantities, failure modes, and baseline comparisons.
+- [Math](knowledge/math/index.qmd) develops reusable formal objects and derivations.
+- [Toy Models](toy-models/index.qmd) connect known generative structure to recovery and evaluation.
+- [Papers](knowledge/papers/index.qmd) and [Research Questions](research-questions/index.qmd) organize evidence and open methodological problems.
+
+## Reading policy
+
+LDG distinguishes established definitions and results, source-author interpretations, project-level synthesis, and research hypotheses. Visualizations, low reconstruction error, decoding performance, temporal correlation, or a low-dimensional embedding are not treated as mechanistic evidence by themselves.

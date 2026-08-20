@@ -1,0 +1,54 @@
+---
+title: "Concepts"
+---
+
+Concept Objects define terminology, intuition, formal meaning, adjacent concepts, non-implications, and relevance to LDG. The sections below provide a public reading order through the current concept library.
+
+## Foundational dynamics
+
+- [State](state.qmd) — what information counts as the state of a specified system at a time. *(L1, stable)*
+- [State Space](state-space.qmd) — the admissible state values under a specified state description. *(L1, stable)*
+- [Trajectory](trajectory.qmd) — one admissible system evolution parameterized by system time. *(L1, stable)*
+- [Phase Space](phase-space.qmd) — a state space read as the arena of dynamical trajectories. *(L2, stable)*
+- [Initial Condition](initial-condition.qmd) — a state value assigned at a reference time. *(L1, stable)*
+- [Vector Field](vector-field.qmd) — a local instantaneous state-change rule. *(L2, stable)*
+- [Flow](flow.qmd) — finite-time evolution across supported initial states. *(L2, stable)*
+- [Fixed Point](fixed-point.qmd) — a state unchanged by the specified evolution. *(L2, stable)*
+- [Stability](stability.qmd) — response of a declared dynamical object to specified perturbations. *(L2, stable)*
+- [Attractor](attractor.qmd) — an invariant set approached from a surrounding basin. *(L2, stable)*
+- [Limit Cycle](limit-cycle.qmd) — an isolated periodic orbit with separately stated stability. *(L2, stable)*
+- [Input-Driven Dynamics](input-driven-dynamics.qmd) — evolution depending on state and an external input signal. *(L2, stable)*
+
+## Latent-variable foundations
+
+- [Latent Variable](latent-variable.qmd) — a model variable not directly observed in the available data. *(L1, stable)*
+- [Observation Model](observation-model.qmd) — the relation from latent or system variables to measurements. *(L2, stable)*
+- [State-Space Model](state-space-model.qmd) — a joint transition and observation description. *(L2, stable)*
+- [Linear Dynamical System](linear-dynamical-system.qmd) — linear state evolution with optional inputs and outputs. *(L2, stable)*
+- [Process Noise](process-noise.qmd) — stochastic disturbance entering state evolution. *(L2, stable)*
+- [Observation Noise](observation-noise.qmd) — stochastic measurement variability conditional on state. *(L2, stable)*
+- [Identifiability](identifiability.qmd) — uniqueness of model specifications from observable distributions. *(L2, stable)*
+
+## Temporal / kernel foundations
+
+- [Kernel](kernel.qmd) — lag-dependent weighting in a temporal linear operator. *(L1, stable)*
+- [Convolution](convolution.qmd) — lag-weighted combination of a signal and kernel. *(L2, stable)*
+- [Deconvolution](deconvolution.qmd) — noise-sensitive inversion of a convolutional observation model. *(L2, stable)*
+
+## Geometry foundations
+
+- [Ambient Dimension](ambient-dimension.qmd) — dimension of the surrounding representation space. *(L1, stable)*
+- [Intrinsic Dimension](intrinsic-dimension.qmd) — degrees of freedom under a declared model, scale, and criterion. *(L1, stable)*
+- [Linear Subspace](linear-subspace.qmd) — a subset closed under linear combinations. *(L1, stable)*
+- [Embedding](embedding.qmd) — an injective structure-preserving representation into another space. *(L1, stable)*
+- [Manifold](manifold.qmd) — a locally Euclidean space with compatible smooth charts. *(L1, stable)*
+- [Tangent Space](tangent-space.qmd) — the local vector space of first-order directions at a point. *(L2, stable)*
+- [Metric](metric.qmd) — a point-to-point distance satisfying the metric axioms. *(L2, stable)*
+- [Geodesic](geodesic.qmd) — a locally straight zero-acceleration curve under chosen geometry. *(L2, stable)*
+- [Riemannian Metric](riemannian-metric.qmd) — a smooth field of tangent-space inner products. *(L2, stable)*
+- [Curvature](curvature.qmd) — departure from flat geometry under a declared curvature notion. *(L2, stable)*
+- [Topology](topology.qmd) — neighborhood and continuity structure defined by open sets. *(L1, stable)*
+- [Circle / S¹](circle-s1.qmd) — one periodic coordinate with circular topology. *(L1, stable)*
+- [Torus](torus.qmd) — the product of two circles or two periodic coordinates. *(L1, stable)*
+- [Latent Trajectory](latent-trajectory.qmd) — a time-indexed latent random path, its posterior law, or a declared realization/summary. *(L2, stable)*
+- [Dynamics on Manifolds](dynamics-on-manifolds.qmd) — tangent vector fields and flows constrained to a manifold. *(L2, stable)*

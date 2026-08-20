@@ -1,0 +1,211 @@
+---
+title: "Dynamics on Manifolds"
+object_type: concept
+maturity: L2
+status: stable
+domain: [dynamics, geometry]
+tags: [manifold-dynamics, tangent-vector-field, constrained-dynamics]
+prerequisites:
+- knowledge/concepts/flow.qmd
+- knowledge/concepts/manifold.qmd
+- knowledge/concepts/tangent-space.qmd
+related:
+- knowledge/concepts/vector-field.qmd
+- knowledge/concepts/riemannian-metric.qmd
+- knowledge/concepts/geodesic.qmd
+- knowledge/concepts/embedding.qmd
+created: 2026-08-18
+updated: 2026-08-18
+---
+
+# Dynamics on Manifolds
+
+## One-sentence definition
+
+**Dynamics on a manifold** evolve states within a manifold using a rule whose instantaneous vectors lie in the appropriate tangent spaces.
+
+## Why this concept matters
+
+Many systems have constrained or non-Euclidean state spaces. Manifold dynamics make those constraints part of the state description rather than relying on ambient coordinates that may leave the admissible space.
+
+## Intuition
+
+For motion constrained to a sphere, the instantaneous velocity must be tangent to the sphere. A vector pointing radially outward would leave the state space.
+
+## Formal definition
+
+Let $M$ be a smooth manifold. An autonomous vector field is a smooth section
+
+$$
+X:M\to TM,
+\qquad
+X(p)\in T_pM.
+$$
+
+An integral curve is a smooth map $\gamma:I\to M$ satisfying intrinsically
+
+$$
+\dot\gamma(t)=X(\gamma(t)).
+$$
+
+In a chart $x=(x^1,\ldots,x^n)$ with
+
+$$
+X=X^i(x)\frac{\partial}{\partial x^i},
+$$
+
+the integral-curve equation becomes
+
+$$
+\dot x^i(t)=X^i(x(t)).
+$$
+
+A smooth vector field therefore supplies ordinary differential equations in each chart, with compatible expressions on overlaps.
+
+### Local flow and supported composition
+
+Under the standard local existence and uniqueness assumptions, integral curves define a smooth local flow
+
+$$
+\Phi:\mathcal D\subseteq\mathbb R\times M\to M,
+$$
+
+where $\mathcal D$ is an open supported domain containing $\{0\}\times M$. It satisfies
+
+$$
+\Phi(0,p)=p,
+$$
+
+and
+
+$$
+\Phi(t+s,p)=\Phi(t,\Phi(s,p))
+$$
+
+whenever both sides are supported. Completeness is the additional condition $\mathcal D=\mathbb R\times M$; tangency and smoothness alone do not imply it [@Mrowka2004, sec. 20.1; @Teschl2012, ch. 6].
+
+### Chart covariance
+
+If $y=h(x)$ is a smooth coordinate change, the vector-field components transform by
+
+$$
+Y^a(y)
+=
+\frac{\partial h^a}{\partial x^i}(x)X^i(x),
+\qquad x=h^{-1}(y).
+$$
+
+Thus coordinate formulas can look different while representing the same intrinsic vector field and integral curves. A non-invertible projection or learned representation does not automatically preserve the vector field.
+
+### Embedded constraints and tangency
+
+Suppose an embedded state manifold is a regular level set
+
+$$
+M=\{q\in\mathbb R^D:c(q)=0\},
+$$
+
+where $c:\mathbb R^D\to\mathbb R^r$ is smooth and $Dc_q$ has full rank on $M$. Then
+
+$$
+T_qM=\ker Dc_q.
+$$
+
+An ambient vector field $F:\mathbb R^D\to\mathbb R^D$ is tangent along $M$ when
+
+$$
+Dc_qF(q)=0,
+\qquad q\in M.
+$$
+
+Under local uniqueness, restricting such a smooth tangent field to $M$ produces manifold-valued integral curves. The algebraic constraint and tangency condition do not by themselves establish global existence, boundary viability, numerical preservation, or adequacy of $M$ as the real state space.
+
+### Numerical projection and retraction
+
+An ambient numerical update such as
+
+$$
+q_{n+1}=\Pi_M(q_n+hF(q_n))
+$$
+
+or a retraction update
+
+$$
+q_{n+1}=R_{q_n}(hX(q_n))
+$$
+
+can keep iterates on or near $M$. These are discretization schemes, not the exact flow $\Phi_h$. Projection/retraction choice can alter the dynamics; consistency, order, constraint error, invariant preservation, and convergence must be evaluated. A plotted constraint-preserving trajectory does not prove that the numerical map approximates the intended intrinsic vector field.
+
+### Additional geometric structures
+
+A manifold and tangent vector field define dynamics without a metric. A Riemannian metric can define gradient dynamics $X=-\operatorname{grad}_gV$ or other metric-dependent rules. Geodesic motion is a special second-order/connection-governed evolution, not a generic first-order vector field. Hamiltonian dynamics requires symplectic or Poisson structure, not merely a Riemannian metric. Each adjective adds assumptions and conserved/variational structure that must be declared.
+
+## Core notation
+
+- $M$: state manifold.
+- $T_pM$: tangent space.
+- $X\in\Gamma(TM)$: smooth tangent vector field/section.
+- $\gamma(t)\in M$: integral curve.
+- $\mathcal D\subseteq\mathbb R\times M$: local flow domain.
+- $\Phi_t:D_t\to M$: fixed-time local flow map; $D_t=M$ only under the relevant global-existence condition.
+- $c(q)=0$: embedded regular-level constraint.
+- $Dc_qF(q)=0$: ambient tangency condition.
+- $\Pi_M,R_q$: projection and retraction used by numerical updates.
+
+## Prerequisites
+
+[Flow](flow.qmd) supplies finite-time evolution. [Manifold](manifold.qmd) supplies the state space. [Tangent Space](tangent-space.qmd) supplies admissible instantaneous directions.
+
+## Relationship to adjacent concepts
+
+| Concept | Distinction |
+|---|---|
+| **Dynamics in ambient coordinates** | Represents manifold dynamics only when the field is tangent and the ambient coordinates/constraints correctly represent the state manifold. |
+| **Projected/retracted integrator** | A numerical map designed to respect constraints; it is not the exact local flow and requires consistency/error analysis. |
+| **Gradient dynamics** | Uses a declared Riemannian metric and objective to define $-\operatorname{grad}_gV$. |
+| **Hamiltonian dynamics** | Uses symplectic or Poisson structure and is not implied by manifold or Riemannian structure alone. |
+| **Riemannian dynamics** | Uses a chosen Riemannian metric; a tangent vector field alone does not require one. |
+| **Geodesic motion** | A special geometry-governed evolution, not every manifold trajectory. |
+| **Manifold learning** | Estimates representations from data; it does not automatically identify a vector field or flow. |
+
+## What this does NOT imply
+
+Dynamics on a manifold do not imply geodesic motion, known metric or curvature, global existence, Hamiltonian or gradient structure, low-dimensional truth, identifiable coordinates, numerical invariant preservation, or that a curved embedding reveals the generator. Tangency in an assumed embedding does not empirically prove the manifold or shared vector field.
+
+## Minimal example
+
+On $S^1$, the vector field $\dot\theta=\omega$ generates constant angular motion. In the embedding $(x,y)=(\cos\theta,\sin\theta)$, the velocity $(-\omega y,\omega x)$ is tangent to the circle.
+
+## Neuroscience / behavioral relevance
+
+Circular head direction, orientation, or joint periodic latent states may motivate manifold-constrained dynamics. Evidence must separately support the state topology and the dynamical rule.
+
+## Relevance to LDG
+
+At L2, Dynamics on Manifolds completes the spine by connecting intrinsic vector fields, chart equations, local flows, embedded tangency constraints, and numerical representations without collapsing manifold evidence, geometry, and dynamical recovery into one claim.
+
+## Open questions
+
+- How can tangent dynamics be recovered from noisy off-manifold observations?
+- Which manifold constraints improve out-of-sample prediction?
+- When do metric or curvature assumptions add value beyond tangent dynamics?
+
+## References
+
+- Teschl provides the inspected autonomous vector-field, integral-curve, and supported-flow framework [@Teschl2012, ch. 6].
+- Mrowka provides the inspected manifold vector-field/local-flow and differential framework [@Mrowka2004, secs. 5, 7.2, 20.1].
+- Lee provides the inspected tangent/embedded-submanifold and Riemannian structures used to delimit special cases [@Lee1997, chs. 2–3].
+- Numerical manifold integrators, geometric mechanics, constraint algorithms, and empirical recovery methods are intentionally deferred.
+
+## Maturity checklist
+
+- [x] Requires vector fields to be tangent to the state manifold.
+- [x] Separates manifold dynamics, Riemannian geometry, geodesics, and manifold learning.
+- [x] Includes a circle dynamics example.
+- [x] Types vector fields as smooth sections and integral curves intrinsically and in charts.
+- [x] States local flow domain, identity, supported composition, and completeness boundary.
+- [x] States chart covariance and embedded regular-level-set tangency conditions.
+- [x] Separates projection/retraction numerical updates from the exact flow.
+- [x] Distinguishes general manifold dynamics from geodesic, gradient, Hamiltonian, Riemannian, and manifold-learning claims.
+- [x] Requires separate empirical evidence for manifold structure and tangent dynamics.
+- [x] Independent L2 scientific review completed with PASS under the recorded review decision.

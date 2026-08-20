@@ -1,0 +1,187 @@
+---
+title: "Convolution"
+object_type: concept
+maturity: L2
+status: stable
+domain: [temporal-modeling, linear-systems]
+tags: [convolution, filtering, impulse-response]
+prerequisites:
+- knowledge/concepts/kernel.qmd
+related:
+- knowledge/concepts/input-driven-dynamics.qmd
+- knowledge/concepts/linear-dynamical-system.qmd
+created: 2026-08-18
+updated: 2026-08-18
+---
+
+# Convolution
+
+## One-sentence definition
+
+**Convolution** combines a signal with a shifted kernel by summing or integrating lag-weighted contributions to produce an output.
+
+## Why this concept matters
+
+Convolution is the canonical input-output operation for linear time-invariant filters. It provides a fixed-kernel baseline against which latent state dynamics can be compared.
+
+## Intuition
+
+At each output time, align the kernel with the input history, multiply overlapping values, and add them. The kernel determines which lags matter and with what sign.
+
+## Formal definition
+
+For scalar functions $k,u:\mathbb R\to\mathbb R$, continuous convolution is
+
+$$
+(k*u)(t)
+=
+\int_{-\infty}^{\infty}k(\tau)u(t-\tau)\,d\tau,
+$$
+
+at times for which the integral exists. A common sufficient condition is $k\in L^1(\mathbb R)$ with bounded $u$; other $L^p$ conditions are possible and must be declared. Compact support is useful only together with sufficient local integrability or boundedness; support alone does not guarantee the integral exists.
+
+For sequences $k=(k_m)$ and $u=(u_m)$,
+
+$$
+(k*u)_n
+=
+\sum_{m\in\mathbb Z}k_m u_{n-m},
+$$
+
+when the series converges. Absolute summability of one sequence together with boundedness of the other is one sufficient condition; finite-support sequences give a finite sum.
+
+### Algebraic properties
+
+For scalar functions or sequences, when all required integrals/sums exist and rearrangement is justified,
+
+$$
+k*u=u*k,
+$$
+
+$$
+(k_1*k_2)*u=k_1*(k_2*u),
+$$
+
+and convolution is distributive and linear in each argument. These identities require compatible domains and convergence conditions. Matrix multiplication is not commutative, so analogous matrix-valued operations must retain order.
+
+### Vector and matrix-valued kernels
+
+For input $u(t)\in\mathbb R^m$, output $y(t)\in\mathbb R^q$, and kernel $H(\tau)\in\mathbb R^{q\times m}$,
+
+$$
+y(t)
+=
+\int H(\tau)u(t-\tau)\,d\tau
+$$
+
+is dimensionally well typed. Each output channel is a sum of convolutions of input channels with the corresponding scalar kernel entries. The expression $u*H$ is not generally an interchangeable commutative form because vector/matrix multiplication order and dimensions matter.
+
+### Causal LTI response
+
+For a causal LTI system initialized at $t_0$ with zero initial state and no direct feedthrough, the output has the zero-state response
+
+$$
+y_{\mathrm{zs}}(t)
+=
+\int_{t_0}^{t}H(t-s)u(s)\,ds
+=
+\int_{0}^{t-t_0}H(\tau)u(t-\tau)\,d\tau.
+$$
+
+Causality is represented by $H(\tau)=0$ for $\tau<0$. The full state-space output can additionally contain an initial-condition response and direct feedthrough:
+
+$$
+y(t)
+=
+Ce^{A(t-t_0)}x(t_0)
++
+\int_{t_0}^{t}Ce^{A(t-s)}Bu(s)\,ds
++
+Du(t).
+$$
+
+Thus $H(\tau)=Ce^{A\tau}B$ for $\tau>0$ gives the ordinary zero-state kernel. The term $Du(t)$ must be kept separate or represented by a generalized impulse contribution $D\delta(\tau)$; it is not an ordinary function-valued lag kernel [@AstromMurray2021, sec. 6.3].
+
+### Correlation and implementation
+
+::: {.callout-note title="Established Mathematical / Computational Background"}
+Under one common convention, cross-correlation is
+
+$$
+(r_{ku})(t)=\int \overline{k(\tau)}u(\tau+t)\,d\tau,
+$$
+
+so it compares shifted alignment rather than applying the same reversal convention as convolution. Conventions vary, especially for complex signals, and must be stated.
+
+Finite recorded arrays require boundary choices such as zero padding, periodic extension, reflection, truncation, or reporting only valid overlaps. Circular convolution produced by a discrete Fourier transform is not the same as linear convolution unless padding and indexing are chosen accordingly. FFT multiplication is an implementation of convolution under stated transform/boundary conventions, not the definition of convolution.
+:::
+
+## Core notation
+
+- $k$: scalar kernel or impulse response.
+- $H(\tau)\in\mathbb R^{q\times m}$: matrix-valued kernel.
+- $u(t)\in\mathbb R^m$: input signal.
+- $y(t)\in\mathbb R^q$: convolved output.
+- $y_{\mathrm{zs}}$: zero-state response.
+- $\tau$ or $m$: lag variable.
+
+## Prerequisites
+
+[Kernel](kernel.qmd) defines the lag-dependent weighting function.
+
+## Relationship to adjacent concepts
+
+| Concept | Distinction |
+|---|---|
+| **Correlation** | Compares shifted alignment under a declared conjugation/reversal convention; it is not automatically the same operation as convolution. |
+| **Circular convolution** | Uses periodic indexing, as in an unpadded DFT implementation. Linear convolution requires appropriate padding or another boundary convention. |
+| **FFT multiplication** | A computational method under transform and boundary assumptions, not the mathematical definition. |
+| **Filtering** | A broader operation; LTI filtering is represented by convolution. |
+| **Kernel** | The weighting function; convolution is the operation using it. |
+| **State-space response** | May include initial-state response and direct feedthrough in addition to the zero-state convolution term. |
+| **Smoothing** | One possible effect of particular kernels. Convolution kernels can also differentiate, delay, oscillate, or amplify. |
+
+## What this does NOT imply
+
+Convolution does not imply causality, finite memory, invertibility, a known kernel, smoothing, stable dynamics, a particular boundary convention, linear biological mechanism, or that all time dependence is captured by a fixed filter. Algebraic identities do not apply when the relevant sums/integrals diverge or dimensions are incompatible.
+
+## Minimal example
+
+With discrete kernel $k=(1/2,1/2)$,
+
+$$
+y_n=\tfrac12u_n+\tfrac12u_{n-1},
+$$
+
+so the output averages the current and previous inputs. This smoothing loses some rapidly varying information.
+
+## Neuroscience / behavioral relevance
+
+Convolution appears in temporal receptive fields, sensor responses, smoothing, and hemodynamic models. Predictive success of a convolutional model does not establish hidden recurrent dynamics.
+
+## Relevance to LDG
+
+At L2, Convolution gives LDG explicit existence, dimensional, algebraic, causal, initial-condition, and direct-feedthrough boundaries for the fixed-kernel alternative before deconvolution or more complex latent temporal models.
+
+## Open questions
+
+- When is time invariance defensible?
+- How should boundary conditions and irregular sampling be handled?
+- Which kernels are distinguishable from available inputs?
+
+## References
+
+- Åström and Murray provide the inspected LTI initial-condition, zero-state convolution, impulse-response, and direct-feedthrough formulations [@AstromMurray2021, sec. 6.3]. Section numbering was checked against the inspected 24 July 2020 electronic second-edition manuscript corresponding to the published edition.
+- Transform theorems, distribution theory, FFT algorithms, and numerical boundary-analysis proofs are intentionally deferred.
+
+## Maturity checklist
+
+- [x] Defines continuous and discrete convolution.
+- [x] Separates kernel, operation, correlation, and full state-space response.
+- [x] States causality and mechanism non-implications.
+- [x] Types continuous and discrete convolution with explicit sufficient existence conditions.
+- [x] Conditions commutativity, associativity, and linearity on convergence and dimensional compatibility.
+- [x] Types matrix-valued kernels and distinguishes scalar commutativity.
+- [x] Separates causal LTI zero-state response, initial-condition response, and direct feedthrough.
+- [x] Separates convolution from correlation, smoothing, finite-window conventions, and FFT implementation.
+- [x] Independent L2 scientific review completed with PASS under the recorded review decision.

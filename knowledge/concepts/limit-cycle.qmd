@@ -1,0 +1,200 @@
+---
+title: "Limit Cycle"
+object_type: concept
+maturity: L2
+status: stable
+domain:
+- dynamics
+tags:
+- limit-cycle
+- periodic-orbit
+- oscillation
+prerequisites:
+- knowledge/concepts/attractor.qmd
+- knowledge/concepts/trajectory.qmd
+related:
+- knowledge/concepts/flow.qmd
+- knowledge/concepts/stability.qmd
+- knowledge/concepts/fixed-point.qmd
+- knowledge/concepts/input-driven-dynamics.qmd
+- knowledge/concepts/metric.qmd
+created: 2026-08-18
+updated: 2026-08-18
+---
+
+# Limit Cycle
+
+## One-sentence definition
+
+A **limit cycle** is an isolated periodic orbit of a continuous-time dynamical system, with its stability behavior qualified separately.
+
+## Why this concept matters
+
+Limit cycles model self-sustained oscillation: the system repeats a closed orbit without requiring the state to remain fixed. They must be distinguished from a sinusoidal-looking observation, a forced periodic response, and a family of non-isolated periodic orbits.
+
+Terminology varies. Some sources use “limit cycle” specifically for an attracting periodic orbit. LDG adopts the broader isolated-periodic-orbit convention and always qualifies its stability; Teschl discusses attracting periodic orbits under the limit-cycle label [@Teschl2012, sec. 7.3].
+
+## Intuition
+
+Imagine trajectories spiraling toward the same closed loop. Once on the loop, the state continues moving and returns after each period. The loop, not any one point on it, is the recurring dynamical object.
+
+## Formal definition
+
+Let $\phi_t$ be a two-sided flow and let $x_0$ be a regular point. The trajectory through $x_0$ is periodic when there exists $T>0$ such that
+
+$$
+\phi_T(x_0)=x_0,
+\qquad
+\phi_{t+T}(x_0)=\phi_t(x_0).
+$$
+
+The **fundamental period** $T_0$ is the least positive return time. The corresponding periodic orbit is the invariant set
+
+$$
+\Gamma
+=
+\{\phi_t(x_0):0\le t<T_0\}.
+$$
+
+All points on $\Gamma$ describe the same orbit with different phase origins. Teschl distinguishes this regular positive-period orbit from a fixed orbit, whose state does not move [@Teschl2012, sec. 6.3].
+
+### Adopted limit-cycle convention
+
+**LDG convention:** a limit cycle is an **isolated regular periodic orbit**. Isolation means there is a neighborhood of $\Gamma$ containing no other periodic orbit. This convention includes attracting, repelling, semistable, and more general transverse behaviors; each must be qualified separately. Some sources, including portions of Teschl, use “limit cycle” more narrowly for an attracting periodic orbit [@Teschl2012, sec. 7.3].
+
+### Orbital stability and attraction
+
+The cycle is **orbitally attracting** when its basin
+
+$$
+B^+(\Gamma)
+=
+\{x:[0,\infty)\subseteq I_x,\ d(\phi_t(x),\Gamma)\to0\}
+$$
+
+contains a neighborhood of $\Gamma$. Equivalently, every sufficiently nearby state has a forward-complete trajectory and
+
+$$
+\lim_{t\to\infty}d(\phi_t(x),\Gamma)=0.
+$$
+
+This is convergence to the orbit as a set, not synchronization to the reference point $x_0$ or to one prescribed phase. Motion tangent to the cycle supplies a neutral phase direction; attraction concerns transverse deviations.
+
+The cycle is **orbitally Lyapunov stable** when every neighborhood of $\Gamma$ contains a smaller neighborhood whose forward trajectories remain in the larger one. It is **asymptotically orbitally stable** when it is both orbitally stable and attracting. A repelling cycle attracts in backward time. A semistable cycle can attract from one side and repel from another.
+
+::: {.callout-tip title="LDG Synthesis"}
+In dimensions above two, the transverse return dynamics can contain both contracting and expanding directions, so attracting, repelling, and semistable are not an exhaustive taxonomy. Full hyperbolic and Floquet classifications are deferred.
+:::
+
+Under the adopted [Attractor](attractor.qmd) convention, an attracting periodic orbit is an attractor: it is closed and invariant, has a neighborhood basin, and the flow restricted to the orbit is transitive. A non-attracting isolated periodic orbit remains a limit cycle under the broader LDG convention but is not thereby an attractor.
+
+### Poincaré return map
+
+Choose a local codimension-one section $\Sigma$ transverse to the vector field near $p\in\Gamma$. When nearby trajectories return to the section, the Poincaré map has the form
+
+$$
+P_\Sigma(y)=\phi_{\tau(y)}(y),
+$$
+
+where $\tau(y)$ is the local first-return time. The cycle intersects $\Sigma$ at a fixed point of $P_\Sigma$, and nearby return-map fixed points correspond locally to nearby periodic orbits under the stated construction. This reduces a local orbital question to a fixed-point question on the transverse section [@Teschl2012, secs. 6.4, 10.2]. Existence of the section/return time, derivative criteria, Floquet multipliers, and stability proofs are deferred.
+
+### Autonomous and forced periodicity
+
+A periodic response to an external periodic input is not automatically an autonomous limit cycle of the original state variables. It may be a forced response whose timing is locked to the input. One can sometimes create an autonomous augmented system by adding the forcing phase as a state, but that changes the state space and the dynamical claim.
+
+## Core notation
+
+- $\Gamma$: the closed periodic orbit as a set.
+- $x_0$: one reference point on the orbit.
+- $T_0>0$: the least positive or fundamental period.
+- $\Sigma$: local transverse Poincaré section.
+- $P_\Sigma$: local return map.
+- $\tau(y)$: local return time to $\Sigma$.
+- $I_x$: supported elapsed-time interval through $x$.
+- $B^+(\Gamma)$: forward basin of the periodic orbit.
+- $\phi_t$: the flow.
+- $d(\phi_t(x),\Gamma)$: distance of a nearby trajectory from the orbit.
+
+## Prerequisites
+
+[Trajectory](trajectory.qmd) defines one time-indexed evolution. [Attractor](attractor.qmd) distinguishes attracting cycles from periodic orbits with other behavior. [Flow](flow.qmd) supplies the evolution and supported-time structure.
+
+**Assumed background:** local transverse sections. Their existence and smoothness proofs are deferred.
+
+## Relationship to adjacent concepts
+
+| Concept | Distinction |
+|---|---|
+| **Periodic orbit** | Every limit cycle is periodic under the LDG convention, but isolation is additionally required. |
+| **Non-isolated periodic family** | A center can contain a continuum of concentric periodic orbits; none is a limit cycle under the isolation-based LDG convention. |
+| **Attractor** | An orbitally attracting limit cycle satisfies the adopted attractor convention; isolation alone does not. |
+| **Orbital stability** | Controls distance to the orbit as a set. It does not require convergence to one reference phase. |
+| **Poincaré-map fixed point** | Represents the periodic orbit on a transverse section; it is not a fixed state of the continuous flow. |
+| **Fixed point** | A fixed point is constant. A limit cycle contains continuing motion and has positive period. |
+| **Forced oscillation** | Periodicity caused by an external periodic input need not be an autonomous limit cycle. |
+| **Oscillatory observation** | A measured scalar can oscillate while the underlying state is not on a limit cycle, and a limit cycle can project to a non-sinusoidal signal. |
+
+## What this does NOT imply
+
+A limit cycle does **not** imply:
+
+- sinusoidal motion or a circular orbit;
+- attraction unless stability is specified;
+- that every nearby trajectory shares or converges to the same phase;
+- that a periodic-looking finite trace is generated autonomously;
+- that observed frequency alone identifies the state-space orbit;
+- absence of noise, inputs, transient dynamics, or multiple cycles;
+- that a spectral peak or autocorrelation peak identifies a closed state-space orbit;
+- that a closed projected curve is closed in the complete state space; or
+- that a periodic forced response persists without the forcing signal.
+
+## Minimal example
+
+In polar coordinates,
+
+$$
+\dot r=r(1-r),\qquad \dot\theta=1,
+$$
+
+the orbit $\Gamma=\{r=1\}$ has fundamental period $2\pi$. For every initial condition with $r_0>0$,
+
+$$
+r(t)\to1,
+$$
+
+so the distance to $\Gamma$ tends to zero. The limiting phase depends on the initial phase and elapsed time; attraction does not select one point of the cycle. The origin is a separate fixed point.
+
+If instead a measured signal oscillates because an external sinusoidal input drives a non-oscillatory system, the observation can be periodic without an autonomous limit cycle in the original state space.
+
+## Neuroscience / behavioral relevance
+
+Limit-cycle hypotheses can describe rhythmic neural population activity, locomotor patterns, or repetitive movements. They require a state-space recurrence claim, not only a spectral peak or repeated peaks in one measured channel.
+
+## Relevance to LDG
+
+At L2, Limit Cycle gives LDG a typed bridge among periodic trajectories, invariant orbits, transverse attraction, attractors, and Poincaré fixed points. It prevents phase neutrality, frequency-domain evidence, or forced periodic responses from being overinterpreted as autonomous state-space dynamics.
+
+## Open questions
+
+- How can one distinguish a noisy limit cycle from a driven oscillator?
+- Which coordinates preserve phase and amplitude interpretations?
+- What interventions reveal attraction toward the orbit?
+
+## References
+
+- Teschl defines periodic points, fundamental periods, periodic orbits, and the Poincaré return map [@Teschl2012, secs. 6.3–6.4].
+- Teschl discusses isolated and attracting periodic orbits under limit-cycle terminology [@Teschl2012, sec. 7.3].
+- Floquet, return-map derivative, and orbital-stability theorems are intentionally deferred.
+
+## Maturity checklist
+
+- [x] Defines period, orbit, and isolation.
+- [x] States the LDG terminology convention.
+- [x] Separates periodicity from attraction and external forcing.
+- [x] Includes a minimal attracting-cycle example.
+- [x] Distinguishes periodic trajectory, orbit set, fundamental period, and isolation.
+- [x] Defines orbital attraction through distance to the orbit and preserves phase neutrality.
+- [x] Separates attracting, repelling, semistable, and mixed transverse behavior.
+- [x] States the bounded Poincaré-map relationship and defers Floquet theory.
+- [x] Separates autonomous limit cycles from forced periodic responses and observed oscillations.
+- [x] Independent L2 scientific review completed with PASS under the recorded review decision.

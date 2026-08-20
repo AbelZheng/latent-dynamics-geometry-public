@@ -1,0 +1,382 @@
+---
+title: "Bounded Autoencoder Baseline"
+object_type: method
+maturity: L2
+status: stable
+domain: [dimensionality-reduction, neural-networks, representation-learning]
+tags: [autoencoder, bottleneck, reconstruction, nonlinear-baseline]
+prerequisites:
+- knowledge/methods/principal-component-analysis.qmd
+- knowledge/methods/factor-analysis.qmd
+- knowledge/concepts/latent-variable.qmd
+related:
+- knowledge/concepts/embedding.qmd
+- knowledge/concepts/identifiability.qmd
+- knowledge/concepts/intrinsic-dimension.qmd
+created: 2026-08-19
+updated: 2026-08-19
+---
+
+# Bounded Autoencoder Baseline
+
+## Problem
+
+A bounded autoencoder learns a deterministic feed-forward map from an observation to a fixed-width bottleneck and back to the observation space. Its purpose in LDG is modest: test whether a prespecified finite nonlinear encoder--decoder architecture improves held-out reconstruction over linear baselines under the same preprocessing and loss.
+
+The bounded method excludes variational autoencoders, stochastic latent-variable models, recurrent or sequence autoencoders, dynamical autoencoders, contrastive objectives, denoising training, sparse or contractive penalties, and broad generative-model claims. Those are related families with different objectives and assumptions, not silent extensions of this baseline.
+
+## Input
+
+Let $x_1,\ldots,x_n\in\mathbb R^p$ be observations. The data definition must state whether a row is a trial, subject, session, time point, condition average, trajectory window or another unit. Fit training preprocessing parameters only on the training split. With training mean $\mu$ and a declared nonsingular diagonal scaling matrix $S$, define
+
+$$
+u_i=S^{-1}(x_i-\mu).
+$$
+
+A reproducible bounded autoencoder must declare before test evaluation:
+
+- the training, validation and test split units;
+- missing-data and exclusion policies;
+- centering, scaling and any feature transforms;
+- bottleneck width $d<p$;
+- the exact finite encoder and decoder layer widths;
+- activation functions, output activation and the presence or absence of biases;
+- the absence of skip connections that bypass the bottleneck;
+- parameter initialization, optimizer, learning-rate schedule and batch size;
+- maximum epochs, validation metric, early-stopping rule and checkpoint selection;
+- weight decay or other permitted ordinary training regularization; and
+- the number of random initializations and model-selection rule.
+
+The core loss is mean squared reconstruction error in the transformed coordinates. If features require another loss because of their support or scientific meaning, that defines another bounded variant and must be compared separately rather than called the same MSE baseline.
+
+## Output
+
+For a fitted parameter pair $(\hat\theta,\hat\phi)$, the method returns:
+
+- an encoder
+  $$
+  f_{\hat\theta}:\mathbb R^p\to\mathbb R^d;
+  $$
+- a bottleneck code
+  $$
+  z=f_{\hat\theta}(u);
+  $$
+- a decoder
+  $$
+  g_{\hat\phi}:\mathbb R^d\to\mathbb R^p;
+  $$
+- a transformed-coordinate reconstruction
+  $$
+  \widehat u=g_{\hat\phi}(f_{\hat\theta}(u));
+  $$
+- and an original-unit reconstruction
+  $$
+  \widehat x=\mu+S\widehat u.
+  $$
+
+The code $z$ is a learned deterministic feature vector. Calling it “latent” describes its internal unobserved role in the network; it does not make it a posterior latent variable, unique hidden cause or dynamical state.
+
+## Core idea
+
+Train the composition
+
+$$
+h_{\theta,\phi}=g_\phi\circ f_\theta
+$$
+
+to approximate the identity map on the training distribution while forcing all information through an undercomplete bottleneck. Auto-associative networks and nonlinear principal-component constructions use this identity-target arrangement to learn compact internal representations [@BourlardKamp1988; @Kramer1991].
+
+Compression alone does not guarantee useful structure. A sufficiently expressive encoder and decoder can memorize a finite training set even through a narrow code, and an overcomplete or bypassed architecture can learn an identity map without meaningful reduction. Capacity, validation and explicit baselines are therefore part of the scientific method, not merely implementation details [@GoodfellowBengioCourville2016, chap. 14].
+
+## Generative / modeling assumptions
+
+This autoencoder is not a probabilistic generative model. It specifies no prior $p(z)$, observation likelihood $p(x\mid z)$, posterior, observation-noise covariance or sampling procedure. Its assumptions are approximation and training choices:
+
+- the fixed network class contains a useful encoder--decoder composition;
+- MSE in the transformed feature coordinates reflects the reconstruction errors that matter;
+- the training and evaluation samples represent the intended deployment distributions;
+- the bottleneck and finite architecture constrain the fit enough to generalize;
+- the optimizer and initialization can find a useful solution; and
+- validation-based stopping and hyperparameter selection control overfitting adequately for the declared sample size.
+
+A nonlinear autoencoder can fit a curved reconstruction map, but that fit is not evidence that the data-generating support is a smooth manifold or that the bottleneck is an intrinsic coordinate chart.
+
+## Mathematical formulation
+
+### Encoder and decoder
+
+For a fixed feed-forward architecture with $L_e$ encoder layers and $L_d$ decoder layers, write schematically
+
+$$
+f_\theta(u)
+=
+\rho_{L_e}\!\left(
+W^{(e)}_{L_e}
+\rho_{L_e-1}(\cdots \rho_1(W^{(e)}_1u+b^{(e)}_1)\cdots)
++b^{(e)}_{L_e}
+\right),
+$$
+
+and similarly
+
+$$
+g_\phi(z)
+=
+\eta_{L_d}\!\left(
+W^{(d)}_{L_d}
+\eta_{L_d-1}(\cdots \eta_1(W^{(d)}_1z+b^{(d)}_1)\cdots)
++b^{(d)}_{L_d}
+\right).
+$$
+
+The bottleneck output dimension is exactly $d$. Hidden activation functions and the output activation are fixed architecture choices. For unconstrained real-valued standardized features, a linear output layer is the ordinary MSE choice; bounded output activations change the representable range and should match declared preprocessing.
+
+### Empirical risk
+
+Let $I_{\mathrm{tr}}$ index training observations. The bounded objective is
+
+$$
+\widehat R_{\mathrm{tr}}(\theta,\phi)
+=
+\frac{1}{|I_{\mathrm{tr}}|}
+\sum_{i\in I_{\mathrm{tr}}}
+\left\lVert
+u_i-g_\phi(f_\theta(u_i))
+\right\rVert_2^2
++
+\lambda_e\Omega_e(\theta)
++
+\lambda_d\Omega_d(\phi),
+$$
+
+where ordinary weight decay may be used through declared penalties $\Omega_e,\Omega_d$; setting both coefficients to zero is allowed. Sparsity, denoising, contractive, adversarial, contrastive or probabilistic terms are outside this bounded objective.
+
+Training returns an optimizer-dependent candidate rather than a guaranteed global minimizer. Validation loss selects the epoch and any architecture, bottleneck, regularization or optimization hyperparameters. The untouched test set is used once for final comparison.
+
+### Linear-autoencoder boundary
+
+If the encoder and decoder are linear, biases are handled consistently with centering, the bottleneck has width $d$, and squared reconstruction error is optimized globally, the composite rank-$d$ map recovers the principal PCA subspace under the ordinary centered equal-weight Euclidean formulation. The individual encoder and decoder matrices need not equal the PCA loading matrix and are not unique; it is the reconstructed subspace or composite map that has the PCA relationship [@BourlardKamp1988; @BaldiHornik1989].
+
+Nonlinear activations remove this closed-form equivalence and introduce nonconvex optimization. A nonlinear autoencoder should therefore be compared both with analytic PCA and with an architecture-matched linear autoencoder. Failure of the trained linear network to approach PCA performance is an implementation or optimization warning, not evidence against PCA.
+
+## What is learned?
+
+The training procedure learns all declared encoder and decoder weights and biases, producing a composite reconstruction map and bottleneck codes for supplied observations. If validation selects among candidates, it also selects one epoch, seed or hyperparameter configuration under the declared rule.
+
+It does not learn a probability distribution, intrinsic dimension, transition model, vector field, causal graph, physical measurement process or unique latent coordinate system.
+
+## What is fixed?
+
+The analyst fixes the observation and feature definitions, preprocessing family, split units, architecture search space or single architecture, bottleneck candidates, activations, loss, regularization family, optimizer family, seed count, training budget, early-stopping rule, selection metric and baselines. Validation may choose only among these predeclared candidates.
+
+Parameter count is part of the method. Comparing a high-capacity nonlinear network with a linear baseline without reporting capacity and training budget confounds nonlinearity with flexibility and optimization effort.
+
+## Temporal assumptions
+
+The bounded autoencoder is order-blind. Permuting observation rows leaves the empirical objective unchanged, apart from stochastic minibatch order. If rows are time samples, the network sees a collection of feature vectors but no temporal succession, lag, derivative or transition relation.
+
+Time may be encoded inside each input vector, for example through a fixed window, but then the autoencoder reconstructs that engineered window. It still does not learn dynamics. Recurrent, temporal-convolutional, predictive and sequence-to-sequence autoencoders are explicitly outside scope.
+
+## Geometry assumptions
+
+MSE imposes Euclidean squared reconstruction geometry after the declared scaling $S$. Changing feature units or weights changes which discrepancies dominate. The decoder image
+
+$$
+\{g_{\hat\phi}(z):z\in\mathbb R^d\}
+$$
+
+can be curved, folded, self-intersecting or poorly constrained away from training codes. Neither low reconstruction error nor smooth interpolation proves that this image is a manifold, that the encoder is injective, or that Euclidean distance in code space corresponds to a scientifically meaningful metric.
+
+The term “embedding” should therefore be used only as an algorithmic label unless injectivity and structural preservation are independently supported. A bottleneck map can send distinct observations to the same code and compensate only imperfectly through reconstruction.
+
+## Supervision
+
+No external class or behavioral label enters the core objective. The identity reconstruction target supplies a training target, so the method is often described as unsupervised or self-supervised depending on convention. Label-guided architecture selection, outcome-based component selection or downstream-task tuning adds supervision and must occur inside a leakage-safe validation protocol.
+
+The absence of labels does not make the learned representation objective-free: MSE, architecture, preprocessing, bottleneck and sampling distribution provide strong inductive biases.
+
+## Optimization / inference
+
+Training uses gradient-based empirical-risk minimization with a declared optimizer. For nonlinear networks the objective is nonconvex, so different initializations can produce different losses, reconstructions and code coordinates. Early stopping selects a point on an optimization trajectory using validation data; it is not proof of convergence or global optimality.
+
+Report the optimizer, learning rates, batch size, epoch limit, stopping patience, checkpoint criterion, initialization and seed distribution. Multiple seeds should be treated as repeated candidate fits: selecting the best validation seed is model selection, and test results must not guide that selection.
+
+There is no posterior inference. Encoding a new observation is a deterministic forward pass through $f_{\hat\theta}$.
+
+## Strengths
+
+- It is a direct nonlinear extension of bottleneck reconstruction with an explicit held-out objective.
+- A fixed feed-forward architecture is easy to state, train and compare with PCA.
+- Encoder and decoder maps permit deterministic out-of-sample application without rebuilding a graph.
+- Reconstruction residuals can be inspected in original feature units as well as transformed units.
+- Architecture, capacity and optimization can be stress-tested through matched controls and multiple seeds.
+- It provides a deliberately weak neural baseline before introducing probabilistic, temporal or generative claims.
+
+## Failure modes
+
+- **Memorization:** a flexible network can assign sample-specific codes and reconstruct training observations without learning reusable structure.
+- **Overfitting:** training loss decreases while validation or test loss worsens.
+- **Identity shortcuts:** overcomplete layers, skip connections or preprocessing leakage can permit trivial copying; this bounded method forbids bottleneck-bypassing skips.
+- **Dead units:** saturating or rectified activations can leave bottleneck or hidden units inactive over the data range.
+- **Code collapse:** optimization can map most observations to nearly identical codes, often yielding a mean-like reconstruction and poor retained variation.
+- **Scale dependence:** high-variance or poorly scaled features dominate MSE.
+- **Outlier sensitivity:** squared error can devote capacity to atypical observations.
+- **Optimization instability:** seeds, learning rates, batch order and stopping epochs can change the solution.
+- **Distribution shift:** accurate reconstruction on the training distribution need not generalize across subjects, sessions, conditions or acquisition systems.
+- **Interpolation artifacts:** decoder outputs between observed codes can be implausible even when training reconstructions are accurate.
+- **Noninjective encoding:** distinct inputs can share a code, preventing faithful recovery.
+- **Unused capacity:** some bottleneck coordinates can be constant or redundant; nominal width is not the number of independently used coordinates.
+- **Nuisance preservation:** MSE rewards reconstruction of artifacts and irrelevant variance as readily as scientific signal.
+- **Evaluation leakage:** fitting scaling, architecture, bottleneck, early stopping or seed selection with test observations makes performance optimistic.
+- **Interpretive overreach:** a visually organized code can be mistaken for manifold coordinates, dynamics, mechanism or causal variables.
+
+Kramer explicitly notes the tradeoff between insufficient network capacity and overfitting in nonlinear auto-associative reconstruction [@Kramer1991]. Goodfellow, Bengio and Courville likewise emphasize that copying objectives can learn little about the data distribution when model capacity is too great [@GoodfellowBengioCourville2016, chap. 14].
+
+## Identifiability issues
+
+Autoencoder parameters and codes are generally non-identifiable. If an invertible transformation
+
+$$
+r:\mathbb R^d\to\mathbb R^d
+$$
+
+and its inverse are representable by the chosen network classes on the relevant code set, then
+
+$$
+f'(u)=r(f(u)),
+\qquad
+g'(z')=g(r^{-1}(z'))
+$$
+
+produce the same composite reconstruction. The observed reconstruction objective cannot prefer one such coordinate system without additional constraints.
+
+Finite networks also admit more specific symmetries:
+
+- hidden units can be permuted while compensating in adjacent weight matrices;
+- sign changes can be compensated for compatible odd or linear activations;
+- positive scalings can be moved across positively homogeneous layers such as ReLU layers;
+- redundant or dead units can change parameters without changing the realized map; and
+- equal-function parameterizations can arise from multiple optimization paths.
+
+For a linear autoencoder, the encoder and decoder factors are nonunique even when the principal reconstruction subspace is uniquely determined [@BaldiHornik1989]. For nonlinear autoencoders, the equivalence can extend beyond rotations and scalings to nonlinear bottleneck reparameterizations supported by the architecture.
+
+Consequently, axis names, ordering and Euclidean distances in code space are not intrinsically identified. Alignment across seeds can aid comparison but does not establish unique biological coordinates.
+
+## Comparison with simpler methods
+
+- **Training mean:** reconstruct every observation using the training mean. This is the $d=0$ reference.
+- **PCA:** the required rank-$d$ analytic linear reconstruction baseline using identical training preprocessing and MSE geometry.
+- **Linear autoencoder:** use the same bottleneck and comparable layer layout with identity activations. At a well-optimized global solution it should approach the PCA principal-subspace reconstruction, providing an implementation control.
+- **Factor Analysis:** a static probabilistic latent-variable comparison with a latent distribution, diagonal feature-specific residual covariance, likelihood and conditional latent inference. The deterministic autoencoder has none of these probabilistic quantities and should not inherit their interpretation.
+- **Frozen random encoder:** keep an architecture-matched random encoder fixed and train only a decoder, repeating over seeds. This tests whether learned encoding improves on generic nonlinear features.
+- **Capacity-matched alternatives:** compare declared widths, parameter counts, optimization budgets and regularization rather than attributing every gain to nonlinearity.
+
+An autoencoder that only beats the mean but not PCA has not demonstrated useful nonlinear reconstruction. A nonlinear gain over PCA is evidence about held-out MSE under the tested architecture and distribution, not evidence for a manifold or mechanism.
+
+## Evaluation criteria
+
+A leakage-safe evaluation should include:
+
+1. **Independent split units:** hold out complete trials, trajectories, subjects, sessions or conditions as appropriate. Adjacent time points from one trajectory should not be scattered across folds when dependence matters.
+2. **Training-only preprocessing:** fit centering, scaling, imputation and feature selection inside the training split.
+3. **Validation-only selection:** choose bottleneck, widths, activations, regularization, epoch and seed using validation data, preferably through nested evaluation when many candidates are explored.
+4. **Untouched test reconstruction:** report
+   $$
+   \operatorname{MSE}_{\mathrm{test}}
+   =
+   \frac{1}{|I_{\mathrm{test}}|}
+   \sum_{i\in I_{\mathrm{test}}}
+   \left\lVert
+   u_i-g_{\hat\phi}(f_{\hat\theta}(u_i))
+   \right\rVert_2^2,
+   $$
+   along with per-feature and original-unit residual summaries.
+5. **Generalization gap:** report training, validation and test losses rather than only the selected test score.
+6. **Seed stability:** report the distribution across predeclared random seeds and distinguish best-validation selection from average performance.
+7. **Baselines and controls:** compare the mean, rank-matched PCA, linear autoencoder, frozen-random encoder and capacity-matched variants.
+8. **Code diagnostics:** report active-coordinate variance, duplicated/dead units and sensitivity to preprocessing. Code plots are diagnostic, not evidence by themselves.
+9. **Distribution shift:** when scientifically relevant, perform subject-, session-, condition- or acquisition-held-out tests rather than only random within-distribution splits.
+10. **Secondary tasks:** fit downstream predictors inside a nested training procedure. Decoding performance is a separate criterion and does not validate the reconstruction representation as a mechanism.
+
+PCA and autoencoder losses must be computed in the same transformed metric. Factor Analysis should primarily be judged by held-out likelihood or predictive distribution; its conditional-mean reconstruction may be reported secondarily but is model-dependent and not directly equivalent to deterministic MSE training.
+
+## Minimal toy model
+
+A future non-executable toy model should sample a scalar parameter $s$ and generate observations in $\mathbb R^3$ by
+
+$$
+x(s)
+=
+\begin{pmatrix}
+s\\
+s^2\\
+0.3\sin(2s)
+\end{pmatrix}
++
+\varepsilon,
+$$
+
+with declared bounded $s$ range and isotropic observation noise. The generation record should retain $s$, but neither PCA nor the autoencoder may use it during fitting.
+
+Compare a mean predictor, rank-one PCA, a rank-one linear autoencoder, a fixed small nonlinear autoencoder with one-dimensional bottleneck, and a frozen-random-encoder control. Select epochs and regularization using validation observations and evaluate held-out MSE on independently sampled $s$ values. Record multiple seeds, dead-code frequency and code monotonicity with $s$ only as a generation-side diagnostic.
+
+Required negative controls are: independent full-dimensional Gaussian data, where a one-dimensional curved explanation is false; a high-capacity architecture trained on very few points to expose memorization; and a shifted test range of $s$ to expose extrapolation failure. Even if the nonlinear autoencoder reconstructs the curved example better than PCA, the valid conclusion is limited to that simulator and loss. No data, code or results are created in this Method Object.
+
+## Relevance to LDG
+
+The bounded autoencoder is LDG's canonical deterministic nonlinear reconstruction baseline. It asks whether finite nonlinear function classes improve held-out reconstruction before stronger claims about geometry, probability or dynamics are entertained.
+
+::: {.callout-warning title="What this does NOT imply"}
+Low reconstruction error or an appealing bottleneck visualization does not prove a manifold, establish intrinsic dimension, identify unique latent coordinates, discover dynamics, recover a mechanism, or support causal interpretation. A narrow code is an architecture choice; a nonlinear decoder image is a fitted function; neither is automatically the true state space of the system.
+:::
+
+### Mouse trajectory
+
+No modality-specific empirical claim is retained. A feed-forward autoencoder could reconstruct fixed trajectory summaries or windows, but it would ignore temporal succession and would not establish behavioral state, movement dynamics or mechanism.
+
+### Eye movement
+
+No modality-specific empirical claim is retained. Gaze samples, event summaries and aligned windows define different reconstruction problems; an organized code would not identify oculomotor coordinates or causal control variables.
+
+### EEG
+
+No modality-specific empirical claim is retained. Channel scaling, rereferencing, artifact handling, subject splits and sensor geometry would determine the loss; bottleneck coordinates would not automatically be neural sources.
+
+### MEG / neural population data
+
+No modality-specific empirical claim is retained. A deterministic reconstruction baseline can test nonlinear compression of declared sensor or unit features, but held-out units, trials, conditions and sessions are distinct generalization problems. Reconstruction alone does not establish a neural manifold or dynamics.
+
+## Primary sources
+
+- Bourlard and Kamp analyze multilayer perceptron auto-association and its connection to singular-value decomposition, supplying an early technical basis for bottleneck reconstruction [@BourlardKamp1988].
+- Baldi and Hornik characterize the squared-error landscape of layered linear networks and show the auto-associative principal-subspace solution while noting encoder/decoder factor nonuniqueness [@BaldiHornik1989].
+- Kramer formulates nonlinear principal-component analysis using a feed-forward auto-associative bottleneck network and squared reconstruction error, while discussing architecture capacity and overfitting [@Kramer1991].
+
+## Reviews / secondary sources
+
+- Goodfellow, Bengio and Courville provide an inspected authoritative synthesis of undercomplete and regularized autoencoders, encoder/decoder notation, reconstruction objectives, capacity and identity-copying failures [@GoodfellowBengioCourville2016, chap. 14]. Denoising, sparse, contractive and variational extensions discussed there are outside this bounded method.
+
+## Open methodological questions
+
+- Which architecture-matched control best separates nonlinear benefit from parameter-count and optimization effects?
+- How should latent-code stability be compared when nonlinear reparameterizations preserve reconstruction?
+- Which held-out split reflects the intended scientific use: trials, conditions, subjects, sessions or acquisition systems?
+- When is MSE scientifically inappropriate even after feature scaling?
+- How should uncertainty in a deterministic reconstruction be assessed without silently turning the method into a probabilistic model?
+- Which negative controls reveal memorization or nuisance reconstruction before downstream interpretation?
+
+## Maturity checklist
+
+- [x] Uses the complete Method schema and defines a bounded deterministic feed-forward method.
+- [x] Declares encoder, bottleneck, decoder, finite architecture and MSE empirical risk.
+- [x] Covers validation, early stopping, regularization, initialization and seed selection.
+- [x] Excludes variational, recurrent, dynamical, contrastive, denoising and sparse families.
+- [x] States learned/fixed quantities, order-blind time handling and Euclidean reconstruction geometry.
+- [x] Covers nonconvex optimization, memorization, overfit, dead units, collapse and distribution shift.
+- [x] States permutation, scale, sign and nonlinear reparameterization ambiguities.
+- [x] Includes PCA, linear-autoencoder, FA, random-feature and capacity controls.
+- [x] Provides leakage-safe held-out evaluation and a non-executable toy contract.
+- [x] Explicitly rejects manifold, dimension, unique-coordinate, dynamics, mechanism and causal overclaims.
+- [x] Foundational, linear-theory, nonlinear and review sources were inspected and verified.
+- [x] Independent mixed review returned PASS with no correction round required.
+- [x] Stable promotion authorized by the human owner under the recorded review decision after published-site review.

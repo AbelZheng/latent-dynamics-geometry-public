@@ -1,0 +1,109 @@
+{
+  "anisotropic_control": {
+    "condition": "anisotropic_feature_scaling_z3",
+    "transform": [
+      [
+        1,
+        0,
+        0
+      ],
+      [
+        0,
+        1,
+        0
+      ],
+      [
+        0,
+        0,
+        3
+      ]
+    ]
+  },
+  "artifact": "graph-geometry-recovery",
+  "artifact_files": [
+    "manifest.json",
+    "metrics.csv",
+    "diagnostics.json",
+    "summary.png"
+  ],
+  "artifact_hashes_sha256": {
+    "diagnostics.json": "ac37f7e08bac609edb65e6651673cf51f1caf17e9053cc6e7ba349c7066cb7fb",
+    "metrics.csv": "83bd6ee740ce384a5071916e463f8095f067f099e874b6cbfd6429843bd4badb",
+    "summary.png": "5d17b441f6e0cb9695fbe73d08fd4f67283bde7528d1a94a365c8fde7dedb3b8"
+  },
+  "circle": {
+    "alpha": 1,
+    "diffusion_time": 1,
+    "epsilon": 0.18,
+    "n": 96,
+    "representation_scoring": "L2(pi)-weighted right-eigenfunction angles and P-invariant-subspace residual"
+  },
+  "date": "2026-08-20",
+  "default_command": "/Users/bytedance/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3 toy-models/graph-geometry-recovery.py",
+  "explicit_commands": {
+    "generate": "/Users/bytedance/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3 toy-models/graph-geometry-recovery.py --generate",
+    "generate_and_verify": "/Users/bytedance/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3 toy-models/graph-geometry-recovery.py --generate --verify",
+    "verify": "/Users/bytedance/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3 toy-models/graph-geometry-recovery.py --verify"
+  },
+  "hairpin": {
+    "branch_length": 3.0,
+    "gap": 0.35,
+    "long_arc_separation_threshold": 0.7,
+    "material_path_shortcut_underestimation_threshold": 0.5,
+    "noise_sd": 0.01,
+    "nominal_k": 6,
+    "radius": 0.175,
+    "reduced_separation": {
+      "endpoint": [
+        0.12,
+        0.0
+      ],
+      "radius": 0.06,
+      "sampling": "reuse nominal sorted quantiles ell/TOTAL",
+      "total_length": 6.188495559215387
+    },
+    "split_sizes": {
+      "test": 80,
+      "train": 180,
+      "validation": 80
+    },
+    "total_length": 6.549778714378213
+  },
+  "interpretation_boundary": "Finite graph/operator recovery only; no proof of topology, manifold, intrinsic dimension, geodesic or Riemannian geometry, unique coordinates, dynamics, mechanism, or causality.",
+  "master_seed": 20260820,
+  "methods": [
+    "mean",
+    "pca_1d",
+    "ambient_cmds_1d",
+    "isomap",
+    "diffusion_maps_alpha_1",
+    "gower_extension",
+    "nystrom_extension"
+  ],
+  "metric_fields": [
+    "domain",
+    "condition",
+    "split",
+    "method",
+    "target",
+    "metric",
+    "value"
+  ],
+  "metric_rows": 197,
+  "runtime": {
+    "numpy": "2.3.5",
+    "pillow": "12.3.0",
+    "platform": "macOS-26.5.1-arm64-arm-64bit",
+    "python": "3.12.13"
+  },
+  "schema_version": 1,
+  "tolerances": {
+    "diagonal": 1e-12,
+    "fourier": 2e-10,
+    "oracle": 2e-10,
+    "poison": 0.0,
+    "projector": 2e-10,
+    "symmetry": 1e-12,
+    "triangle": 1e-10
+  }
+}

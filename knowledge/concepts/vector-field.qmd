@@ -1,0 +1,193 @@
+---
+title: "Vector Field"
+object_type: concept
+maturity: L2
+status: stable
+domain:
+- foundations
+- dynamics
+tags:
+- vector-field
+- instantaneous-change
+- continuous-time
+prerequisites:
+- knowledge/concepts/state-space.qmd
+related:
+- knowledge/concepts/state.qmd
+- knowledge/concepts/trajectory.qmd
+- knowledge/math/first-order-autonomous-dynamical-system.qmd
+created: 2026-08-17
+updated: 2026-08-18
+---
+
+# Vector Field
+
+## One-sentence definition
+
+In a Euclidean continuous-time setting, a **vector field** is a rule that assigns each admissible state an instantaneous change vector, encoding a rate and, when nonzero, a direction.
+
+## Why this concept matters
+
+A state space specifies which state values are admissible, but not how they change. A vector field adds a local evolution rule: at each state, it gives the velocity that a compatible continuous-time trajectory would have there. This makes it possible to distinguish a rule defined across the state space from one realized trajectory or a finite collection of observations.
+
+For an autonomous differential equation, Teschl treats $\dot{x}=f(x)$ as a vector field and describes its solution curves as tangent to that field at every visited state [@Teschl2012, sec. 6.2]. The field is therefore local and instantaneous; finite-time evolution is a different object.
+
+## Intuition
+
+Picture an arrow attached to every admissible state. The arrow at state $x$ answers a local question: “If the system is at $x$ under this rule, in what direction and at what instantaneous rate is its state changing?”
+
+One arrow is a vector. The assignment of arrows across the state space is the vector field. Following the arrows over time can produce a trajectory when the evolution is well-defined, but neither a single arrow nor a plotted collection of arrows is itself a trajectory or a complete finite-time evolution.
+
+The arrow is also not a finite jump to the next state. It has rate units—state units per unit time—and describes change at an instant. Over a sufficiently short interval it may support a local approximation, but the system can encounter different arrows as its state changes.
+
+## Formal definition
+
+For this Cycle's core formulation, assume the state space $\mathcal{X}\subseteq\mathbb{R}^n$ is open. This is a deliberate scope restriction. For a constrained admissible set, a Euclidean rule can instead be defined on an open neighborhood containing that set, but whether the resulting motion remains admissible requires additional conditions deferred below. On the declared open domain, an autonomous vector field is a map
+
+$$
+f:\mathcal{X}\rightarrow\mathbb{R}^n,
+\qquad x\mapsto f(x),
+$$
+
+where $f(x)$ is the instantaneous state-change vector assigned at $x$. A differentiable trajectory $x(t)$ is compatible with the field when
+
+$$
+\dot{x}(t)=f\bigl(x(t)\bigr)
+$$
+
+at the times under consideration. This equation states a local relation between the trajectory's derivative and the field; it does not by itself guarantee that a trajectory exists uniquely or for all time.
+
+The bare concept is the assignment $x\mapsto f(x)$. Continuity, differentiability, local Lipschitz conditions, and other regularity assumptions are additional properties, not part of that bare assignment. Such assumptions become important when asking whether the field generates unique trajectories or a well-defined flow.
+
+### Connection to the autonomous-system formalism
+
+The stable [First-Order Autonomous Dynamical System](../math/first-order-autonomous-dynamical-system.qmd) Math Object is the canonical location for the corresponding initial-value problem, regularity ladder, maximal-solution statements, and local-flow construction. Given an initial state $x_0$ at reference time $t_0$, it writes the field as the local rule in
+
+$$
+\dot{x}=f(x),
+\qquad
+x(t_0)=x_0.
+$$
+
+If the active assumptions give a unique finite-time evolution map $\phi_\tau$ and the curve $\tau\mapsto\phi_\tau(x)$ is differentiable at $\tau=0$, the vector field is its elapsed-time generator:
+
+$$
+f(x)
+=
+\left.\frac{d}{d\tau}\phi_\tau(x)\right|_{\tau=0}.
+$$
+
+This relation connects the instantaneous and finite-time descriptions without identifying them. The derivative is taken with respect to elapsed time along the evolution from $x$; differentiable dependence on the initial state is a stronger property. Neither existence, uniqueness, global continuation, nor joint flow regularity follows from the bare assignment $x\mapsto f(x)$. Those theorem-level conditions and derivations remain in the Math Object [@Teschl2012, secs. 2.2, 2.6, 6.2].
+
+When explicit time or an external input matters, a model may use
+
+$$
+\dot{x}=f(x,u,t).
+$$
+
+For each specified input value and time, $x\mapsto f(x,u,t)$ is a state-dependent velocity assignment; equivalently, the model supplies a family of vector fields indexed by $u$ and $t$. The input is not thereby part of the internal state, and its future values may be required to determine later evolution. Åström and Murray use the corresponding state/input separation in continuous-time system descriptions [@AstromMurray2021, sec. 3.2].
+
+Constrained state spaces with boundaries require separate checks that the assigned change is compatible with admissibility. Boundary conditions, tangent-cone or viability conditions, and vector fields on manifold-valued state spaces are deferred beyond this bounded object. LDG does not import that machinery into the Cycle 1 Euclidean formulation.
+
+## Core notation
+
+- $\mathcal{X}\subseteq\mathbb{R}^n$: the open Euclidean state-space domain used in the core Cycle 1 formulation.
+- $x\in\mathcal{X}$: one state value.
+- $f$: the vector field, defined across its stated domain.
+- $f(x)\in\mathbb{R}^n$: the instantaneous change vector assigned at $x$.
+- $x(t)$: a state trajectory.
+- $\dot{x}(t)$: the instantaneous derivative of the trajectory.
+- $u$: an optional external input.
+- $t$: time; explicit appearance in $f(x,u,t)$ indicates time-dependent local rules.
+
+The same letter $f$ is often used for other kinds of maps. Its domain, codomain, and role must therefore be stated.
+
+## Prerequisites
+
+- [State Space](state-space.qmd): supplies the admissible states on which the field is defined.
+
+**Assumed background:** elementary vectors and single-variable derivatives.
+
+[State](state.qmd) and [Trajectory](trajectory.qmd) are related concepts: the field takes a state value as input, while a compatible trajectory has derivative prescribed by the field.
+
+The [First-Order Autonomous Dynamical System](../math/first-order-autonomous-dynamical-system.qmd) is the formal companion for existence, uniqueness, continuation, and local-flow results. It is linked as a related object rather than used to replace the conceptual definition here.
+
+## Relationship to adjacent concepts
+
+| Concept | Distinction from vector field |
+|---|---|
+| **Vector** | A vector is one magnitude-and-direction value. A vector field assigns such a vector to every state in its declared domain. |
+| **State** | A state value $x$ describes the system at one time. The field value $f(x)$ describes the instantaneous change assigned at that state; it is not another state value. |
+| **Trajectory** | A trajectory is one time-parameterized admissible evolution $x(t)$. A vector field is the local rule defined across states; a compatible differentiable trajectory satisfies $\dot{x}(t)=f(x(t))$. |
+| **Finite displacement** | A displacement such as $x(t+\Delta t)-x(t)$ compares two states over a finite interval. The field value is an instantaneous rate, not that displacement and not generally equal to it. |
+| **External input** | An input $u$ is an influence treated as outside the state. It may select or modify the assigned vector through $f(x,u,t)$ but is not the vector field's output or automatically a state variable. |
+| **Discrete-time update map** | An update map sends a current state directly to a later state, for example $x_{k+1}=F(x_k)$. A vector field assigns an instantaneous rate in continuous time. One formalism should not be silently substituted for the other. |
+| **Flow** | A flow, where defined, maps initial states across finite elapsed times. The vector field supplies the local instantaneous rule from which such finite-time evolution may be generated. |
+| **Fitted velocity field** | A fitted field is an estimate constructed from data under modeling and smoothing choices. It may approximate a proposed vector field, but estimation is not part of the definition. |
+
+## What this does NOT imply
+
+Calling $f$ a vector field does **not** by itself imply that:
+
+- observed trajectories uniquely determine $f$ away from, or even along, the sampled states;
+- a fitted local velocity field is the true physical or biological mechanism;
+- time-varying data or arrows drawn on a plot establish vector-field structure;
+- finite differences are exact instantaneous derivatives;
+- every state in $\mathcal{X}$ has been observed;
+- a compatible trajectory exists uniquely or indefinitely from every state;
+- the field is autonomous, smooth, linear, low-dimensional, or noise-free;
+- a continuous-time vector field is the natural description of a discrete-time system; or
+- knowing the local rule automatically supplies its full finite-time evolution.
+
+## Minimal example
+
+For an idealized dimensionless pendulum, treat the angle $\theta$ as an **unwrapped real-valued coordinate** in this Euclidean example and use the state
+
+$$
+x=(\theta,\omega),
+$$
+
+where $\omega$ is angular velocity. On the resulting open coordinate domain $\mathcal{X}=\mathbb{R}^2$, consider
+
+$$
+f(\theta,\omega)=\bigl(\omega,-\sin\theta\bigr).
+$$
+
+At the state $(\theta,\omega)$, the first component says that angle changes instantaneously at rate $\omega$; the second says that angular velocity changes instantaneously at rate $-\sin\theta$. Teschl uses this pendulum field as an example of the autonomous vector-field viewpoint [@Teschl2012, sec. 6.2].
+
+The vector $f(\theta,\omega)$ is one local rate at one state. The vector field is the entire assignment over admissible angle–velocity states. It does not directly give the finite displacement after one second, because the assigned vector generally changes as the pendulum state changes.
+
+## Neuroscience / behavioral relevance
+
+Using the population-coordinate convention reviewed by Cunningham and Yu, a proposed neural state can be represented by a vector of population activity at a time [@CunninghamYu2014]. A neural vector-field model would assign an instantaneous activity-change vector to each admissible population state. The recorded population vectors and their finite differences are observations or estimates; they are not automatically the underlying field.
+
+The same distinction applies to behavior. Local velocity estimates computed from position, pose, or other behavioral variables constitute a vector field only relative to an adequate state description and a continuous-time modeling assumption. Sparse sampling, omitted state variables, input changes, and measurement noise can make different fields consistent with the available trajectories.
+
+## Relevance to LDG
+
+Vector fields provide the local-rule layer connecting state-space descriptions to continuous-time dynamics. LDG needs this distinction to ask whether a proposed latent, neural, or behavioral evolution law is supported by data without confusing sampled trajectories, plotted arrows, and mechanism. The concept also prepares the local-versus-finite-time distinction needed for Flow while leaving estimation methods and formal existence theory to later work.
+
+## Open questions
+
+- What observations are sufficient to constrain a vector field beyond the sampled trajectories?
+- How should LDG separate changes in the field from changes in external input or unmeasured state?
+- When is a continuous-time vector-field description preferable to a discrete-time update rule for sampled data?
+
+These are later modeling and inference questions, not part of this bounded definition.
+
+## References
+
+- Vector fields, compatible trajectories, and the pendulum example: [@Teschl2012, sec. 6.2].
+- State/input-dependent rate notation: [@AstromMurray2021, sec. 3.2].
+- Neural population-coordinate convention: [@CunninghamYu2014].
+
+## Maturity checklist
+
+- [x] Defines a vector field in a bounded Euclidean continuous-time setting.
+- [x] Distinguishes vector, state, trajectory, displacement, input, update map, and flow.
+- [x] States the local derivative relation without claiming universal existence or uniqueness.
+- [x] Includes explicit inference and visualization non-implications.
+- [x] Defers constrained-boundary and manifold-valued formulations while using canonical existing relationships.
+- [x] Has received lightweight conceptual review and incorporated the required L1 corrections.
+- [x] Links the instantaneous vector-field definition to the stable autonomous-system Math Object without duplicating its theorem-level derivations.
+- [x] Independent review confirmed the bounded L2 formalization; the owner approved `L2` / `stable` promotion on 2026-08-18.

@@ -1,0 +1,497 @@
+---
+title: "Linear-Gaussian Inference Ladder"
+object_type: toy-model
+maturity: L1
+status: stable
+domain: [latent-modeling, temporal-modeling, state-estimation, statistics]
+tags: [linear-gaussian, kalman-filter, rts-smoother, batch-conditioning, parameter-selection]
+prerequisites:
+- knowledge/methods/linear-gaussian-state-space-model.qmd
+- knowledge/methods/kalman-filtering.qmd
+- knowledge/methods/kalman-smoothing.qmd
+- knowledge/methods/factor-analysis.qmd
+related:
+- knowledge/concepts/latent-trajectory.qmd
+- knowledge/concepts/process-noise.qmd
+- knowledge/concepts/observation-noise.qmd
+created: 2026-08-19
+updated: 2026-08-19
+---
+
+# Linear-Gaussian Inference Ladder
+
+This L1/stable object is the scientific and reproducibility record for the first Phase 3 generation/recovery vertical slice. It deliberately separates a known simulator, exact inference conditional on fixed parameters, finite-grid parameter selection, predictive scoring, latent-state recovery, and stress tests. Reported numerical values are deterministic outputs of the bounded implementation under master seed `20260819`; they are not inferred from the equations or generalized beyond this simulator.
+
+**Assumed background:** scalar Gaussian conditioning, conditional expectation, covariance, and elementary time-series evaluation. The stable prerequisite Method Objects fix LDG terminology, but they are not substitutes for the external-source inspection recorded in [Evidence inspected](#evidence-inspected).
+
+## Question
+
+For a scalar discrete-time linear-Gaussian state-space model (LGSSM) with retained latent ground truth:
+
+1. do a known-parameter Kalman filter, a known-parameter fixed-interval Rauch--Tung--Striebel (RTS) smoother, and direct batch Gaussian conditioning return the same model-conditional posterior marginals under their respective information sets;
+2. how do online prediction, online filtering, and retrospective smoothing differ from latent recovery and from observation prediction;
+3. how much performance and calibration change when parameters are selected from a finite grid rather than supplied by the generator; and
+4. how do wrong noise ratios, a contiguous missing block, a false sequence boundary, near-unit-root dynamics, and informative missingness expose model or interpretation failures?
+
+The primary acceptance question is numerical and inferential correctness under the declared model. It is not whether the recovered mean merely looks smooth.
+
+## Ground truth
+
+For each independent sequence, the retained scalar latent state is \(z_{1:T}\), the observed scalar is \(x_{1:T}\), and the complete-data generator is
+
+$$
+z_1\sim\mathcal N(0,p_1),
+\qquad
+p_1=\frac{q}{1-a^2},
+$$
+
+$$
+z_{t+1}=a z_t+w_t,
+\qquad
+w_t\overset{\mathrm{iid}}\sim\mathcal N(0,q),
+$$
+
+$$
+x_t=z_t+v_t,
+\qquad
+v_t\overset{\mathrm{iid}}\sim\mathcal N(0,r),
+$$
+
+with \(z_1\), all \(w_t\), and all \(v_t\) mutually independent. The primary parameters are fixed before simulation:
+
+$$
+a=0.85,
+\qquad
+q=0.10,
+\qquad
+r=0.40,
+\qquad
+p_1=\frac{0.10}{1-0.85^2}.
+$$
+
+The initialization is the stationary zero-mean law for this scalar stable model. Stationarity is a property of the declared generator and initialization, not a conclusion inferred from a finite simulated trace.
+
+The observation map is the identity. This removes latent-coordinate ambiguity for this bounded scalar recovery test, but it does not make the latent state directly observed: \(x_t\) still contains independent measurement noise. Retaining \(z_t\) for scoring is a simulation privilege. Test latent truth is never an input to parameter selection, filtering, smoothing, or batch conditioning.
+
+## Generative model
+
+Generation, masking, parameter selection, inference, and scoring are separate stages with separate function boundaries in the implementation.
+
+1. **Generate complete sequences.** For every sequence, draw a fresh \(z_1\), process-noise stream, and observation-noise stream from its split-specific random generator. Store the latent and complete observation arrays before applying any mask.
+2. **Assign immutable sequence boundaries.** Train, validation, and test sequences are independent replicates. Every recovery method starts each sequence from the declared prior; no posterior mean or covariance crosses a true boundary.
+3. **Create masks without changing the complete arrays.** The primary complete-data mask retains every observation. The missing-block mask removes a predeclared contiguous interval only on test copies. The informative-missingness negative control derives a separate observation-magnitude-dependent mask from the frozen test observations and is never treated as ignorable evidence.
+4. **Select parameters without latent truth.** The finite grid reads only train and validation observations, masks, and sequence boundaries. It may use innovation likelihood, but no latent state or test quantity.
+5. **Run recovery.** Known-parameter and selected-parameter methods receive observations, masks, boundaries, and their declared parameter tuple.
+6. **Score last.** Latent truth is joined only after all posterior and predictive outputs have been frozen.
+
+This ordering prevents generation from being mistaken for recovery and prevents test latent states from becoming pseudo-observations.
+
+## Parameters
+
+### Primary data contract
+
+| Component | Predeclared value |
+|---|---:|
+| Train sequences | 12 independent sequences |
+| Validation sequences | 6 independent sequences |
+| Test sequences | 8 independent sequences |
+| Primary sequence length | \(T=80\) |
+| Master seed | `20260819` with split- and sequence-specific `SeedSequence` words |
+| Primary parameters | \((a,q,r)=(0.85,0.10,0.40)\) |
+| Prior | \(m_1=0,\ p_1=q/(1-a^2)\) |
+| Missing block | zero-based indices \([30,45)\), equivalently \(t=31,\ldots,45\) in one-based notation |
+| Nominal pointwise interval | 95% Gaussian posterior interval |
+| Short-sequence batch oracle | first 24 time points of the first test sequence |
+
+The implementation uses NumPy `Generator(PCG64(SeedSequence(words)))` with distinct split and sequence words. Any change to these values is a contract change, not routine tuning. No primary-parameter correction was required.
+
+### Finite parameter grid
+
+The learned-parameter variant is a bounded plug-in baseline over the 27 predeclared tuples
+
+$$
+a\in\{0.75,0.85,0.95\},
+\qquad
+q\in\{0.05,0.10,0.20\},
+\qquad
+r\in\{0.20,0.40,0.80\}.
+$$
+
+For every tuple, each sequence is reset to \(m_1=0\) and the tuple's stationary variance \(q/(1-a^2)\). Selection minimizes the sum of the mean train and mean validation one-step innovation negative log likelihood. Test observations, test latent truth, and all test metrics remain unavailable until one tuple is frozen. Exact ties are broken lexicographically by \((a,q,r)\), not by distance to the true parameters.
+
+This is finite-grid model selection over a declared candidate set. It is **not** a claim of unrestricted LGSSM maximum-likelihood estimation, consistency, or parameter-identification. Särkkä distinguishes known-parameter state inference from parameter inference and gives the prediction-error factorization of the marginal likelihood used here as a scoring rule [@Sarkka2013, ch. 12, especially sec. 12.1].
+
+### Stress parameters
+
+| Condition | Inference or generator change | Role |
+|---|---|---|
+| **correct** | infer with \((0.85,0.10,0.40)\) | primary correctness condition |
+| **q_small_r_large** | infer with \((0.85,0.025,0.80)\) | overconfident transition / weak measurement weighting stress |
+| **q_large_r_small** | infer with \((0.85,0.40,0.10)\) | weak transition / strong measurement weighting stress |
+| **selected_grid** | infer with frozen grid-selected tuple | bounded parameter-selection baseline |
+| **near_unit_root** | generate and infer with \((0.99,0.02,0.40)\) | separate stability and initialization stress |
+
+The wrong-\(q/r\) conditions alter inference only; their data remain the primary generator. The near-unit-root condition is a separate generated data set of four sequences of length \(T=160\), using the dedicated stage word `40`. It is evaluated once with its matched stationary prior and once with a deliberately tight prior variance `0.05`. It is not pooled into primary success criteria.
+
+## Simulation
+
+The implementation must use the existing Python/NumPy runtime and must not install a dependency. For each split, generation is vectorized across independent sequences only where this does not obscure resets. Stored arrays preserve a sequence axis; flattening sequences before inference is prohibited except in the explicit reset-boundary negative control.
+
+The generator retains \(z\) and \(x\) with split and sequence identities. Recovery functions receive observations, masks, boundaries, and parameters rather than the latent array. Computed poison diagnostics change test observations or every latent array and verify that grid selection and recovery outputs remain unchanged; separate-sequence invocation is also compared numerically with the stacked multi-sequence path. Retained latent values enter only the later scoring functions.
+
+### Correctly specified filtering
+
+Let
+
+$$
+\mathcal I_t^{\mathrm{F}}=\sigma(x_s:\ s\le t,\ x_s\text{ observed})
+$$
+
+be the online information set. Before observing \(x_t\), the scalar prediction is
+
+$$
+m_{t\mid t-1}=a m_{t-1\mid t-1},
+\qquad
+p_{t\mid t-1}=a^2p_{t-1\mid t-1}+q,
+$$
+
+with \(m_{1\mid0}=0\) and \(p_{1\mid0}=p_1\). For an observed \(x_t\),
+
+$$
+\nu_t=x_t-m_{t\mid t-1},
+\qquad
+s_t=p_{t\mid t-1}+r,
+\qquad
+k_t=\frac{p_{t\mid t-1}}{s_t},
+$$
+
+$$
+m_{t\mid t}=m_{t\mid t-1}+k_t\nu_t,
+\qquad
+p_{t\mid t}=p_{t\mid t-1}-k_t^2s_t.
+$$
+
+These are the scalar specialization of exact linear-Gaussian Bayesian filtering [@Kalman1960; @Sarkka2013, theorem 4.2]. If \(x_t\) is missing, no pseudo-observation is inserted:
+
+$$
+m_{t\mid t}=m_{t\mid t-1},
+\qquad
+p_{t\mid t}=p_{t\mid t-1}.
+$$
+
+Thus a filter traverses the declared missing block by repeated open-loop prediction. It cannot use observations after the current time.
+
+### Fixed-interval smoothing
+
+Let
+
+$$
+\mathcal I_T^{\mathrm{S}}=\sigma(x_s:\ 1\le s\le T,\ x_s\text{ observed})
+$$
+
+be the retrospective information set. Starting from \(m_{T\mid T},p_{T\mid T}\), the scalar RTS recursion is
+
+$$
+j_t=\frac{p_{t\mid t}a}{p_{t+1\mid t}},
+$$
+
+$$
+m_{t\mid T}=m_{t\mid t}+j_t\left(m_{t+1\mid T}-m_{t+1\mid t}\right),
+$$
+
+$$
+p_{t\mid T}=p_{t\mid t}+j_t^2\left(p_{t+1\mid T}-p_{t+1\mid t}\right).
+$$
+
+Rauch, Tung, and Striebel derive the backward recursion from the forward filtering solution; the modern Bayesian statement makes explicit that it computes \(p(z_t\mid x_{1:T})\), whereas filtering computes \(p(z_t\mid x_{1:t})\) [@RauchTungStriebel1965, sec. 3.2; @Sarkka2013, secs. 8.1--8.2]. Later observations may therefore revise states inside the missing block. That revision is valid only retrospectively and must never be described as information available online at time \(t\).
+
+### Direct batch Gaussian conditioning oracle
+
+For a bounded sequence, construct the prior path mean \(m_z=0\) and covariance \(K_z\) from the declared prior and transition recursion. Under the stationary primary model,
+
+$$
+(K_z)_{ij}=p_1 a^{|i-j|}.
+$$
+
+For observed time indices \(O\), let \(H_O\) select those state coordinates and let \(x_O\) be the corresponding observation vector. Direct conditioning gives
+
+$$
+\mu_{z\mid x_O}
+=m_z+K_zH_O^\top
+\left(H_OK_zH_O^\top+rI\right)^{-1}
+(x_O-H_Om_z),
+$$
+
+$$
+\Sigma_{z\mid x_O}
+=K_z-K_zH_O^\top
+\left(H_OK_zH_O^\top+rI\right)^{-1}
+H_OK_z.
+$$
+
+The implementation must use a linear solve, not an explicit matrix inverse. For each short oracle sequence, conditioning on observations through \(t\) supplies the current-time filter oracle, while conditioning on every observed time through \(T\) supplies the full smoother oracle. Agreement with this independently assembled joint Gaussian is an implementation test, not an additional estimator [@Sarkka2013, secs. 4.1--4.3, 8.1--8.2].
+
+## Visualization
+
+Exactly one composite **summary.png** is allowed. It must have a scientific checking purpose and contain no decorative panels:
+
+1. one predeclared test sequence with latent truth, observations, filter mean, smoother mean, and filter 95% model-conditional intervals;
+2. the same sequence with the missing block visibly marked;
+3. numerical oracle and leakage summaries; and
+4. compact metric and failure-diagnostic panels distinguishing known parameters, selected parameters, wrong-\(q/r\), reset, near-unit-root, and informative-missingness stresses.
+
+The caption must state that the smoother is retrospective and that the intervals condition on fixed parameters. Visual overlap, smoothness, or a compelling trajectory is never an acceptance oracle.
+
+## Expected behavior
+
+These are model-derived expectations, not prefilled empirical results.
+
+- In exact arithmetic under the correct fixed model, recursive filtering and smoothing should equal direct Gaussian conditioning for the same observations and information set [@Sarkka2013, theorems 4.2 and 8.2].
+- Under the exact fixed model, \(p_{t\mid T}\le p_{t\mid t}\) because smoothing conditions on a superset of observations. Floating-point violations beyond tolerance indicate an implementation problem, not negative variance.
+- Under the correct generator, posterior means are conditional-MSE-optimal for their own information sets. Across repeated draws, the smoother can have lower expected latent MSE than the filter, but any finite test realization may deviate. Lower smoothing RMSE does not make smoothing suitable for an online task.
+- During a missing block, the filter mean and variance evolve only through the transition. The smoother may revise that interval using later observations, but only after the interval endpoint is available.
+- Wrong \(q/r\) changes gains, innovation variance, posterior width, and retrospective coupling. The direction and size of finite-sample metric changes are empirical outputs, not guaranteed numerical values.
+- Near \(a=1\), stationary variance and long-horizon predictive uncertainty are larger and initialization effects can persist. This stress is reported separately rather than used to redefine primary success.
+
+## Parameter manipulations
+
+### A. Correct-model condition
+
+Use the true tuple for filtering, smoothing, prediction, and batch conditioning. This condition tests exact-inference implementation and finite-sample recovery separately:
+
+- batch-versus-recursion discrepancies test numerical implementation;
+- latent RMSE and coverage test recovery under one realized sample from the declared correct model; and
+- predictive negative log likelihood and innovations test the observation distribution.
+
+Low RMSE is not required for posterior correctness on every realization, because process and observation noise leave irreducible uncertainty.
+
+### B. Wrong process/observation noise ratios
+
+Apply **q_small_r_large** and **q_large_r_small** to the unchanged primary test observations. Score predictive likelihood, filter and smoother latent RMSE, interval coverage, mean posterior variance, standardized innovation variance, and lag-1 autocorrelation. These are plug-in, misspecified posteriors. Their intervals do not become valid uncertainty statements about the true generator merely because the covariance recursion remains algebraically valid.
+
+### C. Contiguous missing block
+
+Remove zero-based observations \(x_{30:45}\) from every primary test sequence before both forward and backward inference. Score missing-block and observed-region errors separately. Innovation likelihood is computed only where observations are available. The filter's block trajectory is an online prediction from pre-block information; the smoother's block trajectory is a retrospective reconstruction using both sides. Comparing their RMSE must preserve that information-set difference.
+
+### D. Reset-boundary failure
+
+Take the first two independently generated primary test sequences and, only for this negative control, concatenate them without resetting the prior at the join. Run the same parameter tuple as though the join were a real transition. Compare against correct separate-sequence inference using the inherited boundary prediction, first-state estimate difference, artificial-continuity magnitude, and proper-versus-joined RMSE over the first eight states of the second sequence.
+
+The intended demonstration is that carrying a posterior across an independent reset can impose artificial continuity or otherwise distort inference near the join. The realized direction and magnitude are reported, not guaranteed. The negative control must never alter ordinary split handling.
+
+### E. Near-unit-root stress
+
+Generate the separate \(a=0.99\) condition and compare matched-stationary versus tight-variance initialization. Report stationary prior variance, maximum filter and smoother variance, first-20-step mean/variance sensitivity, and covariance finiteness/nonnegativity. In addition, propagate variance without observations to fixed horizons \(h\in\{1,10,50,100,200\}\) under both initializations. This diagnostic separates long-horizon predictive uncertainty from posterior variance under continuous measurement updates. It is not a second primary model and cannot rescue a failed primary oracle.
+
+### F. Informative-missingness warning
+
+For a warning-only negative control, hide an observation whenever \(|x_t|>0.9\). The ordinary skipped-update filter and smoother deliberately ignore the information carried by that observation-dependent mask. The posterior target under a joint observation--missingness model is therefore not the same as conditioning only on retained values. The resulting missing fraction, latent magnitude inside/outside the mask, and skipped-update filter RMSE are labeled **uncorrected informative-missingness stress**, excluded from primary acceptance, and used only to show why an ignorable-missingness interpretation fails. No correction or calibrated uncertainty claim is permitted without explicitly modeling the missingness process.
+
+## Sanity checks
+
+The implementation and generated diagnostics must assert all of the following.
+
+1. **Filter batch equivalence:** for every short oracle prefix and observed mask, the recursive \(m_{t\mid t},p_{t\mid t}\) equal the current-time marginal from direct conditioning on observations through \(t\).
+2. **Smoother batch equivalence:** all short-sequence \(m_{t\mid T},p_{t\mid T}\) equal the corresponding full batch posterior marginals.
+3. **Nested-information variance:** \(p_{t\mid T}\le p_{t\mid t}+10^{-12}\) for the regular correct-model computations.
+4. **No look-ahead:** changing \(x_{t+1:T}\) while holding \(x_{1:t}\) fixed cannot change any stored filter output through \(t\); it may change smoother outputs.
+5. **No latent leakage:** parameter selection and inference inputs contain no latent array, and test latent truth is joined only by the scoring stage.
+6. **Boundary reset:** separate-sequence outputs equal outputs obtained by running each sequence independently; only the named negative control omits the reset.
+7. **Numerical covariance:** assembled batch covariances are symmetric within \(10^{-12}\); all scalar variances are at least \(-10^{-12}\); oracle mean and variance discrepancies are at most \(10^{-10}\) in absolute value.
+8. **Missing-block handling:** no innovation or likelihood contribution is emitted at hidden times, and skipped updates equal predictions exactly within floating-point tolerance.
+9. **Determinism:** two clean executions with the same runtime and command produce byte-identical **manifest.json**, **metrics.csv**, **diagnostics.json**, and **summary.png**.
+10. **Metric provenance:** every metrics row identifies split, condition, parameter source, method, inference target, region, metric, and value.
+
+Tolerance values belong in the manifest. Passing structural checks does not establish scientific model adequacy.
+
+## Failure cases
+
+- **Filter reads the future:** any dependence of a filter output at \(t\) on \(x_{t+1:T}\) is leakage and a hard failure.
+- **Smoother mislabeled online:** a retrospective estimate presented as available at time \(t\) is an inferential failure even if its arithmetic is correct.
+- **Batch disagreement:** discrepancies above tolerance under the same fixed model indicate indexing, covariance, masking, or conditioning errors.
+- **Latent truth enters selection:** any grid criterion, preprocessing decision, or posterior conditioned on \(z_t\) invalidates the learned-parameter comparison.
+- **State propagates across true boundaries:** failure to reset invents dependence between independent sequences.
+- **Wrong-noise certainty interpreted as calibrated:** covariance is conditional on the assumed tuple; misspecified plug-in intervals can be narrow and wrong.
+- **Parameter uncertainty omitted silently:** selected-grid posterior intervals exclude uncertainty over the selection procedure and candidate tuple.
+- **Missingness treated as ignorable without justification:** state-dependent absence changes the conditioning problem.
+- **Near-unit-root results pooled with primary results:** doing so changes the acceptance population and obscures initialization sensitivity.
+- **Plausible figure replaces numerical checks:** visual smoothness cannot verify a posterior, a boundary, or calibration.
+- **Recovery treated as mechanism:** successful state estimation in a simulator does not establish a causal or biological transition law.
+
+## Recovery task
+
+The recovery outputs are kept distinct.
+
+### Prediction
+
+For observed times, the one-step observation predictive law is
+
+$$
+x_t\mid x_{1:t-1}\sim
+\mathcal N(m_{t\mid t-1},s_t),
+\qquad
+s_t=p_{t\mid t-1}+r.
+$$
+
+The held-out one-step negative log likelihood and standardized innovation \(\nu_t/\sqrt{s_t}\) score this observation prediction. Smoothing does not produce a new prospective sequence likelihood; the same forward predictive factorization supplies the fixed-parameter likelihood [@Sarkka2013, sec. 12.1.1].
+
+### Latent recovery
+
+Filter and smoother posterior means are scored against retained \(z_t\) only after inference. Filtering RMSE evaluates online recovery; smoothing RMSE evaluates retrospective recovery. They are different tasks because their conditioning sigma-fields differ.
+
+### Model-conditional uncertainty
+
+Pointwise 95% coverage uses
+
+$$
+m\pm 1.959963984540054\sqrt{p}
+$$
+
+for the relevant filter or smoother posterior. Coverage is aggregated across independent test sequences and time points, with missing-block inside/outside records. It describes repeated-simulation behavior under a fixed assumed tuple. A single interval does not carry a frequentist guarantee for one state, and finite-sample aggregate coverage need not equal 0.95 exactly.
+
+### Parameter uncertainty
+
+Known-parameter intervals condition on the true tuple. Selected-grid intervals condition on one frozen selected tuple. Neither integrates over parameter uncertainty. The learned-versus-known gap is reported in prediction, recovery, and coverage metrics, but no plug-in covariance is called total uncertainty.
+
+## Candidate analysis methods
+
+1. **Stationary-mean reference.** Use the generator's zero stationary mean as a deliberately non-temporal latent point reference. No latent posterior coverage is reported.
+2. **Persistence / last observation.** Use a latent point proxy equal to the most recent observed \(x\); before any observation use zero. It has no model-conditional state interval.
+3. **Open-loop state prediction.** Assimilate the first available observation once using the declared model, then propagate without further updates. It is a bounded no-reassimilation baseline; prediction-only propagation inside a missing block is also the filter's exact behavior conditional on its last filtered state.
+4. **Known-parameter Kalman filter.** Compute online predictive and filtering distributions using only data through the current time [@Kalman1960; @Sarkka2013, ch. 4].
+5. **Known-parameter RTS smoother.** Run the fixed-interval backward pass after the complete declared interval is available [@RauchTungStriebel1965; @Sarkka2013, ch. 8].
+6. **Direct batch Gaussian conditioning.** Use only bounded short sequences as an independently assembled correctness oracle.
+7. **Selected-grid filter and smoother.** Freeze the finite-grid tuple selected by train/validation innovation likelihood, then evaluate on untouched test sequences.
+
+Static Factor Analysis is a conceptual prerequisite and order-blind comparison, not an executable candidate in this scalar unit. It cannot represent the transition or distinguish online from retrospective information merely because factor scores happen to be smooth.
+
+## Evaluation
+
+Every metrics row includes:
+
+~~~text
+split, condition, parameter_source, method, inference_target,
+region, metric, value
+~~~
+
+Required metrics are:
+
+- held-out one-step predictive negative log likelihood at observed test times;
+- filtering latent RMSE and smoothing latent RMSE;
+- pointwise 95% posterior interval coverage;
+- innovation mean, variance, and lag-1 autocorrelation, using standardized innovations for calibration summaries;
+- mean filtering variance and mean smoothing variance;
+- maximum absolute batch-versus-recursion mean and variance discrepancy;
+- missing-block inside and outside RMSE/coverage;
+- wrong-parameter stress metrics;
+- selected-grid versus known-parameter gaps; and
+- reset-boundary predictive and local-recovery diagnostics.
+
+Train and validation likelihood rows used for selection remain distinct from test evaluation rows. Metrics that do not apply are omitted rather than coerced to zero. In particular, baselines without a latent posterior have no coverage row, and smoothing has no separate prospective one-step likelihood row.
+
+### Empirical results
+
+These values are read from the generated `manifest.json`, `metrics.csv`, and `diagnostics.json`; they remain conditional on this implementation and fixed random seed.
+
+| Acceptance item | Result | Artifact field |
+|---|---|---|
+| Selected grid tuple | \((0.85,0.10,0.40)\), equal to the generating tuple within this finite grid | manifest: selected parameters |
+| Maximum filter-versus-batch mean discrepancy | \(1.94\times10^{-16}\) | diagnostics: filter mean maximum absolute discrepancy |
+| Maximum filter-versus-batch variance discrepancy | \(2.78\times10^{-17}\) | diagnostics: filter variance maximum absolute discrepancy |
+| Maximum smoother-versus-batch mean discrepancy | \(2.36\times10^{-16}\) | diagnostics: smoother mean maximum absolute discrepancy |
+| Maximum smoother-versus-batch variance discrepancy | \(1.39\times10^{-16}\) | diagnostics: smoother variance maximum absolute discrepancy |
+| Maximum smoothing-over-filtering variance violation | \(0\) | diagnostics: covariance excess |
+| Correct-model test predictive NLL | 1.1115 per observed point | metrics: correct-model filter |
+| Correct-model filter / smoother RMSE | 0.3558 / 0.3141 | metrics: correct-model all times |
+| Correct-model filter / smoother coverage | 0.9484 / 0.9484 | metrics: correct-model 95% intervals |
+| Missing-block filter RMSE inside / outside | 0.6148 / 0.3649 | metrics: missing block |
+| Missing-block smoother RMSE inside / outside | 0.5950 / 0.3233 | metrics: missing block |
+| Wrong-\(q/r\) filter RMSE | 0.4788 for small-\(q\)/large-\(r\); 0.5070 for large-\(q\)/small-\(r\) | metrics: wrong-parameter stresses |
+| Wrong-\(q/r\) filter coverage | 0.7063 / 0.7438, below the correct-model 0.9484 | metrics: wrong-parameter stresses |
+| Reset-boundary failure diagnostic | artificial boundary continuity 0.8724; proper/joined first-eight RMSE 0.3335 / 0.3828 | diagnostics: reset boundary |
+| Near-unit-root stress | stationary prior variance 1.0050; first-20 initialization mean sensitivity 1.0643; tight-prior open-loop variance rises from 0.0690 at \(h=1\) to 0.9879 at \(h=200\), approaching the stationary 1.0050; finite nonnegative variances | diagnostics: near-unit-root |
+| Informative-missingness warning | missing fraction 0.2844; mean \(|z|\) missing/observed 0.7178 / 0.4060 | diagnostics: informative missingness |
+| Deterministic rerun | byte-identical manifest, CSV, diagnostics, and PNG in temporary regeneration | verifier and manifest hashes |
+
+The selected-grid prediction, recovery, and coverage gaps are zero here because the finite grid selected the generating tuple. This favorable finite-sample outcome is not a general parameter-learning result. The smoother's lower RMSE uses later observations and is not an online comparison. Both wrong-noise conditions degraded RMSE and interval coverage, while the reset negative control imposed a nonzero inherited boundary prediction. In the near-unit stress, a tight initial variance approached the model's stationary variance slowly under open-loop propagation; this is a diagnostic of the declared \(a=0.99\) model, not a universal unit-root effect size.
+
+## Interpretation
+
+The passed correct-model oracle establishes that, for the declared scalar LGSSM and numerical tolerance, the implementation returns the same fixed-parameter Gaussian marginals by recursive and batch routes. Recovery metrics would then describe finite simulations from that generator. They would not establish that any real data source is linear, Gaussian, stationary, first-order Markov, correctly segmented, or governed by the recovered transition.
+
+Filtering and smoothing must remain separate in every table and caption. The filter answers an online question with \(x_{1:t}\); the smoother answers a retrospective question with \(x_{1:T}\). More information can improve retrospective state reconstruction without making the smoother a fair competitor for a prospective decision.
+
+Wrong-\(q/r\), missing-block, boundary, and near-unit-root conditions diagnose sensitivity to assumptions. They do not provide a generic ranking of all state-space methods. A selected grid point is one data-dependent plug-in model among 27 candidates, not recovered ground truth.
+
+## What this toy model does NOT establish
+
+- It does not prove that observed data lie on a manifold or possess non-Euclidean geometry.
+- It does not identify a causal, physical, neural, or biological state.
+- It does not show that temporal correlation is a mechanistic dynamical law.
+- It does not turn decoding or latent RMSE into evidence of representation.
+- It does not prove unrestricted parameter identifiability or successful maximum-likelihood learning.
+- It does not include parameter uncertainty in plug-in posterior intervals.
+- It does not make fixed-interval smoothing online, causal, or prospectively available.
+- It does not validate skipped updates under informative missingness.
+- It does not imply that low reconstruction error, nominal coverage, or a smooth plot is sufficient evidence for model adequacy.
+- It does not authorize extension to another Phase 3 candidate or promotion to **stable**.
+
+## Extensions to real data
+
+Before a real-data use, the analyst would need to justify observation units, sampling intervals, sequence resets, covariates, latent dimension, transition and noise structure, missingness, nonstationarity, and evaluation splits. Parameters and preprocessing must be learned on independent training units. Prospective tasks require filtering or forecasting; retrospective smoothing outputs cannot be backdated into an online analysis. Residual and predictive checks should test Gaussianity, white innovations, heteroscedasticity, regime changes, and boundary effects. None of those extensions is executed here.
+
+## Reproducibility
+
+### Bounded artifact contract
+
+The implementation owner may create only:
+
+~~~text
+toy-models/linear-gaussian-inference-ladder.py
+toy-models/artifacts/linear-gaussian-inference-ladder/manifest.json
+toy-models/artifacts/linear-gaussian-inference-ladder/metrics.csv
+toy-models/artifacts/linear-gaussian-inference-ladder/diagnostics.json
+toy-models/artifacts/linear-gaussian-inference-ladder/summary.png
+~~~
+
+The source script must regenerate every artifact from scratch. The manifest records equations, all seeds, split sizes, sequence lengths, parameter grid and tie rule, selected tuple, missing-block indices, stress definitions, runtime and package versions, numerical tolerances, generation command, verification command, and SHA-256 hashes. **metrics.csv** contains tidy labelled records, not hand-entered summaries. **diagnostics.json** contains oracle, leakage, covariance, reset, near-unit-root, informative-missingness-warning, and deterministic-rerun checks. The single PNG is derived from the same frozen arrays and metrics.
+
+The required execution in the bundled runtime is:
+
+~~~bash
+/Users/bytedance/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3 toy-models/linear-gaussian-inference-ladder.py
+~~~
+
+By default the script generates the repository artifacts and verifies them, including a clean temporary regeneration and byte comparison. Explicit `--generate` and `--verify` modes are also available. JSON serialization order, float formatting, CSV row order, and PNG output are fixed so determinism is testable. No external data, network access, system package, or private resource is used at execution time.
+
+### Evidence inspected
+
+The following external evidence was actually retrieved and inspected for this design; repository Method summaries were used only as terminology anchors.
+
+- **Kalman (1960):** 12-page article PDF, bibliographic metadata and article-level text inspected. Equation-level inspection covered the “Optimal Estimates” distinction among smoothing, filtering, and prediction; the state-space Problem I; the recursive innovation/projection construction and Theorem 3; covariance recursion; examples; and conclusion. The appendix was not inspected line by line. Kalman's displayed observation formulation is historically broader/different in notation from the additive-noise scalar model used here, so Särkkä supplies the direct Bayesian additive-noise equations [@Kalman1960].
+- **Rauch, Tung, and Striebel (1965):** 14-page publisher-rendered PDF containing the six-page AIAA article plus appended citation material. Publication metadata, abstract, model/criterion setup, sections 3.1 and 3.2 at equation level, the numerical-example discussion, and section 5 conclusion were inspected. Appended citation lists and every continuous-time appendix equation were not inspected in detail [@RauchTungStriebel1965].
+- **Särkkä (2013):** author-hosted 252-page book PDF. Equation-level inspection covered sections 4.1--4.3 (state-space factorization, Bayesian filter, Kalman filter), 8.1--8.2 (fixed-interval Bayesian smoothing and RTS recursions), and 12.1--12.1.1 (unknown parameters and prediction-error/marginal-likelihood factorization). The full book was not read line by line [@Sarkka2013].
+
+The inspected sources support the fixed-parameter filtering/smoothing targets, recursions, and likelihood factorization. They do not supply the particular seeds, finite grid, stress magnitudes, or acceptance tolerances; those are predeclared LDG design choices.
+
+### Integration and validation state
+
+The scientific-design executor ran target structural and diff checks, the implementation owner ran deterministic script and artifact checks, and the parent orchestrator completed repository validation, tests, target/index/full-site renders, independent scientific and implementation focused review, and owner-authorized promotion under the recorded review decision. The executor did not review its own work.
+
+## Maturity checklist
+
+- [x] Complete Toy Model schema at **L1/stable** with generated empirical results distinguished from model-derived expectations.
+- [x] Generation, masking, parameter selection, inference, and scoring are separated.
+- [x] Ground truth, primary parameters, splits, seeds, boundaries, and missing block are predeclared.
+- [x] Known-parameter filtering, RTS smoothing, and direct batch conditioning have distinct information sets.
+- [x] Prediction, latent recovery, model-conditional uncertainty, and parameter uncertainty are distinguished.
+- [x] Finite-grid selection excludes test observations and all latent truth and is not called general ML estimation.
+- [x] Correct-model, wrong-\(q/r\), missing-block, reset-boundary, near-unit-root, and informative-missingness conditions are bounded.
+- [x] Online versus retrospective non-implication limits are explicit.
+- [x] Artifact inventory, manifest fields, determinism, metrics schema, and numerical oracles match the backlog contract.
+- [x] External evidence scope is recorded without claiming complete inspection.
+- [x] Bounded implementation and artifacts generated and deterministically verified.
+- [x] Independent scientific review PASS after focused re-review of the near-unit-root horizon diagnostic.
+- [x] Independent implementation review PASS after focused re-review of seven bounded verification and consistency corrections.
+- [x] Target and repository validation PASS, including deterministic regeneration, 51-object structural validation, 31 unit tests, target/index/full-site renders, and diff checks.
+- [x] Stable promotion explicitly authorized by the owner under the recorded review decision.

@@ -1,0 +1,190 @@
+---
+title: "Phase Space"
+object_type: concept
+maturity: L2
+status: stable
+domain:
+- foundations
+- dynamics
+tags:
+- phase-space
+- state-space
+- phase-portrait
+prerequisites:
+- knowledge/concepts/state-space.qmd
+- knowledge/concepts/trajectory.qmd
+related:
+- knowledge/concepts/state.qmd
+- knowledge/concepts/vector-field.qmd
+- knowledge/concepts/flow.qmd
+- knowledge/concepts/manifold.qmd
+- knowledge/concepts/embedding.qmd
+- knowledge/concepts/tangent-space.qmd
+created: 2026-08-18
+updated: 2026-08-18
+---
+
+# Phase Space
+
+## One-sentence definition
+
+A **phase space** is the state space used to represent a dynamical system so that each point denotes one admissible instantaneous state and each trajectory traces the system's evolution through those states.
+
+## Why this concept matters
+
+The term emphasizes a dynamical reading of a state space: points are possible system states, while curves through the space are trajectories generated or considered over time. It is especially common when position-like and velocity- or momentum-like variables must be represented together.
+
+LDG keeps “phase space” and “state space” close but not automatically identical. Some fields use them interchangeably; others reserve phase space for a particular dynamical construction. A reader should therefore inspect the declared variables and system boundary rather than infer them from the label alone.
+
+## Intuition
+
+A photograph of a pendulum angle cannot distinguish motion to the left from motion to the right. A phase-space description using angle and angular velocity assigns those cases different points. As time passes, the point moves and draws a trajectory.
+
+## Formal definition
+
+Let $\mathcal{X}$ be the admissible state values for a specified dynamical description and let $x:I\to\mathcal{X}$ be a trajectory. Calling $\mathcal{X}$ the phase space highlights the pair:
+
+1. each $x\in\mathcal{X}$ is one instantaneous state value; and
+2. system evolution is represented by trajectories or a flow acting on $\mathcal{X}$.
+
+For a second-order scalar equation, a common first-order state is $x=(q,v)$ with $v=\dot q$, so the corresponding phase space may be a subset of pairs $(q,v)$. Teschl uses this convention for Newtonian systems [@Teschl2012, sec. 6.7].
+
+This definition does not require Euclidean coordinates globally. A phase space may be an abstract set with additional structure, a Euclidean domain, or—when separately justified—a smooth manifold. Calling a representation a phase space does not supply that additional structure by itself.
+
+### First-order form of second-order dynamics
+
+For a finite-dimensional second-order system, let $q(t),v(t)\in\mathbb R^n$ and let $F:U\subseteq\mathbb R^n\times\mathbb R^n\to\mathbb R^n$. Starting from
+
+$$
+\ddot q=F(q,\dot q),
+$$
+
+introduce the velocity variable $v=\dot q$ and phase coordinate $x=(q,v)\in U$. The system becomes
+
+$$
+\dot x
+=
+\begin{pmatrix}
+\dot q\\
+\dot v
+\end{pmatrix}
+=
+\begin{pmatrix}
+v\\
+F(q,v)
+\end{pmatrix}.
+$$
+
+This construction explains the common position–velocity convention: one phase point contains the information required by the first-order evolution rule [@Teschl2012, sec. 1.1]. It does not prove existence, uniqueness, completeness, or the adequacy of $(q,v)$ as a real-system state, and it does not imply that every scientific state description has position and velocity components.
+
+::: {.callout-tip title="LDG Synthesis"}
+For a smooth configuration manifold $Q$, velocity-state descriptions are naturally represented using the tangent bundle $TQ$. Hamiltonian formulations instead commonly replace velocity by momentum and use position–momentum coordinates, with cotangent-bundle language supplying the intrinsic generalization [@Teschl2012, sec. 8.3; @Mrowka2004]. Relating $TQ$ and $T^*Q$ requires additional mechanical structure, so LDG does not treat either convention as the universal meaning of phase space.
+:::
+
+### Coordinates and equivalent representations
+
+Let $h:\mathcal X\to\mathcal Y$ be a time-independent diffeomorphism and set $y(t)=h(x(t))$. If
+
+$$
+\dot x=f(x),
+$$
+
+then the coordinate expression in $y$ is
+
+$$
+\dot y
+=
+Dh(x)f(x)
+=
+Dh\bigl(h^{-1}(y)\bigr)f\bigl(h^{-1}(y)\bigr).
+$$
+
+Thus numerical coordinates, vector components, and the appearance of a phase portrait can change while representing the same abstract states and trajectories. A time-dependent coordinate transformation would contribute an additional partial-time derivative and is outside this bounded formula. A projection or non-injective observation map can collapse distinct phase points and need not preserve the dynamics.
+
+### Phase portraits
+
+**LDG convention:** a **phase portrait** is a coordinate-dependent representation of selected trajectories, orbits, vector-field directions, invariant sets, or other qualitative features in phase space. Teschl directly uses phase portraits as collections of plotted solution structure for autonomous systems [@Teschl2012, secs. 3.2, 6.7]. The broader LDG convention makes explicit which additional qualitative overlays are being shown. A portrait is evidence about the specified model or fitted representation, not a proof that recorded data constitute the complete phase space.
+
+## Core notation
+
+- $\mathcal{X}$: the phase space or dynamical state space.
+- $x\in\mathcal{X}$: one phase point, meaning one state value.
+- $x(t)$: the phase point occupied at time $t$.
+- $x:I\to\mathcal{X}$: one trajectory.
+- $(q,v)$: a common position–velocity coordinate pair.
+- $f(x)$: coordinate expression of a first-order vector field.
+- $h:\mathcal X\to\mathcal Y$: time-independent diffeomorphic coordinate change.
+- $Dh(x)$: derivative/Jacobian transporting vector components between coordinates.
+- $TQ$: velocity phase space associated with a smooth configuration manifold $Q$, when that manifold structure is independently justified.
+
+## Prerequisites
+
+[State Space](state-space.qmd) defines admissible state values. [Trajectory](trajectory.qmd) supplies the time-indexed path through those values.
+
+**Assumed background:** elementary derivatives, Jacobians, coordinate pairs, and first-order rewriting of a second-order equation. Tangent-bundle derivations are deferred to dedicated geometry objects.
+
+## Relationship to adjacent concepts
+
+| Concept | Relationship |
+|---|---|
+| **State space** | The broader LDG term for admissible states under a specified description. “Phase space” emphasizes that those states are being used for dynamics; usage conventions vary. |
+| **Phase portrait** | A drawing or collection of trajectories in chosen phase-space coordinates. The portrait is a representation, not the phase space itself. |
+| **Trajectory** | One time-parameterized evolution in the phase space, not the collection of all admissible states. |
+| **Orbit** | The visited-state set of a trajectory after time labels are discarded. A phase portrait may show orbits without preserving timing. |
+| **Observation space** | Values produced by a measurement model. An observation vector need not identify a phase point uniquely. |
+| **Embedding** | A representation map into an ambient space. The embedded image is distinct from the intrinsic source object, but a verified structure-preserving embedding with pushed-forward dynamics can provide an equivalent realization. A generic dimensionality-reduction map need not be injective or dynamics-preserving. |
+| **Manifold** | A possible smooth structure for a phase space when separately established. “Phase space” alone does not imply a manifold. |
+
+## What this does NOT imply
+
+Calling a set a phase space does **not** imply that:
+
+- plotted data have been shown to be the true state of the system;
+- the space is low-dimensional, Euclidean, smooth, or a manifold;
+- a two-dimensional visualization preserves the system's dynamics;
+- temporal samples define a vector field or flow;
+- the chosen coordinates are unique or mechanistically privileged; or
+- nearby plotted points are close under a scientifically meaningful metric.
+- a phase portrait preserves elapsed time, density, uncertainty, or unobserved state variables; or
+- an invertible coordinate convention has been established for a learned projection.
+
+## Minimal example
+
+For $\ddot q=-q$, set $x=(q,v)$ with $v=\dot q$. The phase space is $\mathbb{R}^2$ in these coordinates, and trajectories satisfy
+
+$$
+\dot q=v,\qquad \dot v=-q.
+$$
+
+Each point gives both position and velocity. Circular trajectories in this example are consequences of the specified equation, not evidence that every phase space is circular or two-dimensional.
+
+## Neuroscience / behavioral relevance
+
+A neural or behavioral phase-space plot may place selected activity variables, latent coordinates, positions, or velocities on axes. Such a plot becomes a phase-space representation only relative to an explicit state description. A delay embedding or low-dimensional projection is not automatically the system's state space.
+
+## Relevance to LDG
+
+At L2, Phase Space gives LDG a typed bridge from higher-order equations to first-order dynamics and clarifies how coordinate transformations alter formulas and portraits without necessarily altering the underlying evolution. It also enforces a boundary: visualizing neural activity in coordinates is not by itself evidence for a manifold, an invertible embedding, or a complete state description.
+
+## Open questions
+
+- When should LDG use “phase space” rather than the more general “state space”?
+- Which measured or inferred variables are sufficient to form a useful phase-space description?
+- How should uncertainty in an inferred phase point be represented?
+
+## References
+
+- Teschl provides the inspected first-order position–velocity reduction, trajectory/orbit terminology, and dynamical-systems convention [@Teschl2012, secs. 1.1, 6.2–6.3, 6.7].
+- Teschl provides inspected phase-portrait examples and first-order autonomous-system context [@Teschl2012, secs. 3.2, 6.7].
+- Mrowka provides the inspected chart and coordinate-change framework used only to delimit the manifold case [@Mrowka2004, secs. 1, 7.2].
+
+## Maturity checklist
+
+- [x] Defines phase space through states and trajectories.
+- [x] Distinguishes phase space, state space, phase portrait, and observation space.
+- [x] Includes a minimal first-order mechanical example.
+- [x] States that a visualization or embedding does not establish manifold structure.
+- [x] Rewrites a bounded second-order system as a typed first-order phase-space system.
+- [x] States how vector-field coordinates transform under a time-independent diffeomorphism.
+- [x] Separates phase point, trajectory, orbit, portrait, observation, embedding, and manifold roles.
+- [x] Independent L2 scientific review completed; initial findings were corrected and focused re-review passed under the recorded review decision.

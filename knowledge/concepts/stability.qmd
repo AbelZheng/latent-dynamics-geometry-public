@@ -1,0 +1,174 @@
+---
+title: "Stability"
+object_type: concept
+maturity: L2
+status: stable
+domain:
+- dynamics
+tags:
+- stability
+- perturbation
+- lyapunov-stability
+prerequisites:
+- knowledge/concepts/fixed-point.qmd
+- knowledge/concepts/flow.qmd
+related:
+- knowledge/concepts/initial-condition.qmd
+- knowledge/concepts/trajectory.qmd
+- knowledge/concepts/metric.qmd
+- knowledge/concepts/attractor.qmd
+created: 2026-08-18
+updated: 2026-08-18
+---
+
+# Stability
+
+## One-sentence definition
+
+**Stability** describes whether specified small perturbations of a dynamical object produce evolutions that remain close under a declared time direction and notion of closeness.
+
+## Why this concept matters
+
+“Stable” is incomplete unless the object, perturbation, time horizon, and comparison criterion are stated. At this stage LDG focuses on forward Lyapunov stability of a fixed point and distinguishes it from asymptotic return.
+
+## Intuition
+
+Balance a ball in a bowl and nudge it slightly. If it stays near the bottom, the equilibrium is stable. If it also returns toward the bottom, it is asymptotically stable. A ball balanced on a hilltop is a fixed point but not stable.
+
+## Formal definition
+
+Let $x^\ast$ be a fixed point of a forward evolution on a state space $\mathcal X$. In neighborhood form, $x^\ast$ is **Lyapunov stable** when, for every neighborhood $U$ of $x^\ast$, there exists a neighborhood $V\subseteq U$ such that every trajectory starting in $V$ is supported for all $t\ge0$ and remains in $U$ for all $t\ge0$.
+
+On a metric state space $(\mathcal X,d)$ this becomes
+
+$$
+\forall\varepsilon>0\;\exists\delta>0\;\forall x_0\in\mathcal X:
+\quad
+d(x_0,x^\ast)<\delta
+\Longrightarrow
+\left(
+[0,\infty)\subseteq I_{x_0}
+\;\text{ and }\;
+d(\phi_t(x_0),x^\ast)<\varepsilon\ \forall t\ge0
+\right),
+$$
+
+where $I_{x_0}$ is the supported elapsed-time interval through $x_0$.
+
+The fixed point is **asymptotically stable** when it is Lyapunov stable and there is a neighborhood $A$ of $x^\ast$ such that every trajectory from $A$ is supported for all forward time and
+
+$$
+\lim_{t\to\infty}d(\phi_t(x_0),x^\ast)=0.
+$$
+
+Convergence without the Lyapunov condition is attraction but is not automatically asymptotic stability. Teschl explicitly notes that the convergence condition alone need not imply stability [@Teschl2012, sec. 6.5].
+
+The fixed point is **locally exponentially stable** when there exist constants $C\ge1$, $\alpha>0$, and $\delta>0$ such that, for all $x_0$ with $d(x_0,x^\ast)<\delta$, the forward trajectory is supported and
+
+$$
+d(\phi_t(x_0),x^\ast)
+\le
+C e^{-\alpha t}d(x_0,x^\ast),
+\qquad t\ge0.
+$$
+
+This quantitative bound implies Lyapunov stability and local attraction under the stated metric and support assumptions [@Teschl2012, sec. 6.5].
+
+### Local and global scope
+
+The definitions above are local because they constrain only sufficiently nearby initial states. **Global asymptotic stability** additionally requires the declared forward domain to include every admissible initial state and requires all of those trajectories to converge to $x^\ast$, while retaining Lyapunov stability. “Global” is therefore relative to the stated state space and forward domain, not necessarily to all of $\mathbb R^n$.
+
+### Which perturbation is being tested?
+
+The bounded definitions perturb the **initial state** while holding the evolution rule, parameters, inputs, state description, and metric fixed. Parameter robustness, input-to-state stability, stochastic stability, structural stability, observation robustness, and numerical stability are different questions with different perturbation objects and criteria.
+
+### Coordinate and metric dependence
+
+::: {.callout-tip title="LDG Synthesis"}
+
+The neighborhood definition of Lyapunov and asymptotic stability is preserved under a verified topological conjugacy that transports the evolution and neighborhoods. Exponential stability additionally contains a numerical rate and distance bound, so it is not invariant under an arbitrary homeomorphism or arbitrary rescaling without further regularity and metric-equivalence conditions. LDG therefore records the metric and coordinate convention for quantitative rate claims rather than treating $C$ or $\alpha$ as representation-free.
+:::
+
+## Core notation
+
+- $x^\ast$: the fixed point whose stability is tested.
+- $x_0$: a perturbed initial state.
+- $d$: the declared notion of distance or closeness.
+- $\varepsilon$: tolerated departure from the reference.
+- $\delta$: allowed initial perturbation.
+- $t\ge0$: the forward-time direction in scope.
+- $A$: local basin neighborhood used in the asymptotic-stability definition.
+- $C,\alpha$: multiplicative constant and exponential decay rate.
+- forward support/completeness: requirement that the quantified trajectories exist for all $t\ge0$.
+
+## Prerequisites
+
+[Fixed Point](fixed-point.qmd) identifies the invariant reference state. [Flow](flow.qmd) supplies its evolution and the nearby trajectories being compared. [Metric](metric.qmd) makes the quantitative notion of closeness explicit.
+
+**Assumed background:** neighborhoods, limits, and elementary metric distance.
+
+## Relationship to adjacent concepts
+
+| Concept | Distinction |
+|---|---|
+| **Fixed point** | Fixedness concerns the unperturbed state; stability concerns nearby initial states. |
+| **Attraction** | Requires convergence toward a set. It need not imply Lyapunov stability; asymptotic stability requires both attraction and stability. |
+| **Global asymptotic stability** | Extends attraction to the declared full forward domain while retaining Lyapunov stability. It is stronger than a local statement. |
+| **Exponential stability** | Adds a metric-dependent quantitative decay bound; it is stronger than asymptotic stability in the stated setting. |
+| **Robustness** | Robustness may concern parameter, model, input, or observation perturbations rather than initial-state perturbations. |
+| **Numerical stability** | A property of an algorithm or discretization, not automatically of the underlying dynamical system. |
+| **Statistical stationarity** | A distributional time-invariance property, not Lyapunov stability. |
+
+## What this does NOT imply
+
+Stability does **not** imply:
+
+- asymptotic convergence unless that stronger condition is shown;
+- resilience to parameter changes, inputs, noise, or model misspecification;
+- global behavior from all initial conditions unless global scope and forward support are proved;
+- a unique equilibrium or basin;
+- that a finite observed trajectory will visibly return; or
+- that low variance in data establishes dynamical stability;
+- that successful decoding, low reconstruction error, or a smooth posterior mean verifies all nearby initial states and all future times; or
+- that stability transfers through a non-injective observation or projection.
+
+## Minimal example
+
+Three scalar systems separate the principal cases:
+
+1. For $\dot x=0$, every point is Lyapunov stable because nearby states remain where they started, but no point attracts a distinct neighboring state.
+2. For $\dot x=-x$, $x^\ast=0$ is exponentially stable because $x(t)=x_0e^{-t}$ satisfies the decay bound with $C=1$ and $\alpha=1$.
+3. For $\dot x=x$, $x^\ast=0$ is unstable because arbitrarily small nonzero initial states grow in forward time.
+
+These examples classify the stated systems directly. They do not authorize a general Jacobian or linearization criterion for nonlinear models; those theorem-level results remain outside this bounded Concept.
+
+## Neuroscience / behavioral relevance
+
+Stability can formalize hypotheses about persistence or recovery of neural and behavioral states after perturbation. Evidence requires specified perturbations and state variables; repeatable occupancy near a region or low trial variance is not enough by itself.
+
+## Relevance to LDG
+
+At L2, Stability supplies explicit quantifiers, time-support assumptions, local/global scope, and the hierarchy among Lyapunov, asymptotic, and exponential stability. It also forces analyses to state which perturbation, state space, metric, and coordinate convention define “nearby” and “rate.”
+
+## Open questions
+
+- Which perturbations are experimentally realizable and scientifically relevant?
+- How should stability be assessed when only partial noisy observations are available?
+- When is a local stability statement adequate for a behavioral claim?
+
+## References
+
+- Teschl gives the inspected Lyapunov, asymptotic, and exponential fixed-point definitions and the warning that convergence alone need not imply stability [@Teschl2012, sec. 6.5].
+- Lyapunov-function, linearization, and eigenvalue criteria in later parts of Teschl are intentionally deferred from this Concept.
+
+## Maturity checklist
+
+- [x] Names the object, perturbation, distance, and forward-time direction.
+- [x] Separates Lyapunov stability from asymptotic stability.
+- [x] Separates dynamical stability from robustness and stationarity.
+- [x] Includes stable and unstable minimal examples.
+- [x] States complete Lyapunov, asymptotic, and exponential quantifiers with forward support.
+- [x] Separates local and global scope and attraction from stability.
+- [x] Distinguishes initial-state stability from parameter, input, stochastic, structural, observation, and numerical robustness.
+- [x] States the coordinate/metric limits of quantitative exponential rates.
+- [x] Independent L2 scientific review completed; initial findings were corrected and focused re-review passed under the recorded review decision.

@@ -1,0 +1,152 @@
+---
+title: "State"
+object_type: concept
+maturity: L1
+status: stable
+domain:
+- foundations
+- dynamics
+tags:
+- state
+- system-description
+- dynamics
+prerequisites: []
+related: []
+created: 2026-08-17
+updated: 2026-08-17
+---
+
+# State
+
+## One-sentence definition
+
+The **state** of a specified system at time $t$ is the current information its chosen description carries forward to determine or predict later evolution.
+
+## Why this concept matters
+
+State is the point at which a description of a changing system separates relevant past from future evolution. Effects of the past that still matter must be carried in the current state; details of the past that no longer matter need not be retained separately. This makes the term stronger than “what was measured now” and more specific than “a set of variables.”
+
+A clear state definition also assigns different roles to quantities in a model. Some quantities change as part of the system, some are measured from it, some are fixed features of the model, and some influence it from outside the chosen boundary. Confusing these roles makes later claims about dynamics difficult to interpret.
+
+## Intuition
+
+Imagine pausing a system at time $t$. A state description is adequate if it contains the information that must be carried forward to continue the description from that time, without consulting the earlier history again. Åström and Murray express this by describing state variables as variables that summarize the past for predicting the future; they also emphasize that choosing how accurately to represent the relevant information is a modeling decision [@AstromMurray2021, sec. 3.2].
+
+Three qualifications are essential:
+
+1. **A state is relative to a system boundary.** The state of a pendulum, the state of a pendulum plus its actuator, and the state of an entire experimental apparatus need not contain the same information.
+2. **A state is indexed by time.** $x(t)$ refers to the state assigned at a particular time or sampling instant, not to the system in general.
+3. **A state is relative to a description and purpose.** A model may omit microscopic details while retaining enough information for the evolution it is intended to describe. Its state is therefore not automatically the complete physical condition of the real system.
+
+Three closely related expressions should not be collapsed:
+
+- A **state description** specifies the chosen collection and structure of future-relevant variables, such as “angle and angular velocity.”
+- A **state value** is one realized condition under that description at a particular time, such as a particular angle and angular velocity at $t$.
+- A **state vector** is a coordinate representation of a state value, commonly written $x(t)$. The same state information may admit another coordinate representation.
+
+Later LDG objects therefore use “possible states” to mean admissible **state values**, not alternative state descriptions.
+
+## Formal definition
+
+For a specified system description, let $x(t)$ represent its state value at time $t$. The proposed description qualifies as a state description if the model can continue from $t$ using:
+
+- $x(t)$;
+- the specified evolution rule and fixed parameters; and
+- the future values or prescription of external inputs, where the modeled evolution depends on them,
+
+without separately requiring the system's history before $t$.
+
+In a deterministic description, these items specify the modeled future. The state description need not be the smallest possible collection: redundant variables can be included, although minimality may be desirable. Nor is its coordinate representation unique.
+
+**LDG generalization:** for a probabilistic description, LDG applies the same future-sufficiency criterion to the model's distribution of possible futures rather than to one exactly determined future. This extension is not attributed here to the deterministic textbook definition cited above.
+
+This is a criterion inside a declared model. Calling $x(t)$ a state asserts future-relevance and adequacy for that model; it does not establish that $x(t)$ is a complete or uniquely correct description of the physical system.
+
+**Physical condition versus model-defined state.** A real system admits descriptions at different scales and with different boundaries. A model-defined state is the information retained for one such description. It can be scientifically useful without being identical to a complete microscopic physical description, but its adequacy must not be claimed beyond the model's stated scale and assumptions.
+
+## Core notation
+
+- $t$: the time or sampling instant at which the state is defined.
+- $x(t)$: the state value at time $t$; when coordinates are used, its coordinate tuple is the state vector.
+- $x_i(t)$: one state variable or coordinate within a multivariable state description.
+- $u(t)$: an optional external input, kept conceptually separate from the state.
+- $\theta$: fixed parameters of the specified model over the interval being considered.
+- $y(t)$: an observation or measurement related to the system at time $t$.
+
+The letters are conventional, not definitions. A quantity's role must be stated rather than inferred from its symbol.
+
+## Prerequisites
+
+**Assumed background:** basic functions of time and elementary vector notation. No existing LDG Knowledge Object is required.
+
+## Relationship to adjacent concepts
+
+| Concept | Distinction from state |
+|---|---|
+| **Observation or measurement** | An observation is information obtained through a sensor, recording process, or behavioral readout. It may be noisy, partial, delayed, or indirect. A state is defined by its role in continuing the system description. An ideal observation can coincide numerically with the state, but the roles remain distinct: one is what is measured, the other is what the model carries forward. One observation need not reveal the state uniquely, and a measured vector is not automatically a state. |
+| **Variable** | A variable is a named quantity that can take values. A state is a collection of variable values with a joint future-relevance role. A variable may instead be an observation, input, parameter, or derived summary. |
+| **Parameter** | A parameter indexes or specifies the model or evolution rule and is held fixed under the declared description; a state value is initialized and propagated by that description. The distinction is about modeling role, not whether a number happens to change: a state may remain constant, for example at equilibrium. An unknown constant parameter can sometimes be incorporated into an augmented state if the description is explicitly reformulated that way. |
+| **External input** | An external input is a time-varying influence treated as originating outside the chosen system boundary. It can affect future evolution, but its future values are not generally contained in the current internal state. Past input effects that persist must be represented in the current state. |
+| **Latent state** | A latent state is a state that is not directly observed and is instead inferred or posited by a model. “Latent” concerns access through observations; “state” concerns the variable's future-relevance role. A hidden variable is not automatically an adequate state, and a latent state need not correspond uniquely to a physical entity. |
+| **Description or feature vector** | A state description specifies the structure of future-relevant variables; a state value realizes that description at a time. A label, summary statistic, embedding coordinate, or list of contemporaneous features counts as a state description only if it is adequate for the specified evolution question. |
+
+## What this does NOT imply
+
+Calling something a state does **not** by itself imply that:
+
+- it is directly observable or exactly recoverable from raw measurements;
+- a single measurement determines it uniquely;
+- it contains every physical detail of the real system;
+- it is the only valid state representation or uses unique coordinates;
+- it is minimal, low-dimensional, noise-free, or continuous;
+- its future is deterministic;
+- every component has an independent physical interpretation;
+- the proposed variables are actually adequate for prediction outside the assumptions and scale of the model; or
+- fitting or visualizing a time-varying feature vector establishes a dynamical mechanism.
+
+## Minimal example
+
+Consider an idealized damped pendulum moving in a plane. Suppose the system boundary includes the pendulum but treats its length and damping coefficient as fixed model parameters and an applied torque as an external input.
+
+At time $t$, the angle alone is generally not an adequate state: two pendulums can have the same angle while moving in opposite directions, leading to different immediate futures. A standard state description therefore contains both angle and angular velocity,
+
+$$
+x(t) = \bigl(\text{angle at }t,\;\text{angular velocity at }t\bigr).
+$$
+
+A camera-derived angle estimate is an observation. It may be noisy and does not by itself supply angular velocity. Pendulum length and damping are parameters under this description, while applied torque after $t$ is an input. If angle and angular velocity are inferred from video rather than directly measured, they are latent relative to that observation process, but they retain the role of state variables in the pendulum model.
+
+## Neuroscience / behavioral relevance
+
+In neural population analysis, a common operational description places the activity of each recorded neuron on one coordinate axis, so that the vector of population activity at a time is a point in those coordinates. Cunningham and Yu support this population-coordinate construction and distinguish recorded population activity from lower-dimensional latent variables extracted from it [@CunninghamYu2014]. Calling that vector an operational **recorded-population state** is LDG's framing when a study assigns it the role of state; it is not a claim made by the source and does not show that the vector is the complete state of the circuit, brain, or behaving organism.
+
+The same discipline applies to behavior. A video frame, pose estimate, cursor position, or task label is first an observation or feature. It should be called a behavioral state only relative to a declared system boundary and when its information is adequate for the evolution being studied. Additional variables such as velocity, task context, or unobserved internal condition may be required; which ones matter is an empirical and modeling question.
+
+## Relevance to LDG
+
+Later LDG work will compare measured neural and behavioral variables with inferred latent descriptions and their change over time. The concept of state provides the role assignment needed before any such analysis: LDG must say what system is being modeled, at what time scale, which quantities constitute the proposed state, which are observations, which are inputs or parameters, and what claim of future adequacy is being made.
+
+This prevents several recurring errors: treating a data vector as a state merely because it is time-indexed, treating inferred coordinates as uniquely real, or interpreting predictive performance as automatic evidence that the chosen state is physically complete or mechanistically correct.
+
+## Open questions
+
+- For a particular neural or behavioral dataset, what evidence would show that a proposed state omits future-relevant information?
+- At what system boundary and temporal resolution is a proposed state intended to be adequate?
+- When several state descriptions support similar predictions, what additional evidence should determine which description is scientifically useful?
+
+These are model- and dataset-specific questions; the L1 definition does not resolve them in advance.
+
+## References
+
+- General definition and modeling distinction: [@AstromMurray2021, sec. 3.2].
+- Neuroscience-specific population-activity convention: [@CunninghamYu2014].
+
+## Maturity checklist
+
+- [x] Defines state relative to a specified system, time, boundary, and description.
+- [x] Distinguishes state description, state value, and state vector.
+- [x] States the information-adequacy criterion without requiring later Cycle 1 concepts.
+- [x] Distinguishes state from observation, variable, parameter, external input, latent state, and generic description.
+- [x] Includes explicit non-implications and a minimal example.
+- [x] Restricts neuroscience claims to an inspected domain source and states their limits.
+- [x] Has received lightweight conceptual review and incorporated the required L1 corrections.

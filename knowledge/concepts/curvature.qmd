@@ -1,0 +1,207 @@
+---
+title: "Curvature"
+object_type: concept
+maturity: L2
+status: stable
+domain: [geometry]
+tags: [curvature, riemann-curvature, sectional-curvature]
+prerequisites:
+- knowledge/concepts/riemannian-metric.qmd
+related:
+- knowledge/concepts/geodesic.qmd
+- knowledge/concepts/embedding.qmd
+created: 2026-08-18
+updated: 2026-08-18
+---
+
+# Curvature
+
+## One-sentence definition
+
+**Curvature** quantifies how a chosen geometric structure departs from flat geometry, with the precise meaning depending on the curvature object and sign convention in use.
+
+## Why this concept matters
+
+Curvature can describe how tangent directions change, how geodesics converge or diverge, and how local geometry differs from Euclidean space. It is not one universal scalar and should not be inferred from visible bending alone.
+
+## Intuition
+
+On a sphere, initially parallel geodesics can converge; in negatively curved geometry they tend to spread. Intrinsic curvature can be measured within the surface without reference to how it bends in an ambient space.
+
+## Formal definition
+
+Let $(M,g)$ be a Riemannian manifold with Levi–Civita connection $\nabla$. **LDG adopts Lee's convention**
+
+$$
+R(X,Y)Z
+=
+\nabla_X\nabla_YZ
+-
+\nabla_Y\nabla_XZ
+-
+\nabla_{[X,Y]}Z.
+$$
+
+This is the Riemann curvature endomorphism, equivalently a $(1,3)$ tensor. The covariant curvature tensor is
+
+$$
+\operatorname{Rm}(X,Y,Z,W)
+=
+g(R(X,Y)Z,W).
+$$
+
+Some authors reverse the sign of $R$ or permute arguments in $\operatorname{Rm}$; formulas and signs must therefore be compared only after conventions are aligned [@Lee1997, ch. 7].
+
+Under this convention the covariant tensor satisfies
+
+$$
+\operatorname{Rm}(X,Y,Z,W)
+=-\operatorname{Rm}(Y,X,Z,W),
+$$
+
+$$
+\operatorname{Rm}(X,Y,Z,W)
+=-\operatorname{Rm}(X,Y,W,Z),
+$$
+
+$$
+\operatorname{Rm}(X,Y,Z,W)
+=\operatorname{Rm}(Z,W,X,Y),
+$$
+
+along with the algebraic Bianchi identity. Proofs are deferred.
+
+### Sectional curvature
+
+For a two-dimensional plane $\Pi\subset T_pM$ with basis $X,Y$, its sectional curvature is
+
+$$
+K(\Pi)=K(X,Y)
+=
+\frac{\operatorname{Rm}(X,Y,Y,X)}
+{g(X,X)g(Y,Y)-g(X,Y)^2}.
+$$
+
+The denominator is the squared area of the parallelogram spanned by $X,Y$, so the value is independent of the chosen basis of $\Pi$. If $X,Y$ are orthonormal, $K(\Pi)=\operatorname{Rm}(X,Y,Y,X)$ [@Lee1997, ch. 8].
+
+### Ricci and scalar curvature
+
+For an orthonormal basis $E_1,\ldots,E_n$ of $T_pM$, the Ricci tensor is the contraction
+
+$$
+\operatorname{Ric}(X,Y)
+=
+\sum_{i=1}^{n}
+\operatorname{Rm}(E_i,X,Y,E_i),
+$$
+
+consistent with Lee's sign/order convention. Scalar curvature is the metric trace
+
+$$
+S
+=
+\operatorname{tr}_g\operatorname{Ric}
+=
+\sum_{j=1}^{n}\operatorname{Ric}(E_j,E_j).
+$$
+
+For a unit vector $V$, $\operatorname{Ric}(V,V)$ sums sectional curvatures of orthonormal planes containing $V$, while scalar curvature sums the corresponding ordered sectional contributions. These contractions summarize rather than replace the full curvature tensor.
+
+### Coordinates and isometries
+
+In coordinates, $R$ and $\operatorname{Rm}$ have component arrays such as $R^\ell{}_{ijk}$ and $R_{ijkl}$. The arrays transform tensorially even though formulas used to compute them contain non-tensorial Christoffel symbols. Vanishing/nonvanishing, sectional curvature, Ricci curvature, and scalar curvature are invariant geometric statements, not properties of one coordinate display.
+
+If $F:(M,g)\to(N,h)$ is a local isometry, curvature is preserved:
+
+$$
+F^*\operatorname{Rm}^{N}=\operatorname{Rm}^{M},
+$$
+
+with the corresponding pushforward relation for $R$. Lee proves curvature is a local-isometry invariant [@Lee1997, ch. 7].
+
+### Constant-curvature model spaces
+
+Under the adopted convention:
+
+- Euclidean space has $K=0$;
+- the round sphere of radius $r$ has constant sectional curvature $K=1/r^2$;
+- hyperbolic space of radius $r$ has constant sectional curvature $K=-1/r^2$.
+
+Changing the curvature-tensor sign convention requires changing the component formula so the geometric meanings of positive and negative sectional curvature remain aligned [@Lee1997, ch. 8].
+
+## Core notation
+
+- $R(X,Y)Z$: Riemann curvature endomorphism, equivalently the associated $(1,3)$ tensor.
+- $\operatorname{Rm}(X,Y,Z,W)$: covariant Riemann curvature tensor after lowering an index with $g$.
+- $K(\Pi)$: sectional curvature of a two-dimensional tangent plane.
+- $\operatorname{Ric}$: Ricci curvature tensor.
+- $S=\operatorname{tr}_g\operatorname{Ric}$: scalar curvature.
+- $R^\ell{}_{ijk},R_{ijkl}$: coordinate components under the declared convention.
+
+## Prerequisites
+
+[Riemannian Metric](riemannian-metric.qmd) supplies lengths, angles, and the canonical connection needed for Riemannian curvature.
+
+**Assumed background:** vector-field brackets, covariant derivatives, and the Levi–Civita connection. These are used only to state the bounded definition; their derivation is deferred beyond this object.
+
+## Relationship to adjacent concepts
+
+| Concept | Distinction |
+|---|---|
+| **Extrinsic bending** | Depends on an embedding and second fundamental form; intrinsic Riemannian curvature is determined by $g$ without choosing an ambient embedding. A cylinder is extrinsically bent but intrinsically flat. |
+| **Gaussian curvature** | On a Riemannian surface it equals the single sectional curvature at each point; in higher dimensions there are many tangent 2-planes. |
+| **Principal / mean curvature** | Extrinsic hypersurface quantities, not Ricci or scalar curvature. |
+| **Nonlinearity** | A model can be nonlinear on a flat space, and a curved space can support simple local equations. |
+| **Geodesic deviation** | One manifestation of curvature, not the definition of every curvature notion. |
+| **Topology** | Related through global theorems but not synonymous; local curvature does not uniquely determine topology. |
+
+## What this does NOT imply
+
+Curvature does not imply visible bending, nonlinear dynamics, a unique scalar summary, a specific topology, better prediction, or reliable estimation from sparse point clouds. Zero scalar curvature does not imply the full curvature tensor vanishes. Signs can reverse across source conventions, and coordinate-dependent estimator output is not automatically intrinsic curvature.
+
+## Minimal example
+
+For the standard model spaces under the adopted convention:
+
+$$
+K_{\mathbb R^n}=0,
+\qquad
+K_{S_r^n}=\frac{1}{r^2},
+\qquad
+K_{H_r^n}=-\frac{1}{r^2}.
+$$
+
+In two dimensions $S=2K$, but in higher dimensions scalar curvature aggregates many sectional curvatures. Consequently, one scalar can hide anisotropic positive and negative sectional behavior.
+
+A cylinder in $\mathbb R^3$ is visibly bent but has zero intrinsic Gaussian curvature, illustrating that extrinsic appearance does not determine intrinsic curvature.
+
+## Neuroscience / behavioral relevance
+
+Claims that latent neural geometry is curved require a declared metric, scale, estimator, uncertainty analysis, and comparison with flat or locally linear baselines.
+
+## Relevance to LDG
+
+At L2, Curvature connects the Riemann tensor, sectional planes, Ricci and scalar contractions, isometries, and model spaces while enforcing the distinction among intrinsic geometry, embeddings, dynamics, topology, and empirical estimation.
+
+## Open questions
+
+- Which curvature notion matches a scientific hypothesis?
+- How biased are curvature estimates under noise and sparse sampling?
+- Does curvature improve prediction beyond linear and metric baselines?
+
+## References
+
+- Lee provides the inspected curvature convention, tensor symmetries, local-isometry invariance, sectional/Ricci/scalar definitions, and constant-curvature model spaces [@Lee1997, chs. 7–8].
+- Bianchi proofs, submanifold/Gauss equations, comparison theorems, topology-curvature theorems, and data estimators are intentionally deferred.
+
+## Maturity checklist
+
+- [x] Defines curvature through a chosen geometric structure.
+- [x] Separates intrinsic curvature, extrinsic bending, nonlinearity, and topology.
+- [x] Flags multiple curvature notions and sign conventions.
+- [x] Declares the endomorphism/tensor sign and argument-order convention.
+- [x] Types sectional, Ricci, and scalar curvature.
+- [x] Separates invariant objects from coordinate components and states isometry invariance.
+- [x] Gives correct Euclidean, spherical, and hyperbolic constant-curvature examples.
+- [x] Separates intrinsic curvature from extrinsic bending, topology, dynamics, and finite-sample estimates.
+- [x] Independent L2 scientific review completed with PASS under the recorded review decision.

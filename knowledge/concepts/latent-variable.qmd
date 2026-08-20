@@ -1,0 +1,123 @@
+---
+title: "Latent Variable"
+object_type: concept
+maturity: L1
+status: stable
+domain:
+- latent-modeling
+- statistics
+tags:
+- latent-variable
+- hidden-variable
+- observation
+prerequisites: []
+related:
+- knowledge/concepts/state.qmd
+- knowledge/concepts/state-space.qmd
+created: 2026-08-18
+updated: 2026-08-18
+---
+
+# Latent Variable
+
+## One-sentence definition
+
+A **latent variable** is a variable included in a model but not directly observed in the available data and related to observations through the model; it may be inferred conditionally or integrated out.
+
+## Why this concept matters
+
+Latent variables can provide compact explanations of dependence, hidden state, unmeasured causes, or structured variability. Their meaning comes from a specified model and evidence, not from being low-dimensional or visually interpretable.
+
+## Intuition
+
+Suppose several measurements covary because the model posits a smaller set of unobserved quantities that influence them. Those unobserved quantities are latent variables. Different models can assign different latent variables to the same observations.
+
+## Formal definition
+
+Let $y$ denote observed data and $z$ a latent variable. A latent-variable model specifies a joint or conditional structure such as
+
+$$
+p(y,z)=p(y\mid z)\,p(z),
+$$
+
+while only $y$ is directly available. Depending on the task, the model may integrate over $z$ to obtain a marginal distribution $p(y)$, infer $p(z\mid y)$, or report a point summary of that conditional distribution.
+
+In the inspected probabilistic PCA model,
+
+$$
+y=Wz+\mu+\varepsilon,
+$$
+
+where $z$ is latent, $W$ links latent and observed variables, and $\varepsilon$ is an observation-error term [@TippingBishop1999]. This is one example, not the definition of every latent variable.
+
+## Core notation
+
+- $y$: observed variable or data vector.
+- $z$: latent or unobserved variable.
+- $p(z)$: prior or population model for the latent variable.
+- $p(y\mid z)$: observation model.
+- $p(z\mid y)$: inferred posterior distribution.
+- $W$: one possible mapping from latent to observed coordinates.
+
+## Prerequisites
+
+**Assumed background:** elementary probability notation. No existing LDG Knowledge Object is required.
+
+## Relationship to adjacent concepts
+
+| Concept | Distinction |
+|---|---|
+| **State** | A state is defined by its role in continuing a system description. A latent variable is defined by being unobserved in a model. A latent variable may represent state, a parameter, a cause, or another hidden quantity. |
+| **Observation** | Observations are available measurements; latent variables are inferred through a model relating them to observations. |
+| **Feature or representation** | A computed feature can be directly observed from data after transformation. Calling it latent requires a generative or inferential role, not merely compression. |
+| **Low-dimensional coordinate** | Latent variables can be high-dimensional, and a low-dimensional embedding can be deterministic rather than latent-variable inference. |
+| **Ground-truth cause** | A fitted latent variable need not correspond uniquely to a physical or biological cause. |
+
+## What this does NOT imply
+
+A latent variable does **not** imply:
+
+- that it is a true hidden mechanism or uniquely identifiable quantity;
+- low dimensionality, smooth geometry, or dynamical state;
+- that decoding or reconstruction validates its interpretation;
+- that different fitted coordinate systems represent different mechanisms;
+- causal influence on observations; or
+- that residual variation is meaningless noise.
+
+## Minimal example
+
+Let $z\sim\mathcal{N}(0,1)$ and
+
+$$
+y_1=z+\varepsilon_1,\qquad
+y_2=2z+\varepsilon_2.
+$$
+
+The observed variables $y_1,y_2$ are measured; $z$ is latent. Their correlation can support the model, but finite observations generally do not reveal a unique realized $z$ or prove that this particular hidden variable generated the data.
+
+## Neuroscience / behavioral relevance
+
+Neural population analyses often use latent variables to summarize shared structure across many recorded units [@CunninghamYu2014]. Such variables can support prediction and hypothesis formation, but a low-dimensional representation is not by itself evidence of a neural mechanism.
+
+## Relevance to LDG
+
+Latent Variable begins the bridge from dynamical state concepts to observation and inference. It gives LDG a place to separate model-hidden quantities from measured variables, geometric coordinates, and mechanistic claims.
+
+## Open questions
+
+- Which transformations of a latent variable preserve the same scientific interpretation?
+- When should a latent variable be interpreted as dynamical state rather than a static factor?
+- What interventions or cross-condition tests can constrain its meaning?
+
+## References
+
+- Tipping and Bishop give an inspected primary example of a probabilistic latent-variable model relating unobserved variables to observations [@TippingBishop1999].
+- Cunningham and Yu review latent variables in neural population dimensionality reduction and caution that population representations must be connected to testable mechanisms [@CunninghamYu2014].
+
+## Maturity checklist
+
+- [x] Defines latent variables through model and observation status.
+- [x] Includes a probabilistic factorization and minimal example.
+- [x] Separates latent variable, state, feature, coordinate, and mechanism.
+- [x] States identifiability and interpretation limits.
+- [x] Independent bounded review completed.

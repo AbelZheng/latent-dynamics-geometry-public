@@ -1,0 +1,298 @@
+{
+  "artifact_files": [
+    "manifest.json",
+    "results.csv",
+    "diagnostics.json",
+    "summary.png"
+  ],
+  "artifact_hashes_sha256": {
+    "diagnostics.json": "fcfb102b86bf53e7d36193911fbf372ee8c6f7790fabb28423fc99ecea0dd5a3",
+    "results.csv": "833e28d647397d8c23805c64d0350cee05bbab4ef128ec759da43f55bf431dd0",
+    "summary.png": "f8bf23a4c057295abfc1abe7352b254c3dc6a2ce5b380d12219ee800a60c5f59"
+  },
+  "benchmark": "P4-U05 nonlinear reconstruction and graph geometry",
+  "canonical_order": "lexicographic row_key",
+  "commands": {
+    "generate": "/Users/bytedance/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3 benchmarks/nonlinear-graph-robustness.py --generate",
+    "resume": "/Users/bytedance/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3 benchmarks/nonlinear-graph-robustness.py --generate --resume",
+    "verify": "/Users/bytedance/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3 benchmarks/nonlinear-graph-robustness.py --verify"
+  },
+  "interpretation_boundary": "No pooled score. Reconstruction, codes, graph distances, eigenspaces, and extensions do not establish manifold, topology, intrinsic dimension, unique coordinates, representation, dynamics, mechanism, causality, real-data validity, or universal superiority.",
+  "master_seed": 20260820,
+  "maturity": "L1",
+  "phase3_sources": [
+    {
+      "path": "toy-models/bounded-nonlinear-reconstruction.py",
+      "role": "hash_only_design_provenance_no_runtime_calls",
+      "sha256": "28473507421cf005692bc9e1a55d219fb7d4bf997c041f7f9464c3cf64ace62e"
+    },
+    {
+      "path": "toy-models/graph-geometry-recovery.py",
+      "role": "actual_executable_routine_reuse",
+      "sha256": "b42fff6f9bd2958f8a7abacd7bfae1bc71012dd9e342df4d0d5c4eb119552ff9"
+    }
+  ],
+  "replicates": 3,
+  "row_count": 4167,
+  "row_fields": [
+    "row_key",
+    "task",
+    "scenario",
+    "scenario_class",
+    "replicate",
+    "seed_id",
+    "provenance",
+    "split",
+    "evaluation_stage",
+    "method",
+    "method_family",
+    "information_set",
+    "parameter_source",
+    "target",
+    "metric",
+    "status",
+    "reason",
+    "value",
+    "n_train",
+    "n_validation",
+    "n_test",
+    "selected_hyperparameter",
+    "domain"
+  ],
+  "runtime": {
+    "executable": "/Users/bytedance/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3",
+    "numpy": "2.3.5",
+    "pillow": "12.3.0",
+    "platform": "macOS-26.5.1-arm64-arm-64bit",
+    "python": "3.12.13"
+  },
+  "schema_version": 1,
+  "stages": {
+    "fitting_selection": "restricted train/validation observations for reconstruction; train observations for graph/operator fits",
+    "generation": "split-specific observations plus scoring-only truth",
+    "recovery": "frozen fitted states and held-out observations only",
+    "scoring": "truth and diagnostics added only after recovery"
+  },
+  "status": "stable",
+  "status_vocabulary": [
+    "ok",
+    "nonconvergence",
+    "invalid",
+    "inapplicable"
+  ],
+  "summary": "replicate-level median,q10,q90 and status/applicability rates within task/scenario/method/metric only",
+  "tasks": {
+    "graph_geometry": {
+      "methods": [
+        "mean",
+        "pca",
+        "ambient_mds",
+        "isomap",
+        "graph_diagnostics",
+        "diffusion_maps",
+        "direct_operator",
+        "nystrom_extension"
+      ],
+      "metrics": [
+        "heldout_coordinate_rmse",
+        "graph_distance_relative_rmse",
+        "component_count",
+        "material_shortcut_rate",
+        "infinite_pair_rate",
+        "mds_negative_eigenmass",
+        "diffusion_eigenspace_angle_max_degrees",
+        "diffusion_truncation_relative_rmse",
+        "direct_spectral_distance_max_abs",
+        "heldout_extension_rmse",
+        "operator_row_sum_max_abs"
+      ],
+      "scenarios": [
+        {
+          "class": "reference",
+          "domain": "hairpin",
+          "id": "hairpin_reference",
+          "k": 6
+        },
+        {
+          "class": "sampling_gap",
+          "domain": "hairpin",
+          "id": "hairpin_sparse_gap",
+          "k": 6,
+          "sampling": "gap"
+        },
+        {
+          "class": "shortcuts",
+          "domain": "hairpin",
+          "id": "hairpin_shortcuts",
+          "k": 6,
+          "radius": 0.06
+        },
+        {
+          "class": "nonuniform_density",
+          "domain": "hairpin",
+          "id": "hairpin_nonuniform",
+          "k": 6,
+          "sampling": "nonuniform"
+        },
+        {
+          "class": "connectivity",
+          "domain": "hairpin",
+          "id": "hairpin_disconnected",
+          "k": 1
+        },
+        {
+          "class": "neighborhood",
+          "domain": "hairpin",
+          "id": "hairpin_large_k",
+          "k": 16
+        },
+        {
+          "class": "neighborhood",
+          "domain": "hairpin",
+          "id": "hairpin_nearly_complete",
+          "k": 100
+        },
+        {
+          "class": "metric_scaling",
+          "domain": "hairpin",
+          "id": "hairpin_metric_scaling",
+          "k": 6,
+          "transform": [
+            1.0,
+            1.0,
+            3.0
+          ]
+        },
+        {
+          "class": "reference",
+          "domain": "circle",
+          "epsilon": 0.18,
+          "id": "circle_reference"
+        },
+        {
+          "class": "nonuniform_density",
+          "domain": "circle",
+          "epsilon": 0.18,
+          "id": "circle_nonuniform",
+          "sampling": "nonuniform"
+        },
+        {
+          "class": "bandwidth",
+          "domain": "circle",
+          "epsilon": 0.008,
+          "id": "circle_bandwidth_small"
+        },
+        {
+          "class": "bandwidth",
+          "domain": "circle",
+          "epsilon": 4.0,
+          "id": "circle_bandwidth_large"
+        },
+        {
+          "class": "metric_scaling",
+          "domain": "circle",
+          "epsilon": 0.18,
+          "id": "circle_metric_scaling",
+          "transform": [
+            1.0,
+            1.0,
+            3.0
+          ]
+        }
+      ]
+    },
+    "reconstruction": {
+      "methods": [
+        "mean",
+        "pca",
+        "linear_autoencoder",
+        "nonlinear_autoencoder",
+        "frozen_encoder"
+      ],
+      "metrics": [
+        "observed_reconstruction_mse",
+        "noiseless_signal_mse",
+        "code_variance",
+        "code_abs_spearman_truth",
+        "code_collision_rate",
+        "selected_validation_mse",
+        "parameter_count"
+      ],
+      "scenarios": [
+        {
+          "class": "curvature",
+          "curvature": 1.0,
+          "id": "reference_curved",
+          "sizes": [
+            120,
+            60,
+            90
+          ]
+        },
+        {
+          "class": "curvature",
+          "curvature": 0.25,
+          "id": "low_curvature",
+          "sizes": [
+            120,
+            60,
+            90
+          ]
+        },
+        {
+          "class": "curvature",
+          "curvature": 1.65,
+          "id": "high_curvature",
+          "sizes": [
+            120,
+            60,
+            90
+          ]
+        },
+        {
+          "class": "support_family",
+          "gaussian": true,
+          "id": "moment_matched_gaussian",
+          "sizes": [
+            120,
+            60,
+            90
+          ]
+        },
+        {
+          "class": "sample_capacity",
+          "curvature": 1.0,
+          "hidden": 18,
+          "id": "small_sample_high_capacity",
+          "sizes": [
+            28,
+            42,
+            90
+          ]
+        },
+        {
+          "class": "nuisance",
+          "curvature": 1.0,
+          "id": "high_variance_nuisance",
+          "nuisance": 2.4,
+          "sizes": [
+            120,
+            60,
+            90
+          ]
+        },
+        {
+          "class": "support_shift",
+          "curvature": 1.0,
+          "id": "support_shift",
+          "shift": true,
+          "sizes": [
+            120,
+            60,
+            90
+          ]
+        }
+      ]
+    }
+  }
+}

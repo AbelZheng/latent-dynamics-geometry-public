@@ -1,0 +1,208 @@
+---
+title: "Observation Noise"
+object_type: concept
+maturity: L2
+status: stable
+domain: [latent-modeling, statistics]
+tags: [observation-noise, measurement-noise, residual]
+prerequisites:
+- knowledge/concepts/observation-model.qmd
+related:
+- knowledge/concepts/process-noise.qmd
+- knowledge/concepts/state-space-model.qmd
+created: 2026-08-18
+updated: 2026-08-18
+---
+
+# Observation Noise
+
+## One-sentence definition
+
+**Observation noise** is stochastic variability in measurements conditional on the modeled latent state and observation mapping.
+
+## Why this concept matters
+
+Observation noise can make identical latent states produce different data without changing the underlying trajectory. Confusing it with process noise changes inference, prediction, and scientific interpretation.
+
+## Intuition
+
+The system may be in the same state, but the sensor reports slightly different values each time.
+
+## Formal definition
+
+In a probabilistic observation model, observation noise or measurement variability is encoded in the conditional observation kernel
+
+$$
+K_{k,\theta_y}(x,u,B)
+=
+\Pr(Y_k\in B\mid X_k=x,u_k=u,\theta_y),
+\qquad B\in\Sigma_{\mathcal Y}.
+$$
+
+It changes the distribution of measurements while conditioning on the same modeled state and declared input. A deterministic observation map is the special case in which $K_k$ is a Dirac measure.
+
+### Conditioned additive special case
+
+A common representation is
+
+$$
+Y_k=G_k(X_k,u_k;\theta_y)+v_k,
+$$
+
+with
+
+$$
+v_k\mid X_k=x,u_k=u
+\sim
+p_v(\,\cdot\mid x,u,k).
+$$
+
+When the required moments exist, define
+
+$$
+m^v_k(x,u)=\mathbb E[v_k\mid x,u],
+$$
+
+$$
+\Sigma^v_k(x,u)
+=
+\operatorname{Cov}(v_k\mid x,u).
+$$
+
+The familiar fixed-law model
+
+$$
+v_k\mid X_k,u_k\sim\mathcal N(0,R)
+$$
+
+adds zero mean, Gaussianity, constant covariance, and conditional independence from state and input. These are optional assumptions, not the definition of observation noise. Tipping and Bishop's PPCA model uses an isotropic Gaussian observation error as one special case [@TippingBishop1999, secs. 2.1, 3.1].
+
+### Dependence and covariance structure
+
+The following properties are separate:
+
+- **Unbiased/zero conditional mean:** $m^v_k(x,u)=0$.
+- **Homoscedastic:** the conditional covariance does not vary with state, input, or time.
+- **Heteroscedastic:** $\Sigma^v_k(x,u)$ varies with state, input, or time.
+- **Uncorrelated channels:** off-diagonal conditional covariance entries vanish.
+- **Independent channels:** the conditional joint law factorizes across channels; this is stronger than zero covariance outside a suitable Gaussian assumption.
+- **White/temporally uncorrelated:** under a declared conditioning path, $\operatorname{Cov}(v_k,v_\ell\mid X_{0:T},u_{0:T},\theta_y)=0$ for $k\ne\ell$.
+- **Independent across time:** under the same conditioning convention, the conditional joint law factorizes across times; this is stronger than uncorrelatedness outside the Gaussian case.
+- **iid:** under the same conditioning convention, combines independence across time with an identical conditional distribution.
+
+A diagonal covariance supports conditional channel independence only under additional distributional assumptions such as joint Gaussianity. Tipping and Bishop make channel independence a consequence of their diagonal Gaussian error model, not covariance diagonality alone [@TippingBishop1999, sec. 2.1].
+
+### Observation memory and temporal filtering
+
+If a sensor has temporal memory, the observation may depend on latent history,
+
+$$
+p(y_k\mid x_{0:k},y_{0:k-1},\theta_y),
+$$
+
+rather than only on $x_k$. Separately, a colored stochastic error sequence can correlate measurements across time even without deterministic sensor filtering. These are distinct mechanisms, but either can invalidate the usual product $\prod_k p(y_k\mid x_k)$ unless sensor memory or correlated noise is explicitly represented in the state or observation model.
+
+### Non-additive and non-Gaussian observation laws
+
+::: {.callout-note title="Established Statistical Background"}
+Many observations do not have a natural additive-error representation. Examples include
+
+$$
+Y_k\mid X_k=x
+\sim
+\operatorname{Poisson}(\lambda(x))
+$$
+
+for counts and
+
+$$
+Y_k\mid X_k=x
+\sim
+\operatorname{Categorical}(\pi(x))
+$$
+
+for labels. Their variability is specified directly by the conditional observation law. Treating such data as Gaussian additive noise can change support, variance structure, and scientific interpretation.
+:::
+
+## Core notation
+
+- $K_{k,\theta_y}(x,u,B)$: conditional observation probability kernel.
+- $v_k$: additive observation-noise realization.
+- $m^v_k(x,u)$: conditional observation-noise mean.
+- $\Sigma^v_k(x,u)$: conditional observation-noise covariance.
+- $R$: constant covariance in a common Gaussian special case.
+- $G_k$: deterministic part of an additive observation mapping.
+
+## Prerequisites
+
+[Observation Model](observation-model.qmd) supplies the measurement relation where this noise enters.
+
+## Relationship to adjacent concepts
+
+| Concept | Distinction |
+|---|---|
+| **Process noise** | Changes latent evolution; observation noise changes data conditional on state. |
+| **Residual** | A fitted discrepancy that may contain observation noise, process noise, calibration error, preprocessing artifacts, missing predictors, and misspecification. |
+| **Calibration uncertainty** | Uncertainty in sensor parameters or mapping; it can be modeled hierarchically and is not automatically a new measurement realization. |
+| **Preprocessing** | Deterministic or stochastic transformations applied to recorded data; they alter the effective observation model rather than simply adding $v_k$. |
+| **Missingness / censoring** | Selection or truncation of observations; it requires a missingness or censoring model when informative. |
+| **Sampling variability** | Variation across sampled datasets or events; it is not necessarily conditional measurement noise. |
+| **Observation model** | Includes the mapping and distribution, not only its noise component. |
+
+## What this does NOT imply
+
+Observation noise does not imply zero mean, whiteness, independence, identical distribution, Gaussianity, additivity, homoscedasticity, unbiasedness, or state independence. Labeling residuals as noise does not prove they lack structure. Fitting or increasing a covariance $R$ can absorb discrepancies and improve predictive calibration without identifying a physical sensor mechanism or separating noise from misspecification.
+
+## Minimal example
+
+For
+
+$$
+X_{k+1}=X_k,
+\qquad
+Y_k=X_k+v_k,
+\qquad
+v_k\mid X_k\sim\mathcal N(0,R),
+$$
+
+the latent state is constant while repeated measurements vary. Averaging reduces variance only under assumptions about independence or temporal correlation; it does not alter the state dynamics.
+
+For a count observation,
+
+$$
+Y_k\mid X_k=x\sim\operatorname{Poisson}(e^x),
+$$
+
+so $\operatorname{Var}(Y_k\mid x)=\mathbb E[Y_k\mid x]=e^x$. The measurement variability is heteroscedastic and encoded by the count likelihood rather than an additive constant-variance Gaussian term.
+
+## Neuroscience / behavioral relevance
+
+Sensor noise, spike-count variability, motion artifacts, and annotation errors may enter observation models differently. Treating all unexplained variance as independent observation noise can hide structured neural or behavioral signals.
+
+## Relevance to LDG
+
+At L2, Observation Noise locates stochastic variability in the conditional measurement law and makes its moment, dependence, support, and memory assumptions explicit. It protects latent-dynamics claims from being driven by measurement variability and prepares deconvolution and state-space inference questions.
+
+## Open questions
+
+- Which noise correlations reflect sensors versus shared unmodeled state?
+- How should heteroscedastic or count-valued observations be modeled?
+- What calibration data constrain $R$?
+
+## References
+
+- Tipping and Bishop provide inspected diagonal and isotropic Gaussian observation-error models and their conditional-independence consequences [@TippingBishop1999, secs. 2.1, 3.1].
+- Åström and Murray provide the inspected linear-Gaussian process-disturbance/measurement-noise special case [@AstromMurray2021, sec. 8.4]. Section numbering was checked against the inspected 24 July 2020 electronic second-edition manuscript corresponding to the published edition.
+- Noise estimation, filtering, calibration estimation, missing-data inference, and generalized-observation algorithms are intentionally deferred.
+
+## Maturity checklist
+
+- [x] Locates noise in observation generation.
+- [x] Separates noise from residual and process uncertainty.
+- [x] States distributional non-implications.
+- [x] Locates general observation noise in the conditional observation kernel and additive noise as a special case.
+- [x] Defines conditional moments and separates Gaussian, white, independent, iid, unbiased, and homoscedastic assumptions.
+- [x] Includes heteroscedastic, correlated-channel, temporally dependent, count, and categorical observation laws.
+- [x] Separates observation noise from process noise, calibration, preprocessing, missingness, censoring, sampling variability, residuals, and model error.
+- [x] States that fitted residual covariance does not identify a physical noise mechanism.
+- [x] Independent L2 scientific review completed after two bounded correction rounds and final focused PASS under the recorded review decision.

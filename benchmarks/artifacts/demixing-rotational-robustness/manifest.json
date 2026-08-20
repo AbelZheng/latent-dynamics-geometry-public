@@ -1,0 +1,146 @@
+{
+  "artifacts": {
+    "diagnostics.json": {
+      "bytes": 339735,
+      "sha256": "beaa6f6ae7486d477472fcbc5b6db6de4ebe4cbd56abfaeaae234df95fb23654"
+    },
+    "results.csv": {
+      "bytes": 1132871,
+      "sha256": "a142ca45d38f8365e93fdcc2781e9e662e78feab0ac3ae5dbf09451ad81ab65d"
+    },
+    "summary.png": {
+      "bytes": 34293,
+      "sha256": "1ec09d3c1861db48e21448601da66745e40bc5a459ef3ad8ee659c712d839398"
+    }
+  },
+  "benchmark": "demixing-rotational-robustness",
+  "commands": {
+    "generate": "/Users/bytedance/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3 benchmarks/demixing-rotational-robustness.py --generate",
+    "resume": "/Users/bytedance/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3 benchmarks/demixing-rotational-robustness.py --generate --resume",
+    "verify": "/Users/bytedance/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3 benchmarks/demixing-rotational-robustness.py --verify"
+  },
+  "contract": {
+    "canonical_order": "row_key lexical",
+    "covariance_control": {
+      "admissibility": "at least two distinct coordinate shifts and material cross-coordinate correspondence change",
+      "exact_preservation_not_assumed": true,
+      "proposal_family": "24 predeclared seed-derived feature-wise cyclic condition-shift attempts; uniform all-coordinate shifts are excluded as global relabelings/no-ops",
+      "selection": "maximum training covariance cosine similarity among admissible proposals only",
+      "threshold": 0.97,
+      "unmatched_label": "incompletely_matched"
+    },
+    "missing_factorial_rule": "rank-deficient training factorial designs invalidate balanced-marginalization targets before recovery; label decoding remains separately assessed",
+    "no_cross_task_score": true,
+    "pseudo_population_rule": "within each split, cell and feature, complete trial trajectories are permuted",
+    "shuffled_control_rule": "independent train/validation label permutations repeat full hyperparameter selection and refit",
+    "split_size_metadata": "demixing records 2x2 per-cell counts plus actual totals; rotation records six per-condition counts plus actual totals",
+    "splits": [
+      "train",
+      "validation",
+      "test"
+    ],
+    "stage_separation": [
+      "generation",
+      "fitting_selection",
+      "frozen_recovery",
+      "scoring"
+    ],
+    "status_values": [
+      "ok",
+      "nonconvergence",
+      "invalid",
+      "inapplicable"
+    ],
+    "time_shift_rule": "explicit nearest-edge fill; no circular wrap"
+  },
+  "date": "2026-08-20",
+  "master_seed": 20260820,
+  "maturity": "L1",
+  "phase3_sources": [
+    {
+      "path": "toy-models/label-dependent-demixing.py",
+      "role": "scientific_design_provenance_only; benchmark-local implementation",
+      "sha256": "e1dd7e37a712cab0ac088939a4c3f8e40a047db0bef2466a02ac1f57e71782e1"
+    },
+    {
+      "path": "toy-models/rotational-projection-controls.py",
+      "role": "scientific_design_provenance_only; benchmark-local implementation",
+      "sha256": "9702a94c889e579c2db43ebf1ddc85a45b53e925f2350836c4e4afbdeba64673"
+    }
+  ],
+  "replicates": 3,
+  "runtime": {
+    "executable": "/Users/bytedance/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3",
+    "numpy": "2.3.5",
+    "pillow": "12.3.0",
+    "platform": "macOS-26.5.1-arm64-arm-64bit",
+    "python": "3.12.13"
+  },
+  "schema_version": 1,
+  "status": "stable",
+  "tasks": {
+    "demixing": {
+      "methods": [
+        "condition_mean",
+        "pca",
+        "marginal_pca",
+        "selected_dpca",
+        "ridge_decoder",
+        "shuffled_dpca_control",
+        "shuffled_decoder_control",
+        "factorial_design_diagnostic"
+      ],
+      "metrics": [
+        "stimulus_marginal_nmse",
+        "decision_marginal_nmse",
+        "stimulus_subspace_angle_degrees",
+        "decision_subspace_angle_degrees",
+        "stimulus_decoding_accuracy",
+        "decision_decoding_accuracy",
+        "factorial_design_rank"
+      ],
+      "scenarios": [
+        "balanced_reference",
+        "near_collinear",
+        "missing_cell",
+        "unbalanced_cells",
+        "label_shuffle",
+        "pseudo_population",
+        "averaging_mismatch",
+        "small_sample",
+        "large_sample"
+      ]
+    },
+    "rotation": {
+      "methods": [
+        "pca_plane",
+        "unrestricted_fit",
+        "skew_fit",
+        "symmetric_fit",
+        "input_aware_fit",
+        "fixed_plane",
+        "random_plane",
+        "covariance_shuffle_control"
+      ],
+      "metrics": [
+        "plane_angle_degrees",
+        "angular_rate_abs_error",
+        "derivative_rmse",
+        "tangential_velocity_ratio",
+        "covariance_similarity"
+      ],
+      "scenarios": [
+        "clean_rotation",
+        "symmetric_decay",
+        "latency_sequence",
+        "common_input",
+        "short_arcs",
+        "time_jitter",
+        "smoothed",
+        "no_condition_subtraction",
+        "nonorthogonal_metric",
+        "covariance_control"
+      ]
+    }
+  }
+}

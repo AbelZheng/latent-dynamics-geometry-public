@@ -1,0 +1,87 @@
+---
+title: "Intrinsic Dimension"
+object_type: concept
+maturity: L1
+status: stable
+domain: [geometry, representation]
+tags: [intrinsic-dimension, degrees-of-freedom, dimensionality]
+prerequisites:
+- knowledge/concepts/ambient-dimension.qmd
+related:
+- knowledge/concepts/latent-variable.qmd
+created: 2026-08-18
+updated: 2026-08-18
+---
+
+# Intrinsic Dimension
+
+## One-sentence definition
+
+**Intrinsic dimension** is the number of independent coordinates or degrees of freedom assigned to an object under a specified structural model, scale, and criterion.
+
+## Why this concept matters
+
+Intrinsic dimension can be smaller than ambient dimension, but it is not a model-free property of a finite noisy dataset. Different estimators, scales, noise models, and tolerances can yield different answers.
+
+## Intuition
+
+Points near a curve in a high-dimensional recording space may vary mainly along one direction at a coarse scale, while fine-scale noise occupies many directions.
+
+## Formal definition
+
+For a smooth $d$-dimensional manifold represented in $\mathbb R^D$, $d$ is its manifold dimension and $D$ its ambient dimension. More generally, “intrinsic dimension” may refer to manifold dimension, local dimension, effective linear rank, or another declared complexity criterion.
+
+LDG therefore requires every estimate $\widehat d$ to state the model class, neighborhood or scale, estimator, and noise assumptions. Levina and Bickel demonstrate an estimator whose behavior depends on neighborhoods and on data lying near rather than exactly on a manifold [@LevinaBickel2004].
+
+## Core notation
+
+- $D$: ambient dimension.
+- $d$: claimed intrinsic dimension.
+- $\widehat d$: estimated dimension.
+- scale or neighborhood size: the resolution at which dimension is assessed.
+
+## Prerequisites
+
+[Ambient Dimension](ambient-dimension.qmd) supplies the surrounding representation against which an intrinsic claim is compared.
+
+## Relationship to adjacent concepts
+
+| Concept | Distinction |
+|---|---|
+| **Rank** | Exact linear dimension of a matrix or subspace; intrinsic dimension can be nonlinear or scale-dependent. |
+| **Latent dimension** | Number of variables in a chosen latent model; it may be selected rather than identified as intrinsic truth. |
+| **Manifold dimension** | A specific mathematical dimension when manifold assumptions hold. |
+| **Variance explained** | A criterion for approximation, not a universal definition of dimension. |
+
+## What this does NOT imply
+
+A low intrinsic-dimension estimate does not prove a manifold, identify unique latent variables, establish mechanism, remain constant across scales, or justify a particular nonlinear embedding.
+
+## Minimal example
+
+Noiseless points on a line in $\mathbb R^{10}$ have a one-dimensional linear structure. Adding small isotropic noise can make fine-scale estimates approach ten while coarse-scale estimates remain near one.
+
+## Neuroscience / behavioral relevance
+
+Neural dimensionality depends on trial conditions, preprocessing, temporal scale, model class, and criterion. Reported dimension should therefore be treated as an operational estimate.
+
+## Relevance to LDG
+
+Intrinsic Dimension enforces one of LDG's central prohibitions: dimensionality is model- and criterion-dependent, and reduction is not proof of geometry.
+
+## Open questions
+
+- Which scales correspond to scientific questions rather than estimator convenience?
+- How should uncertainty and heterogeneity in local dimension be reported?
+- What null models reveal spurious low-dimensional estimates?
+
+## References
+
+- Levina and Bickel provide an inspected primary intrinsic-dimension estimator and discuss scale and near-manifold behavior [@LevinaBickel2004].
+
+## Maturity checklist
+
+- [x] Defines dimension relative to model, scale, and criterion.
+- [x] Separates rank, latent dimension, and manifold dimension.
+- [x] States that low estimated dimension does not prove a manifold.
+- [x] Independent bounded review completed; initial findings were corrected and focused re-review passed.

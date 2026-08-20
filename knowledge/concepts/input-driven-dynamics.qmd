@@ -1,0 +1,230 @@
+---
+title: "Input-Driven Dynamics"
+object_type: concept
+maturity: L2
+status: stable
+domain:
+- dynamics
+- modeling
+tags:
+- input
+- control
+- nonautonomous-dynamics
+prerequisites:
+- knowledge/concepts/vector-field.qmd
+- knowledge/concepts/flow.qmd
+related:
+- knowledge/concepts/state.qmd
+- knowledge/concepts/trajectory.qmd
+- knowledge/concepts/process-noise.qmd
+- knowledge/concepts/observation-model.qmd
+- knowledge/concepts/state-space-model.qmd
+created: 2026-08-18
+updated: 2026-08-18
+---
+
+# Input-Driven Dynamics
+
+## One-sentence definition
+
+**Input-driven dynamics** describe state evolution whose instantaneous or stepwise update depends on an external input signal in addition to the current state.
+
+## Why this concept matters
+
+Many neural, behavioral, and engineered systems are not closed autonomous systems. Stimuli, commands, sensory feedback, context, and interventions may alter the state evolution. If those influences are omitted, input effects can be misread as state-dependent autonomous dynamics.
+
+## Intuition
+
+An autonomous rule asks, “Given the current state, what happens next?” An input-driven rule asks, “Given the current state **and** the externally supplied input now or over an interval, what happens next?”
+
+## Formal definition
+
+For the smooth-manifold formulation, let $\mathcal X$ be a smooth $n$-manifold, $\mathcal U$ an input-value space, and $\Theta$ a parameter space. A continuous-time input-driven model can be written
+
+$$
+\dot x(t)=f\bigl(t,x(t),u(t);\theta\bigr),
+\qquad
+f(t,x,u;\theta)\in T_x\mathcal X,
+$$
+
+In the Euclidean special case, $\mathcal X\subseteq\mathbb R^n$ and $f:\mathbb R\times\mathcal X\times\mathcal U\times\Theta\to\mathbb R^n$. A discrete-time model has the form
+
+$$
+x_{k+1}=F_k(x_k,u_k;\theta).
+$$
+
+Here $F_k:\mathcal X\times\mathcal U\times\Theta\to\mathcal X$.
+
+Here $x$ is the state, $u$ is an externally supplied argument under the declared system boundary, and $\theta$ denotes parameters held fixed for the modeled evolution. Åström and Murray use the corresponding separation among state, control/input, and measured output [@AstromMurray2021, sec. 3.2].
+
+A particular initial condition and input history determine a trajectory only after declaring an admissible input class—such as measurable or piecewise-continuous $\mathcal U$-valued functions—and imposing causal dependence, existence, uniqueness, admissibility, and regularity assumptions. Causal dependence means that two admissible inputs agreeing on $[t_0,t]$ produce the same state at $t$ when the initial condition and parameters agree. Without uniqueness, $\Phi$ may be a set-valued relation rather than a single transition operator. Those theorem-level conditions are not supplied by the notation alone.
+
+### Input-conditioned finite-time evolution
+
+Write the state reached at time $t$ from $(t_0,x_0)$ under an input segment as
+
+$$
+x(t)
+=
+\Phi(t,t_0,x_0;u_{[t_0,t]}).
+$$
+
+For $t_0\le s\le t$, consistent input-conditioned evolution satisfies the segment-concatenation law
+
+$$
+\Phi(t,t_0,x_0;u_{[t_0,t]})
+=
+\Phi\left(
+ t,s,
+ \Phi(s,t_0,x_0;u_{[t_0,s]});
+ u_{[s,t]}
+\right),
+$$
+
+whenever all terms are defined and the two restrictions are compatible pieces of the same input history. The zero-duration identity is $\Phi(t_0,t_0,x;\varnothing)=x$. This two-parameter segment law is not called a cocycle here; cocycle notation requires a defined input-shift/base dynamics. This is not the autonomous one-parameter flow law: the later transition depends on the later input segment, and changing the input can change the trajectory even when the initial state is fixed.
+
+Two bounded special cases can define new autonomous models when the original rule has no explicit clock dependence. A fixed input $u(t)\equiv\bar u$ gives $f_{\bar u}(x)=f(x,\bar u;\theta)$. A state-feedback rule $u=\kappa(x)$ gives the closed-loop vector field $f_{\mathrm{cl}}(x)=f(x,\kappa(x);\theta)$. These are newly declared rules; neither turns the full family of arbitrary input histories into one shared autonomous flow.
+
+For discrete time, define a multi-step transition by
+
+$$
+x_k
+=
+\Phi_{k:j}(x_j;u_j,\ldots,u_{k-1}),
+\qquad k>j.
+$$
+
+Splitting at $m$ gives
+
+$$
+\Phi_{k:j}(x_j;u_j,\ldots,u_{k-1})
+=
+\Phi_{k:m}\left(
+ \Phi_{m:j}(x_j;u_j,\ldots,u_{m-1});
+ u_m,\ldots,u_{k-1}
+\right).
+$$
+
+The discrete identity transition is $\Phi_{j:j}=\operatorname{id}$.
+
+### Modeling roles
+
+- An **input** is an external argument to the transition rule under the chosen boundary; it may be time-varying or constant.
+- A **control** is an input selected according to a declared decision rule or agent. Not every input is controlled.
+- An **intervention** is an experimental or causal manipulation. Representing it as an input does not by itself identify its causal effect.
+- A **parameter** specifies the rule and is held fixed within the declared evolution, unless a new model promotes it to state or input.
+- **Process noise** is a stochastic transition disturbance under a probability model; an observed input is not process noise, and an unknown input is not automatically random.
+- An **observation** is generated from the state through an observation model. Feedback can make an observation inform a future control, but the observation and control retain different roles.
+
+### State augmentation
+
+Suppose the original rule is time-independent, $\dot x=f(x,u;\theta)$, and an input is generated by another modeled system,
+
+$$
+\dot z=g(z),
+\qquad
+u=\rho(z).
+$$
+
+Then the augmented state $(x,z)$ may obey an autonomous rule
+
+$$
+\frac{d}{dt}
+\begin{pmatrix}x\\z\end{pmatrix}
+=
+\begin{pmatrix}f(x,\rho(z);\theta)\\g(z)\end{pmatrix}.
+$$
+
+This is a new system boundary and a new state space. It requires a specified input-generator model, its initial state, and the relevant well-posedness assumptions. If the original rule depends explicitly on clock time, the clock must also be modeled—for example by adding $\dot\tau=1$—or the augmented system remains nonautonomous. An arbitrary prescribed or unknown input history may require infinite-dimensional memory and cannot be made finite-dimensional and autonomous merely by relabeling it as state.
+
+## Core notation
+
+- $x(t)$: the system state.
+- $u(t)$: external input under the declared system boundary.
+- $f(t,x,u;\theta)$: continuous-time state-change rule.
+- $F_k(x,u;\theta)$: discrete-time update rule.
+- $\theta$: parameters held fixed in the declared evolution.
+- $u_{[t_0,t]}$: the input history relevant to evolution over an interval.
+- $\Phi(t,t_0,x_0;u_{[t_0,t]})$: input-conditioned transition operator.
+- $\Phi_{k:j}$: discrete multi-step transition driven by an input sequence.
+- $z$: state of a modeled input generator in an augmented system.
+
+## Prerequisites
+
+[Vector Field](vector-field.qmd) provides the local state-change idea. [Flow](flow.qmd) provides the autonomous finite-time comparison that input-conditioned evolution must not be silently conflated with.
+
+## Relationship to adjacent concepts
+
+| Concept | Distinction |
+|---|---|
+| **Autonomous dynamics** | Depend only on the current state under fixed parameters; input-driven dynamics depend explicitly on an external signal. |
+| **Parameter** | The distinction is a declared modeling role, not whether a realized value changes. A parameter specifies the evolution rule under the model, whereas an input is an externally supplied argument to that rule; a constant signal can still be an input. |
+| **Process noise** | A stochastic transition disturbance under a declared probability model. A measured input, unknown deterministic input, and process noise are not interchangeable. |
+| **Control** | An input chosen by a controller or policy. The model role does not by itself establish experimental control or causal effect. |
+| **Intervention** | A manipulation of a system or environment. Encoding it as $u$ does not by itself establish identifiability or causal interpretation. |
+| **Observation** | An observation reports on state; an input influences its evolution. The same physical quantity can change roles under a different system boundary. |
+| **Augmented state** | An input-generating process can be incorporated only by specifying its own dynamics and initial state, thereby changing the system boundary. |
+| **Autonomous flow** | Depends on state and elapsed time under one autonomous rule. Input-conditioned transitions also depend on compatible input segments and obey a concatenation law rather than a bare one-parameter flow law. |
+
+## What this does NOT imply
+
+Input-driven dynamics do **not** imply:
+
+- that the input is known, measured without error, or experimentally controlled;
+- that state and input effects are identifiable from passive data;
+- linearity, time invariance, or additivity of input effects;
+- that an autonomous flow exists on the original state space;
+- that unexplained variation should be labeled input; or
+- that including an input proves a causal influence;
+- that the input is identifiable separately from state, parameters, or noise;
+- controllability, observability, or robustness;
+- that segment composition is an autonomous group or semigroup law; or
+- that arbitrary unknown inputs can be absorbed into a finite-dimensional state.
+
+## Minimal example
+
+For a leaky integrator,
+
+$$
+\dot x(t)=-a x(t)+b u(t),\qquad a>0,
+$$
+
+the same initial state can produce different trajectories under different input functions. If $u(t)\equiv0$, the special case is autonomous; changing $u$ changes the evolution without changing the initial state. More explicitly,
+
+$$
+x(t)=e^{-a(t-t_0)}x_0+b\int_{t_0}^{t}e^{-a(t-s)}u(s)\,ds.
+$$
+
+The integral exhibits dependence on the full input segment. Splitting it at an intermediate time reproduces the transition-composition law.
+
+## Neuroscience / behavioral relevance
+
+Sensory stimuli, task cues, motor commands, rewards, and perturbations are candidate inputs under suitable system boundaries. Their inclusion can separate externally driven changes from recurrent state evolution, but observational correlations alone do not identify the direction of influence.
+
+## Relevance to LDG
+
+At L2, Input-Driven Dynamics provides typed continuous/discrete rules, input-history-dependent transition operators, and their segment-concatenation law. It prevents LDG from forcing all trajectories into an autonomous shared-flow interpretation and prepares comparisons among controlled, driven, noisy, kernel-based, and latent dynamical models.
+
+## Open questions
+
+- Which experimental variables should be inputs, state components, or observations?
+- When can an unknown input be inferred separately from latent state?
+- What baseline should an input-driven latent model beat?
+
+## References
+
+- Åström and Murray provide the inspected input–state–output state-space formulation and linear input example [@AstromMurray2021, sec. 3.2]. Section numbering was checked against the inspected 24 July 2020 electronic second-edition manuscript corresponding to the published edition.
+- Unknown-input inference, controllability, observability, causal identification, and robustness theorems are intentionally deferred.
+
+## Maturity checklist
+
+- [x] Defines continuous- and discrete-time input dependence.
+- [x] Makes input history explicit in finite-time evolution.
+- [x] Separates inputs, parameters, noise, observations, and augmented states.
+- [x] Avoids treating input-conditioned evolution as an autonomous flow.
+- [x] Types continuous and discrete input-driven state equations and fixed parameters.
+- [x] Defines input-history transitions and compatible segment concatenation.
+- [x] Separates inputs, controls, interventions, parameters, process noise, and observations.
+- [x] States the model and boundary requirements for autonomous state augmentation.
+- [x] Defers unknown-input inference, controllability, causality, and robustness theory.
+- [x] Independent L2 scientific review completed; initial findings were corrected and focused re-review passed under the recorded review decision.

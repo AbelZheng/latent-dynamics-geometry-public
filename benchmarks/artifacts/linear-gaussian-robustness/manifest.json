@@ -1,0 +1,408 @@
+{
+  "aggregation": {
+    "across_replicates": "q10, median, and q90 across five independent replicate-level values",
+    "predictive_nll": "mean one-step observation predictive NLL over observed test times only",
+    "selection_parameter_l1": "unnormalized |a_hat-a|+|q_hat-q|+|r_hat-r|; mixed scales limit cross-parameter interpretation",
+    "within_replicate": "pool the two test sequences and applicable time points before computing each metric"
+  },
+  "artifact": "linear-gaussian-robustness",
+  "artifact_files": [
+    "manifest.json",
+    "results.csv",
+    "diagnostics.json",
+    "summary.png"
+  ],
+  "canonical_row_order": [
+    "scenario",
+    "replicate",
+    "split",
+    "method",
+    "metric"
+  ],
+  "commands": {
+    "generate": "/Users/bytedance/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3 benchmarks/linear-gaussian-robustness.py --generate",
+    "python_executable": "/Users/bytedance/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3",
+    "resume": "/Users/bytedance/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3 benchmarks/linear-gaussian-robustness.py --generate --resume",
+    "verify": "/Users/bytedance/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3 benchmarks/linear-gaussian-robustness.py --verify"
+  },
+  "date": "2026-08-20",
+  "files_sha256": {
+    "diagnostics.json": "cc997dccb36720f18d5bc5d1eb8cb745ff67edf71760600e5e6c6ff2dd29785f",
+    "results.csv": "f0daae73934b062577a317d1f9d75ba03370131b40a2c19c3a9e81473abfeb32",
+    "summary.png": "9f597bbd39681a7a3842ab74908cc0229ffa1b97ec9eaa8c3975b600c306d324"
+  },
+  "ground_truth": "known scalar stationary LGSSM: z[t+1]=a*z[t]+w[t], x[t]=z[t]+v[t]",
+  "interpretation_boundary": "Simulator/task/metric/information-set conditional; not mechanism, causality, real-data validity, or universal superiority.",
+  "master_seed": 20260820,
+  "maturity": "L1",
+  "methods": [
+    {
+      "family": "stationary_mean",
+      "id": "stationary_mean",
+      "information_set": "fixed_reference",
+      "parameter_source": "none"
+    },
+    {
+      "family": "persistence_open_loop",
+      "id": "persistence",
+      "information_set": "online_observation_history",
+      "parameter_source": "none"
+    },
+    {
+      "family": "persistence_open_loop",
+      "id": "open_loop",
+      "information_set": "online_first_observation",
+      "parameter_source": "known_true"
+    },
+    {
+      "family": "known_parameter_kalman",
+      "id": "known_kalman_filter",
+      "information_set": "online_current_and_past",
+      "parameter_source": "known_true"
+    },
+    {
+      "family": "fixed_interval_rts",
+      "id": "known_rts_smoother",
+      "information_set": "retrospective_full_interval",
+      "parameter_source": "known_true"
+    },
+    {
+      "family": "direct_batch_conditioning",
+      "id": "batch_conditioning_oracle",
+      "information_set": "oracle_retrospective_full_interval",
+      "parameter_source": "known_true"
+    },
+    {
+      "family": "finite_grid_selected",
+      "id": "selected_kalman_filter",
+      "information_set": "online_current_and_past",
+      "parameter_source": "selected_train_validation"
+    },
+    {
+      "family": "finite_grid_selected",
+      "id": "selected_rts_smoother",
+      "information_set": "retrospective_full_interval",
+      "parameter_source": "selected_train_validation"
+    },
+    {
+      "family": "wrong_parameter_control",
+      "id": "misspecified_kalman_filter",
+      "information_set": "online_current_and_past",
+      "parameter_source": "predeclared_wrong"
+    },
+    {
+      "family": "wrong_parameter_control",
+      "id": "misspecified_rts_smoother",
+      "information_set": "retrospective_full_interval",
+      "parameter_source": "predeclared_wrong"
+    },
+    {
+      "family": "reset_boundary_negative_control",
+      "id": "false_continuation_filter",
+      "information_set": "invalid_cross_sequence_history",
+      "parameter_source": "known_true"
+    }
+  ],
+  "metrics": [
+    "latent_rmse",
+    "predictive_nll",
+    "interval_95_coverage",
+    "mean_posterior_variance",
+    "inside_missing_block_rmse",
+    "outside_missing_block_rmse",
+    "selection_parameter_l1",
+    "oracle_mean_discrepancy",
+    "reset_first_state_abs_difference"
+  ],
+  "object_id": "P4-U01",
+  "parameter_grid": [
+    {
+      "a": 0.6,
+      "q": 0.025,
+      "r": 0.1
+    },
+    {
+      "a": 0.6,
+      "q": 0.025,
+      "r": 0.4
+    },
+    {
+      "a": 0.6,
+      "q": 0.025,
+      "r": 0.8
+    },
+    {
+      "a": 0.6,
+      "q": 0.1,
+      "r": 0.1
+    },
+    {
+      "a": 0.6,
+      "q": 0.1,
+      "r": 0.4
+    },
+    {
+      "a": 0.6,
+      "q": 0.1,
+      "r": 0.8
+    },
+    {
+      "a": 0.6,
+      "q": 0.4,
+      "r": 0.1
+    },
+    {
+      "a": 0.6,
+      "q": 0.4,
+      "r": 0.4
+    },
+    {
+      "a": 0.6,
+      "q": 0.4,
+      "r": 0.8
+    },
+    {
+      "a": 0.85,
+      "q": 0.025,
+      "r": 0.1
+    },
+    {
+      "a": 0.85,
+      "q": 0.025,
+      "r": 0.4
+    },
+    {
+      "a": 0.85,
+      "q": 0.025,
+      "r": 0.8
+    },
+    {
+      "a": 0.85,
+      "q": 0.1,
+      "r": 0.1
+    },
+    {
+      "a": 0.85,
+      "q": 0.1,
+      "r": 0.4
+    },
+    {
+      "a": 0.85,
+      "q": 0.1,
+      "r": 0.8
+    },
+    {
+      "a": 0.85,
+      "q": 0.4,
+      "r": 0.1
+    },
+    {
+      "a": 0.85,
+      "q": 0.4,
+      "r": 0.4
+    },
+    {
+      "a": 0.85,
+      "q": 0.4,
+      "r": 0.8
+    },
+    {
+      "a": 0.97,
+      "q": 0.025,
+      "r": 0.1
+    },
+    {
+      "a": 0.97,
+      "q": 0.025,
+      "r": 0.4
+    },
+    {
+      "a": 0.97,
+      "q": 0.025,
+      "r": 0.8
+    },
+    {
+      "a": 0.97,
+      "q": 0.1,
+      "r": 0.1
+    },
+    {
+      "a": 0.97,
+      "q": 0.1,
+      "r": 0.4
+    },
+    {
+      "a": 0.97,
+      "q": 0.1,
+      "r": 0.8
+    },
+    {
+      "a": 0.97,
+      "q": 0.4,
+      "r": 0.1
+    },
+    {
+      "a": 0.97,
+      "q": 0.4,
+      "r": 0.4
+    },
+    {
+      "a": 0.97,
+      "q": 0.4,
+      "r": 0.8
+    }
+  ],
+  "phase3_reuse": "toy-models/linear-gaussian-inference-ladder.py",
+  "phase3_source_provenance": {
+    "path": "toy-models/linear-gaussian-inference-ladder.py",
+    "role": "actual_executable_routine_reuse",
+    "sha256": "875d0c0de6fef0caed125d599c336bd97d64312fdd7a49bfb449e6ce5540d34b"
+  },
+  "replicates": 5,
+  "resume": "partial rows must match schema, key, metadata, status/value semantics, and freshly recomputed canonical bytes exactly; duplicate, unknown, stale, corrupted, or incomplete rows are rejected",
+  "row_key": [
+    "scenario",
+    "replicate",
+    "split",
+    "method",
+    "metric"
+  ],
+  "runtime": {
+    "numpy": "2.3.5",
+    "pillow": "12.3.0",
+    "platform": "macOS-26.5.1-arm64-arm-64bit",
+    "python": "3.12.13",
+    "python_executable": "/Users/bytedance/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3"
+  },
+  "scenarios": [
+    {
+      "a": 0.6,
+      "class": "transition_stability",
+      "id": "stable_low_a",
+      "length": 60,
+      "q": 0.1,
+      "r": 0.4
+    },
+    {
+      "a": 0.85,
+      "class": "transition_stability",
+      "id": "stable_moderate",
+      "length": 60,
+      "q": 0.1,
+      "r": 0.4
+    },
+    {
+      "a": 0.97,
+      "class": "transition_stability",
+      "id": "stable_high_a",
+      "length": 60,
+      "q": 0.1,
+      "r": 0.4
+    },
+    {
+      "a": 0.85,
+      "class": "noise_ratio",
+      "id": "process_dominant",
+      "length": 60,
+      "q": 0.4,
+      "r": 0.1
+    },
+    {
+      "a": 0.85,
+      "class": "noise_ratio",
+      "id": "observation_dominant",
+      "length": 60,
+      "q": 0.025,
+      "r": 0.8
+    },
+    {
+      "a": 0.85,
+      "class": "sequence_length",
+      "id": "short_sequence",
+      "length": 24,
+      "q": 0.1,
+      "r": 0.4
+    },
+    {
+      "a": 0.85,
+      "class": "sequence_length",
+      "id": "long_sequence",
+      "length": 120,
+      "q": 0.1,
+      "r": 0.4
+    },
+    {
+      "a": 0.85,
+      "class": "missing_blocks",
+      "id": "missing_block",
+      "length": 80,
+      "missing": [
+        28,
+        48
+      ],
+      "q": 0.1,
+      "r": 0.4
+    },
+    {
+      "a": 0.85,
+      "class": "wrong_parameters",
+      "id": "wrong_parameters",
+      "length": 60,
+      "q": 0.1,
+      "r": 0.4,
+      "wrong": {
+        "a": 0.6,
+        "q": 0.025,
+        "r": 0.8
+      }
+    },
+    {
+      "a": 0.85,
+      "class": "reset_boundary_failure",
+      "id": "reset_boundary",
+      "length": 60,
+      "q": 0.1,
+      "r": 0.4
+    },
+    {
+      "a": 0.99,
+      "class": "near_unit_root_stress",
+      "id": "near_unit_root",
+      "length": 120,
+      "q": 0.02,
+      "r": 0.4
+    }
+  ],
+  "schema_version": 1,
+  "scientific_question": "Where are scalar LGSSM references, filters, smoothers, batch conditioning, and finite-grid plug-in inference applicable, robust, or brittle under declared synthetic scenarios and information sets?",
+  "seed_mapping": "PCG64(SeedSequence(master_seed, sha256(scenario_id)[:4], replicate, split_code, sequence))",
+  "selection": {
+    "criterion": "mean train innovation NLL + mean validation innovation NLL; lexicographic tie break",
+    "latent_truth_allowed": false,
+    "test_inputs_allowed": false
+  },
+  "split_policy": "independent train, validation, and test sequences per replicate; test truth is scoring-only",
+  "split_sizes": {
+    "test": 2,
+    "train": 2,
+    "validation": 2
+  },
+  "stages": [
+    "generation",
+    "selection",
+    "inference",
+    "scoring"
+  ],
+  "status": "stable",
+  "status_vocabulary": [
+    "ok",
+    "nonconvergence",
+    "invalid",
+    "inapplicable"
+  ],
+  "tolerances": {
+    "oracle": 2e-09,
+    "ordering": 0.0,
+    "variance": 1e-11
+  }
+}

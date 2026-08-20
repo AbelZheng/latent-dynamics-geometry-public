@@ -1,0 +1,328 @@
+---
+title: "Factor Analysis"
+object_type: method
+maturity: L2
+status: stable
+domain: [latent-modeling, dimensionality-reduction, statistics]
+tags: [factor-analysis, latent-factor, covariance-model, gaussian-model]
+prerequisites:
+- knowledge/methods/principal-component-analysis.qmd
+- knowledge/concepts/latent-variable.qmd
+- knowledge/concepts/observation-model.qmd
+- knowledge/concepts/observation-noise.qmd
+- knowledge/concepts/identifiability.qmd
+related:
+- knowledge/concepts/ambient-dimension.qmd
+- knowledge/concepts/intrinsic-dimension.qmd
+created: 2026-08-19
+updated: 2026-08-19
+---
+
+# Factor Analysis
+
+## Problem
+
+Factor analysis (FA) explains the covariance among $p$ observed variables using $q<p$ Gaussian latent factors plus variable-specific residual variation. The unit of analysis in this object is one real-valued observation vector. FA is a probabilistic covariance model, not merely a projection rule: it assigns a likelihood to observations and a posterior distribution to factors under explicit distributional assumptions [@GhahramaniHinton1997; @RoweisGhahramani1999].
+
+The bounded scope here is **exploratory maximum-likelihood Gaussian factor analysis** with a diagonal residual covariance whose interior parameter space has $\psi_j>0$. The zero-uniqueness boundary is excluded from this model but remains relevant because a likelihood supremum can approach it. Confirmatory loading constraints, ordinal or non-Gaussian factor models, mixtures, robust variants, Bayesian priors, and temporal extensions require separate objects.
+
+## Input
+
+Let $x_i\in\mathbb R^p$, $i=1,\ldots,n$, denote selected complete observation vectors. A reproducible analysis must declare:
+
+- the observational unit and whether rows are independent units, repeated measurements, time samples, trials, subjects, or condition summaries;
+- the variables, units, transformations, exclusion rules, and missing-data policy;
+- whether the model is fitted to a covariance matrix, a correlation matrix after training-fitted standardization, or the raw observations through the equivalent Gaussian likelihood;
+- the candidate factor count $q$ and its selection protocol; and
+- any loading zeros, equality constraints, rotations, or score conventions introduced after fitting.
+
+The canonical formulation assumes independent and identically distributed observation vectors conditional on common parameters. Treating dependent repeated or temporal samples as independent changes the likelihood and its uncertainty interpretation.
+
+## Output
+
+For a chosen $q$, maximum-likelihood FA estimates:
+
+- a mean $\mu\in\mathbb R^p$;
+- a loading matrix $\Lambda\in\mathbb R^{p\times q}$;
+- diagonal uniqueness covariance $\Psi=\operatorname{diag}(\psi_1,\ldots,\psi_p)$ with $\psi_j>0$; and
+- the model covariance $C=\Lambda\Lambda^\top+\Psi$.
+
+For each observation it also defines a Gaussian posterior distribution over its latent factor vector. A reported “factor score” is therefore a chosen posterior summary or scoring rule, not an observed quantity and not the same object as a PCA projection score.
+
+## Core idea
+
+FA attributes cross-variable covariance to shared latent factors while reserving a separate residual variance for each observed coordinate. Conditional on the factors, the observed coordinates are independent only because $\Psi$ is assumed diagonal. Marginally, they can be correlated through $\Lambda\Lambda^\top$ [@TippingBishop1999, sec. 2.1; @RoweisGhahramani1999, sec. 5.2].
+
+This separation is useful when heterogeneous coordinate-wise noise or unique variation is scientifically defensible. It is also restrictive: correlated residuals, unmodeled groups, temporal filtering, and shared artifacts violate the diagonal-uniqueness assumption and may be forced into the factors.
+
+## Generative / modeling assumptions
+
+The canonical model is
+
+$$
+z_i\sim\mathcal N(0,I_q),\qquad
+\epsilon_i\sim\mathcal N(0,\Psi),\qquad
+x_i=\mu+\Lambda z_i+\epsilon_i,
+$$
+
+with $z_i\perp\!\!\!\perp\epsilon_i$ and independence across $i$. Thus
+
+$$
+x_i\sim\mathcal N(\mu,C),\qquad C=\Lambda\Lambda^\top+\Psi.
+$$
+
+This low-rank-plus-diagonal covariance formulation, together with the need for
+additional identification conditions beyond choosing a factor count, is part
+of the classical statistical factor-analysis problem [@AndersonRubin1956].
+
+The assumptions are substantive:
+
+- the shared structure is linear in the selected observation coordinates;
+- factors and residuals are Gaussian;
+- the latent covariance is fixed to $I_q$ as a scale convention;
+- residual covariance is diagonal and strictly positive;
+- one global loading matrix and one global uniqueness matrix apply to all observations; and
+- the declared sample is represented by independent draws from one stationary marginal distribution.
+
+Diagonal $\Psi$ makes conditional independence coordinate-system dependent. Rotating the observed axes generally destroys diagonality, whereas component-wise unit changes can be absorbed by corresponding row and uniqueness rescaling [@RoweisGhahramani1999, sec. 5.2]. Standardizing variables is therefore a modeling choice, not a neutral route to the same answer.
+
+## Mathematical formulation
+
+With sample mean $\bar x$ and divisor-$n$ sample covariance
+
+$$
+S=\frac1n\sum_{i=1}^n(x_i-\bar x)(x_i-\bar x)^\top,
+$$
+
+the Gaussian log-likelihood at $\widehat\mu=\bar x$, up to an additive constant, is
+
+$$
+\ell(\Lambda,\Psi)
+=-\frac n2\left\{\log|C|+\operatorname{tr}(C^{-1}S)\right\},
+\qquad C=\Lambda\Lambda^\top+\Psi.
+$$
+
+Unlike ordinary PCA, general FA has no single eigendecomposition giving its maximum-likelihood loading and uniqueness estimates. Numerical optimization or latent-variable algorithms are required [@TippingBishop1999, sec. 2.1].
+
+For fixed parameters, let
+
+$$
+M=I_q+\Lambda^\top\Psi^{-1}\Lambda.
+$$
+
+Gaussian conditioning gives
+
+$$
+z_i\mid x_i\sim\mathcal N\!\left(
+M^{-1}\Lambda^\top\Psi^{-1}(x_i-\mu),\ M^{-1}
+\right).
+$$
+
+The posterior covariance explicitly records uncertainty left after observing $x_i$; a point score discards part of this information [@GhahramaniHinton1997].
+
+## What is learned?
+
+Given $q$, the model class, and preprocessing, fitting returns estimates of $\mu$
+and a candidate decomposition $\widehat C=\widehat\Lambda
+\widehat\Lambda^\top+\widehat\Psi$. The observable covariance distribution is
+the primary likelihood target; the particular loading--uniqueness decomposition
+is subject to sampling error, misspecification, boundary behavior, orthogonal
+equivalence, and any additional identification failures. Fitted parameters also
+determine model-conditional posterior distributions for factors of observed or
+new cases.
+
+What is most directly identified by the likelihood is the observable distribution, especially $C$, not a uniquely oriented set of latent axes. Even recovery of $C$ does not show that the fitted factors correspond to physical, psychological, or neural causes.
+
+## What is fixed?
+
+The analyst fixes the observation representation, sample inclusion and dependence treatment, Gaussian linear model class, diagonal residual structure, latent mean zero and covariance $I_q$, factor count or selection rule, and any structural loading constraints. Training-only centering and scaling must be fixed before evaluating held-out data.
+
+The choice $\operatorname{Cov}(z)=I_q$ fixes latent scale but not latent
+orientation. If the latent covariance is instead a free diagonal matrix, scale
+can be transferred between each factor variance and its loading column, in
+addition to sign and permutation conventions. If a fully unrestricted latent
+covariance $\Phi$ is estimated, any invertible coordinate change
+$z'=Az$, $\Lambda'=\Lambda A^{-1}$, and $\Phi'=A\Phi A^\top$ preserves the
+observable covariance. These broader ambiguities require the corresponding
+broader parameterization; they are not invariances of the canonical
+$\operatorname{Cov}(z)=I_q$ model.
+
+## Temporal assumptions
+
+Canonical FA is static and order-blind. Permuting observations leaves $S$ and the likelihood unchanged. If rows are time points, the model does not represent transitions, autocorrelation, process noise, lags, or trajectories; it merely fits their marginal distribution while often overstating effective sample size if dependence is ignored [@RoweisGhahramani1999, sec. 5.1].
+
+A discrete-time linear-Gaussian state-space model adds a transition distribution and process noise to a related linear-Gaussian observation layer. That temporal extension is not implicit in FA.
+
+## Geometry assumptions
+
+FA posits a linear latent-to-observation map embedded in $\mathbb R^p$ and a Gaussian covariance ellipsoid $C$. The diagonal entries of $\Psi$ define coordinate-specific residual scales, so the privileged observed coordinate system is part of the model. Posterior means shrink observations according to both loadings and uniquenesses; they are not orthogonal Euclidean projections in general.
+
+This is covariance geometry under a chosen representation. It does not establish a nonlinear manifold, recover a Riemannian metric, preserve topology, or determine model-free intrinsic dimension.
+
+## Supervision
+
+Exploratory FA is unsupervised with respect to outcomes and labels: its likelihood uses only the selected observation vectors. Label-dependent variable selection, preprocessing, rank choice, or subgroup construction can nevertheless introduce supervision and leakage at the design level.
+
+## Optimization / inference
+
+Parameter learning maximizes the marginal likelihood after integrating out the latent factors. EM alternates between posterior moments of $z_i$ and updates of $\Lambda$ and diagonal $\Psi$; the diagonal constraint is enforced in the uniqueness update [@GhahramaniHinton1997]. EM monotonically improves the likelihood under exact steps but can converge slowly, and monotonicity does not imply arrival at a unique global optimum. ECME and direct/quasi-Newton approaches are alternative numerical strategies; Liu and Rubin document an ECME construction for complete and incomplete Gaussian FA and emphasize convergence assessment [@LiuRubin1998].
+
+Inference with fitted parameters computes the conditional Gaussian distribution $p(z_i\mid x_i)$. Parameter learning and factor inference are distinct tasks. Initialization, convergence tolerances, positivity constraints, and multiple starts must be reported because the likelihood is nonconvex in the factorized parameters. Under the strict interior convention $\psi_j>0$, an optimizer can approach $\psi_j=0$ so that the likelihood supremum is not attained by an interior MLE; implementations that instead permit $\psi_j\geq 0$ may report zero as an attained boundary solution.
+
+## Strengths
+
+- FA provides an explicit probability model, likelihood, and posterior uncertainty for latent factors.
+- Diagonal uniquenesses allow heterogeneous residual variances instead of forcing one isotropic noise level.
+- The model separates shared covariance from coordinate-specific residual variance under clear assumptions.
+- It is a compact static baseline for later temporal latent models.
+- Held-out log likelihood and posterior predictive checks are available because the model defines a normalized density.
+
+## Failure modes
+
+- **Correlated residuals:** shared artifacts, coupling, spatial leakage, or omitted groups violate diagonal $\Psi$ and can appear as spurious factors.
+- **Nonlinearity or non-Gaussianity:** curved structure, heavy tails, skewness, multimodality, and outliers can distort loadings and uniquenesses.
+- **Wrong factor count:** too few factors leave structured residual covariance; too many can overfit, become unstable, or approach boundary uniquenesses.
+- **Heywood or boundary behavior:** one or more uniqueness estimates may approach zero. With the strict $\psi_j>0$ parameter space this can mean an unattained boundary supremum; with a nonnegative implementation it can be an attained boundary solution. Either case signals misspecification, weak identification, or numerical difficulty rather than a scientifically noiseless variable.
+- **Dependence treated as replication:** fitting time points, repeated measures, or trials as independent makes likelihood comparisons and uncertainty claims optimistic.
+- **Preprocessing sensitivity:** covariance- and correlation-based FA answer different questions; unit changes and standardization alter the decomposition.
+- **Local optimization and slow convergence:** different starts can produce different representatives or local solutions, and small likelihood changes can hide incomplete convergence [@LiuRubin1998].
+- **Factor-score overinterpretation:** posterior means are model-dependent uncertain estimates, not measured states.
+- **Causal naming:** labels such as “memory,” “arousal,” or “motor drive” do not turn covariance factors into causes.
+
+## Identifiability issues
+
+For every orthogonal $Q\in\mathbb R^{q\times q}$,
+
+$$
+\Lambda z=(\Lambda Q)(Q^\top z),
+\qquad
+(\Lambda Q)(\Lambda Q)^\top=\Lambda\Lambda^\top.
+$$
+
+Thus the likelihood cannot distinguish orthogonal rotations of the loading matrix. Sign flips and factor permutations are special cases. A post-hoc rotation may choose a more interpretable representative, but it does not create evidence that the selected axes are uniquely present in the data.
+
+With $\operatorname{Cov}(z)=I_q$, arbitrary factor rescaling is not an
+invariance: rescaling one loading column without compensating in the fixed
+latent covariance changes $C$. Free diagonal latent variances add separate
+factor-scale ambiguities, whereas a general invertible coordinate ambiguity
+requires the fully unrestricted latent covariance described above. This
+distinction prevents “scale ambiguity” from being asserted where the canonical
+normalization has already fixed it.
+
+Beyond rotational equivalence, uniqueness and loading recovery can be weak or
+nonunique for some dimensions, factor counts, covariance patterns, and boundary
+cases; classical identification results therefore impose additional rank or
+loading-pattern conditions rather than treating rotation as the only possible
+ambiguity [@AndersonRubin1956]. Posterior factor scores remain uncertain even
+when covariance parameters are well estimated. These are statistical
+identifiability limits, not competing causal mechanisms.
+
+## Comparison with simpler methods
+
+- **Mean plus diagonal Gaussian ($q=0$):** estimates no shared factors. FA should improve held-out likelihood or reduce reproducible off-diagonal covariance residuals before shared latent structure is credited.
+- **PCA:** finds an orthogonal subspace maximizing variance or minimizing Euclidean reconstruction error. It has no likelihood or variable-specific noise model. FA loadings need not span the PCA subspace, and factor solutions for different $q$ need not be nested [@TippingBishop1999; @RoweisGhahramani1999].
+- **Probabilistic PCA (PPCA):** replaces diagonal $\Psi$ by $\sigma^2I$. Its maximum-likelihood loading space is the principal subspace, whereas FA's heterogeneous uniquenesses generally change the fitted loading space [@TippingBishop1999]. PPCA is a useful rank-matched test of whether variable-specific residual variance is needed.
+- **Full-covariance Gaussian:** can fit an unrestricted covariance but is not a low-parameter latent explanation. Comparing predictive likelihood penalized or validated out of sample tests whether FA's structure earns its restrictions.
+- **Discrete-time linear-Gaussian state-space model:** adds latent evolution, process noise, and temporally conditioned inference. It should be preferred only when sequence structure improves properly blocked prediction or likelihood, not because FA scores look smooth.
+
+## Evaluation criteria
+
+Fit preprocessing and parameters on training units only. Evaluation should include:
+
+1. held-out negative log likelihood under $\mathcal N(\widehat\mu,\widehat C)$, compared with $q=0$, rank-matched PPCA, and declared covariance baselines;
+2. residual covariance $S_{\text{test}}-\widehat C$, especially reproducible off-diagonal structure that contradicts diagonal conditional residuals;
+3. posterior predictive checks for marginal variances, correlations, tails, and subgroup or temporal residual patterns;
+4. rank sensitivity and stability of the fitted common covariance or loading subspace across resamples, with orthogonal alignment before comparing loading representatives; and
+5. convergence diagnostics, positivity of uniquenesses, multiple-start agreement, and sensitivity to scaling and exclusion rules.
+
+Splits must preserve the true dependence unit: hold out entire subjects, sessions, trials, trajectories, or time blocks when observations within them are dependent. Factor recovery cannot be validated by visual separation alone. If known latent variables exist only in simulation, compare posterior estimates after an allowed alignment and separately score covariance recovery. Information criteria may supplement but should not replace held-out and misspecification checks.
+
+## Minimal toy model
+
+An analytic example uses $p=3$, $q=1$,
+
+$$
+\Lambda=\begin{pmatrix}2\\1\\0.5\end{pmatrix},
+\qquad
+\Psi=\operatorname{diag}(0.25,1,4),
+$$
+
+which gives
+
+$$
+C=\begin{pmatrix}
+4.25&2&1\\
+2&2&0.5\\
+1&0.5&4.25
+\end{pmatrix}.
+$$
+
+The off-diagonal covariances come entirely from the common factor, while the third variable has large unique variance despite sharing the factor. The posterior variance is
+
+$$
+\left(1+\Lambda^\top\Psi^{-1}\Lambda\right)^{-1}=\frac{1}{18.0625},
+$$
+
+and replacing $\Lambda$ by $-\Lambda$ leaves $C$ unchanged while reversing the factor-score sign.
+
+A future executable toy contract would generate independent training and test samples from this known model; fit $q=0$, one-factor FA, and one-factor PPCA from multiple starts; compare held-out likelihood, $\lVert\widehat C-C\rVert_F$, uniqueness recovery, and aligned factor posterior means; then repeat with a deliberately correlated residual covariance as a negative control. The expected lesson is conditional: correct-model FA should recover covariance structure better than its restricted baselines with enough data, whereas residual correlation should produce systematic misspecification. No execution, benchmark result, or empirical claim is included in this Method Object.
+
+## Relevance to LDG
+
+FA is LDG's canonical static probabilistic latent-factor baseline. It separates a defensible claim—“a Gaussian low-rank-plus-diagonal covariance model predicts these observations”—from stronger claims about intrinsic dimension, nonlinear geometry, temporal dynamics, mechanism, or causality. It also supplies the observation-layer vocabulary needed before discrete-time linear-Gaussian state-space models and Gaussian-process factor analysis.
+
+::: {.callout-warning title="What this does NOT imply"}
+A good FA fit does not prove that factors are causes, identify unique latent axes, establish model-free intrinsic dimension, demonstrate a manifold, or discover dynamics. Diagonal uniqueness is an assumption to test, not a measured fact; smooth-looking factor scores do not add a transition law.
+:::
+
+### Mouse trajectory
+
+FA may model covariance among declared trajectory features or aligned samples, but it ignores ordering and cannot infer movement dynamics. Split evaluation by complete animals or trajectories when dependence requires it. No modality-specific performance claim is made here.
+
+### Eye movement
+
+FA may provide a static shared-versus-coordinate-specific covariance baseline for declared eye-position, velocity, event, or window features. Binocular coupling, filtering, and serial dependence can violate diagonal and independent-observation assumptions. No modality-specific performance claim is made here.
+
+### EEG
+
+FA may summarize covariance in a declared sensor, spectral, or trial-feature representation. Referencing, volume conduction, shared artifacts, and preprocessing can induce correlated residuals, so factors must not be called neural sources without a separate observation model and evidence. No modality-specific performance claim is made here.
+
+### MEG / neural population data
+
+FA can serve as a static observation model for simultaneous channels or units, but time samples and repeated trials are not independent by default. A temporal model must earn its added structure on blocked data. No modality-specific performance claim is made here.
+
+## Primary sources
+
+- Anderson and Rubin formulate statistical inference for the classical factor
+  model, including diagonal residual covariance, rotational indeterminacy,
+  identification conditions, estimation, and testing [@AndersonRubin1956].
+- Ghahramani and Hinton give the Gaussian FA generative model, diagonal uniqueness assumption, conditional factor distribution, and EM updates in a technical report whose primary contribution extends the model to mixtures [@GhahramaniHinton1997].
+- Tipping and Bishop define PPCA as the isotropic-noise restriction of a closely related Gaussian latent-variable model and explicitly contrast it with ordinary diagonal-uniqueness FA [@TippingBishop1999].
+- Liu and Rubin develop and assess ECME maximum-likelihood fitting for complete and incomplete Gaussian FA, including convergence considerations [@LiuRubin1998].
+
+## Reviews / secondary sources
+
+- Roweis and Ghahramani place static FA, PCA/PPCA, and dynamic linear-Gaussian models in one technical framework and state the diagonal residual, scale, coordinate-system, inference, and temporal distinctions used here [@RoweisGhahramani1999].
+
+## Open methodological questions
+
+- Which factor-count criterion remains reliable under small samples, weak factors, and near-boundary uniquenesses for LDG's intended data regimes?
+- Which residual-covariance checks best distinguish a useful low-rank-plus-diagonal approximation from artifacts forced into factors?
+- When should the observation representation be standardized, and which scientific noise model justifies that choice?
+- How stable are downstream temporal conclusions to replacing an FA observation layer with PPCA or a structured residual covariance?
+
+## Maturity checklist
+
+- [x] Schema-complete Method Object at `L2/review`.
+- [x] Gaussian latent-factor, diagonal uniqueness, independence, and positivity assumptions stated.
+- [x] Learned and fixed quantities distinguished.
+- [x] Marginal likelihood, posterior inference, optimization, and convergence boundaries stated.
+- [x] Time, geometry, supervision, data, and preprocessing assumptions stated.
+- [x] Rotation, sign, permutation, scale-convention, and factor-score ambiguities distinguished.
+- [x] PCA, PPCA, diagonal Gaussian, full covariance, and linear-Gaussian state-space comparisons included.
+- [x] Failure modes, baselines, evaluation criteria, and analytic/prose toy contract included.
+- [x] No causal, manifold, dynamical, or model-free intrinsic-dimension claim made.
+- [x] Retained sources inspected and bibliographic metadata verified; no modality-specific empirical result retained.
+- [x] Independent mixed review completed after two bounded correction rounds;
+  focused re-review returned PASS.
+- [x] Stable promotion authorized by the human owner under the recorded review decision after published-site review.

@@ -1,0 +1,155 @@
+---
+title: "Geodesic"
+object_type: concept
+maturity: L2
+status: stable
+domain: [geometry, dynamics]
+tags: [geodesic, shortest-path, connection]
+prerequisites:
+- knowledge/concepts/metric.qmd
+- knowledge/concepts/manifold.qmd
+related:
+- knowledge/concepts/tangent-space.qmd
+- knowledge/concepts/riemannian-metric.qmd
+created: 2026-08-18
+updated: 2026-08-18
+---
+
+# Geodesic
+
+## One-sentence definition
+
+An affinely parameterized **geodesic** is a curve that follows the locally straight, zero-covariant-acceleration paths determined by a chosen connection, and for a Riemannian metric is locally length-minimizing over sufficiently short segments.
+
+## Why this concept matters
+
+Geodesics generalize straight lines to curved spaces. They are often called shortest paths, but a geodesic need not minimize distance globally or beyond special local intervals.
+
+## Intuition
+
+Great circles are geodesics on a sphere. A short arc is the shortest route between nearby points, while a sufficiently long arc may not be globally shortest.
+
+## Formal definition
+
+Let $M$ be a smooth manifold with a linear connection $\nabla$, and let $\gamma:I\to M$ be smooth. Its covariant acceleration is
+
+$$
+D_t\dot\gamma
+=
+\nabla_{\dot\gamma}\dot\gamma.
+$$
+
+An **affinely parameterized geodesic** satisfies
+
+$$
+D_t\dot\gamma=0.
+$$
+
+In local coordinates $x^1,\ldots,x^n$, this is the system
+
+$$
+\ddot x^k(t)
++
+\Gamma^k_{ij}(x(t))\dot x^i(t)\dot x^j(t)
+=0,
+$$
+
+where $\Gamma^k_{ij}$ are the Christoffel symbols of the chosen connection in that chart [@Lee1997, ch. 4]. They are coordinate coefficients, not tensor components by themselves; connection construction and transformation proofs are deferred.
+
+### Initial data and maximal geodesics
+
+For $p\in M$, $v\in T_pM$, and initial time $t_0$, the geodesic initial-value problem is
+
+$$
+\gamma(t_0)=p,
+\qquad
+\dot\gamma(t_0)=v.
+$$
+
+Under the smooth-connection assumptions, these data determine a unique local geodesic and a unique maximal extension on an open interval containing $t_0$ [@Lee1997, ch. 4]. Maximal does not mean defined for all real time; that stronger property is geodesic completeness.
+
+### Affine reparameterization
+
+If $\gamma(t)$ is a geodesic and $a\ne0$, then $\widetilde\gamma(s)=\gamma(as+b)$ is again an affinely parameterized geodesic. A general nonlinear reparameterization usually adds acceleration parallel to the curve and does not satisfy the zero-acceleration equation, even though it traces the same path image. Unparameterized geodesic paths and affine geodesics must therefore be distinguished.
+
+### Riemannian specialization
+
+For a [Riemannian Metric](riemannian-metric.qmd), the relevant connection is the unique torsion-free, metric-compatible Levi–Civita connection. Its geodesics have constant speed because their velocity is parallel along the curve [@Lee1997, ch. 5]. Every Riemannian geodesic is locally minimizing on sufficiently short intervals, and every length-minimizing smooth curve is a geodesic when given an affine (in particular, constant-speed) parametrization. These are local statements: a geodesic can cease to minimize after leaving a normal neighborhood, and multiple geodesics can join the same endpoints [@Lee1997, ch. 6].
+
+### Exponential map
+
+Let $\gamma_v$ denote the maximal geodesic with $\gamma_v(0)=p$ and $\dot\gamma_v(0)=v$. The exponential map is
+
+$$
+\exp_p(v)=\gamma_v(1)
+$$
+
+for tangent vectors $v$ whose geodesic is defined at time $1$. Equivalently, $\exp_p(tv)=\gamma_v(t)$ where defined. Near the zero vector, $\exp_p$ provides normal coordinates and a local relation between tangent vectors and nearby points. It is not generally globally injective or defined on all of $T_pM$ without completeness assumptions.
+
+## Core notation
+
+- $\gamma:I\to M$: curve.
+- $\dot\gamma$: velocity.
+- $\nabla_{\dot\gamma}\dot\gamma$: covariant acceleration.
+- $L(\gamma)$: Riemannian curve length.
+- $\Gamma^k_{ij}$: Christoffel symbols of the chosen connection.
+- $p,v$: initial point and tangent velocity.
+- $\gamma_v$: maximal geodesic determined by $v\in T_pM$.
+- $\exp_p$: exponential map on its supported tangent-domain.
+
+## Prerequisites
+
+[Metric](metric.qmd) supplies general distance language. [Manifold](manifold.qmd) supplies the curved space on which the curve lies. The differential zero-acceleration definition additionally requires tangent and connection machinery; the local length-minimization statement requires a Riemannian metric and its Levi–Civita connection.
+
+**Assumed background:** tangent vectors, covariant differentiation, affine parameterization, and the Levi–Civita connection; their theorem-level construction is deferred. The related [Riemannian Metric](riemannian-metric.qmd) object states the geometric structure but is later in the planning spine.
+
+## Relationship to adjacent concepts
+
+| Concept | Distinction |
+|---|---|
+| **Shortest path** | A global optimization property; geodesics are defined locally/differentially and can cease minimizing. A minimizing smooth path is geodesic, but not every geodesic segment is globally minimizing. |
+| **Exponential map** | Maps an initial tangent vector to the corresponding geodesic endpoint at unit affine time where defined; it need not be globally injective or globally defined. |
+| **Reparameterized path** | Affine changes preserve the geodesic equation; nonlinear changes generally preserve only the path image. |
+| **Straight line** | The Euclidean special case. |
+| **Trajectory** | Parameterized system evolution; it is a geodesic only if the dynamics satisfy the relevant geometric equation. |
+| **Graph geodesic** | Shortest path in a graph metric, not necessarily a smooth geodesic. |
+
+## What this does NOT imply
+
+A geodesic does not imply global shortestness, uniqueness between two points, geodesic completeness, global injectivity of the exponential map, a physical trajectory, constant coordinate velocity, Euclidean straightness, or reliable estimation from a nearest-neighbor graph.
+
+## Minimal example
+
+On the unit sphere, great-circle arcs are geodesics. Between antipodal points there are many geodesics of equal length, demonstrating non-uniqueness.
+
+## Neuroscience / behavioral relevance
+
+Geodesic distances are sometimes used for latent representations. Their validity depends on supported manifold and metric assumptions; graph approximations and visual curves are not sufficient evidence.
+
+## Relevance to LDG
+
+At L2, Geodesic connects connection-based acceleration, coordinate equations, initial tangent data, the exponential map, and local Riemannian minimization while keeping global shortest paths and actual dynamical trajectories separate.
+
+## Open questions
+
+- Which metric should define a scientifically meaningful geodesic?
+- How stable are estimated geodesics under sampling and noise?
+- When should dynamics follow geodesics, and what baseline should that beat?
+
+## References
+
+- Lee provides the inspected zero-acceleration and coordinate equations, initial-value/maximal-geodesic result, Levi–Civita constant-speed property, exponential map, and local minimizing results [@Lee1997, chs. 4–6].
+- Connection construction, variational proofs, cut/conjugate loci, Hopf–Rinow, and graph-geodesic algorithms are intentionally deferred.
+
+## Maturity checklist
+
+- [x] Defines geodesics through covariant acceleration.
+- [x] Separates local geodesic and global shortest-path claims.
+- [x] Distinguishes geodesics from trajectories and graph paths.
+- [x] States zero covariant acceleration with affine parameterization and coordinate equations.
+- [x] Types initial point/tangent data and maximal supported geodesics.
+- [x] Separates affine and nonlinear reparameterizations.
+- [x] States constant-speed and local-minimizing Riemannian properties without global overclaim.
+- [x] Defines the exponential map with domain and injectivity limitations.
+- [x] Separates smooth geodesics, graph shortest paths, and dynamical trajectories.
+- [x] Independent L2 scientific review completed; the sole finding was corrected and focused re-review passed under the recorded review decision.

@@ -1,0 +1,71 @@
+project:
+  type: website
+  output-dir: _site
+  render:
+    - "index.qmd"
+    - "knowledge/concepts/*.qmd"
+    - "knowledge/methods/*.qmd"
+    - "knowledge/math/*.qmd"
+    - "knowledge/papers/*.qmd"
+    - "toy-models/*.qmd"
+    - "research-questions/*.qmd"
+    - "benchmarks/*.qmd"
+
+lang: en
+
+website:
+  title: "Latent Dynamics & Geometry"
+  site-url: "https://abelzheng.github.io/latent-dynamics-geometry-public/"
+  repo-url: "https://github.com/AbelZheng/latent-dynamics-geometry-public"
+  search: true
+  navbar:
+    left:
+      - text: "Home"
+        href: index.qmd
+      - text: "Concepts"
+        href: knowledge/concepts/index.qmd
+      - text: "Methods"
+        href: knowledge/methods/index.qmd
+      - text: "Math"
+        href: knowledge/math/index.qmd
+      - text: "Papers"
+        href: knowledge/papers/index.qmd
+      - text: "Toy Models"
+        href: toy-models/index.qmd
+      - text: "Research Questions"
+        href: research-questions/index.qmd
+      - text: "Benchmarks"
+        href: benchmarks/index.qmd
+    right:
+      - icon: github
+        href: "https://github.com/AbelZheng/latent-dynamics-geometry-public"
+        aria-label: "GitHub repository"
+      - text: "Discussions"
+        href: "https://github.com/AbelZheng/latent-dynamics-geometry-public/discussions"
+  comments:
+    giscus:
+      repo: "AbelZheng/latent-dynamics-geometry-public"
+      repo-id: "R_kgDOT-VBkw"
+      category: "Announcements"
+      category-id: "DIC_kwDOT-VBk84DDyEz"
+      mapping: pathname
+      reactions-enabled: true
+      input-position: bottom
+      loading: lazy
+      theme: preferred_color_scheme
+      language: en
+
+bibliography: references.bib
+
+format:
+  html:
+    theme: cosmo
+    toc: true
+    code-fold: true
+    code-tools: true
+    citations-hover: true
+    link-external-newwindow: true
+
+execute:
+  echo: true
+  warning: true

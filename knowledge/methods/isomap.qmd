@@ -1,0 +1,320 @@
+---
+title: "Isomap"
+object_type: method
+maturity: L2
+status: stable
+domain: [dimensionality-reduction, geometry, graph-methods]
+tags: [isomap, nonlinear-embedding, shortest-path, classical-mds]
+prerequisites:
+- knowledge/methods/principal-component-analysis.qmd
+- knowledge/concepts/embedding.qmd
+- knowledge/concepts/metric.qmd
+- knowledge/concepts/geodesic.qmd
+- knowledge/concepts/manifold.qmd
+related:
+- knowledge/concepts/intrinsic-dimension.qmd
+- knowledge/concepts/topology.qmd
+- knowledge/concepts/identifiability.qmd
+created: 2026-08-19
+updated: 2026-08-19
+---
+
+# Isomap
+
+## Problem
+
+Isomap constructs low-dimensional Euclidean coordinates intended to preserve shortest-path distances in a neighborhood graph built from high-dimensional observations. It addresses a narrower problem than generic nonlinear dimensionality reduction: when ambient distances are locally meaningful and the samples adequately trace a structure whose path metric is approximately Euclidean in some global coordinate system, graph paths can provide a better global distance surrogate than straight ambient chords [@TenenbaumDeSilvaLangford2000; @BernsteinEtAl2000].
+
+The output is an embedding of the fitted observations, not proof that the observations arose from a manifold. Isomap separates three operations that must not be conflated: constructing an ambient-distance neighborhood graph, computing shortest-path distances on that finite graph, and applying classical multidimensional scaling (MDS) to those graph distances.
+
+## Input
+
+Let $x_1,\ldots,x_n\in\mathbb R^p$ be the fitted observations after a declared feature construction and preprocessing pipeline. A reproducible analysis must specify:
+
+- the observational unit represented by each row and any dependence among rows;
+- centering, feature scaling, exclusion, missing-data and duplicate-point policies;
+- the ambient dissimilarity $\delta(x_i,x_j)$ used both to choose neighbors and, unless explicitly separated, to weight graph edges;
+- either a $k$-nearest-neighbor rule or an $\varepsilon$-radius rule;
+- directed versus symmetrized $k$-nearest-neighbor construction, including whether mutual or union symmetrization is used;
+- tie breaking, zero-distance and duplicate handling;
+- the treatment of disconnected components;
+- the target coordinate dimension $d$ or the training-only rule used to choose it; and
+- whether new observations will require an explicitly declared out-of-sample extension.
+
+Ordinary Isomap commonly uses Euclidean distance after preprocessing, but that choice is not automatic. Feature scaling can alter neighbor identities, edge lengths, graph connectivity, shortest paths and the final embedding.
+
+## Output
+
+For the fitted observations, Isomap returns:
+
+- a neighborhood graph $G=(V,E)$ whose vertices correspond to observations;
+- weighted shortest-path distances $d_G(i,j)$ within the analyzed connected component or components;
+- a double-centered matrix derived from squared graph distances;
+- eigenvalues diagnosing how nearly those graph distances admit the requested Euclidean representation; and
+- centered coordinates $y_i\in\mathbb R^d$ for the fitted observations.
+
+Standard Isomap does not return a generative distribution, a posterior over coordinates, a unique inverse map from coordinates to observations, or automatically valid coordinates for observations not included in the fitted graph.
+
+## Core idea
+
+Isomap has three distinct stages [@TenenbaumDeSilvaLangford2000]:
+
+1. **Neighbor graph:** connect observations judged locally close by a fixed $k$ or $\varepsilon$ rule, and weight each retained edge by its declared ambient dissimilarity.
+2. **Graph distance:** approximate long-range path distance by the length of the shortest sequence of local edges between each pair of vertices.
+3. **Classical MDS:** convert squared graph distances to a centered inner-product matrix and approximate that matrix by a rank-$d$ positive-semidefinite Gram matrix.
+
+The first stage proposes which ambient chords are local enough to stand in for short path segments. The second stage produces a finite graph metric. The third asks whether that metric can be represented, exactly or approximately, by Euclidean coordinates of the requested dimension. A visually smooth final plot cannot retroactively validate either the graph or the manifold assumptions.
+
+## Generative / modeling assumptions
+
+Isomap is not a probabilistic generative model. Its interpretation nevertheless relies on strong approximation assumptions:
+
+- nearby ambient observations are close along the candidate structure rather than merely close because two distant branches approach each other;
+- sampling is dense enough that graph paths can follow relevant paths without large gaps;
+- neighborhood scale is large enough for connectivity but small enough to avoid shortcut edges;
+- observation noise and outliers do not substantially corrupt neighbor identities;
+- the relevant connected region is represented by the fitted sample; and
+- the resulting path metric is sufficiently close to a Euclidean distance matrix for classical MDS to represent it at dimension $d$.
+
+Bernstein et al. prove graph-distance approximation under sufficient conditions
+that include geodesic convexity (so the relevant minimizing geodesics exist),
+fine enough sample coverage, and edge scales controlled relative to curvature
+radius and separation between distinct branches. These are conditional theorem
+hypotheses, not tests that a finite dataset satisfies the assumptions
+[@BernsteinEtAl2000]. The original Isomap result additionally emphasizes a
+favorable case in which intrinsic geometry is isometric to a convex region of
+Euclidean space; curved spaces or non-Euclidean path metrics need not flatten
+globally without distortion [@TenenbaumDeSilvaLangford2000].
+
+## Mathematical formulation
+
+### 1. Neighborhood graph
+
+For a symmetric graph, let
+
+$$
+(i,j)\in E
+$$
+
+when the declared $k$-nearest-neighbor or $\varepsilon$-radius relation, followed by its declared symmetrization, retains the pair. Assign edge weight
+
+$$
+w_{ij}=\delta(x_i,x_j).
+$$
+
+A $k$-nearest-neighbor rule fixes a neighbor count but can create very long edges in sparse regions. An $\varepsilon$ rule fixes an ambient scale but can isolate low-density regions. Mutual and union symmetrization generally produce different graphs.
+
+### 2. Shortest-path graph distance
+
+For vertices in the same connected component, define
+
+$$
+d_G(i,j)
+=
+\min_{i=v_0,\ldots,v_m=j}
+\sum_{r=0}^{m-1}w_{v_rv_{r+1}},
+$$
+
+where the minimum ranges over graph paths. If $i$ and $j$ are disconnected, the graph distance is infinite rather than a missing finite geodesic estimate. Deleting small components, analyzing components separately, adding bridging edges, or increasing the neighborhood are scientifically different decisions.
+
+Dense sampling alone is not sufficient if the neighborhood graph contains edges between nearby ambient points on distant branches. Such an edge can make $d_G$ much smaller than the intended path distance for many pairs. Conversely, gaps or overly small neighborhoods can make graph routes much longer than the intended path or disconnect them [@TenenbaumDeSilvaLangford2000; @BernsteinEtAl2000; @VanDerMaatenEtAl2009].
+
+### 3. Classical MDS
+
+Let $D_G^{(2)}$ denote the matrix with entries $d_G(i,j)^2$ for one finite connected component, and let
+
+$$
+H=I_n-\frac{1}{n}\mathbf 1\mathbf 1^\top.
+$$
+
+Classical MDS forms
+
+$$
+B=-\frac{1}{2}H D_G^{(2)}H.
+$$
+
+If
+
+$$
+B=Q\Lambda Q^\top
+$$
+
+has ordered eigenvalues $\lambda_1\geq\cdots\geq\lambda_n$, the usual $d$-dimensional coordinates retain the largest positive eigenvalues,
+
+$$
+Y_d=Q_d\Lambda_d^{1/2}.
+$$
+
+This spectral construction minimizes squared error between $B$ and a rank-$d$ positive-semidefinite Gram matrix; it is a **strain** criterion on double-centered squared distances, not direct minimization of raw distance stress [@TenenbaumDeSilvaLangford2000; @BengioEtAl2003]. Substantial negative eigenvalues show that the supplied graph distances are not exactly Euclidean. They do not identify whether the cause is non-Euclidean intrinsic geometry, sampling, shortcuts, disconnected-component handling, noise, or another misspecification.
+
+For ordinary Euclidean input distances, centered classical MDS recovers the same coordinate subspaces as PCA up to rigid coordinate conventions. Isomap differs by supplying graph shortest-path distances to the MDS stage [@TenenbaumDeSilvaLangford2000].
+
+## What is learned?
+
+Given all analyst-fixed choices, Isomap learns the sample neighborhood graph, its weighted all-pairs shortest-path distances, the double-centered matrix $B$, its spectrum, and one representative rank-$d$ Euclidean coordinate system for the fitted observations.
+
+The algorithm does not learn a smooth manifold atlas, a Riemannian metric tensor, topology, transition law, observation model, noise distribution, intrinsic dimension, or causal mechanism. The graph and its metric are data-dependent estimates, not directly observed properties of an underlying space.
+
+## What is fixed?
+
+The analyst fixes the observations and features, preprocessing, ambient dissimilarity, neighbor rule, neighborhood scale, graph direction/symmetrization, tie handling, edge weights, component policy, target dimension or selection procedure, positive-eigenvalue policy, and any out-of-sample method. Evaluation splits and all tuning ranges are also fixed by the analysis design.
+
+These choices interact. Selecting $k$ or $\varepsilon$ after inspecting the desired visualization is outcome-dependent tuning unless the selection criterion and validation protocol are independently declared.
+
+## Temporal assumptions
+
+Ordinary Isomap is order-blind: permuting observation rows only relabels graph vertices and embedded points. If observations are time samples, the method does not use succession, direction, lag, velocity or transition probability unless those quantities are inserted into features, distances or graph constraints. A temporal-adjacency graph is a modified method and must not be interpreted as ordinary Isomap discovering dynamics.
+
+A trajectory-like ordering visible in Isomap coordinates can result from static similarity structure. It is not evidence for physical time, a vector field, an evolution equation or a latent dynamical system.
+
+## Geometry assumptions
+
+Isomap uses the declared ambient metric locally, graph path length globally,
+and Euclidean geometry in the output. The graph shortest-path metric is a
+combinatorial metric on sampled vertices. Calling it an estimate of manifold
+geodesic distance requires external assumptions about a candidate embedded
+manifold, existence of the relevant minimizing geodesics, local metric
+fidelity, sampling density, curvature and branch separation
+[@BernsteinEtAl2000].
+
+Classical MDS then asks for Euclidean coordinates preserving this graph metric. If the candidate space has non-Euclidean global path geometry, holes, strong curvature or incompatible topology, no low-dimensional Euclidean coordinate system may preserve all graph distances. Isomap does not estimate a Riemannian metric tensor or certify an isometry.
+
+## Supervision
+
+Standard Isomap is unsupervised with respect to labels and outcomes: graph construction and MDS use only the declared observations and distances. Labels can still leak into the result through feature selection, preprocessing, sample exclusion, hyperparameter choice or visual selection. Tuning the neighborhood or dimension to maximize downstream labeled performance creates a supervised model-selection layer that must be evaluated with nested or otherwise leakage-safe splits.
+
+## Optimization / inference
+
+Exact Isomap performs neighborhood search, all-pairs shortest paths on the resulting weighted graph, and a symmetric eigendecomposition of $B$. The MDS step has a spectral global solution for its stated strain objective, but this does not make the preceding graph construction statistically optimal or scientifically validated.
+
+The fitted coordinates are transductive. Adding a new point can add graph edges and change shortest paths between existing points, so recomputing Isomap can move the entire embedding. Nyström/eigenfunction and landmark constructions provide explicit approximate out-of-sample extensions, but they introduce additional assumptions and generally need not equal a full refit [@BengioEtAl2003]. Any claimed deployment rule must state how a new point is connected, how distances to training points are obtained, and how its coordinates are aligned with the training embedding.
+
+## Strengths
+
+- It makes the proposed local-to-global geometry explicit through an inspectable graph.
+- It can represent globally curved but approximately intrinsically Euclidean structures that one affine PCA subspace cannot flatten.
+- Its three stages have clear diagnostics: graph connectivity and edge structure, graph-distance stability, and MDS spectral distortion.
+- The MDS stage has a transparent spectral solution.
+- It supplies a useful stress test for whether nonlinear graph-geodesic assumptions add value beyond PCA and ambient-distance MDS.
+
+## Failure modes
+
+- **Neighborhood too small:** sparse regions disconnect or graph routes detour, inflating distances.
+- **Neighborhood too large:** edges bridge separate arms or folds, creating short circuits that can corrupt many all-pairs distances.
+- **Nonuniform sampling:** one global $k$ or $\varepsilon$ can be simultaneously too large in dense regions and too small in sparse regions.
+- **Noise and outliers:** ambient perturbations alter nearest neighbors; an outlier can create a bridge or isolated component.
+- **High-dimensional distance concentration:** unreliable ambient neighborhoods make every downstream stage unreliable.
+- **Disconnected supports:** infinite graph distances cannot be passed to ordinary classical MDS without a declared component or imputation policy.
+- **Non-Euclidean graph metric:** negative eigenvalues and residual strain remain even with a correctly computed graph.
+- **Boundary and holes:** finite graph paths and global Euclidean flattening can distort structures with nonconvex intrinsic domains or nontrivial topology.
+- **Hyperparameter instability:** modest changes in preprocessing, $k$, $\varepsilon$, symmetrization or target dimension can rotate, fold, split or reconnect the output.
+- **No native inverse:** low-dimensional coordinates do not by themselves reconstruct observations.
+- **No native out-of-sample map:** extensions are extra algorithms, not an automatic property of the fitted embedding.
+- **Visualization overreach:** a convincing two-dimensional layout can conceal large graph-distance errors or discarded negative eigendirections.
+
+The comparative review by van der Maaten et al. emphasizes short-circuit sensitivity, neighborhood-graph dependence, disconnected-component restrictions and weaker performance on more complex natural data than on favorable synthetic examples [@VanDerMaatenEtAl2009].
+
+## Identifiability issues
+
+For a fixed connected graph-distance matrix and a fixed retained positive eigenspace, classical MDS coordinates are centered and are non-unique under orthogonal transformations, including rotations and reflections. Individual axes have arbitrary signs. Repeated retained eigenvalues permit arbitrary rotations within their eigenspaces. If the truncation boundary crosses a repeated eigenvalue, the selected $d$-dimensional coordinate subspace is itself non-unique.
+
+These spectral equivalences do not exhaust practical ambiguity. Different neighborhood graphs can yield different graph metrics and embeddings from the same observations. A plotting alignment or Procrustes transformation chooses a coordinate representative; it does not identify scientifically privileged latent axes. When negative eigenvalues are discarded, even the full positive-coordinate representation is only an approximation to the supplied graph distances.
+
+## Comparison with simpler methods
+
+- **PCA:** the required rank-matched linear Euclidean baseline. It tests whether graph-geodesic construction improves the declared criterion beyond one global affine subspace.
+- **Ambient-distance classical MDS:** applies the same final spectral stage directly to pairwise ambient distances. With Euclidean distances it is closely linked to PCA, and it isolates the contribution of replacing ambient distances by graph paths.
+- **Graph-distance diagnostic without embedding:** inspect connectivity, edge lengths, shortest paths and stability across neighborhoods before attributing any value to the MDS visualization.
+- **Synthetic oracle comparison:** only in a future generated toy setting, compare graph distances with known curve or manifold path distances. This is unavailable for ordinary empirical data without independently known geometry.
+
+A method should not be judged superior merely because its own in-sample graph-distance objective is smaller. Comparisons must use matched dimension, training-only tuning and criteria tied to the intended scientific or predictive use.
+
+## Evaluation criteria
+
+Evaluation should report several layers rather than one plot:
+
+1. **Graph diagnostics:** connected-component sizes, degree and edge-length distributions, sensitivity to tie handling and symmetrization, and the appearance or disappearance of long bridging edges.
+2. **Neighborhood stability:** repeat the analysis across a prespecified, scientifically plausible range of $k$ or $\varepsilon$ and across resampled independent units.
+3. **Distance fidelity:** report classical-MDS strain or a declared stress/correlation measure between $d_G$ and embedded Euclidean distances. State whether negative eigenvalues were omitted.
+4. **Local fidelity:** when relevant, report declared neighborhood-preservation measures rather than inferring local correctness from global distance fit.
+5. **Baseline comparison:** compare rank-matched PCA and ambient-distance classical MDS using the same fitted observations and preprocessing.
+6. **Held-out behavior:** fit preprocessing, graph hyperparameters and dimension on training data; use a predeclared extension for held-out observations and evaluate distances or downstream performance without refitting on the test set.
+7. **Scientific stability:** assess whether conclusions survive plausible preprocessing, sampling-unit, subject/session and neighborhood choices.
+
+The original residual-variance curve is an in-sample summary of distance preservation and can assist dimension comparison, but an elbow is not a model-free intrinsic-dimension estimate [@TenenbaumDeSilvaLangford2000]. Isomap has no native observation-space reconstruction, so “reconstruction error” is undefined unless a separate inverse or decoder is introduced and evaluated as an additional method.
+
+For dependent observations, splits must keep whole trajectories, subjects, sessions or other dependence units together as appropriate. Randomly splitting adjacent time samples can make neighborhood and out-of-sample performance optimistic.
+
+## Minimal toy model
+
+A future non-executable toy model should sample points along a known planar hairpin curve with two long, nearly parallel arms. The generation record should preserve the curve parameter and exact arc-length distance as ground truth, while the fitting algorithm receives only noisy ambient coordinates.
+
+The planned comparisons are:
+
+- rank-one and rank-two PCA;
+- classical MDS on ambient Euclidean distances;
+- Isomap over a prespecified neighborhood range; and
+- an oracle MDS embedding using the known arc-length distances, used only as a generation-side reference.
+
+At an adequate local neighborhood scale, graph paths should follow the hairpin and approximate arc length. With too few samples or too small a neighborhood, the graph should disconnect or detour. With too large a neighborhood, an edge should bridge the two arms and sharply underestimate many path distances. A negative control should remove samples from one bend to create a gap. Evaluation should compare graph distances with known arc length, inspect connected components and shortcuts, and align coordinate outputs only for comparison. This contract belongs to a later executable study; no data, code or results are created here.
+
+## Relevance to LDG
+
+Isomap is LDG's canonical example of a method that turns local metric assumptions into a global graph-distance representation and then into Euclidean coordinates. It is useful precisely because each interpretive leap can be audited separately: local ambient proximity, finite graph paths, Euclidean MDS representation, and any later scientific interpretation.
+
+::: {.callout-warning title="What this does NOT imply"}
+A successful Isomap visualization does not prove that a manifold exists, recover the topology of an underlying space, estimate a Riemannian metric tensor, establish intrinsic dimension, discover physical dynamics, identify a mechanism, or recover unique latent coordinates. Graph connectivity is not topology recovery; graph shortest paths are not automatically manifold geodesics; low strain is not model validation.
+:::
+
+### Mouse trajectory
+
+No modality-specific empirical claim is retained. Applying Isomap to mouse trajectories would require an independently justified representation, distance, temporal-alignment policy, sampling unit and held-out extension; a curved embedding would not establish a behavioral state manifold or movement dynamics.
+
+### Eye movement
+
+No modality-specific empirical claim is retained. Eye-position samples, event summaries and temporal windows define different metric spaces, and ordinary Isomap does not convert their static proximity graph into evidence for oculomotor dynamics.
+
+### EEG
+
+No modality-specific empirical claim is retained. Sensor scaling, rereferencing, artifact handling and subject/session pooling would determine the neighborhood graph; embedded axes would not automatically represent neural sources or cortical geometry.
+
+### MEG / neural population data
+
+No modality-specific empirical claim is retained. Unit normalization, trial averaging and sampling dependence would need to be fixed before graph construction, and a low-dimensional layout would remain a graph-geometric approximation rather than evidence for a neural manifold, mechanism or dynamical law.
+
+## Primary sources
+
+- Tenenbaum, de Silva and Langford introduce Isomap, explicitly separate neighborhood construction, shortest-path graph distances and classical MDS, and state the favorable intrinsically Euclidean setting and finite-sample graph limitations [@TenenbaumDeSilvaLangford2000].
+- Bernstein, de Silva, Langford and Tenenbaum analyze sufficient conditions—including geodesic convexity/minimizing-geodesic existence, sampling coverage, curvature and branch separation—under which graph distances approximate path distances on an embedded manifold [@BernsteinEtAl2000].
+- Bengio et al. give a technical double-centering/eigendecomposition formulation and derive explicit out-of-sample extensions for Isomap, MDS and related spectral methods [@BengioEtAl2003].
+
+## Reviews / secondary sources
+
+- Van der Maaten, Postma and van den Herik provide an inspected comparative review of nonlinear dimensionality-reduction methods and identify Isomap's neighborhood, disconnection, short-circuit and generalization limitations [@VanDerMaatenEtAl2009].
+
+## Open methodological questions
+
+- How should neighborhood scale be selected without optimizing a preferred visualization?
+- Which diagnostics distinguish true local metric fidelity from distance concentration or preprocessing artifacts?
+- How should uncertainty in graph edges and shortest paths propagate to coordinates?
+- When should disconnected components be modeled separately rather than forced into one embedding?
+- Which out-of-sample extension is appropriate when adding a point would materially change the fitted graph?
+- Which scientific claims are invariant under rigid coordinate transformations and neighborhood perturbations?
+
+## Maturity checklist
+
+- [x] Uses the complete Method schema and states the bounded problem.
+- [x] Separates neighbor construction, graph shortest paths and classical MDS.
+- [x] States geodesic-existence, sampling, connectivity, curvature,
+  branch-separation and shortcut assumptions.
+- [x] Declares learned and fixed quantities, temporal handling, geometry and supervision.
+- [x] States spectral and graph-construction ambiguities.
+- [x] Includes PCA, ambient-MDS and graph-diagnostic baselines.
+- [x] Defines evaluation and out-of-sample limits without claiming native reconstruction.
+- [x] Includes a prose-only future toy-model contract with failure and negative-control cases.
+- [x] Avoids unsupported modality-specific empirical claims.
+- [x] Includes explicit manifold, topology, geometry, dimension, dynamics and mechanism non-implications.
+- [x] Foundational, technical and review sources were inspected and bibliographic metadata verified.
+- [x] Independent mixed review completed after one bounded correction round;
+  focused re-review returned PASS.
+- [x] Stable promotion authorized by the human owner under the recorded review decision after published-site review.

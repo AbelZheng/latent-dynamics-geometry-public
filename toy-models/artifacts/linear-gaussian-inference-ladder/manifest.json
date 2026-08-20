@@ -1,0 +1,229 @@
+{
+  "artifact": "linear-gaussian-inference-ladder",
+  "artifact_files": [
+    "manifest.json",
+    "metrics.csv",
+    "diagnostics.json",
+    "summary.png"
+  ],
+  "commands": {
+    "generate": "/Users/bytedance/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3 toy-models/linear-gaussian-inference-ladder.py --generate",
+    "python_executable": "/Users/bytedance/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3",
+    "verify": "/Users/bytedance/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3 toy-models/linear-gaussian-inference-ladder.py --verify"
+  },
+  "date": "2026-08-19",
+  "equations": [
+    "z[t+1] = a*z[t] + w[t], w[t] ~ Normal(0,q)",
+    "x[t] = z[t] + v[t], v[t] ~ Normal(0,r)",
+    "z[0] ~ Normal(0,q/(1-a^2))"
+  ],
+  "explicit_reset_per_sequence": true,
+  "files_sha256": {
+    "diagnostics.json": "a7f5392759746f7c13c03d6ac6050f82594172a02e786224e4fcdbf287837214",
+    "metrics.csv": "e743fd2e23e9d1a3b85822e84e9b2042c7ab1a97e1db117573e342b85e4866eb",
+    "summary.png": "6eb975f69b5983f7464e33c3f94927e81d1c7d18de82982ae3d97c3ed491829b"
+  },
+  "master_seed": 20260819,
+  "methods": [
+    "stationary_mean",
+    "persistence",
+    "open_loop",
+    "known_parameter_kalman_filter",
+    "known_parameter_rts_smoother",
+    "direct_batch_gaussian_conditioning",
+    "finite_grid_selected_filter_and_smoother"
+  ],
+  "missing_block": {
+    "end_exclusive": 45,
+    "start_inclusive": 30
+  },
+  "near_unit_root_stress": {
+    "a": 0.99,
+    "q": 0.02,
+    "r": 0.4
+  },
+  "parameter_grid": [
+    {
+      "a": 0.75,
+      "q": 0.05,
+      "r": 0.2
+    },
+    {
+      "a": 0.75,
+      "q": 0.05,
+      "r": 0.4
+    },
+    {
+      "a": 0.75,
+      "q": 0.05,
+      "r": 0.8
+    },
+    {
+      "a": 0.75,
+      "q": 0.1,
+      "r": 0.2
+    },
+    {
+      "a": 0.75,
+      "q": 0.1,
+      "r": 0.4
+    },
+    {
+      "a": 0.75,
+      "q": 0.1,
+      "r": 0.8
+    },
+    {
+      "a": 0.75,
+      "q": 0.2,
+      "r": 0.2
+    },
+    {
+      "a": 0.75,
+      "q": 0.2,
+      "r": 0.4
+    },
+    {
+      "a": 0.75,
+      "q": 0.2,
+      "r": 0.8
+    },
+    {
+      "a": 0.85,
+      "q": 0.05,
+      "r": 0.2
+    },
+    {
+      "a": 0.85,
+      "q": 0.05,
+      "r": 0.4
+    },
+    {
+      "a": 0.85,
+      "q": 0.05,
+      "r": 0.8
+    },
+    {
+      "a": 0.85,
+      "q": 0.1,
+      "r": 0.2
+    },
+    {
+      "a": 0.85,
+      "q": 0.1,
+      "r": 0.4
+    },
+    {
+      "a": 0.85,
+      "q": 0.1,
+      "r": 0.8
+    },
+    {
+      "a": 0.85,
+      "q": 0.2,
+      "r": 0.2
+    },
+    {
+      "a": 0.85,
+      "q": 0.2,
+      "r": 0.4
+    },
+    {
+      "a": 0.85,
+      "q": 0.2,
+      "r": 0.8
+    },
+    {
+      "a": 0.95,
+      "q": 0.05,
+      "r": 0.2
+    },
+    {
+      "a": 0.95,
+      "q": 0.05,
+      "r": 0.4
+    },
+    {
+      "a": 0.95,
+      "q": 0.05,
+      "r": 0.8
+    },
+    {
+      "a": 0.95,
+      "q": 0.1,
+      "r": 0.2
+    },
+    {
+      "a": 0.95,
+      "q": 0.1,
+      "r": 0.4
+    },
+    {
+      "a": 0.95,
+      "q": 0.1,
+      "r": 0.8
+    },
+    {
+      "a": 0.95,
+      "q": 0.2,
+      "r": 0.2
+    },
+    {
+      "a": 0.95,
+      "q": 0.2,
+      "r": 0.4
+    },
+    {
+      "a": 0.95,
+      "q": 0.2,
+      "r": 0.8
+    }
+  ],
+  "project": "Latent Dynamics & Geometry",
+  "rng": "numpy.Generator(PCG64(SeedSequence((master_seed, stage, split, sequence))))",
+  "runtime": {
+    "numpy": "2.3.5",
+    "pillow": "12.3.0",
+    "platform": "macOS-26.5.1-arm64-arm-64bit",
+    "python": "3.12.13"
+  },
+  "schema_version": 1,
+  "selection": {
+    "criterion": "minimum mean train innovation NLL + mean validation innovation NLL; deterministic lexicographic tie break",
+    "data": "train and validation observations only",
+    "selected": {
+      "a": 0.85,
+      "q": 0.1,
+      "r": 0.4
+    }
+  },
+  "sequence_length": 80,
+  "split_sizes": {
+    "test": 8,
+    "train": 12,
+    "validation": 6
+  },
+  "tolerances": {
+    "covariance": 1e-12,
+    "determinism": 0.0,
+    "oracle": 1e-10,
+    "variance": 1e-12
+  },
+  "true_parameters": {
+    "a": 0.85,
+    "q": 0.1,
+    "r": 0.4
+  },
+  "wrong_parameter_conditions": {
+    "q_too_large_r_too_small": {
+      "a": 0.85,
+      "q": 0.4,
+      "r": 0.1
+    },
+    "q_too_small_r_too_large": {
+      "a": 0.85,
+      "q": 0.025,
+      "r": 0.8
+    }
+  }
+}

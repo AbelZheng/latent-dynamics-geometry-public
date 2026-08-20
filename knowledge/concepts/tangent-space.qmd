@@ -1,0 +1,217 @@
+---
+title: "Tangent Space"
+object_type: concept
+maturity: L2
+status: stable
+domain: [geometry, dynamics]
+tags: [tangent-space, local-linearization, tangent-vector]
+prerequisites:
+- knowledge/concepts/manifold.qmd
+- knowledge/concepts/linear-subspace.qmd
+related:
+- knowledge/concepts/vector-field.qmd
+- knowledge/concepts/embedding.qmd
+- knowledge/concepts/riemannian-metric.qmd
+created: 2026-08-18
+updated: 2026-08-18
+---
+
+# Tangent Space
+
+## One-sentence definition
+
+The **tangent space** $T_pM$ is the vector space of first-order directions available on a smooth manifold $M$ at a point $p$.
+
+## Why this concept matters
+
+The tangent space is the local linear arena for velocities, derivatives, vector fields, and Riemannian inner products. It approximates first-order behavior at one point; it is not the manifold itself.
+
+## Intuition
+
+At a point on a sphere, the tangent plane contains the instantaneous directions in which a curve on the sphere can move. The sphere leaves that plane at second order.
+
+## Formal definition
+
+Let $M$ be a smooth $n$-manifold and $p\in M$.
+
+### Curve-velocity definition
+
+Consider smooth curves $\gamma:(-\epsilon,\epsilon)\to M$ with $\gamma(0)=p$. Two curves are tangent-equivalent at $p$ when, in one—and therefore every—chart $(U,x)$ containing $p$,
+
+$$
+\left.\frac{d}{dt}\right|_{0}x(\gamma_1(t))
+=
+\left.\frac{d}{dt}\right|_{0}x(\gamma_2(t)).
+$$
+
+A tangent vector is an equivalence class $[\gamma]$, and the tangent space $T_pM$ is the set of such classes with vector-space operations induced in coordinates. Mrowka gives the equivalent chart-representative construction [@Mrowka2004, sec. 7.2].
+
+### Derivation definition
+
+Equivalently, a tangent vector at $p$ is a linear map
+
+$$
+v:C^\infty_p(M)\to\mathbb R
+$$
+
+on germs of smooth functions satisfying the Leibniz rule
+
+$$
+v(fg)=f(p)v(g)+g(p)v(f).
+$$
+
+For a curve representative,
+
+$$
+v(f)
+=
+\left.\frac{d}{dt}\right|_{0}f(\gamma(t)).
+$$
+
+The curve-velocity and derivation descriptions define canonically isomorphic tangent spaces [@Lee1997, ch. 2]. This Concept states the equivalence but defers its proof.
+
+### Coordinates and basis changes
+
+A chart $x=(x^1,\ldots,x^n)$ supplies the coordinate basis
+
+$$
+\left.\frac{\partial}{\partial x^1}\right|_p,
+\ldots,
+\left.\frac{\partial}{\partial x^n}\right|_p,
+$$
+
+so every $v\in T_pM$ has components
+
+$$
+v
+=
+v^i\left.\frac{\partial}{\partial x^i}\right|_p.
+$$
+
+Thus $\dim T_pM=n$. Under another chart $y=(y^1,\ldots,y^n)$,
+
+$$
+v'^a
+=
+\frac{\partial y^a}{\partial x^i}(p)v^i,
+$$
+
+and
+
+$$
+\left.\frac{\partial}{\partial x^i}\right|_p
+=
+\frac{\partial y^a}{\partial x^i}(p)
+\left.\frac{\partial}{\partial y^a}\right|_p.
+$$
+
+The components change, while the intrinsic tangent vector does not.
+
+### Differential of a smooth map
+
+For a smooth map $f:M\to N$, the differential at $p$ is the linear map
+
+$$
+df_p:T_pM\to T_{f(p)}N.
+$$
+
+Using curve representatives,
+
+$$
+df_p([\gamma])=[f\circ\gamma].
+$$
+
+Using derivations,
+
+$$
+(df_pv)(g)=v(g\circ f).
+$$
+
+In charts, the matrix of $df_p$ is the Jacobian $[\partial f^a/\partial x^i]_p$ [@Mrowka2004, sec. 7.2].
+
+### Embedded tangent spaces
+
+If $i:M\hookrightarrow\widetilde M$ is a smooth embedding, $di_p$ identifies $T_pM$ with a linear subspace of $T_{i(p)}\widetilde M$. For an embedded manifold in $\mathbb R^D$, this gives the familiar ambient tangent plane. This represented subspace depends on the embedding, whereas the abstract $T_pM$ is intrinsic. An arbitrary ambient subspace fitted to data is not automatically the image of an intrinsic tangent space.
+
+### Tangent bundle and vector fields
+
+The tangent bundle is the disjoint union
+
+$$
+TM=\bigsqcup_{p\in M}T_pM
+$$
+
+with its compatible smooth bundle structure. A smooth vector field is a smooth section $X:M\to TM$ satisfying $X(p)\in T_pM$. Bundle construction proofs and connection theory are deferred.
+
+## Core notation
+
+- $T_pM$: tangent space at $p$.
+- $v\in T_pM$: tangent vector.
+- $[\gamma]$: equivalence class of curves through $p$.
+- $v(f)$: derivation of a smooth function germ.
+- $\partial/\partial x^i|_p$: chart-induced tangent basis.
+- $v^i$: tangent-vector components in a chart.
+- $df_p:T_pM\to T_{f(p)}N$: differential/pushforward of a smooth map.
+- $TM=\bigsqcup_{p\in M}T_pM$: tangent bundle.
+
+## Prerequisites
+
+[Manifold](manifold.qmd) supplies charts and smooth curves. [Linear Subspace](linear-subspace.qmd) supplies vector-space language.
+
+## Relationship to adjacent concepts
+
+| Concept | Distinction |
+|---|---|
+| **Manifold** | The nonlinear space of points; $T_pM$ is one attached local vector space. |
+| **Ambient space** | An embedding differential represents $T_pM$ as a subspace of the ambient tangent space; the intrinsic tangent space is not defined by ambient coordinates alone. |
+| **Differential / Jacobian** | $df_p$ maps tangent vectors between manifolds. A coordinate Jacobian is its matrix representation, not the intrinsic map itself. |
+| **Tangent bundle** | The smoothly organized union of all tangent spaces; it is not one vector space because fibers at different points are distinct. |
+| **Vector field** | Assigns one tangent vector to each point, rather than describing one tangent space. |
+| **Local PCA plane** | A statistical estimate that may approximate a tangent space under additional sampling and noise assumptions. |
+
+## What this does NOT imply
+
+A tangent space does not imply global flatness, a canonical identification between different points, a unique ambient orientation, a metric or inner product, accurate estimation from sparse samples, validity far from $p$, or that local linear dynamics extend globally.
+
+## Minimal example
+
+For $S^1\subset\mathbb R^2$ and $p=(1,0)$,
+
+$$
+T_pS^1=\{(0,a):a\in\mathbb R\}.
+$$
+
+This vertical line captures instantaneous motion at $p$ but not the whole circle.
+
+## Neuroscience / behavioral relevance
+
+Local tangent estimates can describe directions of neural or behavioral variation near a state. Their interpretation depends on neighborhood scale and should be compared with simpler local-linear null models.
+
+## Relevance to LDG
+
+At L2, Tangent Space connects intrinsic curve/derivation definitions, coordinate representations, differentials, embedded subspaces, vector fields, and later Riemannian geometry without treating local linearization as global structure.
+
+## Open questions
+
+- How many samples are needed for reliable tangent estimation?
+- How should uncertainty in $T_pM$ propagate to dynamics?
+- When do tangent estimates vary smoothly across conditions?
+
+## References
+
+- Mrowka provides the inspected chart-equivalence, coordinate-basis, differential-map, and tangent-bundle construction [@Mrowka2004, sec. 7.2].
+- Lee provides the inspected curve/derivation equivalence, embedded-submanifold tangent representation, and tangent-bundle context [@Lee1997, ch. 2].
+- Bundle proofs, connections, and statistical tangent-estimation algorithms are intentionally deferred.
+
+## Maturity checklist
+
+- [x] Defines tangent vectors through curve velocities and charts.
+- [x] Separates local tangent space, manifold, ambient space, and estimated local planes.
+- [x] Includes an explicit circle example.
+- [x] States intrinsic curve-equivalence and derivation definitions.
+- [x] Types chart bases, component transformations, and $\dim T_pM=\dim M$.
+- [x] Defines the differential $df_p$ intrinsically and in coordinates.
+- [x] Separates intrinsic and embedded tangent spaces and arbitrary ambient subspaces.
+- [x] Relates tangent bundles and vector fields while deferring bundle theory.
+- [x] States empirical scale, sampling, noise, and manifold-assumption limits for tangent estimation.
+- [x] Independent L2 scientific review completed with PASS under the recorded review decision.

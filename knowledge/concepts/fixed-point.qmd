@@ -1,0 +1,187 @@
+---
+title: "Fixed Point"
+object_type: concept
+maturity: L2
+status: stable
+domain:
+- dynamics
+tags:
+- fixed-point
+- equilibrium
+- invariant-state
+prerequisites:
+- knowledge/concepts/vector-field.qmd
+- knowledge/concepts/flow.qmd
+related:
+- knowledge/concepts/trajectory.qmd
+- knowledge/concepts/stability.qmd
+- knowledge/concepts/attractor.qmd
+- knowledge/math/first-order-autonomous-dynamical-system.qmd
+created: 2026-08-18
+updated: 2026-08-18
+---
+
+# Fixed Point
+
+## One-sentence definition
+
+A **fixed point** is a state that remains unchanged under the specified evolution for every supported elapsed time.
+
+## Why this concept matters
+
+Fixed points describe stationary behaviors of a dynamical model. They provide reference states around which local stability, linearization, basins, and transitions can later be studied. Existence and stability are separate questions: a state can be fixed yet unstable.
+
+## Intuition
+
+Place the system exactly at a fixed point and let its rule act. The state does not move. This says nothing yet about what happens when the initial state is slightly displaced.
+
+## Formal definition
+
+For a local flow with supported domain $W\subseteq\mathbb R\times\mathcal X$, $x^\ast\in\mathcal X$ is a fixed point when
+
+$$
+\phi_\tau(x^\ast)=x^\ast
+$$
+
+for every supported elapsed time $(\tau,x^\ast)\in W$. Equivalently, its orbit is the singleton $\{x^\ast\}$ and its associated trajectory is constant. Teschl uses fixed, stationary, and equilibrium point for this constant-orbit case [@Teschl2012, sec. 6.3].
+
+For an autonomous differential equation
+
+$$
+\dot x=f(x),
+$$
+
+a candidate equilibrium satisfies
+
+$$
+f(x^\ast)=0.
+$$
+
+This zero guarantees that $x(t)\equiv x^\ast$ is a constant solution. Under the regularity and uniqueness assumptions that generate the single-valued local flow described in the stable Math Object, it is equivalent to $\phi_\tau(x^\ast)=x^\ast$ on the supported domain. The converse from flow-fixedness to $f(x^\ast)=0$ also uses the elapsed-time generator/differentiability relation. Without uniqueness, the constant solution can coexist with other solutions through the same initial state, so a bare zero of $f$ does not by itself supply a unique flow [@Teschl2012, secs. 1.3, 2.2, 6.2–6.3].
+
+The identity $\phi_0(x)=x$ holds for every state and therefore does not establish fixedness. Likewise, $\phi_T(p)=p$ for one $T>0$ may indicate a nontrivial periodic orbit; a continuous-time fixed point remains unchanged for every supported elapsed time and has a singleton orbit.
+
+### Discrete-time fixed points
+
+For a discrete update map $F:\mathcal X\to\mathcal X$, a point $p$ is fixed when
+
+$$
+F(p)=p.
+$$
+
+Its iterates remain constant: $F^n(p)=p$ for all $n\ge0$. A periodic point has **prime period** $k$ when $k$ is the least positive integer satisfying $F^k(p)=p$; if $F^n(p)=p$, the prime period divides $n$. It is a fixed point of $F$ only when its prime period is one. Teschl makes this distinction for discrete dynamical systems [@Teschl2012, sec. 10.2]. A discrete fixed point is not automatically the fixed point of a continuous-time flow, nor does every update map arise as a time-one flow map.
+
+### Coordinate invariance
+
+Fixedness is a property of the represented evolution, not of one coordinate label. For a bijective change of state representation $h:\mathcal X\to\mathcal Y$, define the conjugate discrete map
+
+$$
+G=h\circ F\circ h^{-1}.
+$$
+
+If $F(p)=p$, then $G(h(p))=h(p)$. For a conjugated flow,
+
+$$
+\psi_\tau=h\circ\phi_\tau\circ h^{-1},
+$$
+
+fixed points are likewise carried from $p$ to $h(p)$, with supported domains transported by $h$. For vector-field coordinates, a time-independent $C^1$ diffeomorphism gives
+
+$$
+g(y)=Dh\bigl(h^{-1}(y)\bigr)f\bigl(h^{-1}(y)\bigr),
+$$
+
+so $f(p)=0$ if and only if $g(h(p))=0$. A non-injective projection or observation map can merge fixed and non-fixed states and does not preserve this conclusion [@Teschl2012, secs. 6.2, 9.3].
+
+### Parameters and persistence
+
+For a parameterized family $f(x;\mu)$, equilibria solve $f(x^\ast;\mu)=0$ at a specified parameter value. Whether an equilibrium continues, disappears, splits, or changes stability as $\mu$ changes is a separate persistence or bifurcation question. This Concept records that boundary but defers implicit-function, bifurcation, and stability theorems.
+
+## Core notation
+
+- $x^\ast$: a candidate fixed point.
+- $f(x^\ast)=0$: zero instantaneous change for an autonomous vector field.
+- $\phi_\tau(x^\ast)=x^\ast$: invariance under finite-time evolution.
+- $x(t)\equiv x^\ast$: the constant trajectory through the fixed point.
+- $F:\mathcal X\to\mathcal X$: discrete-time update map.
+- $\operatorname{Fix}(F)=\{p\in\mathcal X:F(p)=p\}$: set of discrete fixed points.
+- $G=h\circ F\circ h^{-1}$: coordinate-conjugate update map.
+- $\mu$: parameter held fixed when solving an equilibrium equation.
+
+## Prerequisites
+
+[Vector Field](vector-field.qmd) supplies the local condition $f(x^\ast)=0$. [Flow](flow.qmd) supplies the finite-time invariance statement.
+
+The [First-Order Autonomous Dynamical System](../math/first-order-autonomous-dynamical-system.qmd) records the regularity, existence, uniqueness, and local-flow assumptions required for the strongest equivalence statements.
+
+## Relationship to adjacent concepts
+
+| Concept | Distinction from fixed point |
+|---|---|
+| **Initial condition** | Any admissible state can be an initial condition; only special states are fixed. |
+| **Constant observation** | A measurement may appear constant while hidden state variables change. |
+| **Stability** | Stability concerns the response to nearby perturbations. Fixed-point existence alone does not answer it. |
+| **Attractor** | Fixedness alone establishes neither attraction nor Lyapunov stability. A point may satisfy an adopted attraction convention only after convergence from a basin is shown, while stability must be assessed separately. |
+| **Periodic orbit** | A nontrivial periodic orbit returns after a positive period while moving between returns; a fixed point has a constant orbit. |
+| **Discrete periodic point** | Satisfies $F^n(p)=p$ for some $n$; it is fixed only when the prime period is one. |
+| **Zero of an estimated vector field** | A numerical or fitted root whose scientific status depends on model adequacy, optimization error, and uncertainty. |
+| **Equilibrium branch** | A parameter-indexed family of fixed points. Its persistence is additional structure, not part of one fixed-point definition. |
+| **Fixed point of an operator in an existence theorem** | An equation such as $T(u)=u$ used by the Banach contraction method. It may help prove a differential equation has a solution, but it is not automatically a stationary state of a dynamical evolution [@Teschl2012, sec. 2.1]. |
+
+## What this does NOT imply
+
+A fixed point does **not** imply:
+
+- stability, attraction, robustness, or biological desirability;
+- uniqueness of the fixed point;
+- that nearby trajectories are slow;
+- that a constant recording reveals a fixed latent state;
+- that the fixed point persists after parameters or inputs change;
+- that an estimated zero of a fitted vector field is a true system equilibrium;
+- that a small residual $\|f(\widehat x)\|$ proves an exact root or an admissible state; or
+- that a non-injective observation preserves the number or identity of fixed states.
+
+## Minimal example
+
+For
+
+$$
+\dot x=x(1-x),
+$$
+
+$x^\ast=0$ and $x^\ast=1$ are fixed points because the right-hand side vanishes at both values. Their shared status as fixed points does not make their nearby behavior identical.
+
+For a discrete example, $F(x)=-x$ has the fixed point $0$. Every $x\ne0$ satisfies $F^2(x)=x$ but not $F(x)=x$, so it has prime period two rather than being fixed.
+
+## Neuroscience / behavioral relevance
+
+Fixed-point models are often used as hypotheses for persistent activity or settled behavioral states. Such an interpretation requires evidence that the relevant state is stationary under the model and that observed constancy is not produced by measurement saturation, unobserved motion, or a slowly varying trajectory.
+
+## Relevance to LDG
+
+At L2, Fixed Point establishes compatible continuous-flow, vector-field, and discrete-map formulations and makes their assumptions explicit. It provides the stationary reference needed for stability and point-attractor analysis without using “equilibrium,” “stable state,” and “attractor” as synonyms.
+
+## Open questions
+
+- How robust is an inferred fixed point to model class, coordinates, and regularization?
+- When do inputs turn an autonomous fixed point into a moving or input-dependent equilibrium?
+- What observations can distinguish a true fixed state from slow dynamics?
+
+## References
+
+- Teschl defines fixed, stationary, or equilibrium points through constant flow orbits [@Teschl2012, sec. 6.3].
+- Teschl defines fixed and periodic points of discrete maps and their iterates [@Teschl2012, sec. 10.2].
+- Teschl supplies the inspected topological-conjugacy and operator-fixed-point contexts used to delimit coordinate invariance and terminology [@Teschl2012, secs. 2.1, 9.3].
+- The stable Math Object contains the inspected existence, uniqueness, maximal-solution, and local-flow assumptions supporting the continuous-time equivalence.
+
+## Maturity checklist
+
+- [x] States both flow and vector-field conditions.
+- [x] Separates existence from stability and attraction.
+- [x] Includes a minimal example with multiple fixed points.
+- [x] States observational and inferential non-implications.
+- [x] Conditions the equivalence between vector-field zeros, constant solutions, and flow-fixed points.
+- [x] Distinguishes continuous-time fixed points, discrete fixed points, and nontrivial periodic points.
+- [x] States coordinate invariance under bijective/diffeomorphic representation changes.
+- [x] Separates fixed-point existence from uniqueness, stability, attraction, and parameter persistence.
+- [x] Independent L2 scientific review completed; initial findings were corrected and focused re-review passed under the recorded review decision.

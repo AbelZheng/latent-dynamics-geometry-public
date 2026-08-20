@@ -1,0 +1,145 @@
+---
+title: "Trajectory"
+object_type: concept
+maturity: L1
+status: stable
+domain:
+- foundations
+- dynamics
+tags:
+- trajectory
+- time
+- state-evolution
+prerequisites:
+- knowledge/concepts/state.qmd
+- knowledge/concepts/state-space.qmd
+related:
+- knowledge/concepts/vector-field.qmd
+- knowledge/concepts/flow.qmd
+created: 2026-08-17
+updated: 2026-08-17
+---
+
+# Trajectory
+
+## One-sentence definition
+
+A **trajectory** is a time-parameterized representation of one admissible evolution of a specified system through its state space.
+
+## Why this concept matters
+
+A trajectory joins the concepts of state and time. A state value describes the system at one time; a trajectory records how those values are ordered across time. Without this distinction, a curve in a plot, a collection of observations, and the evolution of a modeled system can be mistakenly treated as the same object.
+
+In standard differential-equation language, a solution or integral curve through an initial state is called a trajectory [@Teschl2012, sec. 6.2]. The governing rule need not be known or inferred from data for researchers to propose or estimate a trajectory, but the object must still be interpreted as one admissible evolution of the specified system rather than as an arbitrary map into a state space.
+
+**LDG usage convention:** LDG extends the textbook ODE usage to sampled-time and model-agnostic descriptions of system evolution. Under this convention, “trajectory” retains the requirement that the time-indexed states represent one evolution, even when no differential equation or complete generative rule has been specified.
+
+## Intuition
+
+Imagine taking successive snapshots of a pendulum's full state rather than only its image. At each time, the state contains angle and angular velocity. Keeping the time labels and their order gives a trajectory.
+
+If the system-time labels are discarded, only the set of visited states—the trajectory's orbit—remains. A path may also be parameterized, but its parameter need not be the physical or modeled time of the system. Discarding a path's parameter leaves its path image or trace. If the snapshots contain camera pixels rather than state values, they form an observation sequence, not automatically a state trajectory.
+
+## Formal definition
+
+Let $\mathcal{X}$ be a state space and let $I$ be the system's time domain, such as a continuous interval or a discrete ordered set of sampling times. A map
+
+$$
+x:I\rightarrow\mathcal{X},\qquad t\mapsto x(t).
+$$
+
+is a trajectory only when it represents one admissible evolution of the specified system. The formula alone is insufficient: an arbitrary assignment of state values to times is not automatically a dynamical trajectory.
+
+The trajectory retains both the visited state values and their association with system time. In the continuous-time ODE setting, Teschl calls solution curves trajectories and defines the **orbit** as the set of points visited by the evolution [@Teschl2012, secs. 6.2–6.3]. Thus the orbit of a trajectory $x$ is its image $x(I)$, with the time labels discarded.
+
+LDG distinguishes this from a **path**, which is a parameterized route through $\mathcal{X}$ whose parameter is not necessarily system time. The **path image** or **trace** is the set of points on that path after its parameterization is discarded.
+
+A proposed trajectory is adequate as a state trajectory only relative to the chosen state description. If $x(t)$ contains observations or estimated coordinates instead, it should be labeled an observed or inferred trajectory unless those values have been justified as state values.
+
+## Core notation
+
+- $I$: the time interval or ordered set on which the trajectory is defined.
+- $t\in I$: one time or sampling instant.
+- $\mathcal{X}$: the specified state space.
+- $x(t)\in\mathcal{X}$: the state value at time $t$.
+- $x:I\to\mathcal{X}$: the entire trajectory, not merely one value $x(t)$.
+- $\{x(t_k)\}_{k=0}^{N}$: sampled state values from a trajectory, when the samples are genuinely states.
+
+## Prerequisites
+
+- [State](state.qmd): defines the state value assigned at each time.
+- [State Space](state-space.qmd): defines the admissible values to which the trajectory maps.
+
+**Assumed background:** elementary functions and ordered time samples.
+
+## Relationship to adjacent concepts
+
+| Concept | Distinction from trajectory |
+|---|---|
+| **State value** | One value $x(t)$ at one time. A trajectory is the full time-indexed assignment $t\mapsto x(t)$. |
+| **State space** | The set of admissible state values. A trajectory takes values in that space but does not equal the whole space. |
+| **Orbit** | The visited-state set $x(I)$, or image of a trajectory. It discards when states were visited and how long the system spent in different parts of the orbit. |
+| **Path** | A parameterized route through a state space. Its parameter need not be the system's physical or modeled time, so a path is not automatically a trajectory. |
+| **Path image or trace** | The set of points visited by a path after its parameterization is discarded. It is to a path what an orbit is to a trajectory, but the underlying parameter roles differ. |
+| **Sample sequence** | A finite ordered list. It may sample a trajectory, but it does not specify unsampled behavior and may contain observations rather than states. |
+| **Time series of observations** | Sensor or behavioral measurements indexed by time. It is a state trajectory only when those measurements constitute the specified state; otherwise it is evidence about an unknown or inferred trajectory. |
+| **Plotted curve** | A visual representation that may project, interpolate, average, or smooth data. The display is not the trajectory itself and can omit timing or state variables. |
+| **Evolution rule** | A rule specifies how state may change. A vector field is one local continuous-time rule, while a flow is a finite-time evolution family. A trajectory is one realized or proposed time course and does not by itself identify either object. |
+| **Collection of trials** | Multiple time courses, possibly under different conditions or initial values. Averaging them does not automatically produce a trajectory followed on any individual trial. |
+
+## What this does NOT imply
+
+Calling a time-indexed object a trajectory does **not** by itself imply that:
+
+- its entries are states rather than observations or features;
+- the map represents an admissible system evolution merely because its values lie in $\mathcal{X}$;
+- a governing equation or causal mechanism is known;
+- temporal correlation establishes dynamics;
+- the trajectory is continuous, smooth, noise-free, or fully observed;
+- interpolated points were actually visited;
+- the state description is complete or uniquely recoverable from data;
+- one trajectory determines the full set of possible evolutions;
+- two curves with the same plotted shape have the same timing; or
+- a low-dimensional projection preserves distinctions present in the original state description.
+
+## Minimal example
+
+For the pendulum state space of admissible angle–velocity pairs, a trajectory is
+
+$$
+t\mapsto x(t)=\bigl(\text{angle}(t),\;\text{angular velocity}(t)\bigr).
+$$
+
+A list of camera-derived angle measurements is not yet this trajectory because angular velocity is missing and the measurements may be noisy. Estimating both state variables at sampled times gives a sequence of state estimates, or an estimated sampled trajectory. Connecting those estimates with a line is a visualization or interpolation, not evidence that the pendulum followed that exact curve between samples.
+
+The pendulum trajectory retains the time assigned to each visited state. Taking the image $x(I)$ of that same trajectory gives its orbit and discards those time labels. The orbit alone therefore does not record when a state was visited or how long the pendulum spent in different parts of the visited-state set.
+
+## Neuroscience / behavioral relevance
+
+Cunningham and Yu describe neural population activity using one firing-rate coordinate per recorded neuron and note that successive time points trace a trajectory in this population-coordinate domain [@CunninghamYu2014]. This supports the coordinate-and-time usage of “neural trajectory.” It does not establish that the recorded population vector is the complete neural state or that a low-dimensional plotted trajectory is the unique latent evolution.
+
+For behavior, sequences of poses, positions, or task variables are often called trajectories. LDG should specify whether the object is a trajectory of the proposed behavioral state, an observation sequence, or an inferred latent trajectory. This distinction matters when velocity, context, or other future-relevant variables are absent from the recorded coordinates.
+
+## Relevance to LDG
+
+Trajectory is the minimal concept needed to discuss time-evolving latent, neural, or behavioral descriptions without conflating data with state. It provides a target for later questions about generation, comparison, and recovery while preserving a crucial boundary: temporal ordering and a plotted curve do not by themselves establish a dynamical law.
+
+## Open questions
+
+- Which state variables and time resolution are required for a trajectory to be adequate for a given LDG question?
+- How should uncertainty in inferred state values be represented without treating a single estimated curve as ground truth?
+- Which comparisons should preserve system-time parameterization, and which should compare only an orbit, path, or path image?
+
+## References
+
+- Mathematical trajectory and orbit terminology: [@Teschl2012, secs. 6.2–6.3].
+- Neural population trajectories: [@CunninghamYu2014].
+
+## Maturity checklist
+
+- [x] Defines trajectory as a time-parameterized admissible system evolution.
+- [x] Distinguishes trajectories from paths, orbits, samples, observations, and plots.
+- [x] States that temporal ordering alone does not identify a generating law.
+- [x] Covers continuous and sampled time without unnecessary advanced machinery.
+- [x] Uses only existing canonical prerequisites.
+- [x] Has received lightweight conceptual review and incorporated the required L1 corrections.

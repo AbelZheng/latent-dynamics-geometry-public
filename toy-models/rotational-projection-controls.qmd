@@ -1,0 +1,786 @@
+---
+title: "Rotational Projection Versus Alternatives"
+object_type: toy-model
+maturity: L1
+status: stable
+domain: [dimensionality-reduction, temporal-modeling, dynamical-systems]
+tags: [jpca, pca, rotation, skew-symmetric, derivative-regression, input-driven, preprocessing]
+prerequisites:
+- knowledge/methods/jpca.qmd
+- knowledge/methods/principal-component-analysis.qmd
+- knowledge/concepts/vector-field.qmd
+- knowledge/concepts/input-driven-dynamics.qmd
+related:
+- toy-models/label-dependent-demixing.qmd
+- toy-models/two-dimensional-autonomous-dynamics.qmd
+created: 2026-08-19
+updated: 2026-08-19
+---
+
+# Rotational Projection Versus Alternatives
+
+This L1/stable Candidate E Toy Model tests when a jPCA-style skew-constrained derivative fit recovers known rotational planes and when visually rotational projections arise from decay, latency sequences, common input, preprocessing, short arcs, or coordinate choice. Numerical values are deterministic outputs under master seed `20260819`; they are conditional on this simulator, Euclidean metric, preprocessing, and loss.
+
+**Assumed background:** centered PCA, continuous-time linear systems, finite-difference derivatives, least squares, real skew-symmetric matrices, principal angles, and train/validation/test separation.
+
+## Question
+
+Within a declared Euclidean feature metric and a training-fitted rank-six PCA representation:
+
+1. does true skew-constrained least squares recover the observed-space image of known rotational state planes under an isometric embedding;
+2. how much held-out derivative prediction is lost by the skew restriction relative to unrestricted linear regression;
+3. can symmetric decay, delayed transients, or common inputs produce rotational-looking projections without the positive autonomous generator;
+4. how sensitive are fitted planes to arc length, event-time jitter, smoothing, and across-condition mean subtraction; and
+5. what changes when a nonorthogonal observation map alters the Euclidean metric?
+
+A rotational projection is a description of processed trajectories in one fitted plane. It is not, by itself, proof of an oscillator, autonomous dynamics, recurrence, a global vector field, causality, or a neural/physical mechanism [@ChurchlandEtAl2012; @CunninghamYu2014].
+
+## Ground truth
+
+### Positive six-dimensional state equation
+
+The positive generator is the continuous-time system
+
+$$
+\dot z(t)=Az(t),
+\qquad z(t)\in\mathbb R^6,
+$$
+
+with
+
+$$
+A=operatorname{blockdiag}
+\left(
+J(2.0),
+J(0.7),
+\operatorname{diag}(-0.4,-0.9)
+\right),
+$$
+
+and the **precise sign convention**
+
+$$
+J(\omega)=
+\begin{pmatrix}
+0&-\omega\\
+\omega&0
+\end{pmatrix}.
+$$
+
+Thus, for column states,
+
+$$
+\dot z_1=-2z_2,
+\qquad
+\dot z_2=2z_1,
+$$
+
+so positive $\omega$ generates counterclockwise rotation in the $(z_1,z_2)$ plane. This explicit block definition is authoritative even if OCR or adjacent prose from a source drops a minus sign.
+
+The true rotational planes are
+
+$$
+\mathcal P_1=\operatorname{span}(e_1,e_2),
+\qquad
+\mathcal P_2=\operatorname{span}(e_3,e_4),
+$$
+
+with angular rates $2.0$ and $0.7$ radians per unit time. Coordinates five and six decay monotonically and are not rotational modes.
+
+### Conditions and initial states
+
+There are $C=8$ experimental conditions. Draw one deterministic initial-state matrix
+
+$$
+Z_0\in\mathbb R^{8\times6}
+$$
+
+from independent standard normals using seed word `initial_states`, then multiply its columns by
+
+$$
+(1.2,1.2,0.8,0.8,0.55,0.55).
+$$
+
+The same eight population initial states define train, validation, and test condition means; independent trials differ only through observation noise and declared event jitter. The manifest stores the realized $Z_0$, its rank, pairwise distances, and initial occupancy in both rotational planes. No initial state is selected after observing recovery.
+
+### Isometric observed embedding
+
+The observed dimension is $p=10$. Draw a fixed $10\times6$ standard-normal matrix with seed word `isometric_embedding`, compute its reduced QR decomposition, and orient columns so the diagonal of $R$ is positive. Call the result $H$. Require
+
+$$
+H^\top H=I_6
+$$
+
+within $10^{-12}$. The noiseless observed trajectory is
+
+$$
+y_c(t)=Hz_c(t).
+$$
+
+Because $H$ is an isometry on the six-dimensional state image, the observed-space true planes are
+
+$$
+\mathcal Q_1=\operatorname{span}(He_1,He_2),
+\qquad
+\mathcal Q_2=\operatorname{span}(He_3,He_4).
+$$
+
+The positive recovery target is either $\mathcal Q_j$ in observed coordinates or its image under the **training-fitted** PCA basis $W$:
+
+$$
+\mathcal Q_j^{\mathrm{PCA}}=operatorname{col}
+\left(W^\top H[e_{2j-1},e_{2j}]
+ight).
+$$
+
+The latter basis is orthonormalized before principal-angle scoring. Test data never refit $W$.
+
+### Trial observations
+
+At each condition, split, trial, and time bin,
+
+$$
+y_{c,r}^{\mathrm{obs}}(t)=y_c(t)+\epsilon_{c,r}(t),
+\qquad
+\epsilon_{c,r}(t)\sim\mathcal N(0,0.12^2I_{10}),
+$$
+
+independently over trials, time bins, conditions, and splits except where an explicit jitter stress changes sampling alignment.
+
+## Generative model
+
+The time grid is
+
+$$
+t_m=0.04m,qquad m=0,\ldots,60,
+$$
+
+so $T=61$ and the full interval is $[0,2.4]$. The exact positive trajectory uses matrix-exponential block formulas rather than numerical integration:
+
+$$
+\begin{pmatrix}z_1(t)\\z_2(t)\end{pmatrix}
+=
+\begin{pmatrix}
+\cos(2t)&-\sin(2t)\\
+\sin(2t)&\cos(2t)
+\end{pmatrix}
+\begin{pmatrix}z_1(0)\\z_2(0)\end{pmatrix},
+$$
+
+with the analogous $0.7$ block and exponential decays for coordinates five and six.
+
+Independent trials per condition are:
+
+| Split | Trials per condition | Total trials |
+|---|---:|---:|
+| train | 10 | 80 |
+| validation | 5 | 40 |
+| test | 7 | 56 |
+
+Generation, condition averaging, preprocessing, PCA, derivative construction, fitting, plane extraction, scoring, controls, plotting, and verification are separate functions. Exact states, true matrices, and true planes enter only generation, final scoring, and implementation oracles.
+
+The master seed is `20260819`. Every condition, split, trial, jitter, random plane, embedding, and shuffle proposal receives explicit integer seed words recorded in the manifest.
+
+## Parameters
+
+The fixed analysis contract is:
+
+- primary representation: rank-six covariance PCA fitted on training condition means;
+- no feature standardization beyond declared centering, preserving the positive isometric metric;
+- primary derivative estimator: within-condition midpoint secants;
+- primary smoothing: none;
+- light-smoothing stress: a centered three-bin moving average with unchanged endpoints;
+- primary across-condition preprocessing: subtract each feature's training across-condition mean at every time bin, then subtract one training global feature mean;
+- alternate preprocessing: omit the time-varying across-condition subtraction while retaining the global training mean;
+- five deterministic random rank-two planes plus one fixed first-two-PC plane;
+- matrix and plane algebra tolerance $10^{-10}$;
+- isometry and truth-transform tolerance $10^{-12}$;
+- finite-difference analytic check tolerance $3\times10^{-3}$; and
+- byte-identical artifact regeneration.
+
+No rank, window, smoothing, subtraction, control family, or plane is selected using test outcomes.
+
+## Simulation
+
+### Condition means and preprocessing
+
+Average trials only within the same condition and split. Fit all preprocessing on training means. When across-condition subtraction is enabled, define
+
+$$
+\bar y_{\mathrm{cond}}(t)=\frac1C\sum_c\bar y_c^{\mathrm{train}}(t),
+$$
+
+and subtract this frozen function from training, validation, and test condition means at corresponding nominal times. Then subtract the frozen training global mean and fit PCA. For the positive homogeneous system, the across-condition mean also obeys the same $A$ before observation noise, so subtraction changes condition offsets but does not introduce a different state matrix. That property need not hold in the input-driven or latency controls.
+
+### PCA representation
+
+Let $W\in\mathbb R^{10\times6}$ contain the training rank-six PCA basis. For each processed condition trajectory,
+
+$$
+x_c(t)=W^\top y_c^{\mathrm{proc}}(t).
+$$
+
+The PCA subspace is a training-fitted observation projection, not an inferred latent-state posterior. Churchland et al.'s jPCs rotate a retained PCA basis, while Cunningham and Yu distinguish such projections from posterior trajectories that trade off data against a probabilistic dynamics model [@ChurchlandEtAl2012; @CunninghamYu2014].
+
+### Boundary-preserving derivatives
+
+For each condition separately, define
+
+$$
+x_{c,m+1/2}=\frac{x_c(t_{m+1})+x_c(t_m)}2,
+$$
+
+$$
+\dot x_{c,m+1/2}
+=\frac{x_c(t_{m+1})-x_c(t_m)}{0.04}.
+$$
+
+Stack these pairs only after differentiation. Never create a derivative from the final sample of one condition or trial to the first sample of another. Jittered observations use their declared physical or nominal sample times consistently; wrapped `roll` transitions are prohibited.
+
+### Empirical results
+
+| Acceptance item | Result |
+|---|---|
+| Positive recovered plane 1 / plane 2 maximum angle | $1.35^\circ / 4.78^\circ$ |
+| Positive signed rates | 1.9944 / 0.6999 |
+| Positive absolute rate errors | 0.00557 / 0.000105 |
+| Train--validation observed-space plane stability | $1.02^\circ / 1.36^\circ$ |
+| Train--test observed-space plane stability | $0.73^\circ / 1.71^\circ$ |
+| Positive test unrestricted / skew / symmetric derivative $R^2$ | 0.3381 / 0.3364 / 0.0126 |
+| Positive pooled plane occupancy | 0.4001 / 0.4919 |
+| Positive tangential/radial energy ratio | 3.44 / 1.64 |
+| Short-window plane-1 angle | $4.98^\circ$ |
+| Jittered unrestricted / skew $R^2$ | 0.3329 / 0.3311 |
+| Smoothed unrestricted / skew $R^2$ | 0.8187 / 0.8144 |
+| No-subtraction unrestricted / skew $R^2$ | 0.4310 / 0.4294 |
+| Symmetric-decay unrestricted / skew / symmetric $R^2$ | 0.0353 / 0.00175 / 0.0355 |
+| Latency-sequence unrestricted / skew $R^2$ | 0.3036 / 0.3005; no autonomous-plane truth target |
+| Same-data input-driven state-only affine $R^2$ | 0.0465 |
+| Same-data input-aware affine $R^2$ | 0.0808 |
+| Clean Euler identity / fitted $M,G,b$ errors | $2.33\times10^{-14}$ / 2.614 / 0.207 / 0.033 |
+| Nonorthogonal plane-1 angle and unrestricted/skew $R^2$ | $7.29^\circ$, 0.4609 / 0.3399 |
+| Whole-trajectory shuffle train/validation/test covariance similarity | 0.746 / 0.750 / 0.730; all miss the 0.95 target |
+| Deterministic regeneration | byte-identical manifest, metrics, diagnostics, and PNG |
+
+Both positive planes are matched jointly to the two true PCA-space planes. The slower plane has a larger finite-sample angle but an accurate rate. Smoothing greatly increases derivative prediction and tangential/radial ratios because differencing amplifies observation noise; this sensitivity is not independent evidence for dynamics. The best-of-128 shuffle preserves every feature's complete trajectory multiset but does not reach the predeclared covariance-similarity threshold, so it is retained as an incompletely matched control rather than a successful null.
+
+## Visualization
+
+The single `summary.png` contains at most four panels:
+
+1. one positive held-out condition trajectory in recovered plane 1 as a bounded projection display;
+2. unrestricted/state-only-affine and skew-constrained held-out derivative $R^2$ across all scenarios;
+3. both positive plane matches/rates, positive plane-1 occupancy/tangential/perpendicular summaries, preprocessing sensitivities, and the achieved whole-trajectory shuffle similarities with explicit threshold misses; and
+4. isometry, finite-difference, constraint/LS, plane re-extraction, poison, applicability, and interpretation checks.
+
+The in-figure text states that the trajectories are projections rather than posterior state estimates, that latency and input-driven controls omit autonomous-plane truth metrics, and that rotation is not evidence of an oscillator, autonomy, or mechanism. Symmetric-constrained and input-aware derivative rows, the complete fixed/random/negative-control plane metrics, and stability records remain in `metrics.csv`; the single PNG is not a substitute for them.
+
+## Expected behavior
+
+1. Under the positive isometric generator, rank-six PCA should recover the six-dimensional observed image and constrained skew least squares should approximately recover the two true rotational planes, subject to noise, finite differences, occupancy, and subtraction.
+2. The unrestricted derivative fit cannot have larger training SSE than the constrained skew fit. Similar held-out performance supports a skew-dominant local linear relation under this metric; it does not prove a pure rotational generator in unknown data.
+3. The symmetric-decay control should favor a symmetric derivative map and lack a valid rotational-plane truth target.
+4. Staggered transient latencies may produce curved or rotational-looking projections despite having no shared autonomous six-dimensional state law [@MichaelsEtAl2016; @LebedevEtAl2019].
+5. Input-driven trajectories can make a state-only matrix absorb correlations with $u(t)$. The input-aware fit should be judged by held-out derivative prediction and recovery of the declared state/input coefficients, not by whether its projected curves look less circular.
+6. Short arcs can show a strong tangent relation without completing a cycle. Event jitter can reduce condition consistency; light smoothing can reduce derivative noise while changing bandwidth and phase.
+7. Across-condition subtraction can reveal or suppress different variance patterns and is part of the estimand, not neutral cleanup [@LebedevEtAl2019].
+8. A covariance-matched condition shuffle is more informative than an unconstrained shuffle only for the nuisance structure it actually preserves [@MichaelsEtAl2016].
+9. Under nonorthogonal mixing, the latent physical trajectory is unchanged but Euclidean skew symmetry is not preserved in general. This is a metric-dependence stress, not a failed isometric positive case.
+
+## Parameter manipulations
+
+### A. Positive full-window isometric condition
+
+Use the declared $A$, eight initial states, isometric $H$, full $[0,2.4]$ interval, no smoothing, correct alignment, and primary across-condition subtraction. Both true rotational planes and rates are applicable.
+
+The name `full_window` means the complete predeclared observation interval, not proof that every trajectory completes a cycle. The fastest ideal mode spans $4.8$ radians and the slower mode spans $1.68$ radians over this interval; those facts are reported explicitly.
+
+### B. Short-arc stress
+
+Retain only the first 18 samples, $t\in[0,0.68]$, before fitting PCA and derivatives. The fastest ideal mode spans $1.36$ radians and the slower mode $0.476$ radians. Report angular span, occupancy, plane angle, rate error, and fit stability. A low derivative error on this window cannot establish periodicity, recurrence, or a closed orbit.
+
+### C. Event-time jitter
+
+For each trial independently, draw an integer offset from $\{-3,-2,\ldots,3\}$ bins using frozen seeds. Generate or resample the analytic trajectory at the shifted physical times before adding noise, then analyze against the nominal aligned grid. Samples outside $[0,2.4]$ use the analytic generator rather than circular wrapping. Store every offset. This models imperfect event alignment without inventing transitions across window boundaries.
+
+### D. No versus light smoothing
+
+Compare no smoothing with the frozen three-bin moving average applied independently within each condition/trial trajectory. Fit preprocessing, PCA, derivatives, and matrices separately for the two branches using training data only. Do not smooth derivatives after differencing in one branch and before differencing in the other without naming the changed target.
+
+### E. Across-condition time-mean subtraction
+
+Run the positive generator both with and without the time-varying training across-condition mean subtraction. Retain the same rank, derivative estimator, and split. Report how plane occupancy, true-plane angle, derivative fit, angular rate, and condition consistency change. Neither branch is declared universally correct.
+
+### F. Symmetric decay control
+
+Replace the positive state matrix by
+
+$$
+A_{\mathrm{sym}}=operatorname{diag}(-1.2,-0.8,-0.5,-0.35,-0.2,-0.1)
+$$
+
+under the same isometric $H$, initial states, noise, and splits. The true derivative map is symmetric and has no nonzero imaginary eigenvalues. Score derivative prediction for unrestricted, skew-constrained, and symmetric-constrained fits. Do not assign a true rotational-plane angle or angular-rate target.
+
+### G. Latency-sequence transient control
+
+This control is defined directly in observed coordinates and has no autonomous latent state equation. For observed feature $j=1,\ldots,10$, condition $c=0,\ldots,7$, and time $t$,
+
+$$
+y_{c,j}(t)
+=
+(-1)^j(1+0.08c)
+\exp\left[-\left(\frac{t-\tau_{j,c}}{w_j}\right)^2\right],
+$$
+
+with
+
+$$
+\tau_{j,c}=\operatorname{linspace}(0.35,1.70)_{j}+0.025c,
+\qquad
+w_j=\operatorname{linspace}(0.13,0.25)_j.
+$$
+
+Add the same observation noise and split structure. This produces an ordered sequence of feature peaks. jPCA metrics may be computed, but true-plane and autonomous-matrix recovery are not applicable. The control tests whether delayed transients can yield rotational-looking projections, as motivated by Michaels et al. and Lebedev et al. [@MichaelsEtAl2016; @LebedevEtAl2019].
+
+### H. Input-driven pulse/common-input control
+
+Generate
+
+$$
+\dot z(t)=A_u z(t)+Bu_c(t),
+$$
+
+where
+
+$$
+A_u=\operatorname{diag}(-0.25,-0.30,-0.35,-0.40,-0.45,-0.50),
+$$
+
+$$
+B=
+\begin{pmatrix}
+0.8&0\\
+0&0.7\\
+0.5&0.3\\
+-0.3&0.5\\
+0.2&-0.4\\
+0.4&0.25
+\end{pmatrix},
+$$
+
+and
+
+$$
+u_{c,1}(t)=\sin(1.3t+0.35c),
+\qquad
+u_{c,2}(t)=
+\exp\left[-\left(\frac{t-(0.8+0.04c)}{0.28}\right)^2\right].
+$$
+
+Use one frozen numerical integration rule and step equal to the observation grid; record its local consistency check. Compare:
+
+- **state-only affine:** $\Delta x/\Delta t\approx Mx_i+b$;
+- **input-aware affine:** $\Delta x/\Delta t\approx Mx_i+Gu_i+b$.
+
+Both fits use the same frozen noisy trials, training centering, PCA coordinates, and left-endpoint predictors, matching the forward-Euler generator. No time-varying across-condition subtraction is used in this control. The known input columns are supplied only to the input-aware fit. The state-only fit's skew component can reflect omitted drive. Including $u$ is a model comparison under known simulator inputs, not proof of causal input identification in observational data [@CunninghamYu2014].
+
+### I. Nonorthogonal mixing and metric dependence
+
+Use
+
+$$
+G=HS,
+$$
+
+with
+
+$$
+S=egin{pmatrix}
+1&0.35&0&0&0&0\\
+0&1.6&0.2&0&0&0\\
+0&0&0.7&0.25&0&0\\
+0&0&0&1.3&0.2&0\\
+0&0&0&0&0.8&0.3\\
+0&0&0&0&0&1.8
+\end{pmatrix}.
+$$
+
+Generate $y=Gz$ from the same positive latent trajectories. The mapped true planes $G\mathcal P_j$ remain valid geometric images for angle scoring, but $GAG^+$ is not generally skew-symmetric under the ordinary observed Euclidean metric. Report the Gram matrix $G^\top G$, its condition number, and plane/rate diagnostics. Do not merge this stress with the isometric positive acceptance criterion.
+
+### J. Covariance- and condition-structure-matched shuffle
+
+For each feature independently, permute **whole condition trajectories** among the eight conditions, preserving each feature's complete time course and marginal condition distribution while disrupting cross-feature condition identity. Generate 128 frozen permutation proposals per split. Select the proposal with maximum similarity between the original and shuffled flattened feature covariance, using only covariance similarity—not any rotational metric—and report
+
+$$
+\operatorname{sim}(C,C_\pi)
+=1-rac{\lVert C-C_\pi\rVert_F^2}{\lVert C\rVert_F^2}.
+$$
+
+The target threshold is $0.95$; if no proposal reaches it, use the highest-similarity proposal, record the miss, and narrow interpretation. Refit the complete pipeline on the selected shuffled training/validation data. This bounded construction is motivated by, but is not identical to, the iterative CMPT of Michaels et al. [@MichaelsEtAl2016]. A time-wise permutation that breaks every trajectory is not an acceptable matched control.
+
+## Sanity checks
+
+The verifier must assert all of the following.
+
+1. **Positive generator algebra:** analytic derivatives equal $Az(t)$ within floating-point tolerance.
+2. **Correct skew sign:** the stored $J(\omega)$ blocks have upper-right $-\omega$, lower-left $+\omega$, and $J^\top=-J$.
+3. **Embedding isometry:** $\lVert H^\top H-I\rVert_{\max}\le10^{-12}$.
+4. **Split integrity:** trial identifiers are disjoint and no condition means, preprocessing, PCA basis, matrix, plane, or hyperparameter use test trials.
+5. **Boundary integrity:** every derivative pair belongs to one condition and one trial/condition-mean trajectory; the expected pair count is checked exactly.
+6. **Derivative oracle:** midpoint finite differences on noiseless positive trajectories agree with analytic midpoint derivatives within $3\times10^{-3}$.
+7. **PCA oracle:** training PCA projector equals the independent rank-six SVD projector within $10^{-10}$.
+8. **Unrestricted LS:** normal-equation residual orthogonality or an independent least-squares recomputation passes tolerance.
+9. **True constrained skew LS:** $M_{\mathrm{skew}}+M_{\mathrm{skew}}^\top=0$ and reconstruction from the explicit skew basis agrees within $10^{-10}$.
+10. **No antisymmetrization substitution:** the verifier independently solves the skew-basis least-squares problem and does not accept $(M_{\mathrm{un}}-M_{\mathrm{un}}^\top)/2$ as an oracle unless the two happen to agree numerically.
+11. **Symmetric constrained LS:** $M_{\mathrm{sym}}-M_{\mathrm{sym}}^\top=0$ and the symmetric-basis solution is independently recomputed.
+12. **Nested training loss:** unrestricted training SSE is no larger than skew- or symmetric-constrained SSE within numerical tolerance.
+13. **Plane extraction:** each recovered plane is orthonormal and invariant under the fitted skew matrix; the stored rate equals $|q_1^\top M_{\mathrm{skew}}q_2|$.
+14. **Plane equivalence:** plane-angle metrics are invariant to within-plane rotations, axis swaps, and sign changes.
+15. **Truth applicability:** true-plane/rate rows exist only for the positive and separately labelled nonorthogonal mapped-plane conditions; they are absent for latency and symmetric controls.
+16. **Input design:** input-aware predictors contain the declared two input columns, are full rank where required, and state-only fits cannot access them.
+17. **Jitter integrity:** offsets are stored, no circular wrapping occurs, and physical derivative times are handled consistently.
+18. **Smoothing/subtraction isolation:** each branch refits training preprocessing and changes only its named operation.
+19. **Shuffle matching:** whole trajectories are permuted, covariance similarity is computed before rotational analysis, and selection never uses jPCA metrics.
+20. **Truth and test poison:** replacing latent truth and test observations cannot change training/validation fitted parameters or selected controls.
+21. **Determinism:** a clean temporary rerun produces byte-identical `manifest.json`, `metrics.csv`, `diagnostics.json`, and `summary.png`.
+22. **Metric provenance:** every row has unique labels for split, condition, preprocessing, method, target, metric, and finite value.
+
+Passing these checks establishes bounded numerical consistency, not that a real system is an autonomous oscillator.
+
+## Failure cases
+
+- **Antisymmetrizing the unrestricted fit:** Euclidean matrix projection is not generally the skew-constrained derivative least-squares solution.
+- **Wrong skew sign:** using $\begin{psmallmatrix}0&+\omega\\-\omega&0\end{psmallmatrix}$ silently reverses the declared positive orientation.
+- **Cross-condition derivatives:** joining condition endpoints creates artificial velocities.
+- **Test-refitted PCA or preprocessing:** this is transductive leakage, not held-out evaluation.
+- **Plane selected by visual circularity:** plane selection must follow the frozen skew-operator rule.
+- **Fast rate mistaken for high occupancy:** frequency, data variance, derivative fit, and stability are separate quantities.
+- **Short tangent arc called oscillation:** less than a cycle does not show recurrence or periodicity.
+- **Latency control assigned a latent oscillator:** ordered transients can yield rotation without the positive autonomous law.
+- **State-only input fit called autonomous truth:** omitted common drive can be absorbed into $M$.
+- **Across-condition subtraction called harmless:** it changes the fitted data and can change displayed rotations [@LebedevEtAl2019].
+- **Smoothing called cosmetic:** it changes derivatives and temporal bandwidth.
+- **Unmatched shuffle:** destroying covariance, smoothness, and condition structure simultaneously produces an uninformative easy null.
+- **Nonorthogonal mixing pooled with isometry:** skew symmetry is metric-dependent and not invariant to arbitrary invertible coordinates.
+- **Projection called posterior state inference:** jPCA projections do not perform probabilistic de-noising or state posterior estimation [@CunninghamYu2014].
+- **Rotation called a global vector field:** the fit is supported only over the sampled, processed condition--time region.
+- **Rotation called mechanism or causality:** a fitted local linear relation does not identify circuit implementation or intervention effects.
+
+## Recovery task
+
+### Rank-six PCA
+
+Fit $W$ from training condition means under the declared preprocessing. PCA supplies the observation representation in which all derivative models are compared. It is not a rotational method and receives no angular-rate estimate.
+
+### Unrestricted derivative regression
+
+Stack midpoint states $X$ and derivative targets $D$ as columns and solve
+
+$$
+\widehat M_{\mathrm{un}}
+\in\arg\min_M\lVert D-MX\rVert_F^2
+$$
+
+with `lstsq` or an equivalent stable solve. Report rank, condition number, training SSE, and held-out derivative error.
+
+### Skew-constrained least squares
+
+Let $B_{ij}$, $i<j$, have $+1$ at $(i,j)$, $-1$ at $(j,i)$, and zeros elsewhere. Solve
+
+$$
+\widehat M_{\mathrm{skew}}
+=
+\sum_{i<j}\theta_{ij}B_{ij},
+$$
+
+$$
+\widehat\theta
+\in
+\arg\min_\theta
+\left\lVert
+\operatorname{vec}(D)-
+\begin{bmatrix}
+\operatorname{vec}(B_{12}X)&\cdots
+\end{bmatrix}
+\theta
+\right\rVert_2^2.
+$$
+
+This is the actual jPCA constrained fit described in the Churchland supplementary derivation [@ChurchlandEtAl2012]. It is not formed by antisymmetrizing $\widehat M_{\mathrm{un}}$.
+
+### Symmetric structure
+
+Fit a matched constrained symmetric model
+
+$$
+\widehat M_{\mathrm{sym}}
+\in\arg\min_{M^\top=M}\lVert D-MX\rVert_F^2
+$$
+
+using an explicit symmetric basis. Also report the algebraic decomposition
+
+$$
+\widehat M_{\mathrm{un}}
+=
+\frac{\widehat M_{\mathrm{un}}+\widehat M_{\mathrm{un}}^\top}{2}
++
+\frac{\widehat M_{\mathrm{un}}-\widehat M_{\mathrm{un}}^\top}{2}
+$$
+
+only as a diagnostic of the unrestricted operator. Neither algebraic part substitutes for its corresponding constrained regression.
+
+### Rotational-plane extraction
+
+For a fitted real skew matrix, diagonalize the symmetric positive-semidefinite matrix
+
+$$
+-\widehat M_{\mathrm{skew}}^2.
+$$
+
+Each positive repeated eigenvalue $\omega_j^2$ defines a two-dimensional invariant plane. Group the repeated eigenspace, orient a deterministic orthonormal basis $(q_{j1},q_{j2})$, and set handedness so
+
+$$
+q_{j1}^\top\widehat M_{\mathrm{skew}}q_{j2}<0
+$$
+
+for the declared $J(\omega)$ convention, equivalently
+
+$$
+Q_j^\top\widehat M_{\mathrm{skew}}Q_j
+\approx
+\begin{pmatrix}0&-\widehat\omega_j\\\widehat\omega_j&0\end{pmatrix}.
+$$
+
+Order planes by decreasing $|\widehat\omega_j|$. Near-repeated frequencies are compared as a combined four-dimensional invariant subspace rather than assigned unstable plane labels.
+
+### Input-aware regression
+
+For the input control, solve
+
+$$
+D=MX+GU+E
+$$
+
+jointly by least squares. Compare held-out prediction with the state-only model and report $M$, $G$, rank, and coefficient error in the training PCA representation. Known simulator input does not enter positive or other control fits.
+
+### Fixed and random planes
+
+The fixed baseline is the first two training PCs. Five random rank-two planes are generated once in the six-dimensional PCA space, orthonormalized, and frozen before data generation. They receive occupancy, tangential/radial, angular-span, and condition-consistency metrics but no fitted rate unless a separately named in-plane derivative fit is performed.
+
+## Candidate analysis methods
+
+1. **Training PCA rank six.** Shared representation for every fitted derivative method.
+2. **Unrestricted state-only linear derivative regression.** Best linear state-only training fit.
+3. **True skew-constrained derivative regression.** jPCA operator and invariant planes.
+4. **True symmetric-constrained derivative regression.** Expansion/decay alternative.
+5. **Algebraic symmetric/skew parts of the unrestricted matrix.** Diagnostic only.
+6. **Fixed first-two-PC plane.** Variance-oriented baseline.
+7. **Five fixed random planes.** Data-independent projection references.
+8. **Input-aware state-plus-input regression.** Applicable only to the declared input control.
+9. **Covariance-matched condition shuffle.** Structured null, not a fitted dynamical method.
+
+## Evaluation
+
+### Held-out derivative prediction
+
+For method $m$, report
+
+$$
+\operatorname{MSE}_m
+=
+\frac{1}{N_D}\lVert D^{\mathrm{test}}-widehat D_m^{\mathrm{test}}\rVert_F^2
+$$
+
+and
+
+$$
+R_m^2
+=1-
+\frac{\lVert D^{\mathrm{test}}-widehat D_m^{\mathrm{test}}\rVert_F^2}
+{\lVert D^{\mathrm{test}}-\bar D^{\mathrm{test}}\rVert_F^2}.
+$$
+
+Report train, validation, and test separately. For the forward-Euler input control, $\widehat D=\widehat MX+\widehat GU+\widehat b$ at left endpoints; state-only methods cannot access $U$.
+
+### True-plane principal angles
+
+For recovered plane $Q$ and true plane $T$, use singular values of orthonormal bases:
+
+$$
+\theta_1,\theta_2
+=
+\arccos\left(\operatorname{svd}(Q^\top T)\right).
+$$
+
+Report maximum angle, RMS sine error, and projector Frobenius error. Match the two positive recovered planes to the two true planes by minimum total maximum-angle assignment, then report the assignment itself. Plane metrics are invariant to sign, axis swap, and within-plane rotation.
+
+### Angular-rate error
+
+For matched recovered plane $Q_j$,
+
+$$
+\widehat\omega_j
+=
+\left|q_{j1}^\top\widehat M_{\mathrm{skew}}q_{j2}\right|,
+$$
+
+and report absolute and relative errors against $2.0$ and $0.7$. Do not report latent-rate recovery as applicable in the nonorthogonal stress unless the metric transformation is explicitly accounted for.
+
+### Tangential and radial energy
+
+For projected state $r=Q^\top x=(r_1,r_2)^\top$ with $\lVert r\rVert>10^{-8}$, define
+
+$$
+e_r=\frac{r}{\lVert r\rVert},
+\qquad
+e_\tau=J(1)e_r,
+$$
+
+$$
+v_r=e_r^\top Q^\top\dot x,
+\qquad
+v_\tau=e_\tau^\top Q^\top\dot x.
+$$
+
+Report mean radial energy $E_r=\operatorname{mean}(v_r^2)$, tangential energy $E_\tau=\operatorname{mean}(v_\tau^2)$, their ratio, the fraction of state--derivative angles within a predeclared tolerance of $\pi/2$, and the signed rotation-direction consistency across conditions. A high ratio can occur over a short nonrecurrent arc.
+
+### Plane occupancy and angular span
+
+Plane occupancy is
+
+$$
+\operatorname{Occ}(Q)=
+\frac{\sum\lVert Q^\top x\rVert_2^2}
+{\sum\lVert x\rVert_2^2}.
+$$
+
+Angular span unwraps $\operatorname{atan2}(r_2,r_1)$ separately by condition, reports each condition's span, and summarizes median/range. Never unwrap across condition boundaries.
+
+### Condition and trial stability
+
+Report:
+
+- training-versus-validation and training-versus-test independently fitted plane angles;
+- leave-one-condition-out plane angles and rate changes;
+- condition-wise direction consistency and angular-rate dispersion under the training-fitted plane; and
+- single-trial projected tangential/radial summaries using the frozen condition-mean fit.
+
+Condition means and single trials are different noise regimes. Stable means do not imply stable trial-level rotation.
+
+### Matrix and preprocessing diagnostics
+
+Report predictor rank and condition number, skew/symmetric constraint violations, unrestricted-versus-constrained SSE gaps, PCA occupancy, subtraction sensitivity, smoothing sensitivity, jitter offsets, shuffle covariance similarity, and nonorthogonal map condition number.
+
+### Tidy metrics schema
+
+Every `metrics.csv` row contains exactly:
+
+~~~text
+split,condition,preprocessing,method,target,metric,value
+~~~
+
+Values are finite. Inapplicable rows are omitted and listed with reasons in `diagnostics.json`; latency controls never receive zero-valued true-plane errors.
+
+## Interpretation
+
+The positive simulator establishes a narrow implementation and recovery question: under an isometric observation map, known linear state equation, occupied initial conditions, fixed PCA rank, declared preprocessing, and finite-difference target, does the recovered skew operator identify the mapped rotational planes and rates? A favorable answer validates that bounded pipeline, not a general mechanistic interpretation of rotational projections.
+
+The controls separate alternatives. Symmetric decay tests whether constrained model comparison distinguishes contraction. Latency sequences test ordered transients without a shared autonomous state law. The input control tests omitted drive. Short arcs, jitter, smoothing, and subtraction show that preprocessing and sampling define the estimand. Nonorthogonal mixing shows that Euclidean skew symmetry is coordinate/metric dependent.
+
+::: {.callout-tip title="LDG synthesis"}
+A vector field assigns a local velocity to a declared state. jPCA instead fits one linear state-to-derivative relation to sampled, processed trajectories. Agreement on those samples does not establish that the fitted matrix is valid globally, that the observed coordinates are the complete state, or that external inputs are absent.
+:::
+
+## What this toy model does NOT establish
+
+- It does not prove that a rotational projection is an oscillator or limit cycle.
+- It does not establish recurrence, periodicity, phase resetting, or self-sustained oscillation.
+- It does not establish autonomous dynamics when inputs, feedback, clock time, or omitted state may matter.
+- It does not infer a global vector field beyond the sampled condition--time region.
+- It does not identify a causal, neural, physical, or biological mechanism.
+- It does not make projected condition means posterior latent trajectories.
+- It does not show that one PCA/jPCA plane is a unique state space.
+- It does not make skew symmetry invariant to arbitrary feature scaling or nonorthogonal coordinates.
+- It does not turn smoothing, alignment, averaging, or across-condition subtraction into neutral operations.
+- It does not make covariance-matched shuffles universal hypothesis tests.
+- It does not imply that high plane occupancy means good derivative prediction, or vice versa.
+- It does not infer dynamics from visual circularity alone.
+- It does not establish manifold structure, topology, intrinsic dimension, or nonlinear geometry.
+
+## Extensions to real data
+
+A real-data analysis must define simultaneously recorded versus pseudo-population features, independent trial/session/subject units, condition balance, alignment events, time window, smoothing, feature normalization, across-condition subtraction, PCA rank, derivative estimator, condition boundaries, input measurements, and nested selection. Trial-averaged projections should be supplemented by single-trial stability and noise-aware analyses.
+
+Competing explanations require matched controls: latency models should preserve realistic time courses; input-aware models require measured inputs and declared system boundaries; shuffles should preserve the nuisance statistics relevant to the tested hypothesis. If arbitrary nonorthogonal coordinates are scientifically plausible, rotation should be evaluated relative to a justified metric rather than treated as coordinate-free. None of those additions turns an observational fit into causal identification.
+
+## Reproducibility
+
+### Bounded artifact contract
+
+The implementation scope is exactly:
+
+~~~text
+toy-models/rotational-projection-controls.py
+toy-models/artifacts/rotational-projection-controls/manifest.json
+toy-models/artifacts/rotational-projection-controls/metrics.csv
+toy-models/artifacts/rotational-projection-controls/diagnostics.json
+toy-models/artifacts/rotational-projection-controls/summary.png
+~~~
+
+No additional artifact is authorized. The script uses only the bundled Python, NumPy, and Pillow environment. JSON ordering, CSV ordering, float formatting, plot dimensions, fonts, and PNG metadata are fixed for byte-comparison determinism.
+
+The manifest records:
+
+- exact positive, symmetric, input, latency, and nonorthogonal generator definitions;
+- the correct $J(\omega)$ sign convention;
+- realized initial states, isometric/nonorthogonal maps, split sizes, time grid, and all seeds;
+- preprocessing, windows, smoothing, subtraction, derivative construction, PCA rank, plane orientation, and random planes;
+- unrestricted, skew, symmetric, and input-aware solve conventions;
+- shuffle proposal count, covariance criterion, threshold, selected proposal, and achieved similarity;
+- applicability rules, tolerances, runtime versions, commands, and SHA-256 hashes; and
+- exact artifact inventory.
+
+`diagnostics.json` contains generator, isometry, derivative, boundary, leakage, PCA, constrained-solve, plane-invariance, truth-applicability, input, jitter, smoothing, subtraction, shuffle, metric-dependence, trial-stability, and deterministic-regeneration records.
+
+The expected command is:
+
+~~~bash
+/Users/bytedance/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3 toy-models/rotational-projection-controls.py
+~~~
+
+The default command should generate and verify artifacts, with explicit `--generate` and `--verify` modes if following the Phase 3 convention. Verification includes clean temporary regeneration and byte comparison.
+
+### Evidence inspected
+
+The following sources were actually retrieved and inspected. Existing LDG Methods and Concepts were terminology anchors, not substitutes for source inspection.
+
+- **Churchland et al. (2012):** the complete openly accessible main-article full text was inspected for the abstract, central reaching results, controls, state--derivative angle analysis, unrestricted-versus-skew comparison, projection interpretation, and Methods preprocessing/alignment description. The 15-page supplementary PDF was inspected for shuffle descriptions, smoothing and cross-condition-mean figures, PCA-rank/plane controls, and the supplementary jPCA derivation on pages 12--14, including the explicit skew-basis constrained least-squares construction and complex-eigenvector plane formation. Supplementary movies, the spreadsheet, and source code were not inspected frame-by-frame or line-by-line. OCR in the supplement drops some minus signs; this object uses the mathematically correct $M_{\mathrm{skew}}=(M-M^\top)/2$, $M_{\mathrm{skew}}^\top=-M_{\mathrm{skew}}$, and $J(\omega)$ convention stated above [@ChurchlandEtAl2012].
+- **Michaels, Dann, and Scherberger (2016):** the 22-page PLOS Computational Biology PDF was inspected for the abstract and introduction; latency-augmented representational simulation; jPCA results; covariance-matched permutation-test rationale and results; condition/neuron-count sensitivity; discussion; and Methods sections defining jPCA preprocessing, rotational metrics, latency simulation, and iterative condition-wise covariance matching. RNN training details and every supplementary figure were not checked equation by equation. This source supports latency controls and a covariance-preserving condition-structure null, not a universal significance test [@MichaelsEtAl2016].
+- **Lebedev et al. (2019):** the complete open full-text article was inspected for the abstract; temporal ordering of response peaks; simulated latency sequences; PCA/jPCA reanalysis; condition shuffles; across-condition-subtraction critique; Methods descriptions; discussion; and interpretation limits. The authors' code was not independently rerun and their stronger mechanistic conclusions are not adopted as settled fact. This source supports treating temporal response order and subtraction as explicit alternatives/sensitivities [@LebedevEtAl2019].
+- **Cunningham and Yu (2014):** the complete 10-page author PDF was inspected for the overview of covariance and time-series dimensionality reduction, the discussion of dynamical-model assumptions, and the section distinguishing direct orthogonal projections from trajectories inferred through a probabilistic dynamics/noise tradeoff. The review's modality examples and reference list were not read exhaustively. This source supports calling jPCA trajectories projections of processed data rather than posterior latent-state trajectories [@CunninghamYu2014].
+
+These sources do not supply this Toy Model's dimensions, matrix values, embeddings, initial states, time grid, trial counts, noise level, windows, jitter, random planes, input functions, shuffle proposal budget, or tolerances. Those are frozen LDG design choices.
+
+### Integration state
+
+The bounded implementation and deterministic artifacts are reconciled with this record at L1/stable after independent scientific and implementation focused PASS, repository validation, target/index/full-site renders, and mechanical promotion under the recorded review decision.
+
+### Historical target-check responsibilities
+
+The executor ran structural, target-render, and diff checks; the implementation owner ran generation and artifact verification; and the parent orchestrator completed repository-wide tests, index/control reconciliation, review integration, and stable promotion. This records completed role separation rather than pending work.
+
+## Maturity checklist
+
+- [x] Complete L1/stable Toy Model schema and exact five-file implementation contract.
+- [x] Positive six-dimensional generator, correct skew blocks, isometric observed embedding, and independent splits are frozen.
+- [x] Observed and PCA-represented true rotational-plane targets are explicit.
+- [x] Symmetric, latency, input-driven, and nonorthogonal controls are separated.
+- [x] Rank-six PCA, unrestricted, true skew-constrained, symmetric, fixed/random-plane, and input-aware methods are defined.
+- [x] Full/short windows, jitter, smoothing, subtraction, matched shuffle, and input-aware stresses are bounded.
+- [x] Derivative, angle, rate, tangential/radial, occupancy, and stability metrics are defined.
+- [x] Condition boundaries, split leakage, applicability, and deterministic oracles are explicit.
+- [x] Projection, oscillator, autonomy, vector-field, causality, metric, and mechanism limits are explicit.
+- [x] External evidence depth and limitations are recorded.
+- [x] Deterministic empirical artifacts integrated.
+- [x] Independent scientific review PASS after focused re-review of input consistency, metric applicability, shuffle selection, and stability.
+- [x] Independent implementation review PASS after focused re-review of all eight numerical, leakage, manifest, and figure findings.

@@ -1,0 +1,247 @@
+{
+  "artifact_files": [
+    "manifest.json",
+    "results.csv",
+    "diagnostics.json",
+    "summary.png"
+  ],
+  "artifact_hashes_sha256": {
+    "diagnostics.json": "4c517dbc7b7dad30d4b2184cea0c21fe6ca4e6893b01d60e755a68507e0323bc",
+    "results.csv": "a6afee11c03a2d23267863bed94eb9a473908b4860832879e89b6bffa936a9ba",
+    "summary.png": "2a7c083069c784445394af9031cfa69b9eaaaedfb20103594b618b5ba7141af8"
+  },
+  "benchmark": "cross-suite-robustness-synthesis",
+  "canonical_order": "lexicographic row_key",
+  "commands": {
+    "generate": "/Users/bytedance/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3 benchmarks/cross-suite-robustness-synthesis.py --generate",
+    "resume": "/Users/bytedance/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3 benchmarks/cross-suite-robustness-synthesis.py --generate --resume",
+    "verify": "/Users/bytedance/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3 benchmarks/cross-suite-robustness-synthesis.py --verify"
+  },
+  "contract": {
+    "cross_task_metric_averaging": false,
+    "cross_task_metric_normalization": false,
+    "failure_rate_semantics": {
+      "conditional_failure_rate": "(invalid + nonconvergence) / (ok + invalid + nonconvergence); blank and inapplicable when denominator is zero",
+      "raw_cartesian_failure_label_fraction": "(invalid + nonconvergence) / all task-scenario-method raw Cartesian rows"
+    },
+    "method_ranking": false,
+    "rates_task_specific_with_denominators": true,
+    "read_only_sources": true,
+    "score": false,
+    "source_boundary": {
+      "scientific_inputs": [
+        "manifest.json",
+        "results.csv",
+        "diagnostics.json"
+      ],
+      "summary_png": "optional integrity_only_attachment; never parsed as scientific input"
+    },
+    "source_method_reruns": false,
+    "source_metric_values_imported": false,
+    "stable_sources_only": true,
+    "winner": false
+  },
+  "date": "2026-08-20",
+  "interpretation_boundary": [
+    "Inventory counts are not evidence of scientific quality or method superiority.",
+    "Applicability and failure rates are conditional on each source task's own row design and must not be compared as normalized performance scores.",
+    "Scenario-target coverage membership records applicability coverage only, not direction, magnitude, or robustness.",
+    "No universal winner, mechanism, causal conclusion, or real-data claim is licensed."
+  ],
+  "maturity": "L1",
+  "record_types": [
+    "inventory",
+    "applicability_pattern",
+    "failure_pattern",
+    "scenario_target_coverage"
+  ],
+  "row_count": 2308,
+  "row_fields": [
+    "row_key",
+    "record_type",
+    "benchmark",
+    "task",
+    "scenario",
+    "scenario_class",
+    "method",
+    "dimension",
+    "value_label",
+    "numerator",
+    "denominator",
+    "rate",
+    "status",
+    "stress_class",
+    "applicable_target_families",
+    "source_reference",
+    "notes"
+  ],
+  "row_key": "record_type|benchmark|task|scenario|method|dimension|value_label",
+  "runtime": {
+    "executable": "/Users/bytedance/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3",
+    "numpy": "2.3.5",
+    "pillow": "12.3.0",
+    "platform": "macOS-26.5.1-arm64-arm-64bit",
+    "python": "3.12.13"
+  },
+  "schema_version": 1,
+  "scientific_question": "What task-specific coverage, applicability/failure patterns, and declared stress-to-target mappings are present across the five stable Phase 4 synthetic benchmark suites?",
+  "sources": [
+    {
+      "benchmark": "linear-gaussian-robustness",
+      "declared_benchmark": "P4-U01",
+      "files_bytes": {
+        "diagnostics.json": 359882,
+        "manifest.json": 9699,
+        "results.csv": 2611881
+      },
+      "files_sha256": {
+        "diagnostics.json": "cc997dccb36720f18d5bc5d1eb8cb745ff67edf71760600e5e6c6ff2dd29785f",
+        "manifest.json": "39fef99dd1336f844fa8b6facf1a73c738c8cdd04cba5804fc91049f91989bf3",
+        "results.csv": "f0daae73934b062577a317d1f9d75ba03370131b40a2c19c3a9e81473abfeb32"
+      },
+      "integrity_only_attachments": {
+        "summary.png": {
+          "bytes": 42102,
+          "declared_hash_present": true,
+          "role": "integrity_only_attachment",
+          "sha256": "9f597bbd39681a7a3842ab74908cc0229ffa1b97ec9eaa8c3975b600c306d324"
+        }
+      },
+      "maturity": "L1",
+      "row_count": 5445,
+      "scientific_inputs": [
+        "manifest.json",
+        "results.csv",
+        "diagnostics.json"
+      ],
+      "status": "stable"
+    },
+    {
+      "benchmark": "static-linear-latent-robustness",
+      "declared_benchmark": "P4-U02",
+      "files_bytes": {
+        "diagnostics.json": 592116,
+        "manifest.json": 10538,
+        "results.csv": 1799938
+      },
+      "files_sha256": {
+        "diagnostics.json": "527266ed8c3f09783132a3ee6dcba66b06b8e29199e5858366089f4fd8fb518d",
+        "manifest.json": "765a7202ce55ee1b02eaa41651897a833244cad763828151f4584b6194b8aae1",
+        "results.csv": "ccf91db1332b9cda02db7264b136fe8fa65dfca46cf559ba6cbe221018e94a12"
+      },
+      "integrity_only_attachments": {
+        "summary.png": {
+          "bytes": 37994,
+          "declared_hash_present": true,
+          "role": "integrity_only_attachment",
+          "sha256": "ece6e58ebb18b5209d148b2dfbb998d0fc46fd46fd782af0ce9204030f12b321"
+        }
+      },
+      "maturity": "L1",
+      "row_count": 4356,
+      "scientific_inputs": [
+        "manifest.json",
+        "results.csv",
+        "diagnostics.json"
+      ],
+      "status": "stable"
+    },
+    {
+      "benchmark": "temporal-covariance-inference",
+      "declared_benchmark": "P4-U03",
+      "files_bytes": {
+        "diagnostics.json": 448251,
+        "manifest.json": 10583,
+        "results.csv": 1179430
+      },
+      "files_sha256": {
+        "diagnostics.json": "2f195f1d7556d42d3c9bfd5866e3443bcd7dd769f20dc9558eabd82b9828915a",
+        "manifest.json": "eed44735c44a2510e575b71963a5c8abf71f88b18e144b66a3fbf4cbf2e0865f",
+        "results.csv": "5d02e270a36e165c10d92fe28b95df03cfbc263eca448c5f4138766ff5e635b5"
+      },
+      "integrity_only_attachments": {
+        "summary.png": {
+          "bytes": 46178,
+          "declared_hash_present": true,
+          "role": "integrity_only_attachment",
+          "sha256": "8ae2d382daa1280313bd1f12efe0ef9c06ee6af0780929049e9adc07ee0a213c"
+        }
+      },
+      "maturity": "L1",
+      "row_count": 3960,
+      "scientific_inputs": [
+        "manifest.json",
+        "results.csv",
+        "diagnostics.json"
+      ],
+      "status": "stable"
+    },
+    {
+      "benchmark": "demixing-rotational-robustness",
+      "declared_benchmark": "demixing-rotational-robustness",
+      "files_bytes": {
+        "diagnostics.json": 339735,
+        "manifest.json": 5062,
+        "results.csv": 1132871
+      },
+      "files_sha256": {
+        "diagnostics.json": "beaa6f6ae7486d477472fcbc5b6db6de4ebe4cbd56abfaeaae234df95fb23654",
+        "manifest.json": "3d315811c9da29df3a22711ca14d44faccce806c749c1e474c8852866680c10f",
+        "results.csv": "a142ca45d38f8365e93fdcc2781e9e662e78feab0ac3ae5dbf09451ad81ab65d"
+      },
+      "integrity_only_attachments": {
+        "summary.png": {
+          "bytes": 34293,
+          "declared_hash_present": true,
+          "role": "integrity_only_attachment",
+          "sha256": "1ec09d3c1861db48e21448601da66745e40bc5a459ef3ad8ee659c712d839398"
+        }
+      },
+      "maturity": "L1",
+      "row_count": 2712,
+      "scientific_inputs": [
+        "manifest.json",
+        "results.csv",
+        "diagnostics.json"
+      ],
+      "status": "stable"
+    },
+    {
+      "benchmark": "nonlinear-graph-robustness",
+      "declared_benchmark": "P4-U05 nonlinear reconstruction and graph geometry",
+      "files_bytes": {
+        "diagnostics.json": 712289,
+        "manifest.json": 8035,
+        "results.csv": 1673289
+      },
+      "files_sha256": {
+        "diagnostics.json": "fcfb102b86bf53e7d36193911fbf372ee8c6f7790fabb28423fc99ecea0dd5a3",
+        "manifest.json": "6553a0e5dbc437e512ea71552d494543a7feb80c65a064bdf8bd91e81b1ac541",
+        "results.csv": "833e28d647397d8c23805c64d0350cee05bbab4ef128ec759da43f55bf431dd0"
+      },
+      "integrity_only_attachments": {
+        "summary.png": {
+          "bytes": 34921,
+          "declared_hash_present": true,
+          "role": "integrity_only_attachment",
+          "sha256": "f8bf23a4c057295abfc1abe7352b254c3dc6a2ce5b380d12219ee800a60c5f59"
+        }
+      },
+      "maturity": "L1",
+      "row_count": 4167,
+      "scientific_inputs": [
+        "manifest.json",
+        "results.csv",
+        "diagnostics.json"
+      ],
+      "status": "stable"
+    }
+  ],
+  "status": "stable",
+  "status_vocabulary": [
+    "ok",
+    "inapplicable",
+    "invalid",
+    "nonconvergence"
+  ]
+}

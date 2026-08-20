@@ -1,0 +1,230 @@
+---
+title: "Metric"
+object_type: concept
+maturity: L2
+status: stable
+domain: [geometry, foundations]
+tags: [metric, distance, geometry]
+prerequisites:
+- knowledge/concepts/state-space.qmd
+related:
+- knowledge/concepts/ambient-dimension.qmd
+- knowledge/concepts/topology.qmd
+- knowledge/concepts/riemannian-metric.qmd
+created: 2026-08-18
+updated: 2026-08-18
+---
+
+# Metric
+
+## One-sentence definition
+
+A **metric** is a function assigning a nonnegative distance to each pair of points while satisfying identity, symmetry, and the triangle inequality.
+
+## Why this concept matters
+
+Claims about proximity, neighborhoods, trajectory error, clustering, stability, and geometry depend on a notion of distance. Coordinates alone do not determine which metric is scientifically meaningful.
+
+## Intuition
+
+A metric turns “near” and “far” into declared mathematical relations. Different metrics on the same set can produce different neighborhoods and nearest neighbors.
+
+## Formal definition
+
+For a set $X$, a metric is a function
+
+$$
+d:X\times X\to[0,\infty)
+$$
+
+such that for all $x,y,z\in X$:
+
+$$
+d(x,y)=0\iff x=y,
+$$
+
+$$
+d(x,y)=d(y,x),
+$$
+
+$$
+d(x,z)\le d(x,y)+d(y,z).
+$$
+
+These are identity of indiscernibles, symmetry, and the triangle inequality. Nonnegativity is encoded in the codomain. Sutherland states the same metric axioms and the induced topology [@Sutherland2024].
+
+### Balls, topology, and convergence
+
+The open ball of radius $r>0$ around $x$ is
+
+$$
+B_r^d(x)=\{y\in X:d(x,y)<r\}.
+$$
+
+Open balls form a basis for the topology induced by $d$. A sequence converges to $x$ exactly when
+
+$$
+d(x_n,x)\to0.
+$$
+
+It is Cauchy when
+
+$$
+\forall\varepsilon>0\;\exists N\;\forall m,n\ge N:
+\quad d(x_m,x_n)<\varepsilon.
+$$
+
+The metric space is complete when every Cauchy sequence converges to a point in $X$. Completeness depends on the metric, not only on the underlying topology.
+
+### Norms and inner products
+
+On a vector space, every norm induces the translation-invariant metric
+
+$$
+d(x,y)=\|x-y\|.
+$$
+
+An inner product induces the norm $\|x\|=\sqrt{\langle x,x\rangle}$ and therefore a metric. Not every norm comes from an inner product, and not every metric comes from a norm.
+
+Squared Euclidean distance,
+
+$$
+d_2^2(x,y)=\|x-y\|_2^2,
+$$
+
+is generally not a metric because it can violate the triangle inequality. On $\mathbb R$, for example, $d_2^2(0,2)=4>1+1=d_2^2(0,1)+d_2^2(1,2)$.
+
+### Equivalent metrics
+
+Two metrics are **topologically equivalent** when they induce the same open sets. They then have the same convergent sequences and continuous maps, but need not have the same Cauchy sequences, completeness, numerical distances, nearest neighbors, or convergence rates.
+
+They are **bi-Lipschitz equivalent** when there exist constants $0<c\le C<\infty$ such that
+
+$$
+c\,d_1(x,y)
+\le
+d_2(x,y)
+\le
+C\,d_1(x,y)
+$$
+
+for all $x,y$. Bi-Lipschitz equivalence is quantitative: it preserves Cauchy behavior and completeness and controls distortion of distances up to constants. It is stronger than topological equivalence.
+
+### Product and weighted metrics
+
+If $(X_1,d_1)$ and $(X_2,d_2)$ are metric spaces, examples on $X_1\times X_2$ include
+
+$$
+d_{\max}((x_1,x_2),(y_1,y_2))
+=
+\max\{d_1(x_1,y_1),d_2(x_2,y_2)\},
+$$
+
+and
+
+$$
+d_2((x_1,x_2),(y_1,y_2))
+=
+\sqrt{d_1(x_1,y_1)^2+d_2(x_2,y_2)^2}.
+$$
+
+For $x,y\in\mathbb R^D$ and weights $w_i>0$,
+
+$$
+d_w(x,y)
+=
+\sqrt{\sum_{i=1}^{D}w_i(x_i-y_i)^2}
+$$
+
+is a metric. Zero weights produce only a pseudometric on the full coordinate space because distinct points can have zero distance. Negative weights do not define a real positive metric.
+
+Rescaling coordinates and then applying ordinary Euclidean distance changes the metric unless the metric is transformed consistently. Coordinate invariance is therefore a property to demonstrate, not an automatic consequence of using coordinates.
+
+### Metric-space and Riemannian metrics
+
+A [Riemannian Metric](riemannian-metric.qmd) assigns inner products to tangent spaces and induces curve lengths and a point-to-point distance by taking an infimum over path lengths. The tensor field and the induced metric-space distance are related but are not the same mathematical object [@Lee1997, chs. 3, 6].
+
+## Core notation
+
+- $(X,d)$: metric space.
+- $d(x,y)$: distance.
+- $B_r^d(x)=\{y:d(x,y)<r\}$: open metric ball.
+- $x_n\to x$: metric convergence, equivalent to $d(x_n,x)\to0$.
+- $d_1,d_2$: alternative metrics on the same set.
+- $c,C$: bi-Lipschitz lower and upper distortion constants.
+- $d_w$: weighted Euclidean metric with strictly positive weights.
+
+## Prerequisites
+
+[State Space](state-space.qmd) supplies the set of states whose pairwise distances may be defined. The related [Topology](topology.qmd) object supplies broader open-set language; here the topology is induced directly by metric balls.
+
+## Relationship to adjacent concepts
+
+| Concept | Distinction |
+|---|---|
+| **Norm** | Measures vector magnitude and induces a metric by $d(x,y)=\|x-y\|$. Not every metric comes from a norm. |
+| **Similarity** | Need not satisfy metric axioms and often increases rather than decreases with resemblance. |
+| **Divergence / loss** | Can be asymmetric or fail the triangle inequality while remaining useful for optimization or statistical comparison. |
+| **Squared distance** | Often used as a loss but may fail the triangle inequality and therefore not be a metric. |
+| **Learned distance** | A fitted function that must still be checked against metric axioms and evaluated for generalization and scientific relevance. |
+| **Riemannian metric** | A smoothly varying inner product on tangent spaces that induces curve lengths and distance. |
+| **Graph distance** | Shortest-path length is a finite metric on a connected graph (or within each connected component); disconnected pairs otherwise have infinite extended distance. |
+
+## What this does NOT imply
+
+A metric does not imply Euclidean geometry, smoothness, completeness, a unique scientific choice, coordinate invariance, causal similarity, or that nearest points share mechanism. Intrinsic-dimension estimates, neighborhood graphs, and local geometric summaries can change with the selected metric and scale. Topological equivalence does not imply equal nearest neighbors, Cauchy behavior, completeness, or quantitative rates.
+
+## Minimal example
+
+On $\mathbb R^2$,
+
+$$
+d_E(x,y)=\sqrt{(x_1-y_1)^2+(x_2-y_2)^2}
+$$
+
+and
+
+$$
+d_M(x,y)=|x_1-y_1|+|x_2-y_2|
+$$
+
+are both metrics and induce the standard topology, but their balls are circular and diamond-shaped and their numerical distances differ. The weighted metric
+
+$$
+d_w(x,y)=\sqrt{100(x_1-y_1)^2+(x_2-y_2)^2}
+$$
+
+makes differences in the first coordinate ten times more costly. A nearest-neighbor or trajectory-error analysis can therefore change solely because of the declared metric.
+
+## Neuroscience / behavioral relevance
+
+Distances between neural states or behaviors often depend on scaling, covariance, temporal alignment, and noise. Metric choice should be justified rather than inherited silently from plotting coordinates.
+
+## Relevance to LDG
+
+At L2, Metric supplies the explicit notions of topology, convergence, completeness, quantitative equivalence, and coordinate weighting needed for stability, geometry, neighbors, and trajectory comparisons. It makes metric dependence a reviewable scientific assumption rather than a plotting default.
+
+## Open questions
+
+- Which metric is invariant to nuisance transformations?
+- How should uncertainty alter distance comparisons?
+- When should learned metrics be preferred to simple baselines?
+
+## References
+
+- Sutherland provides the inspected metric axioms and induced-topology definitions [@Sutherland2024]. LDG uses the standard all-pairs Cauchy definition rather than the adjacent-pair shorthand appearing in those brief notes.
+- Lee develops lengths and metric distance induced by Riemannian structure [@Lee1997, ch. 6].
+- Metric-learning algorithms, completion constructions, and equivalence proofs are intentionally deferred.
+
+## Maturity checklist
+
+- [x] States all metric axioms.
+- [x] Separates metric, norm, similarity, and Riemannian metric.
+- [x] States scientific metric-choice limitations.
+- [x] Defines open balls, induced topology, convergence, Cauchy sequences, and completeness.
+- [x] Separates general, norm-induced, inner-product-induced, and squared distances.
+- [x] Distinguishes topological and bi-Lipschitz metric equivalence.
+- [x] Gives valid product and positive-weight metrics and states pseudometric failures.
+- [x] Separates metrics from similarities, divergences, learned distances, and Riemannian tensors.
+- [x] States scientific metric dependence of neighbors, stability, dimension, trajectories, and geometry.
+- [x] Independent L2 scientific review completed; initial findings were corrected and focused re-review passed under the recorded review decision.

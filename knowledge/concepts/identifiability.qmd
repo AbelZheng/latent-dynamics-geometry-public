@@ -1,0 +1,189 @@
+---
+title: "Identifiability"
+object_type: concept
+maturity: L2
+status: stable
+domain: [latent-modeling, statistics]
+tags: [identifiability, observational-equivalence, parameters]
+prerequisites:
+- knowledge/concepts/latent-variable.qmd
+- knowledge/concepts/observation-model.qmd
+related:
+- knowledge/concepts/state-space-model.qmd
+- knowledge/concepts/observation-noise.qmd
+created: 2026-08-18
+updated: 2026-08-18
+---
+
+# Identifiability
+
+## One-sentence definition
+
+**Identifiability** asks whether distinct model specifications can produce the same distribution of observable data under the stated experimental design.
+
+## Why this concept matters
+
+If several parameters or latent representations are observationally equivalent, unlimited data from the same design cannot select a unique one without added constraints. Optimization quality cannot repair structural non-identifiability.
+
+## Intuition
+
+Imagine two different internal descriptions that make exactly the same predictions for every observation the experiment can collect. The data cannot tell them apart.
+
+## Formal definition
+
+Let $\Theta$ be a model-specification space and let $\mathcal P(\mathcal Y)$ denote probability laws on the observable sample space under a fixed experimental design. The model induces a parameterization map
+
+$$
+\Psi:\Theta\to\mathcal P(\mathcal Y),
+\qquad
+\Psi(\theta)=P_\theta.
+$$
+
+Rothenberg frames identification through this mapping from structural parameters to observable distributions [@Rothenberg1971].
+
+### Global, local, and generic identifiability
+
+The parameterization is **globally (strictly) identifiable** when
+
+$$
+P_{\theta_1}=P_{\theta_2}
+\Longrightarrow
+\theta_1=\theta_2.
+$$
+
+It is **locally identifiable at $\theta$** when there is a neighborhood $U$ of $\theta$ such that
+
+$$
+\Psi^{-1}(P_\theta)\cap U=\{\theta\}.
+$$
+
+Local identifiability excludes indistinguishable parameters arbitrarily near $\theta$ but permits observationally equivalent parameters elsewhere.
+
+A finite-dimensional parametric model is **generically identifiable** under a declared convention when identifiability holds outside a specified exceptional subset, commonly a lower-dimensional algebraic set or a set of measure zero. The meaning of “generic,” the reference measure/geometry, and any remaining finite symmetry must be stated. Generic identifiability does not make the exceptional parameters impossible or empirically detectable. Allman, Matias, and Rhodes use this notion for latent-structure models and explicitly allow label permutations [@AllmanMatiasRhodes2009].
+
+### Observational equivalence and quotient targets
+
+Define
+
+$$
+\theta_1\sim\theta_2
+\quad\Longleftrightarrow\quad
+P_{\theta_1}=P_{\theta_2}.
+$$
+
+This is an equivalence relation. When exact parameter recovery is impossible or scientifically unnecessary, the identifiable target may be the equivalence class $[\theta]\in\Theta/{\sim}$ or an identifiable function $\psi(\theta)$ satisfying
+
+$$
+P_{\theta_1}=P_{\theta_2}
+\Longrightarrow
+\psi(\theta_1)=\psi(\theta_2).
+$$
+
+A known symmetry group $G$ may generate part of the equivalence: $g\cdot\theta$ and $\theta$ produce the same observable law. Identifiability **up to $G$** means the observational fiber equals the declared group orbit, not that the original coordinates are uniquely recovered.
+
+### Structural and practical identifiability
+
+**Structural identifiability** asks the idealized infinite-information question using exact observable distributions and the declared model/design.
+
+::: {.callout-tip title="LDG Operational Synthesis"}
+LDG uses **practical identifiability** for finite-data weakness caused by limited experimental coverage, weak sensitivity, ill-conditioning, broad posterior uncertainty, or large estimator variance. Optimization failure is a separate computational difficulty: it can prevent recovery even when a well-conditioned identifiable target exists. A structurally identifiable model can be practically difficult; a structurally non-identifiable parameter cannot be made unique by a better optimizer or more data from the same unchanged design.
+:::
+
+### Latent-model symmetries
+
+Symmetries must be derived from the specific model:
+
+- In finite mixtures and discrete hidden-state models, permuting latent labels can leave the observable distribution unchanged; Allman, Matias, and Rhodes call this label swapping and formulate identifiability up to permutation [@AllmanMatiasRhodes2009].
+- In PPCA with $z\sim\mathcal N(0,I)$, replacing $W$ by $WR$ and $z$ by $R^\top z$ for orthogonal $R$ preserves the latent prior and observable covariance. Thus $W$ and the latent coordinate frame are non-identifiable under right-orthogonal transformations [@TippingBishop1999, sec. 3.2]. Describing the full model as identifiable “up to rotation” additionally requires conditions excluding further degeneracies.
+- General scalings or invertible transformations preserve the observable law only when the observation map, latent law, transition model, and other affected components are transformed consistently. They are not universal symmetries.
+
+## Core notation
+
+- $\theta$: model specification or parameter.
+- $P_\theta$: induced observable-data distribution.
+- $\Psi:\Theta\to\mathcal P(\mathcal Y)$: parameterization map.
+- $\Psi^{-1}(P_\theta)$: observational fiber.
+- $\theta_1\sim\theta_2$: observational equivalence.
+- $[\theta]\in\Theta/{\sim}$: identifiable equivalence-class target.
+- $\psi(\theta)$: identifiable function when constant on observational fibers.
+- $G\cdot\theta$: orbit of a declared symmetry group.
+
+## Prerequisites
+
+[Latent Variable](latent-variable.qmd) and [Observation Model](observation-model.qmd) supply the hidden quantities and observable mapping whose uniqueness is questioned.
+
+## Relationship to adjacent concepts
+
+| Concept | Distinction |
+|---|---|
+| **Estimability / practical identifiability** | Concerns finite-data precision, conditioning, posterior concentration, or an estimator; structural identifiability is a property of the idealized model plus design. |
+| **Observability** | In control theory, concerns recovering state from outputs over time; related but not synonymous. |
+| **Interpretability** | A scientific meaning assigned to a model component; an identifiable parameter can still be hard to interpret. |
+| **Predictive accuracy** | Equivalent models predict the same observable law by definition, and non-equivalent misspecified models can still have similar finite-sample prediction. Prediction does not identify internal parameters. |
+| **Causal identification** | Targets interventional or counterfactual quantities under a causal model and identifying assumptions. Some targets are identifiable from sufficiently strong observational assumptions, while others require interventional data or design; statistical parameter identifiability alone is not causal identification. |
+| **Label or coordinate convention** | Can choose one representative from an equivalence class for reporting or computation without making it scientifically identified. |
+
+## What this does NOT imply
+
+Identifiability does not imply easy estimation, good conditioning, low variance, correct model class, observability of every realized state, causal interpretation, or mechanistic truth. Generic identifiability does not guarantee the fitted parameter is outside the exceptional set. Non-identifiability does not imply useless prediction, but it limits which internal claims can be unique.
+
+## Minimal example
+
+### Rotation symmetry in PPCA
+
+Let
+
+$$
+z\sim\mathcal N(0,I),
+\qquad
+y=Wz+\varepsilon,
+\qquad
+\varepsilon\sim\mathcal N(0,\sigma^2I).
+$$
+
+For any orthogonal matrix $R$, define $z'=R^\top z$ and $W'=WR$. Then $z'\sim\mathcal N(0,I)$ and
+
+$$
+W'z'=Wz,
+$$
+
+so the observable distribution is unchanged. The loading matrix $W$ and latent coordinate frame are therefore not identified under this orthogonal action. The observable covariance $WW^\top+\sigma^2I$ is determined by the PPCA law; identification of the loading subspace requires the relevant rank and eigenvalue-separation conditions and is not asserted here without them.
+
+### Label swapping
+
+In a two-component mixture, exchanging component labels and all label-indexed parameters leaves the mixture distribution unchanged. One can identify the unordered pair of components under suitable conditions, but not a privileged numerical label without an external convention.
+
+These are exact model symmetries. An arbitrary scaling or nonlinear transform is not observationally equivalent unless every affected model component is transformed consistently.
+
+## Neuroscience / behavioral relevance
+
+Latent neural coordinates, dynamical matrices, and observation mappings can trade off while fitting the same recordings. Claims should state what is identifiable—predictions, subspaces, equivalence classes, or individual parameters.
+
+## Relevance to LDG
+
+At L2, Identifiability provides a typed map from model specifications to observable laws and clarifies when the scientific target is a parameter, an identifiable function, or an equivalence class. It is the principal guardrail against equating a fitted latent representation with a unique biological mechanism.
+
+## Open questions
+
+- Which interventions break important equivalences?
+- What transformations preserve the scientific claim?
+- Which parameters are only practically, rather than structurally, weakly determined?
+
+## References
+
+- Rothenberg provides the inspected primary parametric identification framework and local-identification perspective [@Rothenberg1971].
+- Allman, Matias, and Rhodes provide an inspected primary treatment of strict and generic identifiability, exceptional sets, and latent-label permutations [@AllmanMatiasRhodes2009].
+- Tipping and Bishop provide the inspected PPCA rotation symmetry [@TippingBishop1999, sec. 3.2].
+- Information-matrix/rank tests, algebraic identifiability proofs, experimental-design optimization, and estimator theory are intentionally deferred.
+
+## Maturity checklist
+
+- [x] Defines observational equivalence and global identification.
+- [x] Separates identifiability from estimation, prediction, and interpretation.
+- [x] Includes a latent-coordinate equivalence example.
+- [x] Types the parameterization map and global/local/generic identifiability.
+- [x] Defines observational equivalence, quotient targets, and identifiable functions.
+- [x] Separates structural and practical identifiability.
+- [x] Restricts permutation, rotation, scaling, and coordinate symmetries to models where they preserve the observable law.
+- [x] Separates identifiability from estimability, observability, prediction, interpretation, and causal identification.
+- [x] Independent L2 scientific review completed; initial findings were corrected and focused re-review passed under the recorded review decision.

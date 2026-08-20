@@ -1,0 +1,219 @@
+---
+title: "Process Noise"
+object_type: concept
+maturity: L2
+status: stable
+domain: [latent-modeling, statistics]
+tags: [process-noise, transition-noise, stochastic-dynamics]
+prerequisites:
+- knowledge/concepts/state-space-model.qmd
+related:
+- knowledge/concepts/input-driven-dynamics.qmd
+- knowledge/concepts/observation-noise.qmd
+- knowledge/concepts/initial-condition.qmd
+created: 2026-08-18
+updated: 2026-08-18
+---
+
+# Process Noise
+
+## One-sentence definition
+
+**Process noise** is stochastic variability or unresolved disturbance entering the state-transition model and therefore changing the latent state trajectory.
+
+## Why this concept matters
+
+Process noise represents uncertainty in evolution, not merely uncertainty in measurement. It changes predictions for future state even if observations were perfect.
+
+## Intuition
+
+Two systems starting from the same state can diverge because the transition itself receives different disturbances.
+
+## Formal definition
+
+In a probabilistic state-space model, process noise is the stochasticity in the transition kernel
+
+$$
+Q_k(x,u,A)
+=
+\Pr(X_{k+1}\in A\mid X_k=x,u_k=u).
+$$
+
+It changes the conditional distribution of the next state even when the present state and declared input are fixed. A deterministic transition is the special case in which $Q_k$ is a Dirac measure.
+
+### Conditioned additive special case
+
+A common representation is
+
+$$
+X_{k+1}=F_k(X_k,u_k;\theta_x)+w_k,
+$$
+
+with a conditional disturbance law
+
+$$
+w_k\mid X_k=x,u_k=u
+\sim
+p_w(\,\cdot\mid x,u,k).
+$$
+
+When the required moments are finite, define the conditional mean and covariance
+
+$$
+m_k(x,u)=\mathbb E[w_k\mid x,u],
+$$
+
+$$
+\Sigma^w_k(x,u)
+=
+\mathbb E\left[
+(w_k-m_k)(w_k-m_k)^\top
+\mid x,u
+\right].
+$$
+
+Using $m_k=0$ and a constant matrix $\Sigma^w_k(x,u)=Q$ states that the first two conditional moments are zero and constant across state, input, and time. It does not make the full conditional law state independent or time homogeneous; higher moments or distributional shape may still vary. Kalman's primary formulation uses independent zero-mean Gaussian random excitation with a specified covariance as one important special case [@Kalman1960].
+
+### Dependence assumptions
+
+The following properties are distinct and must be stated separately:
+
+- **Gaussian:** each declared joint distribution is Gaussian.
+- **White/uncorrelated across time:** cross-time covariance vanishes for unequal times.
+- **Independent across time:** the random vectors are probabilistically independent, which is stronger than uncorrelatedness outside the Gaussian case.
+- **Identically distributed:** the conditional law does not change with $k$.
+- **iid across time:** combines independence across time with identical distribution.
+- **Uncorrelated components:** off-diagonal covariance entries vanish.
+- **Independent components:** the joint law factorizes across components; zero off-diagonal covariance does not imply this outside a suitable jointly Gaussian assumption.
+- **Independent of state, input, parameters, and initial condition:** a separate collection of assumptions, not implied by the label process noise.
+
+Colored process noise has temporal dependence. Cross-component covariance allows coordinated disturbances across state variables. Both can be scientifically meaningful rather than defects.
+
+### State-dependent and multiplicative noise
+
+Additive state-independent noise is not the general case. A model may use
+
+$$
+X_{k+1}
+=
+F_k(X_k,u_k)
++
+L_k(X_k,u_k)\,\varepsilon_k,
+$$
+
+where the disturbance amplitude or orientation depends on state or input. If
+
+$$
+\mathbb E[\varepsilon_k\mid x,u]=0,
+\qquad
+\operatorname{Cov}(\varepsilon_k\mid x,u)=\Sigma_\varepsilon,
+$$
+
+then the resulting conditional transition covariance is
+
+$$
+\Sigma^w_k(x,u)=L_k(x,u)\,\Sigma_\varepsilon\,L_k(x,u)^\top.
+$$
+
+Independence of $\varepsilon_k$ from $(x,u)$ is sufficient for these conditional assumptions but is not necessary.
+
+### Continuous-time stochastic forcing
+
+A continuous-time diffusion may be written schematically as
+
+$$
+dX_t=f(t,X_t,u_t)\,dt+L(t,X_t,u_t)\,dW_t.
+$$
+
+The Brownian increment $dW_t$ and diffusion matrix $L$ define continuous-time stochastic forcing. They are not ordinary finite-variance functions that can be substituted directly for a discrete $w_k$. The exact SDE determines its transition law independently of any numerical integration scheme.
+
+A numerical discrete approximation does depend on the scheme. For an Euler–Maruyama step with locally fixed $L$,
+
+$$
+w_k\approx L(t_k,X_k,u_k)\sqrt{\Delta t}\,\xi_k,
+\qquad
+\operatorname{Cov}(w_k\mid X_k,u_k)\approx LL^\top\Delta t,
+$$
+
+with $\xi_k\sim\mathcal N(0,I)$ under the stated approximation. SDE existence, stochastic calculus, exact transition laws, and discretization-error theory are outside this Concept.
+
+## Core notation
+
+- $Q_k(x,u,A)$: transition probability kernel.
+- $w_k$: additive process-disturbance realization.
+- $m_k(x,u)$: conditional process-noise mean.
+- $\Sigma^w_k(x,u)$: conditional process-noise covariance matrix, distinct from the transition kernel $Q_k(x,u,A)$.
+- $L_k(x,u)$: state/input-dependent disturbance loading.
+- $W_t$: Brownian motion in a continuous-time diffusion model.
+- $F_k$: deterministic part of the transition rule.
+
+## Prerequisites
+
+[State-Space Model](state-space-model.qmd) supplies the transition equation where process noise enters.
+
+## Relationship to adjacent concepts
+
+| Concept | Distinction |
+|---|---|
+| **Observation noise** | Perturbs measurements conditional on state; process noise perturbs state evolution. |
+| **Input** | A declared external argument or intervention under the chosen boundary. An unknown deterministic input is not automatically process noise. |
+| **Parameter uncertainty** | Uncertainty about a fixed rule specification; it is not a new random transition disturbance unless the model is reformulated. |
+| **Model error** | Broader structural misspecification that need not be adequately represented by any random transition kernel. |
+| **Residual** | A discrepancy after fitting that can mix process noise, observation noise, unknown inputs, numerical error, and misspecification. |
+| **Initial-state uncertainty** | Uncertainty at the starting time rather than new disturbance during transitions. |
+
+## What this does NOT imply
+
+Process noise does not imply zero mean, independence, whiteness, identical distribution, Gaussianity, additivity, state independence, physical randomness, or that model misspecification has been solved. Increasing or tuning $Q$ can absorb residual variation and improve predictive calibration without identifying its physical cause or proving that the variability is irreducibly stochastic.
+
+## Minimal example
+
+For
+
+$$
+X_{k+1}=X_k+w_k,
+\qquad
+Y_k=X_k,
+$$
+
+the observations are perfect but the evolution is uncertain. If $X_0$ is treated as fixed and $w_k\sim\mathcal N(0,Q)$ are independent across time and independent of $X_0$, then
+
+$$
+\operatorname{Var}(X_k\mid X_0)=kQ.
+$$
+
+Repeated runs from the same $X_0$ therefore separate because transition uncertainty accumulates. Replacing the independent, identical-law assumption with positively correlated disturbances changes this growth law even when each one-step variance is still $Q$.
+
+For a multiplicative contrast, $X_{k+1}=aX_k+\sigma X_k\varepsilon_k$ has state-dependent disturbance scale; it cannot be represented by one constant additive covariance without approximation.
+
+## Neuroscience / behavioral relevance
+
+Trial-to-trial latent variability may be modeled as process noise, variable initial state, unknown input, or model error. These explanations are not interchangeable and should be compared.
+
+## Relevance to LDG
+
+At L2, Process Noise locates stochasticity in the transition kernel and makes its conditional moments, dependence structure, and continuous/discrete interpretation explicit. It separates variability in latent evolution from measurement variability, unknown input, initial uncertainty, and model error.
+
+## Open questions
+
+- Is stochastic forcing preferable to deterministic hidden inputs?
+- How can process noise be distinguished from initial-condition variation?
+- Which covariance structures are identifiable?
+
+## References
+
+- Kalman provides an inspected primary linear stochastic state-transition model with independent Gaussian random excitation and specified covariance [@Kalman1960].
+- Åström and Murray provide the inspected modern linear-Gaussian process-disturbance/measurement-noise special case [@AstromMurray2021, sec. 8.4]. Section numbering was checked against the inspected 24 July 2020 electronic second-edition manuscript corresponding to the published edition.
+- Filtering equations, covariance propagation proofs, stochastic calculus, and SDE discretization theory are intentionally deferred.
+
+## Maturity checklist
+
+- [x] Locates noise in state transition.
+- [x] Separates it from observation noise, inputs, and model error.
+- [x] States distributional non-implications.
+- [x] Locates general process noise in the transition kernel and additive noise as a special case.
+- [x] Defines conditional mean/covariance and separates Gaussian, white, independent, iid, and component assumptions.
+- [x] Includes temporally correlated and state-dependent/multiplicative disturbance forms.
+- [x] Separates continuous diffusion from discrete process disturbances.
+- [x] Separates process noise from initial uncertainty, inputs, parameters, observation noise, residuals, and model error.
+- [x] Independent L2 scientific review completed; initial findings were corrected and focused re-review passed under the recorded review decision.

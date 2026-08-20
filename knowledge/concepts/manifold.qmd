@@ -1,0 +1,99 @@
+---
+title: "Manifold"
+object_type: concept
+maturity: L1
+status: stable
+domain: [geometry, topology]
+tags: [manifold, local-coordinates, atlas]
+prerequisites:
+- knowledge/concepts/embedding.qmd
+- knowledge/concepts/intrinsic-dimension.qmd
+related:
+- knowledge/concepts/state-space.qmd
+- knowledge/concepts/linear-subspace.qmd
+created: 2026-08-18
+updated: 2026-08-18
+---
+
+# Manifold
+
+## One-sentence definition
+
+A **smooth manifold** is a space that is locally described by Euclidean coordinates whose overlapping coordinate systems change smoothly.
+
+## Why this concept matters
+
+Manifolds allow globally curved or topologically nontrivial spaces to support local calculus. They provide one possible model for latent state spaces, but finite data or a nonlinear visualization does not establish that model.
+
+## Intuition
+
+The surface of a sphere cannot be covered by one undistorted planar coordinate system, yet every sufficiently small patch looks like an open patch of $\mathbb R^2$. Compatible patches form an atlas.
+
+## Formal definition
+
+An $n$-dimensional smooth manifold $M$ is a Hausdorff, second-countable topological space equipped with an atlas of charts $(U_\alpha,\varphi_\alpha)$ whose domains cover $M$, where
+
+$$
+\varphi_\alpha:U_\alpha\to\varphi_\alpha(U_\alpha)\subseteq\mathbb R^n
+$$
+
+is a homeomorphism onto an open subset of $\mathbb R^n$, and the transition maps between overlapping charts are smooth. Mrowka gives this chart-and-atlas definition [@Mrowka2004, sec. 1].
+
+This is an intrinsic definition: a manifold need not first be given as a subset of Euclidean space. An embedding is one way to represent it in an ambient space.
+
+## Core notation
+
+- $M$: manifold.
+- $n=\dim M$: manifold dimension.
+- $(U,\varphi)$: coordinate chart.
+- $\varphi(p)\in\mathbb R^n$: local coordinates of $p$.
+- $\varphi_\beta\circ\varphi_\alpha^{-1}$: transition map.
+
+## Prerequisites
+
+[Embedding](embedding.qmd) distinguishes an intrinsic space from one representation of it. [Intrinsic Dimension](intrinsic-dimension.qmd) provides the local coordinate count under the manifold model.
+
+**Assumed background:** open sets, continuity, and elementary topology; the dedicated Topology Concept appears later in the spine.
+
+## Relationship to adjacent concepts
+
+| Concept | Distinction |
+|---|---|
+| **Linear subspace** | Globally closed under linear combinations; a manifold may be curved and only locally Euclidean. |
+| **Embedded manifold** | A manifold represented as a suitably regular subset of an ambient space. |
+| **Point cloud** | Finite samples do not themselves supply charts, topology, or smooth transitions. |
+| **Topology** | Supplies continuity and neighborhood structure; a smooth manifold additionally has compatible differentiable charts. |
+
+## What this does NOT imply
+
+A manifold claim does not imply a Riemannian metric, known topology, low curvature, global Euclidean coordinates, unique dimension estimate, faithful sampling, or biological mechanism.
+
+## Minimal example
+
+The circle $S^1$ is a one-dimensional manifold. It requires more than one ordinary real-valued chart, although it can be embedded in $\mathbb R^2$.
+
+## Neuroscience / behavioral relevance
+
+Neural or behavioral states may be modeled as lying near a manifold. Such a claim requires evidence beyond dimensionality reduction: local coordinate consistency, scale analysis, sampling adequacy, and comparison with simpler subspaces.
+
+## Relevance to LDG
+
+Manifold establishes the object on which tangent spaces, Riemannian metrics, geodesics, and intrinsic curvature can later be defined.
+
+## Open questions
+
+- Which data can distinguish a manifold from condition-specific subspaces?
+- At what scales are chart assumptions defensible?
+- How should noise away from a candidate manifold be modeled?
+
+## References
+
+- Mrowka provides the inspected chart, atlas, and smooth-manifold definitions [@Mrowka2004, sec. 1].
+- Whitney supplies classical embedding context [@Whitney1936].
+
+## Maturity checklist
+
+- [x] Defines local Euclidean charts and smooth transitions.
+- [x] Separates intrinsic manifold and ambient embedding.
+- [x] States that visualization and low dimension do not prove a manifold.
+- [x] Independent bounded review completed; initial findings were corrected and focused re-review passed.

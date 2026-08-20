@@ -1,0 +1,3396 @@
+{
+  "covariance_checks": {
+    "all_finite": true,
+    "max_symmetry_error": 1.1102230246251565e-16,
+    "minimum_eigenvalue": 2.1573629609561035e-05,
+    "records": {
+      "correlated_residuals:fa": {
+        "all_finite": true,
+        "minimum_eigenvalue": 0.13097282126028528,
+        "symmetry_max_abs": 0.0
+      },
+      "correlated_residuals:population": {
+        "all_finite": true,
+        "minimum_eigenvalue": 0.12561587101625696,
+        "symmetry_max_abs": 1.1102230246251565e-16
+      },
+      "correlated_residuals:ppca": {
+        "all_finite": true,
+        "minimum_eigenvalue": 0.6506252733660933,
+        "symmetry_max_abs": 0.0
+      },
+      "high_variance_nuisance:fa": {
+        "all_finite": true,
+        "minimum_eigenvalue": 0.23346335425628323,
+        "symmetry_max_abs": 0.0
+      },
+      "high_variance_nuisance:population": {
+        "all_finite": true,
+        "minimum_eigenvalue": 0.18244526725691157,
+        "symmetry_max_abs": 0.0
+      },
+      "high_variance_nuisance:ppca": {
+        "all_finite": true,
+        "minimum_eigenvalue": 0.8343274338497642,
+        "symmetry_max_abs": 0.0
+      },
+      "matched_diagonal:fa": {
+        "all_finite": true,
+        "minimum_eigenvalue": 0.1776546210810461,
+        "symmetry_max_abs": 0.0
+      },
+      "matched_diagonal:population": {
+        "all_finite": true,
+        "minimum_eigenvalue": 0.18185583490787202,
+        "symmetry_max_abs": 0.0
+      },
+      "matched_diagonal:ppca": {
+        "all_finite": true,
+        "minimum_eigenvalue": 0.7397380356681531,
+        "symmetry_max_abs": 0.0
+      },
+      "near_zero_uniqueness:fa": {
+        "all_finite": true,
+        "minimum_eigenvalue": 2.1573629609561035e-05,
+        "symmetry_max_abs": 0.0
+      },
+      "near_zero_uniqueness:population": {
+        "all_finite": true,
+        "minimum_eigenvalue": 2.173239523491373e-05,
+        "symmetry_max_abs": 0.0
+      },
+      "near_zero_uniqueness:ppca": {
+        "all_finite": true,
+        "minimum_eigenvalue": 0.034519801691502795,
+        "symmetry_max_abs": 0.0
+      },
+      "outliers:fa": {
+        "all_finite": true,
+        "minimum_eigenvalue": 0.36966722822409165,
+        "symmetry_max_abs": 0.0
+      },
+      "outliers:population": {
+        "all_finite": true,
+        "minimum_eigenvalue": 0.18185583490787202,
+        "symmetry_max_abs": 0.0
+      },
+      "outliers:ppca": {
+        "all_finite": true,
+        "minimum_eigenvalue": 1.002102335464517,
+        "symmetry_max_abs": 0.0
+      },
+      "repeated_signal_eigenvalues:fa": {
+        "all_finite": true,
+        "minimum_eigenvalue": 0.2623379438386755,
+        "symmetry_max_abs": 0.0
+      },
+      "repeated_signal_eigenvalues:population": {
+        "all_finite": true,
+        "minimum_eigenvalue": 0.2999999999999993,
+        "symmetry_max_abs": 0.0
+      },
+      "repeated_signal_eigenvalues:ppca": {
+        "all_finite": true,
+        "minimum_eigenvalue": 0.29271628795708177,
+        "symmetry_max_abs": 0.0
+      }
+    }
+  },
+  "fa_multistart_selection": {
+    "correlated_residuals": {
+      "candidates": [
+        {
+          "converged": true,
+          "final_train_improvement": 0.24064820054601554,
+          "floor": 1e-05,
+          "iterations": 95,
+          "maximum_train_nll_increase": 0.0,
+          "restart": 0,
+          "train_nll": 10.732811309790748,
+          "validation_nll": 10.769433450047446
+        },
+        {
+          "converged": true,
+          "final_train_improvement": 0.26185494591855907,
+          "floor": 1e-05,
+          "iterations": 89,
+          "maximum_train_nll_increase": 0.0,
+          "restart": 1,
+          "train_nll": 10.732810233902722,
+          "validation_nll": 10.769801347816696
+        },
+        {
+          "converged": true,
+          "final_train_improvement": 0.4515825689115154,
+          "floor": 1e-05,
+          "iterations": 113,
+          "maximum_train_nll_increase": 0.0,
+          "restart": 2,
+          "train_nll": 10.732813169712234,
+          "validation_nll": 10.769336305537536
+        },
+        {
+          "converged": true,
+          "final_train_improvement": 0.24064820054601554,
+          "floor": 0.001,
+          "iterations": 95,
+          "maximum_train_nll_increase": 0.0,
+          "restart": 0,
+          "train_nll": 10.732811309790748,
+          "validation_nll": 10.769433450047446
+        },
+        {
+          "converged": true,
+          "final_train_improvement": 0.26185494591855907,
+          "floor": 0.001,
+          "iterations": 89,
+          "maximum_train_nll_increase": 0.0,
+          "restart": 1,
+          "train_nll": 10.732810233902722,
+          "validation_nll": 10.769801347816696
+        },
+        {
+          "converged": true,
+          "final_train_improvement": 0.4515825689115154,
+          "floor": 0.001,
+          "iterations": 113,
+          "maximum_train_nll_increase": 0.0,
+          "restart": 2,
+          "train_nll": 10.732813169712234,
+          "validation_nll": 10.769336305537536
+        }
+      ],
+      "selected": {
+        "converged": true,
+        "floor": 1e-05,
+        "iterations": 113,
+        "restart": 2,
+        "train_nll": 10.732813169712234,
+        "validation_nll": 10.769336305537536
+      }
+    },
+    "high_variance_nuisance": {
+      "candidates": [
+        {
+          "converged": false,
+          "final_train_improvement": 0.059335397769459064,
+          "floor": 1e-05,
+          "iterations": 250,
+          "maximum_train_nll_increase": 0.0,
+          "restart": 0,
+          "train_nll": 12.100494256154601,
+          "validation_nll": 12.098709476064705
+        },
+        {
+          "converged": false,
+          "final_train_improvement": 0.1827475303481183,
+          "floor": 1e-05,
+          "iterations": 250,
+          "maximum_train_nll_increase": 0.0,
+          "restart": 1,
+          "train_nll": 12.100552717518685,
+          "validation_nll": 12.098750265121605
+        },
+        {
+          "converged": false,
+          "final_train_improvement": 0.1326686687237686,
+          "floor": 1e-05,
+          "iterations": 250,
+          "maximum_train_nll_increase": 0.0,
+          "restart": 2,
+          "train_nll": 12.100525027583247,
+          "validation_nll": 12.098730657112675
+        },
+        {
+          "converged": false,
+          "final_train_improvement": 0.059335397769459064,
+          "floor": 0.001,
+          "iterations": 250,
+          "maximum_train_nll_increase": 0.0,
+          "restart": 0,
+          "train_nll": 12.100494256154601,
+          "validation_nll": 12.098709476064705
+        },
+        {
+          "converged": false,
+          "final_train_improvement": 0.1827475303481183,
+          "floor": 0.001,
+          "iterations": 250,
+          "maximum_train_nll_increase": 0.0,
+          "restart": 1,
+          "train_nll": 12.100552717518685,
+          "validation_nll": 12.098750265121605
+        },
+        {
+          "converged": false,
+          "final_train_improvement": 0.1326686687237686,
+          "floor": 0.001,
+          "iterations": 250,
+          "maximum_train_nll_increase": 0.0,
+          "restart": 2,
+          "train_nll": 12.100525027583247,
+          "validation_nll": 12.098730657112675
+        }
+      ],
+      "selected": {
+        "converged": false,
+        "floor": 1e-05,
+        "iterations": 250,
+        "restart": 0,
+        "train_nll": 12.100494256154601,
+        "validation_nll": 12.098709476064705
+      }
+    },
+    "matched_diagonal": {
+      "candidates": [
+        {
+          "converged": true,
+          "final_train_improvement": 0.09828907348399696,
+          "floor": 1e-05,
+          "iterations": 61,
+          "maximum_train_nll_increase": 0.0,
+          "restart": 0,
+          "train_nll": 10.86544014560815,
+          "validation_nll": 10.626747716404186
+        },
+        {
+          "converged": true,
+          "final_train_improvement": 0.16582604974973592,
+          "floor": 1e-05,
+          "iterations": 67,
+          "maximum_train_nll_increase": 0.0,
+          "restart": 1,
+          "train_nll": 10.86544015152663,
+          "validation_nll": 10.626749562220931
+        },
+        {
+          "converged": true,
+          "final_train_improvement": 0.14097166157552898,
+          "floor": 1e-05,
+          "iterations": 63,
+          "maximum_train_nll_increase": 0.0,
+          "restart": 2,
+          "train_nll": 10.865440153132802,
+          "validation_nll": 10.626748367740305
+        },
+        {
+          "converged": true,
+          "final_train_improvement": 0.09828907348399696,
+          "floor": 0.001,
+          "iterations": 61,
+          "maximum_train_nll_increase": 0.0,
+          "restart": 0,
+          "train_nll": 10.86544014560815,
+          "validation_nll": 10.626747716404186
+        },
+        {
+          "converged": true,
+          "final_train_improvement": 0.16582604974973592,
+          "floor": 0.001,
+          "iterations": 67,
+          "maximum_train_nll_increase": 0.0,
+          "restart": 1,
+          "train_nll": 10.86544015152663,
+          "validation_nll": 10.626749562220931
+        },
+        {
+          "converged": true,
+          "final_train_improvement": 0.14097166157552898,
+          "floor": 0.001,
+          "iterations": 63,
+          "maximum_train_nll_increase": 0.0,
+          "restart": 2,
+          "train_nll": 10.865440153132802,
+          "validation_nll": 10.626748367740305
+        }
+      ],
+      "selected": {
+        "converged": true,
+        "floor": 1e-05,
+        "iterations": 61,
+        "restart": 0,
+        "train_nll": 10.86544014560815,
+        "validation_nll": 10.626747716404186
+      }
+    },
+    "near_zero_uniqueness": {
+      "candidates": [
+        {
+          "converged": false,
+          "final_train_improvement": 4.269150966028002,
+          "floor": 1e-05,
+          "iterations": 250,
+          "maximum_train_nll_increase": 0.0,
+          "restart": 0,
+          "train_nll": -4.363440627524428,
+          "validation_nll": -4.305790935404623
+        },
+        {
+          "converged": false,
+          "final_train_improvement": 3.4224592159496994,
+          "floor": 1e-05,
+          "iterations": 250,
+          "maximum_train_nll_increase": 0.0,
+          "restart": 1,
+          "train_nll": -4.307050398507251,
+          "validation_nll": -4.231599577425562
+        },
+        {
+          "converged": false,
+          "final_train_improvement": 6.4789362613134625,
+          "floor": 1e-05,
+          "iterations": 250,
+          "maximum_train_nll_increase": 0.0,
+          "restart": 2,
+          "train_nll": -4.2947859698320805,
+          "validation_nll": -4.219431618879133
+        },
+        {
+          "converged": false,
+          "final_train_improvement": 1.9610620277332202,
+          "floor": 0.001,
+          "iterations": 250,
+          "maximum_train_nll_increase": 0.0,
+          "restart": 0,
+          "train_nll": -2.0553516892296453,
+          "validation_nll": -1.9864104654639325
+        },
+        {
+          "converged": false,
+          "final_train_improvement": 1.5008859541201387,
+          "floor": 0.001,
+          "iterations": 250,
+          "maximum_train_nll_increase": 0.0,
+          "restart": 1,
+          "train_nll": -2.0255068241962104,
+          "validation_nll": -1.943593694155639
+        },
+        {
+          "converged": false,
+          "final_train_improvement": 4.110473107035987,
+          "floor": 0.001,
+          "iterations": 250,
+          "maximum_train_nll_increase": 0.0,
+          "restart": 2,
+          "train_nll": -2.0215961672157823,
+          "validation_nll": -1.9398246097178076
+        }
+      ],
+      "selected": {
+        "converged": false,
+        "floor": 1e-05,
+        "iterations": 250,
+        "restart": 0,
+        "train_nll": -4.363440627524428,
+        "validation_nll": -4.305790935404623
+      }
+    },
+    "outliers": {
+      "candidates": [
+        {
+          "converged": true,
+          "final_train_improvement": 0.062117326979702625,
+          "floor": 1e-05,
+          "iterations": 27,
+          "maximum_train_nll_increase": 0.0,
+          "restart": 0,
+          "train_nll": 12.275540087179547,
+          "validation_nll": 12.184854855071798
+        },
+        {
+          "converged": true,
+          "final_train_improvement": 0.07723380052082796,
+          "floor": 1e-05,
+          "iterations": 33,
+          "maximum_train_nll_increase": 0.0,
+          "restart": 1,
+          "train_nll": 12.275540262667052,
+          "validation_nll": 12.185262458909696
+        },
+        {
+          "converged": true,
+          "final_train_improvement": 0.07853906848450443,
+          "floor": 1e-05,
+          "iterations": 28,
+          "maximum_train_nll_increase": 0.0,
+          "restart": 2,
+          "train_nll": 12.275540280311134,
+          "validation_nll": 12.185255458405585
+        },
+        {
+          "converged": true,
+          "final_train_improvement": 0.062117326979702625,
+          "floor": 0.001,
+          "iterations": 27,
+          "maximum_train_nll_increase": 0.0,
+          "restart": 0,
+          "train_nll": 12.275540087179547,
+          "validation_nll": 12.184854855071798
+        },
+        {
+          "converged": true,
+          "final_train_improvement": 0.07723380052082796,
+          "floor": 0.001,
+          "iterations": 33,
+          "maximum_train_nll_increase": 0.0,
+          "restart": 1,
+          "train_nll": 12.275540262667052,
+          "validation_nll": 12.185262458909696
+        },
+        {
+          "converged": true,
+          "final_train_improvement": 0.07853906848450443,
+          "floor": 0.001,
+          "iterations": 28,
+          "maximum_train_nll_increase": 0.0,
+          "restart": 2,
+          "train_nll": 12.275540280311134,
+          "validation_nll": 12.185255458405585
+        }
+      ],
+      "selected": {
+        "converged": true,
+        "floor": 1e-05,
+        "iterations": 27,
+        "restart": 0,
+        "train_nll": 12.275540087179547,
+        "validation_nll": 12.184854855071798
+      }
+    },
+    "repeated_signal_eigenvalues": {
+      "candidates": [
+        {
+          "converged": true,
+          "final_train_improvement": 0.0005778292212728076,
+          "floor": 1e-05,
+          "iterations": 12,
+          "maximum_train_nll_increase": 0.0,
+          "restart": 0,
+          "train_nll": 8.805940612253991,
+          "validation_nll": 8.940289528920495
+        },
+        {
+          "converged": false,
+          "final_train_improvement": 0.021554397207593112,
+          "floor": 1e-05,
+          "iterations": 250,
+          "maximum_train_nll_increase": 0.0,
+          "restart": 1,
+          "train_nll": 9.073946080959278,
+          "validation_nll": 9.193160455523818
+        },
+        {
+          "converged": false,
+          "final_train_improvement": 0.00010401694534500905,
+          "floor": 1e-05,
+          "iterations": 250,
+          "maximum_train_nll_increase": 0.0,
+          "restart": 2,
+          "train_nll": 9.437154461629934,
+          "validation_nll": 9.495567059083832
+        },
+        {
+          "converged": true,
+          "final_train_improvement": 0.0005778292212728076,
+          "floor": 0.001,
+          "iterations": 12,
+          "maximum_train_nll_increase": 0.0,
+          "restart": 0,
+          "train_nll": 8.805940612253991,
+          "validation_nll": 8.940289528920495
+        },
+        {
+          "converged": false,
+          "final_train_improvement": 0.03269145817028374,
+          "floor": 0.001,
+          "iterations": 250,
+          "maximum_train_nll_increase": 0.0,
+          "restart": 1,
+          "train_nll": 9.061377855398653,
+          "validation_nll": 9.176960226847187
+        },
+        {
+          "converged": false,
+          "final_train_improvement": 0.4311610790352667,
+          "floor": 0.001,
+          "iterations": 250,
+          "maximum_train_nll_increase": 0.0,
+          "restart": 2,
+          "train_nll": 9.003505468622826,
+          "validation_nll": 9.104171020934809
+        }
+      ],
+      "selected": {
+        "converged": true,
+        "floor": 1e-05,
+        "iterations": 12,
+        "restart": 0,
+        "train_nll": 8.805940612253991,
+        "validation_nll": 8.940289528920495
+      }
+    }
+  },
+  "failure_conditions": {
+    "correlated_residuals": {
+      "fa_loading_subspace_max_angle_degrees": 11.213255062291855,
+      "fa_result_status": "converged_bounded_fit",
+      "fa_selected_converged": true,
+      "fa_test_gaussian_nll": 10.601400829322667,
+      "fa_test_reconstruction_mse": 0.6201944343023529,
+      "pca_population_subspace_max_angle_degrees": 10.265737703973187,
+      "pca_test_reconstruction_mse": 0.512467345909171,
+      "ppca_population_subspace_max_angle_degrees": 10.265737703973187,
+      "reference_method": "oracle_true_gaussian",
+      "reference_test_gaussian_nll": 10.275038713137786
+    },
+    "high_variance_nuisance": {
+      "fa_loading_subspace_max_angle_degrees": 85.84046512217786,
+      "fa_result_status": "bounded_optimizer_nonconvergence_computational_failure",
+      "fa_selected_converged": false,
+      "fa_test_gaussian_nll": 12.157475952690806,
+      "fa_test_reconstruction_mse": 0.7274609090071824,
+      "pca_population_subspace_max_angle_degrees": 4.629212448508891,
+      "pca_test_reconstruction_mse": 0.6515201364289563,
+      "ppca_population_subspace_max_angle_degrees": 4.629212448508891,
+      "reference_method": "oracle_true_gaussian",
+      "reference_test_gaussian_nll": 11.606970390273853
+    },
+    "interpretation": {
+      "correlated_residuals": "Diagonal-noise FA is misspecified; its fitted diagonal residual cannot reproduce true residual off-diagonals.",
+      "high_variance_nuisance": "The selected FA fit reached the fixed iteration bound; its FA result is a bounded optimizer nonconvergence/computational failure, not evidence of method-level population failure. PCA is scored against its population principal-subspace target.",
+      "near_zero_uniqueness": "The selected FA fit reached the fixed iteration bound near the uniqueness boundary; this is recorded as bounded optimizer nonconvergence/computational failure. The floor remains a numerical/modeling choice.",
+      "outliers": "Gaussian likelihood and covariance estimators are intentionally exposed to non-Gaussian contamination; the nominal oracle is not a contamination model.",
+      "repeated_signal_eigenvalues": "Only the complete rank-two eigenspace is compared; displayed axes within it are not treated as identified."
+    },
+    "matched_diagonal": {
+      "fa_loading_subspace_max_angle_degrees": 3.9800444724481685,
+      "fa_result_status": "converged_bounded_fit",
+      "fa_selected_converged": true,
+      "fa_test_gaussian_nll": 10.960264040514712,
+      "fa_test_reconstruction_mse": 0.6564573305138285,
+      "pca_population_subspace_max_angle_degrees": 3.6975371314067424,
+      "pca_test_reconstruction_mse": 0.5606837543931831,
+      "ppca_population_subspace_max_angle_degrees": 3.6975371314067424,
+      "reference_method": "oracle_true_gaussian",
+      "reference_test_gaussian_nll": 10.941333080148045
+    },
+    "near_zero_uniqueness": {
+      "fa_loading_subspace_max_angle_degrees": 1.1398502469434952,
+      "fa_result_status": "bounded_optimizer_nonconvergence_computational_failure",
+      "fa_selected_converged": false,
+      "fa_test_gaussian_nll": -4.4222066834403195,
+      "fa_test_reconstruction_mse": 0.030768616646913965,
+      "pca_population_subspace_max_angle_degrees": 1.302827971717441,
+      "pca_test_reconstruction_mse": 0.025160148128058786,
+      "ppca_population_subspace_max_angle_degrees": 1.302827971717441,
+      "reference_method": "oracle_true_gaussian",
+      "reference_test_gaussian_nll": -4.443915957414511
+    },
+    "outliers": {
+      "fa_loading_subspace_max_angle_degrees": 11.82401817530228,
+      "fa_result_status": "converged_bounded_fit",
+      "fa_selected_converged": true,
+      "fa_test_gaussian_nll": 12.0107201758163,
+      "fa_test_reconstruction_mse": 0.8075264097016123,
+      "pca_population_subspace_max_angle_degrees": 8.707220869206301,
+      "pca_test_reconstruction_mse": 0.6959019385841968,
+      "ppca_population_subspace_max_angle_degrees": 8.707220869206301,
+      "reference_method": "nominal_clean_gaussian_reference",
+      "reference_test_gaussian_nll": 12.188945529890713
+    },
+    "repeated_signal_eigenvalues": {
+      "fa_loading_subspace_max_angle_degrees": 1.1791605353174162,
+      "fa_result_status": "converged_bounded_fit",
+      "fa_selected_converged": true,
+      "fa_test_gaussian_nll": 8.803339883855198,
+      "fa_test_reconstruction_mse": 0.23028582564895908,
+      "pca_population_subspace_max_angle_degrees": 1.4458818953948531,
+      "pca_test_reconstruction_mse": 0.22393485389128395,
+      "ppca_population_subspace_max_angle_degrees": 1.4458818953948531,
+      "reference_method": "oracle_true_gaussian",
+      "reference_test_gaussian_nll": 8.775699657412867
+    }
+  },
+  "fixed_and_random_projections": {
+    "fit_policy": "fixed before observing outcomes; no fitting or selection on validation/test data",
+    "fixed_orthonormal_basis": [
+      [
+        1.0,
+        0.0
+      ],
+      [
+        0.0,
+        1.0
+      ],
+      [
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0
+      ]
+    ],
+    "random_bases": [
+      [
+        [
+          -0.18880724979833663,
+          -0.6398407638272563
+        ],
+        [
+          0.2895309977530012,
+          0.39709357404153633
+        ],
+        [
+          -0.48628546468056727,
+          -0.10878759589629969
+        ],
+        [
+          -0.38811808058108355,
+          0.09692222237979345
+        ],
+        [
+          -0.17954498281651504,
+          0.04692812601440681
+        ],
+        [
+          -0.13330925076652,
+          -0.3667380174386027
+        ],
+        [
+          0.17737673743246704,
+          0.16160941108005353
+        ],
+        [
+          0.641828763731808,
+          -0.4988739399811086
+        ]
+      ],
+      [
+        [
+          -0.06458324857837128,
+          0.14455270375478563
+        ],
+        [
+          0.007651918916098845,
+          -0.20008236379666058
+        ],
+        [
+          0.4805101011069626,
+          0.6445152720698707
+        ],
+        [
+          0.17694850694036235,
+          0.2979965039905858
+        ],
+        [
+          -0.029949053159631783,
+          -0.29345449532863077
+        ],
+        [
+          -0.7828579354851984,
+          0.2697578473725701
+        ],
+        [
+          -0.32665786212357745,
+          0.5060589120483541
+        ],
+        [
+          0.11445902734719975,
+          0.14102925831749788
+        ]
+      ],
+      [
+        [
+          0.08411603994384698,
+          -0.1291612308810896
+        ],
+        [
+          0.3561841641044152,
+          0.5259102162051825
+        ],
+        [
+          -0.5634979693117264,
+          0.17469912229691606
+        ],
+        [
+          -0.20567661924153957,
+          -0.11071485267358233
+        ],
+        [
+          -0.2803205330926845,
+          -0.2687012918833533
+        ],
+        [
+          0.5543713259654184,
+          0.06066077026274466
+        ],
+        [
+          0.33853026868447855,
+          -0.4873309712353183
+        ],
+        [
+          -0.07559489931686889,
+          0.5921035974900368
+        ]
+      ],
+      [
+        [
+          -0.12883585639639672,
+          0.17122861653589527
+        ],
+        [
+          0.22387993302192463,
+          -0.08306200547915767
+        ],
+        [
+          -0.45386576704187154,
+          0.018457065257329475
+        ],
+        [
+          0.19961852118134907,
+          0.624252154208661
+        ],
+        [
+          0.3649215540931298,
+          -0.272036222017774
+        ],
+        [
+          -0.18729150957409496,
+          0.3842005054962316
+        ],
+        [
+          0.07791476954995474,
+          0.5893353571163122
+        ],
+        [
+          -0.7163245407573716,
+          -0.06942730854815829
+        ]
+      ],
+      [
+        [
+          -0.2712402286003093,
+          0.4435542474340269
+        ],
+        [
+          -0.4286903311996705,
+          0.09955467080206015
+        ],
+        [
+          -0.6767941841369055,
+          0.27707891548020686
+        ],
+        [
+          -0.2108505227225105,
+          -0.3866802595858725
+        ],
+        [
+          -0.058892411501985584,
+          -0.3144960914858628
+        ],
+        [
+          -0.35880520122115533,
+          -0.4140838031182212
+        ],
+        [
+          -0.30530067816491113,
+          -0.12278340244719113
+        ],
+        [
+          -0.12135499605309132,
+          -0.5306648632295144
+        ]
+      ],
+      [
+        [
+          0.15803188202724416,
+          0.267468544030115
+        ],
+        [
+          -0.7695760222341522,
+          0.21490698765948765
+        ],
+        [
+          0.2558806094989677,
+          0.8396833283358308
+        ],
+        [
+          -0.20257568565956294,
+          0.34736640950470654
+        ],
+        [
+          0.22036944443984235,
+          0.06537586004028528
+        ],
+        [
+          -0.4114469845207211,
+          -0.043233358059077166
+        ],
+        [
+          0.24134252341859672,
+          -0.22323734654526162
+        ],
+        [
+          -0.013013408592929971,
+          -0.02379098683459731
+        ]
+      ],
+      [
+        [
+          0.7695415904443754,
+          -0.4430564534639889
+        ],
+        [
+          -0.25156121663926234,
+          0.21453664550561544
+        ],
+        [
+          0.1892406485291529,
+          0.6078022373348698
+        ],
+        [
+          -0.06239968088108151,
+          -0.31400139193476734
+        ],
+        [
+          -0.3455711357464474,
+          -0.3566884899292493
+        ],
+        [
+          -0.05508100701907608,
+          0.17028030831919283
+        ],
+        [
+          0.37503723638585407,
+          0.361366250610937
+        ],
+        [
+          0.2042319655642967,
+          0.053356757800408876
+        ]
+      ]
+    ],
+    "random_projection_count": 7
+  },
+  "generator": {
+    "ambient_dimension": 8,
+    "conditions": {
+      "correlated_residuals": {
+        "anderson_rubin_sufficient_rank_pass": true,
+        "diagonal_residual_specification_applicable": false,
+        "loading": [
+          [
+            1.0540925533894598,
+            0.11183672662065199
+          ],
+          [
+            0.7378647873726218,
+            -0.3818425380333689
+          ],
+          [
+            0.42163702135578396,
+            0.7061690452332594
+          ],
+          [
+            -0.632455532033676,
+            0.5943323186126076
+          ],
+          [
+            0.948683298050514,
+            0.186927100208804
+          ],
+          [
+            -0.21081851067789198,
+            -0.6406646767840205
+          ],
+          [
+            0.5270462766947299,
+            -0.30355682939891243
+          ],
+          [
+            -0.7378647873726218,
+            -0.12142273175956501
+          ]
+        ],
+        "outlier_fraction": 0.0,
+        "outlier_scale": 0.0,
+        "residual_covariance": [
+          [
+            0.12,
+            0.0650661202162846,
+            0.0345671992501562,
+            0.017781119999999997,
+            0.009018551811122138,
+            0.00441264386266473,
+            0.0021258928531315852,
+            0.0010101727456970425
+          ],
+          [
+            0.06506612021628459,
+            0.19999999999999998,
+            0.10625252938165754,
+            0.05465554098167905,
+            0.027721191247130773,
+            0.013563568407019737,
+            0.006534561599999999,
+            0.0031050652546644967
+          ],
+          [
+            0.0345671992501562,
+            0.10625252938165754,
+            0.32,
+            0.16460571071502955,
+            0.08348771789910177,
+            0.040849304157794405,
+            0.01968009349207061,
+            0.009351503322086265
+          ],
+          [
+            0.017781119999999997,
+            0.05465554098167906,
+            0.16460571071502958,
+            0.48,
+            0.2434551293359826,
+            0.11911898992184242,
+            0.05738831803076301,
+            0.027269537460777524
+          ],
+          [
+            0.009018551811122136,
+            0.02772119124713077,
+            0.08348771789910177,
+            0.24345512933598257,
+            0.7000000000000001,
+            0.3424996350363019,
+            0.16500709075673078,
+            0.07840736925366135
+          ],
+          [
+            0.00441264386266473,
+            0.013563568407019737,
+            0.040849304157794405,
+            0.11911898992184242,
+            0.3424996350363019,
+            0.9499999999999998,
+            0.4576843890717707,
+            0.21748052602474546
+          ],
+          [
+            0.0021258928531315852,
+            0.006534561599999999,
+            0.019680093492070606,
+            0.05738831803076301,
+            0.1650070907567308,
+            0.45768438907177067,
+            1.2500000000000002,
+            0.5939696961966999
+          ],
+          [
+            0.0010101727456970425,
+            0.0031050652546644967,
+            0.009351503322086265,
+            0.027269537460777524,
+            0.07840736925366135,
+            0.21748052602474544,
+            0.5939696961966999,
+            1.6
+          ]
+        ],
+        "uniqueness_metrics_identified_and_reported": false
+      },
+      "high_variance_nuisance": {
+        "anderson_rubin_sufficient_rank_pass": true,
+        "diagonal_residual_specification_applicable": true,
+        "loading": [
+          [
+            1.0540925533894598,
+            0.11183672662065199
+          ],
+          [
+            0.7378647873726218,
+            -0.3818425380333689
+          ],
+          [
+            0.42163702135578396,
+            0.7061690452332594
+          ],
+          [
+            -0.632455532033676,
+            0.5943323186126076
+          ],
+          [
+            0.948683298050514,
+            0.186927100208804
+          ],
+          [
+            -0.21081851067789198,
+            -0.6406646767840205
+          ],
+          [
+            0.5270462766947299,
+            -0.30355682939891243
+          ],
+          [
+            -0.7378647873726218,
+            -0.12142273175956501
+          ]
+        ],
+        "outlier_fraction": 0.0,
+        "outlier_scale": 0.0,
+        "residual_covariance": [
+          [
+            0.12,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.2,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            0.32,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            0.48,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.7,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.95,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            1.25,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            7.5
+          ]
+        ],
+        "uniqueness_metrics_identified_and_reported": true
+      },
+      "matched_diagonal": {
+        "anderson_rubin_sufficient_rank_pass": true,
+        "diagonal_residual_specification_applicable": true,
+        "loading": [
+          [
+            1.0540925533894598,
+            0.11183672662065199
+          ],
+          [
+            0.7378647873726218,
+            -0.3818425380333689
+          ],
+          [
+            0.42163702135578396,
+            0.7061690452332594
+          ],
+          [
+            -0.632455532033676,
+            0.5943323186126076
+          ],
+          [
+            0.948683298050514,
+            0.186927100208804
+          ],
+          [
+            -0.21081851067789198,
+            -0.6406646767840205
+          ],
+          [
+            0.5270462766947299,
+            -0.30355682939891243
+          ],
+          [
+            -0.7378647873726218,
+            -0.12142273175956501
+          ]
+        ],
+        "outlier_fraction": 0.0,
+        "outlier_scale": 0.0,
+        "residual_covariance": [
+          [
+            0.12,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.2,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            0.32,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            0.48,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.7,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.95,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            1.25,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            1.6
+          ]
+        ],
+        "uniqueness_metrics_identified_and_reported": true
+      },
+      "near_zero_uniqueness": {
+        "anderson_rubin_sufficient_rank_pass": true,
+        "diagonal_residual_specification_applicable": true,
+        "loading": [
+          [
+            1.0540925533894598,
+            0.11183672662065199
+          ],
+          [
+            0.7378647873726218,
+            -0.3818425380333689
+          ],
+          [
+            0.42163702135578396,
+            0.7061690452332594
+          ],
+          [
+            -0.632455532033676,
+            0.5943323186126076
+          ],
+          [
+            0.948683298050514,
+            0.186927100208804
+          ],
+          [
+            -0.21081851067789198,
+            -0.6406646767840205
+          ],
+          [
+            0.5270462766947299,
+            -0.30355682939891243
+          ],
+          [
+            -0.7378647873726218,
+            -0.12142273175956501
+          ]
+        ],
+        "outlier_fraction": 0.0,
+        "outlier_scale": 0.0,
+        "residual_covariance": [
+          [
+            1e-05,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            2e-05,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            5e-05,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            0.0001,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.02,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.04,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.08,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.12
+          ]
+        ],
+        "uniqueness_metrics_identified_and_reported": true
+      },
+      "outliers": {
+        "anderson_rubin_sufficient_rank_pass": true,
+        "diagonal_residual_specification_applicable": false,
+        "loading": [
+          [
+            1.0540925533894598,
+            0.11183672662065199
+          ],
+          [
+            0.7378647873726218,
+            -0.3818425380333689
+          ],
+          [
+            0.42163702135578396,
+            0.7061690452332594
+          ],
+          [
+            -0.632455532033676,
+            0.5943323186126076
+          ],
+          [
+            0.948683298050514,
+            0.186927100208804
+          ],
+          [
+            -0.21081851067789198,
+            -0.6406646767840205
+          ],
+          [
+            0.5270462766947299,
+            -0.30355682939891243
+          ],
+          [
+            -0.7378647873726218,
+            -0.12142273175956501
+          ]
+        ],
+        "outlier_fraction": 0.025,
+        "outlier_scale": 9.0,
+        "residual_covariance": [
+          [
+            0.12,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.2,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            0.32,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            0.48,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.7,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.95,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            1.25,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            1.6
+          ]
+        ],
+        "uniqueness_metrics_identified_and_reported": false
+      },
+      "repeated_signal_eigenvalues": {
+        "anderson_rubin_sufficient_rank_pass": true,
+        "diagonal_residual_specification_applicable": true,
+        "loading": [
+          [
+            0.8696263565463043,
+            0.1476244791392606
+          ],
+          [
+            0.608738449582413,
+            -0.5040321502040469
+          ],
+          [
+            0.3478505426185218,
+            0.9321431397079024
+          ],
+          [
+            -0.5217758139277827,
+            0.784518660568642
+          ],
+          [
+            0.782663720891674,
+            0.24674377227562125
+          ],
+          [
+            -0.1739252713092609,
+            -0.8456773733549069
+          ],
+          [
+            0.43481317827315213,
+            -0.4006950148065644
+          ],
+          [
+            -0.608738449582413,
+            -0.1602780059226258
+          ]
+        ],
+        "outlier_fraction": 0.0,
+        "outlier_scale": 0.0,
+        "residual_covariance": [
+          [
+            0.3,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.3,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            0.3,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            0.3,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.3,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.3,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.3,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.3
+          ]
+        ],
+        "uniqueness_metrics_identified_and_reported": true
+      }
+    },
+    "equation": "x = mean + Lambda z + epsilon; z ~ N(0,I_2)",
+    "independent_splits": true,
+    "latent_rank": 2,
+    "retained_latent_truth": true,
+    "split_sizes": {
+      "test": 500,
+      "train": 700,
+      "validation": 350
+    }
+  },
+  "leakage_and_generation": {
+    "independent_split_regeneration": {
+      "all_exact": true,
+      "any_train_validation_prefix_arrays_equal": false,
+      "checks": {
+        "correlated_residuals:test": {
+          "latent_max_abs": 0.0,
+          "observed_max_abs": 0.0,
+          "outlier_mask_equal": true
+        },
+        "correlated_residuals:train": {
+          "latent_max_abs": 0.0,
+          "observed_max_abs": 0.0,
+          "outlier_mask_equal": true
+        },
+        "correlated_residuals:validation": {
+          "latent_max_abs": 0.0,
+          "observed_max_abs": 0.0,
+          "outlier_mask_equal": true
+        },
+        "high_variance_nuisance:test": {
+          "latent_max_abs": 0.0,
+          "observed_max_abs": 0.0,
+          "outlier_mask_equal": true
+        },
+        "high_variance_nuisance:train": {
+          "latent_max_abs": 0.0,
+          "observed_max_abs": 0.0,
+          "outlier_mask_equal": true
+        },
+        "high_variance_nuisance:validation": {
+          "latent_max_abs": 0.0,
+          "observed_max_abs": 0.0,
+          "outlier_mask_equal": true
+        },
+        "matched_diagonal:test": {
+          "latent_max_abs": 0.0,
+          "observed_max_abs": 0.0,
+          "outlier_mask_equal": true
+        },
+        "matched_diagonal:train": {
+          "latent_max_abs": 0.0,
+          "observed_max_abs": 0.0,
+          "outlier_mask_equal": true
+        },
+        "matched_diagonal:validation": {
+          "latent_max_abs": 0.0,
+          "observed_max_abs": 0.0,
+          "outlier_mask_equal": true
+        },
+        "near_zero_uniqueness:test": {
+          "latent_max_abs": 0.0,
+          "observed_max_abs": 0.0,
+          "outlier_mask_equal": true
+        },
+        "near_zero_uniqueness:train": {
+          "latent_max_abs": 0.0,
+          "observed_max_abs": 0.0,
+          "outlier_mask_equal": true
+        },
+        "near_zero_uniqueness:validation": {
+          "latent_max_abs": 0.0,
+          "observed_max_abs": 0.0,
+          "outlier_mask_equal": true
+        },
+        "outliers:test": {
+          "latent_max_abs": 0.0,
+          "observed_max_abs": 0.0,
+          "outlier_mask_equal": true
+        },
+        "outliers:train": {
+          "latent_max_abs": 0.0,
+          "observed_max_abs": 0.0,
+          "outlier_mask_equal": true
+        },
+        "outliers:validation": {
+          "latent_max_abs": 0.0,
+          "observed_max_abs": 0.0,
+          "outlier_mask_equal": true
+        },
+        "repeated_signal_eigenvalues:test": {
+          "latent_max_abs": 0.0,
+          "observed_max_abs": 0.0,
+          "outlier_mask_equal": true
+        },
+        "repeated_signal_eigenvalues:train": {
+          "latent_max_abs": 0.0,
+          "observed_max_abs": 0.0,
+          "outlier_mask_equal": true
+        },
+        "repeated_signal_eigenvalues:validation": {
+          "latent_max_abs": 0.0,
+          "observed_max_abs": 0.0,
+          "outlier_mask_equal": true
+        }
+      }
+    },
+    "poison_regressions": {
+      "correlated_residuals": {
+        "latent_truth_poison": {
+          "fa_candidate_parameter_max_abs_discrepancy": 0.0,
+          "fa_candidate_selection_record_max_abs_discrepancy": 0.0,
+          "fa_candidates": {
+            "0": {
+              "parameter_max_abs_discrepancy": 0.0,
+              "selection_record_max_abs_discrepancy": 0.0
+            },
+            "1": {
+              "parameter_max_abs_discrepancy": 0.0,
+              "selection_record_max_abs_discrepancy": 0.0
+            },
+            "2": {
+              "parameter_max_abs_discrepancy": 0.0,
+              "selection_record_max_abs_discrepancy": 0.0
+            },
+            "3": {
+              "parameter_max_abs_discrepancy": 0.0,
+              "selection_record_max_abs_discrepancy": 0.0
+            },
+            "4": {
+              "parameter_max_abs_discrepancy": 0.0,
+              "selection_record_max_abs_discrepancy": 0.0
+            },
+            "5": {
+              "parameter_max_abs_discrepancy": 0.0,
+              "selection_record_max_abs_discrepancy": 0.0
+            }
+          },
+          "fa_selected_index_unchanged": true,
+          "fa_selected_parameters": {
+            "covariance": 0.0,
+            "loading": 0.0,
+            "maximum": 0.0,
+            "mean": 0.0,
+            "uniqueness": 0.0
+          },
+          "overall_max_abs_discrepancy": 0.0,
+          "pca_fitted_parameters": {
+            "basis": 0.0,
+            "eigenvalues": 0.0,
+            "maximum": 0.0,
+            "mean": 0.0,
+            "sample_covariance": 0.0
+          },
+          "poisoned_all_latent_arrays_norm": 9694004.833307652,
+          "ppca_fitted_parameters": {
+            "basis": 0.0,
+            "covariance": 0.0,
+            "loading": 0.0,
+            "maximum": 0.0,
+            "mean": 0.0,
+            "noise_variance": 0.0
+          },
+          "test_reconstruction_max_abs_discrepancy": 0.0,
+          "test_reconstructions_by_method_max_abs_discrepancy": {
+            "fa_candidate_0": 0.0,
+            "fa_candidate_1": 0.0,
+            "fa_candidate_2": 0.0,
+            "fa_candidate_3": 0.0,
+            "fa_candidate_4": 0.0,
+            "fa_candidate_5": 0.0,
+            "fa_selected": 0.0,
+            "pca": 0.0,
+            "ppca": 0.0
+          }
+        },
+        "test_observation_poison": {
+          "fa_candidate_parameter_max_abs_discrepancy": 0.0,
+          "fa_candidate_selection_record_max_abs_discrepancy": 0.0,
+          "fa_candidates": {
+            "0": {
+              "parameter_max_abs_discrepancy": 0.0,
+              "selection_record_max_abs_discrepancy": 0.0
+            },
+            "1": {
+              "parameter_max_abs_discrepancy": 0.0,
+              "selection_record_max_abs_discrepancy": 0.0
+            },
+            "2": {
+              "parameter_max_abs_discrepancy": 0.0,
+              "selection_record_max_abs_discrepancy": 0.0
+            },
+            "3": {
+              "parameter_max_abs_discrepancy": 0.0,
+              "selection_record_max_abs_discrepancy": 0.0
+            },
+            "4": {
+              "parameter_max_abs_discrepancy": 0.0,
+              "selection_record_max_abs_discrepancy": 0.0
+            },
+            "5": {
+              "parameter_max_abs_discrepancy": 0.0,
+              "selection_record_max_abs_discrepancy": 0.0
+            }
+          },
+          "fa_selected_index_unchanged": true,
+          "fa_selected_parameters": {
+            "covariance": 0.0,
+            "loading": 0.0,
+            "maximum": 0.0,
+            "mean": 0.0,
+            "uniqueness": 0.0
+          },
+          "overall_max_abs_discrepancy": 0.0,
+          "pca_fitted_parameters": {
+            "basis": 0.0,
+            "eigenvalues": 0.0,
+            "maximum": 0.0,
+            "mean": 0.0,
+            "sample_covariance": 0.0
+          },
+          "poisoned_test_norm": 635634.0380069593,
+          "ppca_fitted_parameters": {
+            "basis": 0.0,
+            "covariance": 0.0,
+            "loading": 0.0,
+            "maximum": 0.0,
+            "mean": 0.0,
+            "noise_variance": 0.0
+          },
+          "test_reconstruction_max_abs_discrepancy": 0.0,
+          "test_reconstructions_by_method_max_abs_discrepancy": {
+            "fa_candidate_0": 0.0,
+            "fa_candidate_1": 0.0,
+            "fa_candidate_2": 0.0,
+            "fa_candidate_3": 0.0,
+            "fa_candidate_4": 0.0,
+            "fa_candidate_5": 0.0,
+            "fa_selected": 0.0,
+            "pca": 0.0,
+            "ppca": 0.0
+          }
+        }
+      },
+      "high_variance_nuisance": {
+        "latent_truth_poison": {
+          "fa_candidate_parameter_max_abs_discrepancy": 0.0,
+          "fa_candidate_selection_record_max_abs_discrepancy": 0.0,
+          "fa_candidates": {
+            "0": {
+              "parameter_max_abs_discrepancy": 0.0,
+              "selection_record_max_abs_discrepancy": 0.0
+            },
+            "1": {
+              "parameter_max_abs_discrepancy": 0.0,
+              "selection_record_max_abs_discrepancy": 0.0
+            },
+            "2": {
+              "parameter_max_abs_discrepancy": 0.0,
+              "selection_record_max_abs_discrepancy": 0.0
+            },
+            "3": {
+              "parameter_max_abs_discrepancy": 0.0,
+              "selection_record_max_abs_discrepancy": 0.0
+            },
+            "4": {
+              "parameter_max_abs_discrepancy": 0.0,
+              "selection_record_max_abs_discrepancy": 0.0
+            },
+            "5": {
+              "parameter_max_abs_discrepancy": 0.0,
+              "selection_record_max_abs_discrepancy": 0.0
+            }
+          },
+          "fa_selected_index_unchanged": true,
+          "fa_selected_parameters": {
+            "covariance": 0.0,
+            "loading": 0.0,
+            "maximum": 0.0,
+            "mean": 0.0,
+            "uniqueness": 0.0
+          },
+          "overall_max_abs_discrepancy": 0.0,
+          "pca_fitted_parameters": {
+            "basis": 0.0,
+            "eigenvalues": 0.0,
+            "maximum": 0.0,
+            "mean": 0.0,
+            "sample_covariance": 0.0
+          },
+          "poisoned_all_latent_arrays_norm": 9804777.459792055,
+          "ppca_fitted_parameters": {
+            "basis": 0.0,
+            "covariance": 0.0,
+            "loading": 0.0,
+            "maximum": 0.0,
+            "mean": 0.0,
+            "noise_variance": 0.0
+          },
+          "test_reconstruction_max_abs_discrepancy": 0.0,
+          "test_reconstructions_by_method_max_abs_discrepancy": {
+            "fa_candidate_0": 0.0,
+            "fa_candidate_1": 0.0,
+            "fa_candidate_2": 0.0,
+            "fa_candidate_3": 0.0,
+            "fa_candidate_4": 0.0,
+            "fa_candidate_5": 0.0,
+            "fa_selected": 0.0,
+            "pca": 0.0,
+            "ppca": 0.0
+          }
+        },
+        "test_observation_poison": {
+          "fa_candidate_parameter_max_abs_discrepancy": 0.0,
+          "fa_candidate_selection_record_max_abs_discrepancy": 0.0,
+          "fa_candidates": {
+            "0": {
+              "parameter_max_abs_discrepancy": 0.0,
+              "selection_record_max_abs_discrepancy": 0.0
+            },
+            "1": {
+              "parameter_max_abs_discrepancy": 0.0,
+              "selection_record_max_abs_discrepancy": 0.0
+            },
+            "2": {
+              "parameter_max_abs_discrepancy": 0.0,
+              "selection_record_max_abs_discrepancy": 0.0
+            },
+            "3": {
+              "parameter_max_abs_discrepancy": 0.0,
+              "selection_record_max_abs_discrepancy": 0.0
+            },
+            "4": {
+              "parameter_max_abs_discrepancy": 0.0,
+              "selection_record_max_abs_discrepancy": 0.0
+            },
+            "5": {
+              "parameter_max_abs_discrepancy": 0.0,
+              "selection_record_max_abs_discrepancy": 0.0
+            }
+          },
+          "fa_selected_index_unchanged": true,
+          "fa_selected_parameters": {
+            "covariance": 0.0,
+            "loading": 0.0,
+            "maximum": 0.0,
+            "mean": 0.0,
+            "uniqueness": 0.0
+          },
+          "overall_max_abs_discrepancy": 0.0,
+          "pca_fitted_parameters": {
+            "basis": 0.0,
+            "eigenvalues": 0.0,
+            "maximum": 0.0,
+            "mean": 0.0,
+            "sample_covariance": 0.0
+          },
+          "poisoned_test_norm": 634303.329152209,
+          "ppca_fitted_parameters": {
+            "basis": 0.0,
+            "covariance": 0.0,
+            "loading": 0.0,
+            "maximum": 0.0,
+            "mean": 0.0,
+            "noise_variance": 0.0
+          },
+          "test_reconstruction_max_abs_discrepancy": 0.0,
+          "test_reconstructions_by_method_max_abs_discrepancy": {
+            "fa_candidate_0": 0.0,
+            "fa_candidate_1": 0.0,
+            "fa_candidate_2": 0.0,
+            "fa_candidate_3": 0.0,
+            "fa_candidate_4": 0.0,
+            "fa_candidate_5": 0.0,
+            "fa_selected": 0.0,
+            "pca": 0.0,
+            "ppca": 0.0
+          }
+        }
+      },
+      "matched_diagonal": {
+        "latent_truth_poison": {
+          "fa_candidate_parameter_max_abs_discrepancy": 0.0,
+          "fa_candidate_selection_record_max_abs_discrepancy": 0.0,
+          "fa_candidates": {
+            "0": {
+              "parameter_max_abs_discrepancy": 0.0,
+              "selection_record_max_abs_discrepancy": 0.0
+            },
+            "1": {
+              "parameter_max_abs_discrepancy": 0.0,
+              "selection_record_max_abs_discrepancy": 0.0
+            },
+            "2": {
+              "parameter_max_abs_discrepancy": 0.0,
+              "selection_record_max_abs_discrepancy": 0.0
+            },
+            "3": {
+              "parameter_max_abs_discrepancy": 0.0,
+              "selection_record_max_abs_discrepancy": 0.0
+            },
+            "4": {
+              "parameter_max_abs_discrepancy": 0.0,
+              "selection_record_max_abs_discrepancy": 0.0
+            },
+            "5": {
+              "parameter_max_abs_discrepancy": 0.0,
+              "selection_record_max_abs_discrepancy": 0.0
+            }
+          },
+          "fa_selected_index_unchanged": true,
+          "fa_selected_parameters": {
+            "covariance": 0.0,
+            "loading": 0.0,
+            "maximum": 0.0,
+            "mean": 0.0,
+            "uniqueness": 0.0
+          },
+          "overall_max_abs_discrepancy": 0.0,
+          "pca_fitted_parameters": {
+            "basis": 0.0,
+            "eigenvalues": 0.0,
+            "maximum": 0.0,
+            "mean": 0.0,
+            "sample_covariance": 0.0
+          },
+          "poisoned_all_latent_arrays_norm": 9685159.975921985,
+          "ppca_fitted_parameters": {
+            "basis": 0.0,
+            "covariance": 0.0,
+            "loading": 0.0,
+            "maximum": 0.0,
+            "mean": 0.0,
+            "noise_variance": 0.0
+          },
+          "test_reconstruction_max_abs_discrepancy": 0.0,
+          "test_reconstructions_by_method_max_abs_discrepancy": {
+            "fa_candidate_0": 0.0,
+            "fa_candidate_1": 0.0,
+            "fa_candidate_2": 0.0,
+            "fa_candidate_3": 0.0,
+            "fa_candidate_4": 0.0,
+            "fa_candidate_5": 0.0,
+            "fa_selected": 0.0,
+            "pca": 0.0,
+            "ppca": 0.0
+          }
+        },
+        "test_observation_poison": {
+          "fa_candidate_parameter_max_abs_discrepancy": 0.0,
+          "fa_candidate_selection_record_max_abs_discrepancy": 0.0,
+          "fa_candidates": {
+            "0": {
+              "parameter_max_abs_discrepancy": 0.0,
+              "selection_record_max_abs_discrepancy": 0.0
+            },
+            "1": {
+              "parameter_max_abs_discrepancy": 0.0,
+              "selection_record_max_abs_discrepancy": 0.0
+            },
+            "2": {
+              "parameter_max_abs_discrepancy": 0.0,
+              "selection_record_max_abs_discrepancy": 0.0
+            },
+            "3": {
+              "parameter_max_abs_discrepancy": 0.0,
+              "selection_record_max_abs_discrepancy": 0.0
+            },
+            "4": {
+              "parameter_max_abs_discrepancy": 0.0,
+              "selection_record_max_abs_discrepancy": 0.0
+            },
+            "5": {
+              "parameter_max_abs_discrepancy": 0.0,
+              "selection_record_max_abs_discrepancy": 0.0
+            }
+          },
+          "fa_selected_index_unchanged": true,
+          "fa_selected_parameters": {
+            "covariance": 0.0,
+            "loading": 0.0,
+            "maximum": 0.0,
+            "mean": 0.0,
+            "uniqueness": 0.0
+          },
+          "overall_max_abs_discrepancy": 0.0,
+          "pca_fitted_parameters": {
+            "basis": 0.0,
+            "eigenvalues": 0.0,
+            "maximum": 0.0,
+            "mean": 0.0,
+            "sample_covariance": 0.0
+          },
+          "poisoned_test_norm": 635733.4636141493,
+          "ppca_fitted_parameters": {
+            "basis": 0.0,
+            "covariance": 0.0,
+            "loading": 0.0,
+            "maximum": 0.0,
+            "mean": 0.0,
+            "noise_variance": 0.0
+          },
+          "test_reconstruction_max_abs_discrepancy": 0.0,
+          "test_reconstructions_by_method_max_abs_discrepancy": {
+            "fa_candidate_0": 0.0,
+            "fa_candidate_1": 0.0,
+            "fa_candidate_2": 0.0,
+            "fa_candidate_3": 0.0,
+            "fa_candidate_4": 0.0,
+            "fa_candidate_5": 0.0,
+            "fa_selected": 0.0,
+            "pca": 0.0,
+            "ppca": 0.0
+          }
+        }
+      },
+      "near_zero_uniqueness": {
+        "latent_truth_poison": {
+          "fa_candidate_parameter_max_abs_discrepancy": 0.0,
+          "fa_candidate_selection_record_max_abs_discrepancy": 0.0,
+          "fa_candidates": {
+            "0": {
+              "parameter_max_abs_discrepancy": 0.0,
+              "selection_record_max_abs_discrepancy": 0.0
+            },
+            "1": {
+              "parameter_max_abs_discrepancy": 0.0,
+              "selection_record_max_abs_discrepancy": 0.0
+            },
+            "2": {
+              "parameter_max_abs_discrepancy": 0.0,
+              "selection_record_max_abs_discrepancy": 0.0
+            },
+            "3": {
+              "parameter_max_abs_discrepancy": 0.0,
+              "selection_record_max_abs_discrepancy": 0.0
+            },
+            "4": {
+              "parameter_max_abs_discrepancy": 0.0,
+              "selection_record_max_abs_discrepancy": 0.0
+            },
+            "5": {
+              "parameter_max_abs_discrepancy": 0.0,
+              "selection_record_max_abs_discrepancy": 0.0
+            }
+          },
+          "fa_selected_index_unchanged": true,
+          "fa_selected_parameters": {
+            "covariance": 0.0,
+            "loading": 0.0,
+            "maximum": 0.0,
+            "mean": 0.0,
+            "uniqueness": 0.0
+          },
+          "overall_max_abs_discrepancy": 0.0,
+          "pca_fitted_parameters": {
+            "basis": 0.0,
+            "eigenvalues": 0.0,
+            "maximum": 0.0,
+            "mean": 0.0,
+            "sample_covariance": 0.0
+          },
+          "poisoned_all_latent_arrays_norm": 9730243.093922324,
+          "ppca_fitted_parameters": {
+            "basis": 0.0,
+            "covariance": 0.0,
+            "loading": 0.0,
+            "maximum": 0.0,
+            "mean": 0.0,
+            "noise_variance": 0.0
+          },
+          "test_reconstruction_max_abs_discrepancy": 0.0,
+          "test_reconstructions_by_method_max_abs_discrepancy": {
+            "fa_candidate_0": 0.0,
+            "fa_candidate_1": 0.0,
+            "fa_candidate_2": 0.0,
+            "fa_candidate_3": 0.0,
+            "fa_candidate_4": 0.0,
+            "fa_candidate_5": 0.0,
+            "fa_selected": 0.0,
+            "pca": 0.0,
+            "ppca": 0.0
+          }
+        },
+        "test_observation_poison": {
+          "fa_candidate_parameter_max_abs_discrepancy": 0.0,
+          "fa_candidate_selection_record_max_abs_discrepancy": 0.0,
+          "fa_candidates": {
+            "0": {
+              "parameter_max_abs_discrepancy": 0.0,
+              "selection_record_max_abs_discrepancy": 0.0
+            },
+            "1": {
+              "parameter_max_abs_discrepancy": 0.0,
+              "selection_record_max_abs_discrepancy": 0.0
+            },
+            "2": {
+              "parameter_max_abs_discrepancy": 0.0,
+              "selection_record_max_abs_discrepancy": 0.0
+            },
+            "3": {
+              "parameter_max_abs_discrepancy": 0.0,
+              "selection_record_max_abs_discrepancy": 0.0
+            },
+            "4": {
+              "parameter_max_abs_discrepancy": 0.0,
+              "selection_record_max_abs_discrepancy": 0.0
+            },
+            "5": {
+              "parameter_max_abs_discrepancy": 0.0,
+              "selection_record_max_abs_discrepancy": 0.0
+            }
+          },
+          "fa_selected_index_unchanged": true,
+          "fa_selected_parameters": {
+            "covariance": 0.0,
+            "loading": 0.0,
+            "maximum": 0.0,
+            "mean": 0.0,
+            "uniqueness": 0.0
+          },
+          "overall_max_abs_discrepancy": 0.0,
+          "pca_fitted_parameters": {
+            "basis": 0.0,
+            "eigenvalues": 0.0,
+            "maximum": 0.0,
+            "mean": 0.0,
+            "sample_covariance": 0.0
+          },
+          "poisoned_test_norm": 634894.5901939281,
+          "ppca_fitted_parameters": {
+            "basis": 0.0,
+            "covariance": 0.0,
+            "loading": 0.0,
+            "maximum": 0.0,
+            "mean": 0.0,
+            "noise_variance": 0.0
+          },
+          "test_reconstruction_max_abs_discrepancy": 0.0,
+          "test_reconstructions_by_method_max_abs_discrepancy": {
+            "fa_candidate_0": 0.0,
+            "fa_candidate_1": 0.0,
+            "fa_candidate_2": 0.0,
+            "fa_candidate_3": 0.0,
+            "fa_candidate_4": 0.0,
+            "fa_candidate_5": 0.0,
+            "fa_selected": 0.0,
+            "pca": 0.0,
+            "ppca": 0.0
+          }
+        }
+      },
+      "outliers": {
+        "latent_truth_poison": {
+          "fa_candidate_parameter_max_abs_discrepancy": 0.0,
+          "fa_candidate_selection_record_max_abs_discrepancy": 0.0,
+          "fa_candidates": {
+            "0": {
+              "parameter_max_abs_discrepancy": 0.0,
+              "selection_record_max_abs_discrepancy": 0.0
+            },
+            "1": {
+              "parameter_max_abs_discrepancy": 0.0,
+              "selection_record_max_abs_discrepancy": 0.0
+            },
+            "2": {
+              "parameter_max_abs_discrepancy": 0.0,
+              "selection_record_max_abs_discrepancy": 0.0
+            },
+            "3": {
+              "parameter_max_abs_discrepancy": 0.0,
+              "selection_record_max_abs_discrepancy": 0.0
+            },
+            "4": {
+              "parameter_max_abs_discrepancy": 0.0,
+              "selection_record_max_abs_discrepancy": 0.0
+            },
+            "5": {
+              "parameter_max_abs_discrepancy": 0.0,
+              "selection_record_max_abs_discrepancy": 0.0
+            }
+          },
+          "fa_selected_index_unchanged": true,
+          "fa_selected_parameters": {
+            "covariance": 0.0,
+            "loading": 0.0,
+            "maximum": 0.0,
+            "mean": 0.0,
+            "uniqueness": 0.0
+          },
+          "overall_max_abs_discrepancy": 0.0,
+          "pca_fitted_parameters": {
+            "basis": 0.0,
+            "eigenvalues": 0.0,
+            "maximum": 0.0,
+            "mean": 0.0,
+            "sample_covariance": 0.0
+          },
+          "poisoned_all_latent_arrays_norm": 9677787.837581797,
+          "ppca_fitted_parameters": {
+            "basis": 0.0,
+            "covariance": 0.0,
+            "loading": 0.0,
+            "maximum": 0.0,
+            "mean": 0.0,
+            "noise_variance": 0.0
+          },
+          "test_reconstruction_max_abs_discrepancy": 0.0,
+          "test_reconstructions_by_method_max_abs_discrepancy": {
+            "fa_candidate_0": 0.0,
+            "fa_candidate_1": 0.0,
+            "fa_candidate_2": 0.0,
+            "fa_candidate_3": 0.0,
+            "fa_candidate_4": 0.0,
+            "fa_candidate_5": 0.0,
+            "fa_selected": 0.0,
+            "pca": 0.0,
+            "ppca": 0.0
+          }
+        },
+        "test_observation_poison": {
+          "fa_candidate_parameter_max_abs_discrepancy": 0.0,
+          "fa_candidate_selection_record_max_abs_discrepancy": 0.0,
+          "fa_candidates": {
+            "0": {
+              "parameter_max_abs_discrepancy": 0.0,
+              "selection_record_max_abs_discrepancy": 0.0
+            },
+            "1": {
+              "parameter_max_abs_discrepancy": 0.0,
+              "selection_record_max_abs_discrepancy": 0.0
+            },
+            "2": {
+              "parameter_max_abs_discrepancy": 0.0,
+              "selection_record_max_abs_discrepancy": 0.0
+            },
+            "3": {
+              "parameter_max_abs_discrepancy": 0.0,
+              "selection_record_max_abs_discrepancy": 0.0
+            },
+            "4": {
+              "parameter_max_abs_discrepancy": 0.0,
+              "selection_record_max_abs_discrepancy": 0.0
+            },
+            "5": {
+              "parameter_max_abs_discrepancy": 0.0,
+              "selection_record_max_abs_discrepancy": 0.0
+            }
+          },
+          "fa_selected_index_unchanged": true,
+          "fa_selected_parameters": {
+            "covariance": 0.0,
+            "loading": 0.0,
+            "maximum": 0.0,
+            "mean": 0.0,
+            "uniqueness": 0.0
+          },
+          "overall_max_abs_discrepancy": 0.0,
+          "pca_fitted_parameters": {
+            "basis": 0.0,
+            "eigenvalues": 0.0,
+            "maximum": 0.0,
+            "mean": 0.0,
+            "sample_covariance": 0.0
+          },
+          "poisoned_test_norm": 637168.2606424429,
+          "ppca_fitted_parameters": {
+            "basis": 0.0,
+            "covariance": 0.0,
+            "loading": 0.0,
+            "maximum": 0.0,
+            "mean": 0.0,
+            "noise_variance": 0.0
+          },
+          "test_reconstruction_max_abs_discrepancy": 0.0,
+          "test_reconstructions_by_method_max_abs_discrepancy": {
+            "fa_candidate_0": 0.0,
+            "fa_candidate_1": 0.0,
+            "fa_candidate_2": 0.0,
+            "fa_candidate_3": 0.0,
+            "fa_candidate_4": 0.0,
+            "fa_candidate_5": 0.0,
+            "fa_selected": 0.0,
+            "pca": 0.0,
+            "ppca": 0.0
+          }
+        }
+      },
+      "repeated_signal_eigenvalues": {
+        "latent_truth_poison": {
+          "fa_candidate_parameter_max_abs_discrepancy": 0.0,
+          "fa_candidate_selection_record_max_abs_discrepancy": 0.0,
+          "fa_candidates": {
+            "0": {
+              "parameter_max_abs_discrepancy": 0.0,
+              "selection_record_max_abs_discrepancy": 0.0
+            },
+            "1": {
+              "parameter_max_abs_discrepancy": 0.0,
+              "selection_record_max_abs_discrepancy": 0.0
+            },
+            "2": {
+              "parameter_max_abs_discrepancy": 0.0,
+              "selection_record_max_abs_discrepancy": 0.0
+            },
+            "3": {
+              "parameter_max_abs_discrepancy": 0.0,
+              "selection_record_max_abs_discrepancy": 0.0
+            },
+            "4": {
+              "parameter_max_abs_discrepancy": 0.0,
+              "selection_record_max_abs_discrepancy": 0.0
+            },
+            "5": {
+              "parameter_max_abs_discrepancy": 0.0,
+              "selection_record_max_abs_discrepancy": 0.0
+            }
+          },
+          "fa_selected_index_unchanged": true,
+          "fa_selected_parameters": {
+            "covariance": 0.0,
+            "loading": 0.0,
+            "maximum": 0.0,
+            "mean": 0.0,
+            "uniqueness": 0.0
+          },
+          "overall_max_abs_discrepancy": 0.0,
+          "pca_fitted_parameters": {
+            "basis": 0.0,
+            "eigenvalues": 0.0,
+            "maximum": 0.0,
+            "mean": 0.0,
+            "sample_covariance": 0.0
+          },
+          "poisoned_all_latent_arrays_norm": 9692549.652497837,
+          "ppca_fitted_parameters": {
+            "basis": 0.0,
+            "covariance": 0.0,
+            "loading": 0.0,
+            "maximum": 0.0,
+            "mean": 0.0,
+            "noise_variance": 0.0
+          },
+          "test_reconstruction_max_abs_discrepancy": 0.0,
+          "test_reconstructions_by_method_max_abs_discrepancy": {
+            "fa_candidate_0": 0.0,
+            "fa_candidate_1": 0.0,
+            "fa_candidate_2": 0.0,
+            "fa_candidate_3": 0.0,
+            "fa_candidate_4": 0.0,
+            "fa_candidate_5": 0.0,
+            "fa_selected": 0.0,
+            "pca": 0.0,
+            "ppca": 0.0
+          }
+        },
+        "test_observation_poison": {
+          "fa_candidate_parameter_max_abs_discrepancy": 0.0,
+          "fa_candidate_selection_record_max_abs_discrepancy": 0.0,
+          "fa_candidates": {
+            "0": {
+              "parameter_max_abs_discrepancy": 0.0,
+              "selection_record_max_abs_discrepancy": 0.0
+            },
+            "1": {
+              "parameter_max_abs_discrepancy": 0.0,
+              "selection_record_max_abs_discrepancy": 0.0
+            },
+            "2": {
+              "parameter_max_abs_discrepancy": 0.0,
+              "selection_record_max_abs_discrepancy": 0.0
+            },
+            "3": {
+              "parameter_max_abs_discrepancy": 0.0,
+              "selection_record_max_abs_discrepancy": 0.0
+            },
+            "4": {
+              "parameter_max_abs_discrepancy": 0.0,
+              "selection_record_max_abs_discrepancy": 0.0
+            },
+            "5": {
+              "parameter_max_abs_discrepancy": 0.0,
+              "selection_record_max_abs_discrepancy": 0.0
+            }
+          },
+          "fa_selected_index_unchanged": true,
+          "fa_selected_parameters": {
+            "covariance": 0.0,
+            "loading": 0.0,
+            "maximum": 0.0,
+            "mean": 0.0,
+            "uniqueness": 0.0
+          },
+          "overall_max_abs_discrepancy": 0.0,
+          "pca_fitted_parameters": {
+            "basis": 0.0,
+            "eigenvalues": 0.0,
+            "maximum": 0.0,
+            "mean": 0.0,
+            "sample_covariance": 0.0
+          },
+          "poisoned_test_norm": 635657.8535006708,
+          "ppca_fitted_parameters": {
+            "basis": 0.0,
+            "covariance": 0.0,
+            "loading": 0.0,
+            "maximum": 0.0,
+            "mean": 0.0,
+            "noise_variance": 0.0
+          },
+          "test_reconstruction_max_abs_discrepancy": 0.0,
+          "test_reconstructions_by_method_max_abs_discrepancy": {
+            "fa_candidate_0": 0.0,
+            "fa_candidate_1": 0.0,
+            "fa_candidate_2": 0.0,
+            "fa_candidate_3": 0.0,
+            "fa_candidate_4": 0.0,
+            "fa_candidate_5": 0.0,
+            "fa_selected": 0.0,
+            "pca": 0.0,
+            "ppca": 0.0
+          }
+        }
+      }
+    },
+    "poison_scope": {
+      "conditions": [
+        "matched_diagonal",
+        "repeated_signal_eigenvalues",
+        "near_zero_uniqueness",
+        "correlated_residuals",
+        "high_variance_nuisance",
+        "outliers"
+      ],
+      "latent_poison_evaluation": "every retained train/validation/test latent array is poisoned; observation-only fit and reconstruction must remain unchanged",
+      "methods": [
+        "pca",
+        "ppca",
+        "six_fa_candidates",
+        "selected_fa",
+        "all_test_reconstructions"
+      ],
+      "test_observation_poison_evaluation": "test arrays are poisoned, while reconstruction comparisons use the same original test observations so only fitted-state leakage can change outputs"
+    },
+    "retained_latent_truth_shape": {
+      "correlated_residuals": {
+        "test": [
+          500,
+          2
+        ],
+        "train": [
+          700,
+          2
+        ],
+        "validation": [
+          350,
+          2
+        ]
+      },
+      "high_variance_nuisance": {
+        "test": [
+          500,
+          2
+        ],
+        "train": [
+          700,
+          2
+        ],
+        "validation": [
+          350,
+          2
+        ]
+      },
+      "matched_diagonal": {
+        "test": [
+          500,
+          2
+        ],
+        "train": [
+          700,
+          2
+        ],
+        "validation": [
+          350,
+          2
+        ]
+      },
+      "near_zero_uniqueness": {
+        "test": [
+          500,
+          2
+        ],
+        "train": [
+          700,
+          2
+        ],
+        "validation": [
+          350,
+          2
+        ]
+      },
+      "outliers": {
+        "test": [
+          500,
+          2
+        ],
+        "train": [
+          700,
+          2
+        ],
+        "validation": [
+          350,
+          2
+        ]
+      },
+      "repeated_signal_eigenvalues": {
+        "test": [
+          500,
+          2
+        ],
+        "train": [
+          700,
+          2
+        ],
+        "validation": [
+          350,
+          2
+        ]
+      }
+    }
+  },
+  "scaling_leakage_negative_control": {
+    "interpretation": "The pooled path is invalid regardless of whether its finite-sample test MSE is numerically better or worse.",
+    "invalid_path": "feature mean and scale fitted on pooled training and test observations; intentionally leaked negative control",
+    "leaked_minus_proper_mse": 0.0009080766732295631,
+    "leaked_mse_original_coordinates": 0.5734147435606051,
+    "leaked_test_poison_mean_max_abs_change": 20.833333333333353,
+    "leaked_test_poison_scale_max_abs_change": 23.53212064189201,
+    "proper_mse_original_coordinates": 0.5725066668873755,
+    "proper_test_poison_mean_max_abs_change": 0.0,
+    "proper_test_poison_scale_max_abs_change": 0.0,
+    "proper_vs_leaked_basis_angle_max_degrees": 1.688560209382729,
+    "proper_vs_leaked_reconstruction_max_abs": 0.0986182989819171,
+    "valid_path": "feature mean and scale fitted on training observations only"
+  },
+  "scientific_limits": [
+    "PCA is evaluated against the population covariance principal subspace, not presumed to recover the factor-loading subspace.",
+    "Repeated eigenvalues identify the whole repeated eigenspace; no arbitrary within-eigenspace axis is scored.",
+    "FA uniqueness metrics are emitted only when the diagonal-residual specification is applicable and the computed Anderson-Rubin-style sufficient row-deletion rank check passes.",
+    "The bounded EM search is not a claim of global maximum-likelihood optimization.",
+    "For outliers, the generating clean-Gaussian covariance is labeled nominal_clean_gaussian_reference and is not called the covariance of the contaminated observable law.",
+    "Low reconstruction error or subspace alignment is not evidence of mechanism, causality, intrinsic dimension, or a unique latent generator."
+  ],
+  "structural_identification": {
+    "rank_diagnostics": {
+      "correlated_residuals": {
+        "criterion": "after deleting any one row, two disjoint remaining two-row submatrices each have rank two",
+        "identification_scope": "sufficient structural identification of diagonal uniqueness and the common-loading structure up to orthogonal loading rotation; not a finite-sample recovery guarantee",
+        "overall_pass": true,
+        "per_deleted_row": {
+          "0": {
+            "pass": true,
+            "witness": {
+              "first_rows": [
+                1,
+                2
+              ],
+              "second_rows": [
+                3,
+                4
+              ]
+            }
+          },
+          "1": {
+            "pass": true,
+            "witness": {
+              "first_rows": [
+                0,
+                2
+              ],
+              "second_rows": [
+                3,
+                4
+              ]
+            }
+          },
+          "2": {
+            "pass": true,
+            "witness": {
+              "first_rows": [
+                0,
+                1
+              ],
+              "second_rows": [
+                3,
+                4
+              ]
+            }
+          },
+          "3": {
+            "pass": true,
+            "witness": {
+              "first_rows": [
+                0,
+                1
+              ],
+              "second_rows": [
+                2,
+                4
+              ]
+            }
+          },
+          "4": {
+            "pass": true,
+            "witness": {
+              "first_rows": [
+                0,
+                1
+              ],
+              "second_rows": [
+                2,
+                3
+              ]
+            }
+          },
+          "5": {
+            "pass": true,
+            "witness": {
+              "first_rows": [
+                0,
+                1
+              ],
+              "second_rows": [
+                2,
+                3
+              ]
+            }
+          },
+          "6": {
+            "pass": true,
+            "witness": {
+              "first_rows": [
+                0,
+                1
+              ],
+              "second_rows": [
+                2,
+                3
+              ]
+            }
+          },
+          "7": {
+            "pass": true,
+            "witness": {
+              "first_rows": [
+                0,
+                1
+              ],
+              "second_rows": [
+                2,
+                3
+              ]
+            }
+          }
+        }
+      },
+      "high_variance_nuisance": {
+        "criterion": "after deleting any one row, two disjoint remaining two-row submatrices each have rank two",
+        "identification_scope": "sufficient structural identification of diagonal uniqueness and the common-loading structure up to orthogonal loading rotation; not a finite-sample recovery guarantee",
+        "overall_pass": true,
+        "per_deleted_row": {
+          "0": {
+            "pass": true,
+            "witness": {
+              "first_rows": [
+                1,
+                2
+              ],
+              "second_rows": [
+                3,
+                4
+              ]
+            }
+          },
+          "1": {
+            "pass": true,
+            "witness": {
+              "first_rows": [
+                0,
+                2
+              ],
+              "second_rows": [
+                3,
+                4
+              ]
+            }
+          },
+          "2": {
+            "pass": true,
+            "witness": {
+              "first_rows": [
+                0,
+                1
+              ],
+              "second_rows": [
+                3,
+                4
+              ]
+            }
+          },
+          "3": {
+            "pass": true,
+            "witness": {
+              "first_rows": [
+                0,
+                1
+              ],
+              "second_rows": [
+                2,
+                4
+              ]
+            }
+          },
+          "4": {
+            "pass": true,
+            "witness": {
+              "first_rows": [
+                0,
+                1
+              ],
+              "second_rows": [
+                2,
+                3
+              ]
+            }
+          },
+          "5": {
+            "pass": true,
+            "witness": {
+              "first_rows": [
+                0,
+                1
+              ],
+              "second_rows": [
+                2,
+                3
+              ]
+            }
+          },
+          "6": {
+            "pass": true,
+            "witness": {
+              "first_rows": [
+                0,
+                1
+              ],
+              "second_rows": [
+                2,
+                3
+              ]
+            }
+          },
+          "7": {
+            "pass": true,
+            "witness": {
+              "first_rows": [
+                0,
+                1
+              ],
+              "second_rows": [
+                2,
+                3
+              ]
+            }
+          }
+        }
+      },
+      "matched_diagonal": {
+        "criterion": "after deleting any one row, two disjoint remaining two-row submatrices each have rank two",
+        "identification_scope": "sufficient structural identification of diagonal uniqueness and the common-loading structure up to orthogonal loading rotation; not a finite-sample recovery guarantee",
+        "overall_pass": true,
+        "per_deleted_row": {
+          "0": {
+            "pass": true,
+            "witness": {
+              "first_rows": [
+                1,
+                2
+              ],
+              "second_rows": [
+                3,
+                4
+              ]
+            }
+          },
+          "1": {
+            "pass": true,
+            "witness": {
+              "first_rows": [
+                0,
+                2
+              ],
+              "second_rows": [
+                3,
+                4
+              ]
+            }
+          },
+          "2": {
+            "pass": true,
+            "witness": {
+              "first_rows": [
+                0,
+                1
+              ],
+              "second_rows": [
+                3,
+                4
+              ]
+            }
+          },
+          "3": {
+            "pass": true,
+            "witness": {
+              "first_rows": [
+                0,
+                1
+              ],
+              "second_rows": [
+                2,
+                4
+              ]
+            }
+          },
+          "4": {
+            "pass": true,
+            "witness": {
+              "first_rows": [
+                0,
+                1
+              ],
+              "second_rows": [
+                2,
+                3
+              ]
+            }
+          },
+          "5": {
+            "pass": true,
+            "witness": {
+              "first_rows": [
+                0,
+                1
+              ],
+              "second_rows": [
+                2,
+                3
+              ]
+            }
+          },
+          "6": {
+            "pass": true,
+            "witness": {
+              "first_rows": [
+                0,
+                1
+              ],
+              "second_rows": [
+                2,
+                3
+              ]
+            }
+          },
+          "7": {
+            "pass": true,
+            "witness": {
+              "first_rows": [
+                0,
+                1
+              ],
+              "second_rows": [
+                2,
+                3
+              ]
+            }
+          }
+        }
+      },
+      "near_zero_uniqueness": {
+        "criterion": "after deleting any one row, two disjoint remaining two-row submatrices each have rank two",
+        "identification_scope": "sufficient structural identification of diagonal uniqueness and the common-loading structure up to orthogonal loading rotation; not a finite-sample recovery guarantee",
+        "overall_pass": true,
+        "per_deleted_row": {
+          "0": {
+            "pass": true,
+            "witness": {
+              "first_rows": [
+                1,
+                2
+              ],
+              "second_rows": [
+                3,
+                4
+              ]
+            }
+          },
+          "1": {
+            "pass": true,
+            "witness": {
+              "first_rows": [
+                0,
+                2
+              ],
+              "second_rows": [
+                3,
+                4
+              ]
+            }
+          },
+          "2": {
+            "pass": true,
+            "witness": {
+              "first_rows": [
+                0,
+                1
+              ],
+              "second_rows": [
+                3,
+                4
+              ]
+            }
+          },
+          "3": {
+            "pass": true,
+            "witness": {
+              "first_rows": [
+                0,
+                1
+              ],
+              "second_rows": [
+                2,
+                4
+              ]
+            }
+          },
+          "4": {
+            "pass": true,
+            "witness": {
+              "first_rows": [
+                0,
+                1
+              ],
+              "second_rows": [
+                2,
+                3
+              ]
+            }
+          },
+          "5": {
+            "pass": true,
+            "witness": {
+              "first_rows": [
+                0,
+                1
+              ],
+              "second_rows": [
+                2,
+                3
+              ]
+            }
+          },
+          "6": {
+            "pass": true,
+            "witness": {
+              "first_rows": [
+                0,
+                1
+              ],
+              "second_rows": [
+                2,
+                3
+              ]
+            }
+          },
+          "7": {
+            "pass": true,
+            "witness": {
+              "first_rows": [
+                0,
+                1
+              ],
+              "second_rows": [
+                2,
+                3
+              ]
+            }
+          }
+        }
+      },
+      "outliers": {
+        "criterion": "after deleting any one row, two disjoint remaining two-row submatrices each have rank two",
+        "identification_scope": "sufficient structural identification of diagonal uniqueness and the common-loading structure up to orthogonal loading rotation; not a finite-sample recovery guarantee",
+        "overall_pass": true,
+        "per_deleted_row": {
+          "0": {
+            "pass": true,
+            "witness": {
+              "first_rows": [
+                1,
+                2
+              ],
+              "second_rows": [
+                3,
+                4
+              ]
+            }
+          },
+          "1": {
+            "pass": true,
+            "witness": {
+              "first_rows": [
+                0,
+                2
+              ],
+              "second_rows": [
+                3,
+                4
+              ]
+            }
+          },
+          "2": {
+            "pass": true,
+            "witness": {
+              "first_rows": [
+                0,
+                1
+              ],
+              "second_rows": [
+                3,
+                4
+              ]
+            }
+          },
+          "3": {
+            "pass": true,
+            "witness": {
+              "first_rows": [
+                0,
+                1
+              ],
+              "second_rows": [
+                2,
+                4
+              ]
+            }
+          },
+          "4": {
+            "pass": true,
+            "witness": {
+              "first_rows": [
+                0,
+                1
+              ],
+              "second_rows": [
+                2,
+                3
+              ]
+            }
+          },
+          "5": {
+            "pass": true,
+            "witness": {
+              "first_rows": [
+                0,
+                1
+              ],
+              "second_rows": [
+                2,
+                3
+              ]
+            }
+          },
+          "6": {
+            "pass": true,
+            "witness": {
+              "first_rows": [
+                0,
+                1
+              ],
+              "second_rows": [
+                2,
+                3
+              ]
+            }
+          },
+          "7": {
+            "pass": true,
+            "witness": {
+              "first_rows": [
+                0,
+                1
+              ],
+              "second_rows": [
+                2,
+                3
+              ]
+            }
+          }
+        }
+      },
+      "repeated_signal_eigenvalues": {
+        "criterion": "after deleting any one row, two disjoint remaining two-row submatrices each have rank two",
+        "identification_scope": "sufficient structural identification of diagonal uniqueness and the common-loading structure up to orthogonal loading rotation; not a finite-sample recovery guarantee",
+        "overall_pass": true,
+        "per_deleted_row": {
+          "0": {
+            "pass": true,
+            "witness": {
+              "first_rows": [
+                1,
+                2
+              ],
+              "second_rows": [
+                3,
+                4
+              ]
+            }
+          },
+          "1": {
+            "pass": true,
+            "witness": {
+              "first_rows": [
+                0,
+                2
+              ],
+              "second_rows": [
+                3,
+                4
+              ]
+            }
+          },
+          "2": {
+            "pass": true,
+            "witness": {
+              "first_rows": [
+                0,
+                1
+              ],
+              "second_rows": [
+                3,
+                4
+              ]
+            }
+          },
+          "3": {
+            "pass": true,
+            "witness": {
+              "first_rows": [
+                0,
+                1
+              ],
+              "second_rows": [
+                2,
+                4
+              ]
+            }
+          },
+          "4": {
+            "pass": true,
+            "witness": {
+              "first_rows": [
+                0,
+                1
+              ],
+              "second_rows": [
+                2,
+                3
+              ]
+            }
+          },
+          "5": {
+            "pass": true,
+            "witness": {
+              "first_rows": [
+                0,
+                1
+              ],
+              "second_rows": [
+                2,
+                3
+              ]
+            }
+          },
+          "6": {
+            "pass": true,
+            "witness": {
+              "first_rows": [
+                0,
+                1
+              ],
+              "second_rows": [
+                2,
+                3
+              ]
+            }
+          },
+          "7": {
+            "pass": true,
+            "witness": {
+              "first_rows": [
+                0,
+                1
+              ],
+              "second_rows": [
+                2,
+                3
+              ]
+            }
+          }
+        }
+      }
+    },
+    "structural_vs_finite_recovery": "Passing the sufficient rank condition supports structural identification up to orthogonal loading rotation under the diagonal-residual FA specification; it does not guarantee finite-sample accuracy or optimizer convergence.",
+    "uniqueness_metric_applicability": {
+      "correlated_residuals": {
+        "anderson_rubin_sufficient_rank_pass": true,
+        "diagonal_residual_specification_applicable": false,
+        "rule": "emit uniqueness error only when the analyzed condition has an applicable diagonal residual specification and the sufficient row-deletion rank diagnostic passes",
+        "uniqueness_metrics_emitted": false
+      },
+      "high_variance_nuisance": {
+        "anderson_rubin_sufficient_rank_pass": true,
+        "diagonal_residual_specification_applicable": true,
+        "rule": "emit uniqueness error only when the analyzed condition has an applicable diagonal residual specification and the sufficient row-deletion rank diagnostic passes",
+        "uniqueness_metrics_emitted": true
+      },
+      "matched_diagonal": {
+        "anderson_rubin_sufficient_rank_pass": true,
+        "diagonal_residual_specification_applicable": true,
+        "rule": "emit uniqueness error only when the analyzed condition has an applicable diagonal residual specification and the sufficient row-deletion rank diagnostic passes",
+        "uniqueness_metrics_emitted": true
+      },
+      "near_zero_uniqueness": {
+        "anderson_rubin_sufficient_rank_pass": true,
+        "diagonal_residual_specification_applicable": true,
+        "rule": "emit uniqueness error only when the analyzed condition has an applicable diagonal residual specification and the sufficient row-deletion rank diagnostic passes",
+        "uniqueness_metrics_emitted": true
+      },
+      "outliers": {
+        "anderson_rubin_sufficient_rank_pass": true,
+        "diagonal_residual_specification_applicable": false,
+        "rule": "emit uniqueness error only when the analyzed condition has an applicable diagonal residual specification and the sufficient row-deletion rank diagnostic passes",
+        "uniqueness_metrics_emitted": false
+      },
+      "repeated_signal_eigenvalues": {
+        "anderson_rubin_sufficient_rank_pass": true,
+        "diagonal_residual_specification_applicable": true,
+        "rule": "emit uniqueness error only when the analyzed condition has an applicable diagonal residual specification and the sufficient row-deletion rank diagnostic passes",
+        "uniqueness_metrics_emitted": true
+      }
+    }
+  }
+}

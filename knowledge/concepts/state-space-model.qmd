@@ -1,0 +1,223 @@
+---
+title: "State-Space Model"
+object_type: concept
+maturity: L2
+status: stable
+domain: [dynamics, latent-modeling]
+tags: [state-space-model, transition-model, observation-model]
+prerequisites:
+- knowledge/concepts/state-space.qmd
+- knowledge/concepts/observation-model.qmd
+related:
+- knowledge/concepts/latent-variable.qmd
+- knowledge/concepts/input-driven-dynamics.qmd
+- knowledge/concepts/process-noise.qmd
+- knowledge/concepts/observation-noise.qmd
+- knowledge/concepts/identifiability.qmd
+created: 2026-08-18
+updated: 2026-08-18
+---
+
+# State-Space Model
+
+## One-sentence definition
+
+A **state-space model** specifies both how a state evolves and how observations are generated from that state.
+
+## Why this concept matters
+
+State-space models keep latent evolution, inputs, process uncertainty, and measurement separate while connecting them in one generative description. This makes them central to filtering, smoothing, forecasting, system identification, and latent-dynamics analysis.
+
+## Intuition
+
+One equation moves the hidden state forward; another equation turns the hidden state into data. Inference works backward from observations to uncertain states.
+
+## Formal definition
+
+Let $(\mathcal X,\Sigma_{\mathcal X})$ be a state space, $(\mathcal Y,\Sigma_{\mathcal Y})$ an observation space, $(\mathcal U,\Sigma_{\mathcal U})$ an optional input space, and $\theta=(\theta_0,\theta_x,\theta_y)$ model parameters in declared measurable parameter spaces. A discrete-time probabilistic state-space model specifies an initial law $\mu_{\theta_0}$, transition kernels $Q_{k,\theta_x}$, and observation kernels $G_{k,\theta_y}$. In measure notation,
+
+$$
+X_0\sim\mu_{\theta_0},
+$$
+
+$$
+Q_{k,\theta_x}(x,u,A)
+=
+\Pr(X_{k+1}\in A\mid X_k=x,u_k=u,\theta_x),
+$$
+
+$$
+G_{k,\theta_y}(x,u,B)
+=
+\Pr(Y_k\in B\mid X_k=x,u_k=u,\theta_y),
+$$
+
+for measurable $A\in\Sigma_{\mathcal X}$ and $B\in\Sigma_{\mathcal Y}$. Here $\mu_{\theta_0}$ is a probability measure on $\mathcal X$; for fixed parameters, $A\mapsto Q_{k,\theta_x}(x,u,A)$ is a probability measure and $(x,u)\mapsto Q_{k,\theta_x}(x,u,A)$ is measurable, with analogous conditions for $G_{k,\theta_y}$. When parameters vary as kernel arguments, the corresponding joint measurability is required. When suitable dominating measures exist, the same components can be written as densities:
+
+1. an initial-state law
+   $$
+   p(x_0\mid\theta_0);
+   $$
+2. a transition kernel
+   $$
+   p(x_{k+1}\mid x_k,u_k,\theta_x);
+   $$
+3. an observation kernel
+   $$
+   p(y_k\mid x_k,u_k,\theta_y).
+   $$
+
+Under the explicit assumptions that the latent state is first-order Markov conditional on the input sequence and that observations are conditionally independent given the contemporaneous state, input, and parameters, the generative joint distribution factors as
+
+$$
+\begin{aligned}
+&p(x_{0:T},y_{0:T}\mid u_{0:T},\theta)\\
+&=p(x_0\mid\theta_0)
+  \prod_{k=0}^{T-1}p(x_{k+1}\mid x_k,u_k,\theta_x)
+  \prod_{k=0}^{T}p(y_k\mid x_k,u_k,\theta_y).
+\end{aligned}
+$$
+
+If observations do not depend directly on input, omit $u_k$ from the observation kernel. Higher-order state dependence, correlated observation errors, observation memory, or shared disturbances require a different factorization or an augmented state. The Markov and emission assumptions are modeling choices, not consequences of writing variables with time indices.
+
+The displayed distribution conditions on $u_{0:T}$ and therefore contains no probability law for the inputs. Random, endogenous, or feedback-generated inputs require an additional input model or an enlarged system boundary.
+
+### Deterministic and noise-driven special cases
+
+A deterministic state-space model can be written
+
+$$
+x_{k+1}=F_k(x_k,u_k;\theta_x),
+\qquad
+y_k=G_k(x_k,u_k;\theta_y).
+$$
+
+When $F_k$ and $G_k$ are measurable, these equations correspond to Dirac transition and observation kernels concentrated at $F_k(x_k,u_k;\theta_x)$ and $G_k(x_k,u_k;\theta_y)$.
+
+An additive stochastic special case is
+
+$$
+x_{k+1}=F_k(x_k,u_k;\theta_x)+w_k,
+\qquad
+y_k=G_k(x_k,u_k;\theta_y)+v_k.
+$$
+
+Here $w_k$ enters state evolution and $v_k$ enters observation generation. Their distributions, dependence, correlation across time, mutual independence, and independence from the initial state are separate assumptions. An uncertain initial state $x_0\sim p(x_0\mid\theta_0)$ is not process noise: it is uncertainty before the first modeled transition.
+
+### Continuous-time state and sampled observations
+
+A continuous-time model may specify
+
+$$
+\dot x(t)=f(t,x(t),u(t);\theta_x)
+$$
+
+or a stochastic differential/state process, together with observations at times $t_k$,
+
+$$
+y_k\sim p(y_k\mid x(t_k),u(t_k),\theta_y).
+$$
+
+When the continuous state process is well posed, it induces finite-time transition kernels $Q^{\theta_x}_{s,t}$ between sampling times. A deterministic evolution induces a Dirac kernel. Stochastic transition laws may be available only implicitly or numerically; not every continuous stochastic model has a simple transition density. Continuous-discrete models must therefore state the state process, observation schedule, and approximation used for any discrete transition likelihood.
+
+### Generative model versus inference tasks
+
+The state-space model is the forward generative specification above. It is distinct from algorithms or target distributions used for:
+
+- **filtering:** $p(x_k\mid y_{0:k},u_{0:k})$;
+- **smoothing:** $p(x_{0:T}\mid y_{0:T},u_{0:T})$;
+- **prediction/forecasting:** future states or observations conditional on available data;
+- **parameter learning/system identification:** estimating $\theta$ or model structure.
+
+Observability asks whether state information can be recovered from outputs under a transition model. Identifiability asks whether different full model specifications induce different observable distributions. Neither property follows merely from writing a state-space model.
+
+## Core notation
+
+- $x_k$: latent or observed state.
+- $u_k$: optional input.
+- $y_k$: observation.
+- $F_k$ or $p(x_{k+1}\mid x_k,u_k,\theta_x)$: deterministic or probabilistic transition model.
+- $G_k$ or $p(y_k\mid x_k,u_k,\theta_y)$: deterministic or probabilistic observation model.
+- $\mu_{\theta_0},Q_{k,\theta_x},G_{k,\theta_y}$: initial law, transition kernel, and observation kernel.
+- $p(x_0\mid\theta_0)$: initial-state law.
+- $w_k$, $v_k$: process and observation disturbances.
+- $\theta_0,\theta_x,\theta_y$: initial, transition, and observation parameters.
+
+## Prerequisites
+
+[State Space](state-space.qmd) defines admissible states. [Observation Model](observation-model.qmd) defines the measurement relation. [Input-Driven Dynamics](input-driven-dynamics.qmd) supplies input-conditioned transition language.
+
+[Process Noise](process-noise.qmd) and [Observation Noise](observation-noise.qmd) distinguish the two stochastic locations used in common special cases.
+
+## Relationship to adjacent concepts
+
+| Concept | Distinction |
+|---|---|
+| **Dynamical system** | May specify state evolution without any observation equation. |
+| **Observation model** | Only the measurement component of a state-space model. |
+| **Linear dynamical system** | Often refers to linear state evolution, even when no observation equation is specified. A **linear state-space model** additionally requires the included observation relation to be linear. |
+| **Hidden Markov model** | A state-space model with a Markov latent process, often discrete-valued; terminology varies. |
+| **Filter / smoother** | An inference procedure or posterior target based on a state-space model, not the generative model itself. |
+| **Observability** | A recoverability property of transition and observation structure across time, not guaranteed by the model format. |
+| **Identifiability** | A uniqueness property of the induced observable distribution, not guaranteed by state-space notation. |
+| **Initial-state uncertainty** | Uncertainty in $x_0$ before the first transition; it is distinct from process disturbances injected at later steps. |
+
+## What this does NOT imply
+
+A state-space model does not imply linearity, Gaussianity, low-dimensional state, time homogeneity, conditional independence beyond what is stated, observability, identifiability, tractable inference, or that inferred state equals physical ground truth. Good filtering or forecasting performance does not validate the state variables as a unique mechanism.
+
+## Minimal example
+
+Consider
+
+$$
+x_0\sim\mathcal N(0,P_0),
+$$
+
+$$
+x_{k+1}=0.9x_k+w_k,
+\qquad
+w_k\sim\mathcal N(0,Q),
+$$
+
+$$
+y_k=x_k+v_k,
+\qquad
+v_k\sim\mathcal N(0,R).
+$$
+
+If $x_0$, $(w_k)$, and $(v_k)$ are mutually independent and each noise sequence is independent across time, the model has the standard Markov/emission factorization. $P_0$ describes initial uncertainty, $Q$ transition uncertainty, and $R$ measurement uncertainty. Moving $v_k$ into the state equation or $w_k$ into the observation equation changes the model's scientific meaning.
+
+A filter can estimate $p(x_k\mid y_{0:k})$, but that estimate and the algorithm producing it are not additional parts of the state-space model definition.
+
+## Neuroscience / behavioral relevance
+
+State-space models can represent latent neural trajectories with spiking or continuous observations and external task inputs. Their usefulness depends on testing transition and observation assumptions separately.
+
+## Relevance to LDG
+
+At L2, this object joins the dynamics and latent-variable branches through an explicit initial law, transition model, observation model, and conditional factorization. It keeps the generative specification separate from inference algorithms and from claims of observability, identifiability, or mechanism.
+
+## Open questions
+
+- Which state dimension and transition family are justified?
+- How should irregular sampling enter the model?
+- What baselines reveal whether dynamics improve over independent latent factors?
+
+## References
+
+- Åström and Murray give the inspected deterministic state-dynamics/output formulation and a linear-Gaussian uncertain-initial-state/two-noise special case [@AstromMurray2021, secs. 3.2, 8.4].
+- Kalman provides an inspected primary linear stochastic state-transition, random-excitation, partial-observation, and filtering framework while treating model construction and estimation as separate problems [@Kalman1960]. His inspected formulation is not cited here as the source of a separate additive measurement-noise term.
+- Filtering, smoothing, forecasting, parameter estimation, observability tests, and identifiability theorems are intentionally deferred.
+
+## Maturity checklist
+
+- [x] Contains distinct transition and observation components.
+- [x] Allows inputs and two noise locations.
+- [x] States linearity and identifiability non-implications.
+- [x] Types the initial-state law, transition kernel, and observation kernel.
+- [x] States Markov and conditional-emission assumptions before factorizing the joint distribution.
+- [x] Separates initial uncertainty, process noise, and observation noise.
+- [x] Relates continuous-time state evolution to sampled observations without assuming a closed-form density.
+- [x] Separates the generative model from filtering, smoothing, forecasting, learning, observability, and identifiability.
+- [x] Independent L2 scientific review completed; initial findings were corrected and focused re-review passed under the recorded review decision.

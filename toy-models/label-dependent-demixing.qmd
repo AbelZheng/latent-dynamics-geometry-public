@@ -1,0 +1,676 @@
+---
+title: "Label-Dependent Demixing"
+object_type: toy-model
+maturity: L1
+status: stable
+domain: [dimensionality-reduction, supervised-learning, statistics]
+tags: [dpca, pca, marginalization, reduced-rank-regression, task-labels, trial-averaging, leakage]
+prerequisites:
+- knowledge/methods/demixed-principal-component-analysis.qmd
+- knowledge/methods/principal-component-analysis.qmd
+- knowledge/concepts/linear-subspace.qmd
+related:
+- toy-models/static-linear-latent-recovery.qmd
+created: 2026-08-19
+updated: 2026-08-19
+---
+
+# Label-Dependent Demixing
+
+This L1/stable Candidate C Toy Model is a supervised generation/recovery demonstration. It asks whether balanced ANOVA-style task marginalizations and a bounded reduced-rank dPCA map recover the declared label-dependent mean effects, and where that recovery fails. Numerical values are deterministic outputs under master seed `20260819`; they are conditional on this simulator and protocol rather than population or real-data claims.
+
+**Assumed background:** centered PCA, factorial means, linear subspaces, ridge regression, singular value decomposition, and independent train/validation/test trials.
+
+## Question
+
+For independent trials with time, binary stimulus, and binary decision labels:
+
+1. can condition averaging recover the known time, stimulus, decision, and stimulus--decision interaction mean effects;
+2. can global PCA, separate marginal PCA, and regularized rank-one dPCA preserve or isolate those effects on held-out trials;
+3. how do oblique or nearly collinear mixing directions affect demixing;
+4. what becomes invalid when a factorial cell is absent;
+5. what information is lost by pseudo-population construction; and
+6. how different are mean-map recovery and single-trial decoding or reconstruction?
+
+The object keeps four distinctions explicit:
+
+- an **effect** is a feature-by-time-by-condition tensor;
+- a **mixing direction** is a feature-space vector multiplying that effect's scalar temporal/label profile;
+- a **marginal main effect** and its **time interaction** are distinct full-factorial terms even when this object groups them into one time-dependent task marginalization; and
+- label predictability, marginal reconstruction, statistical independence, causality, and mechanism are different endpoints.
+
+Machens separated task-associated covariance sources but explicitly did not assume statistical independence; Brendel, Romo, and Machens introduced factorial marginalizations and an earlier orthogonality-constrained dPCA; Kobak et al. replaced that formulation with separately fitted reduced-rank encoder/decoder maps that can represent nonorthogonal task subspaces [@Machens2010; @BrendelRomoMachens2011; @KobakEtAl2016].
+
+## Ground truth
+
+### Trial-resolved observation tensor
+
+The ambient feature dimension is $N=12$, the number of aligned time bins is $T=24$, and labels are
+
+$$
+s,d\in\{-1,+1\}.
+$$
+
+For trial $k$ in cell $(s,d)$, the observed feature vector at time $t$ is
+
+$$
+x_k(t,s,d)
+=
+G_t(t)+G_s(t,s)+G_d(t,d)+G_{sd}(t,s,d)+\varepsilon_k(t),
+$$
+
+where
+
+$$
+G_t(t)=a_t f_t(t),
+$$
+
+$$
+G_s(t,s)=a_s\,s f_s(t),\qquad
+G_d(t,d)=a_d\,d f_d(t),
+$$
+
+and
+
+$$
+G_{sd}(t,s,d)=a_{sd}\,sd f_{sd}(t).
+$$
+
+The four $a_\phi\in\mathbb R^{12}$ are unit feature-space mixing directions. The four $G_\phi$ are the ground-truth marginal effect tensors. A recovered decoder direction is not itself an effect tensor, and a recovered encoder direction is not interpreted as a causal source.
+
+### Fixed oblique mixing directions
+
+Normalize the columns below separately, without orthogonalizing them:
+
+$$
+\begin{aligned}
+r_t={}&(1.0,0.3,-0.2,0.5,0,0.4,-0.6,0.2,0.1,-0.3,0.7,-0.1)^\top,\\
+r_s={}&(0.2,1.0,0.4,-0.3,0.6,-0.2,0.3,-0.7,0.1,0.5,-0.4,0.2)^\top,\\
+r_d={}&(-0.4,0.2,1.0,0.5,-0.2,0.7,-0.1,0.3,-0.6,0.2,0.4,-0.5)^\top,\\
+r_{sd}={}&(0.5,-0.3,0.2,1.0,0.4,-0.6,0.2,0.1,0.7,-0.2,0.3,0.4)^\top,
+\end{aligned}
+$$
+
+$$
+a_\phi=r_\phi/\lVert r_\phi\rVert_2.
+$$
+
+The implementation records the complete Gram matrix $a_\phi^\top a_\psi$. These directions are deliberately oblique. dPCA is not allowed to assume that different task effects occupy orthogonal subspaces; the 2016 formulation specifically permits nonorthogonal encoder/decoder axes [@KobakEtAl2016].
+
+### Time profiles and amplitudes
+
+Let $u_t=(t-1)/(T-1)$ for $t=1,\ldots,T$. Define
+
+$$
+\begin{aligned}
+f_t(u) &= 0.7\sin(2\pi u)+0.35(u-0.5),\\
+f_s(u) &= 1.25\exp\!\left[-\left(\frac{u-0.35}{0.18}\right)^2\right]-0.25,\\
+f_d(u) &= \frac{1.1}{1+\exp[-12(u-0.58)]}-0.55,\\
+f_{sd}(u) &= 0.85\sin(3\pi u)\exp(-1.3u).
+\end{aligned}
+$$
+
+The effect amplitudes multiplying these profiles are
+
+$$
+(\alpha_t,\alpha_s,\alpha_d,\alpha_{sd})=(1.00,1.35,1.15,0.75).
+$$
+
+Thus $G_\phi$ uses $\alpha_\phi f_\phi$. Because $f_s$, $f_d$, and $f_{sd}$ need not have zero temporal mean, each grouped task effect contains both a pure label main effect and a label-by-time interaction:
+
+$$
+f_s(t)=\bar f_s+[f_s(t)-\bar f_s],
+$$
+
+so $a_s s\bar f_s$ is the pure stimulus term and $a_s s[f_s(t)-\bar f_s]$ is the stimulus--time term. The analogous decomposition applies to decision and stimulus--decision interaction. Grouping these terms later does not erase their conceptual distinction.
+
+### Trial noise
+
+Trials are independent. At each trial and time bin,
+
+$$
+\varepsilon_k(t)\sim\mathcal N(0,\Sigma_\varepsilon),
+$$
+
+independently over trials and time bins, with
+
+$$
+\Sigma_\varepsilon=0.16I_{12}+0.10vv^\top,
+\qquad
+v=\frac{(1,2,\ldots,12)^\top}{\lVert(1,2,\ldots,12)\rVert_2}.
+$$
+
+The rank-one term creates simultaneous cross-feature trial noise. It exists so the pseudo-population control can preserve feature-wise condition means while destroying simultaneous noise covariance. This noise is not a latent task effect and is excluded from the noiseless marginal truth.
+
+## Generative model
+
+Generation, condition-mean estimation, marginalization, fitting, regularization selection, scoring, and plotting are separate functions. The retained noiseless effects and exact mixing directions are provided only to scoring and implementation oracles.
+
+For the balanced and nearly collinear conditions, each split contains the following number of independent trials **per $(s,d)$ cell**:
+
+| Split | Trials per cell | Total trials |
+|---|---:|---:|
+| train | 40 | 160 |
+| validation | 20 | 80 |
+| test | 30 | 120 |
+
+Train, validation, and test trials are generated independently rather than partitioned from one realized array. Time bins from one trial never cross split boundaries.
+
+The master seed is `20260819`. All random streams use `Generator(PCG64(SeedSequence(words)))` with explicit condition, split, cell, trial, shuffle, feature-permutation, and method codes recorded in the manifest. Python's process-dependent hash is prohibited.
+
+## Parameters
+
+The fixed fitting contract is:
+
+- four grouped marginalizations: `time`, `stimulus_time`, `decision_time`, and `interaction_time`;
+- one component per grouped marginalization;
+- rank-four global PCA, matching the maximum combined signal rank;
+- rank-one separate PCA for each marginalization;
+- dPCA ridge grid
+  $$
+  \lambda\in\{10^{-4},10^{-2},1,100\};
+  $$
+- one common dPCA $\lambda$ selected by the mean validation normalized marginal reconstruction error across all four groups, with the smaller $\lambda$ winning exact ties;
+- trial-level ridge-decoder grid
+  $$
+  \lambda_{\mathrm{decode}}\in\{10^{-3},10^{-1},10\},
+  $$
+  selected separately for stimulus and decision by validation accuracy, then smaller-$\lambda$ tie breaking;
+- covariance/marginal algebra tolerance $10^{-10}$;
+- leakage and fitted-output poison tolerance $10^{-12}$; and
+- byte-identical deterministic regeneration.
+
+The grids are finite LDG design choices. They are not claims that the selected values are universal or that the search recovers a population-optimal regularization parameter.
+
+## Simulation
+
+### Balanced correct design
+
+All four label cells are present with equal trial counts. The fixed oblique directions and profiles above define the primary condition. The full noiseless mean tensor has rank at most four in feature space.
+
+### Condition means
+
+For each split, estimate
+
+$$
+\bar X(t,s,d)=\frac{1}{K_{sd}}
+\sum_{k=1}^{K_{sd}}x_k(t,s,d).
+$$
+
+In the balanced condition, every cell receives equal weight after averaging. Trial count affects precision but not the factorial estimand.
+
+### Balanced grouped marginalization
+
+Let
+
+$$
+\mu_t(t)=\frac14\sum_{s,d}\bar X(t,s,d),
+\qquad
+\mu=\frac1T\sum_t\mu_t(t).
+$$
+
+After subtracting the grand mean $\mu$, define replicated grouped terms
+
+$$
+X_t(t,s,d)=\mu_t(t)-\mu,
+$$
+
+$$
+X_s(t,s,d)=\frac12\sum_{d'}\bar X(t,s,d')-\mu_t(t),
+$$
+
+$$
+X_d(t,s,d)=\frac12\sum_{s'}\bar X(t,s',d)-\mu_t(t),
+$$
+
+and
+
+$$
+X_{sd}(t,s,d)=
+\bar X(t,s,d)-\mu_t(t)-X_s(t,s,d)-X_d(t,s,d).
+$$
+
+These satisfy
+
+$$
+\bar X-\mu=X_t+X_s+X_d+X_{sd}
+$$
+
+and are mutually orthogonal in the equal-cell Frobenius inner product, up to floating-point tolerance. The grouped stimulus term equals the full-factorial sum $X_s^{\mathrm{main}}+X_{ts}$; the decision term equals $X_d^{\mathrm{main}}+X_{td}$; and the interaction term equals $X_{sd}^{\mathrm{main}}+X_{tsd}$. This grouping follows the canonical presentation while remaining an analyst-declared estimand [@BrendelRomoMachens2011; @KobakEtAl2016].
+
+### Empirical results
+
+The generated artifacts report:
+
+| Acceptance item | Result |
+|---|---|
+| Selected balanced-condition dPCA $\lambda$ | 1.0 |
+| Balanced dPCA marginal NMSE: time / stimulus / decision / interaction | 0.1130 / 0.0542 / 0.0824 / 0.2454 |
+| Balanced combined condition-mean reconstruction NMSE | 0.0557 |
+| Balanced empirical-marginal versus noiseless-truth NMSE | 0.0914 / 0.0470 / 0.0705 / 0.2386 |
+| Balanced separate marginal-PCA NMSE | 0.0813 / 0.0421 / 0.0626 / 0.1749 |
+| Balanced separate marginal-PCA combined NMSE | 0.0679 |
+| dPCA encoder angles: time / stimulus / decision / interaction | $3.11^\circ / 1.91^\circ / 1.97^\circ / 3.43^\circ$ |
+| dPCA demixing indices: time / stimulus / decision / interaction | 0.9968 / 1.0000 / 0.9986 / 0.9936 |
+| Trial-level stimulus / decision accuracy | 1.000 / 1.000 |
+| 32-shuffle null median and 95% interval: stimulus | 0.508, $[0.421,0.595]$ |
+| 32-shuffle null median and 95% interval: decision | 0.500, $[0.383,0.619]$ |
+| Nearly collinear stimulus/decision NMSE | 0.4286 / 0.6187 |
+| Nearly collinear stimulus/decision assigned fraction | 0.6203 / 0.4656 |
+| Nearly collinear stimulus/decision max-based demixing index | 0.6203 / 0.5304 |
+| Missing-cell training design rank | 3 of 4; every recovery target machine-labelled invalid |
+| Pseudo-population condition-mean / off-diagonal covariance change | $4.44\times10^{-16}$ / 0.0233 |
+| Mean-map / noiseless single-trial / noisy single-trial NMSE | 0.0557 / 0.6312 / 0.4723 |
+| Maximum marginal-sum / balanced orthogonality discrepancy | $2.22\times10^{-16}$ / $8.88\times10^{-16}$ |
+| Deterministic regeneration | byte-identical manifest, metrics, diagnostics, and PNG |
+
+The saturated primary decoder accuracies are not treated as discriminating evidence for demixing. Their independently refit label-shuffle nulls establish that the generator contains strong label information, not that dPCA discovers an independent or causal representation. Under the frozen joint-pair shuffle, refit stimulus/decision decoder accuracies fall to 0.483/0.542. The nearly collinear condition preserves small direction-angle errors while substantially degrading assigned marginal isolation, illustrating that recovering a direction and separating overlapping label effects are different criteria.
+
+## Visualization
+
+The single `summary.png` contains at most four panels:
+
+1. one true and held-out estimated stimulus-marginal time course projected onto its known mixing direction;
+2. the complete labelled balanced-condition dPCA normalized confusion matrix;
+3. negative-control summaries for joint label shuffling, decoder nulls, the missing cell, pseudo-population construction, and mean-versus-single-trial transfer; and
+4. executable generator, leakage, marginal-algebra, solve/rank, and interpretation checks.
+
+The in-figure interpretation lines state that labels supervise the decomposition, encoder and decoder axes may be nonorthogonal, decoding is a separate endpoint, and demixing does not mean independence, causality, or mechanism. The negative-control panel distinguishes condition-mean from noiseless and noisy single-trial transfer. Visual separation is not an acceptance oracle; the condition-by-method errors and encoder angles remain in `metrics.csv` rather than duplicating the bounded matrix/time-course figure.
+
+## Expected behavior
+
+1. Balanced empirical condition means should approach the known mean-effect tensors as independent trial counts increase.
+2. Global PCA may reconstruct the combined mean signal well without assigning individual components to task labels.
+3. Separate marginal PCA should compress each provided marginal effectively, but it is given the marginal target directly and therefore does not demonstrate isolation from the full mean tensor.
+4. Regularized dPCA should trade marginal isolation against reconstruction by learning a map from the full condition-mean tensor to each target marginal [@KobakEtAl2016].
+5. Encoder directions may align with true mixing directions, while decoder directions need not: with oblique effects, dPCA can use a nonorthogonal readout/reconstruction pair.
+6. Near-collinear stimulus and decision directions should increase cross-marginal confusion or instability. The empirical direction and magnitude are reported rather than guaranteed.
+7. A missing factorial cell makes the balanced four-cell marginalization unidentified from the observed training design. A pseudoinverse extrapolation is a diagnostic, not valid recovery.
+8. Joint label shuffling should remove systematic label alignment in expectation while preserving observations and cell counts.
+9. Feature-wise pseudo-population permutation should preserve each feature's condition means exactly but alter simultaneous cross-feature trial covariance and potentially change single-trial decoding.
+10. A condition-mean-trained map can generalize to independent condition means while performing materially differently on noisy single trials. One endpoint does not validate the other.
+
+## Parameter manipulations
+
+### A. Balanced correct design
+
+Use the primary generator, all four complete cells, and the balanced counts above. This is the only condition used for primary marginal-recovery acceptance.
+
+### B. Nearly collinear stimulus and decision directions
+
+Keep $a_s$ fixed. Let
+
+$$
+r_\perp=
+\frac{a_d-a_s(a_s^\top a_d)}
+{\lVert a_d-a_s(a_s^\top a_d)\rVert_2}
+$$
+
+and replace
+
+$$
+a_d^{\mathrm{collinear}}
+=
+\frac{a_s+0.06r_\perp}{\lVert a_s+0.06r_\perp\rVert_2}.
+$$
+
+The resulting acute angle is approximately $\arctan(0.06)=3.43^\circ$. Labels remain balanced and the temporal profiles remain different. True stimulus and decision marginal effects still exist, but their feature-space directions are practically difficult to separate. Report full confusion and stability; do not force a binary pass/fail based only on one angle.
+
+### C. Missing or severely unbalanced cell
+
+Use cell order
+
+$$
+(-1,-1),\ (-1,+1),\ (+1,-1),\ (+1,+1)
+$$
+
+with counts:
+
+| Split | Cell counts |
+|---|---|
+| train | $(40,30,16,0)$ |
+| validation | $(20,15,8,0)$ |
+| test | $(30,30,30,30)$ |
+
+The fourth training and validation cell is absent. Therefore the full intercept/stimulus/decision/interaction design has rank below four, and the balanced factorial mean tensor is not identified from those splits. The implementation may compute a minimum-norm weighted least-squares or pseudoinverse extrapolation for a named negative-control diagnostic, but it must record the design rank and label every resulting marginal, dPCA fit, and test score **invalid as balanced-cell recovery**. It may not silently fill the cell, apply the balanced formulas, or treat extrapolation as observed condition evidence.
+
+If a future variant uses unequal but nonzero counts, it must first estimate each cell mean and then assign explicit equal-cell weights to target the balanced factorial estimand. Trial-frequency weighting answers a different question and must receive a different label.
+
+### D. Trial-level label shuffles
+
+For the balanced condition, jointly permute the $(s,d)$ label pairs among complete training trials using fixed shuffle seeds while preserving the exact four cell counts. Observations, validation labels, and test labels remain unchanged. Use one frozen shuffle for the complete dPCA negative-control fit and 32 predeclared shuffle seeds for stimulus/decision decoding null summaries.
+
+Every shuffled fit repeats condition-mean estimation, marginalization, regularization selection, fitting, and scoring. Shuffling only component labels after fitting is prohibited. Shuffled results are null controls, not alternative scientific decompositions.
+
+### E. Pseudo-population warning/control
+
+Within each split and $(s,d)$ cell, independently permute whole-trial identities for each feature. A feature's complete 24-bin trajectory moves together, but different features generally come from different original trials. This construction:
+
+- preserves labels and every feature's cell-wise condition mean exactly;
+- preserves each feature's univariate trial distribution;
+- destroys simultaneous feature-to-feature trial identity and changes the rank-one noise covariance contribution; and
+- cannot support claims about simultaneously available population noise correlations.
+
+Mean-based marginalizations and condition-mean dPCA maps should therefore remain equal within the declared algebra tolerance. The realized maximum fitted-map discrepancy is $8.52\times10^{-15}$, consistent with floating-point summation order rather than a scientific change. Trial-level covariance and decoding may change. Any apparent improvement is not evidence that pseudo-populations are superior data; it reflects a changed noise structure.
+
+### F. Trial-averaging mismatch
+
+Fit dPCA only on training condition means. Evaluate the frozen maps in two distinct ways:
+
+1. **Mean-map transfer:** apply each map to independent validation/test condition-mean tensors and compare with their empirical balanced marginals.
+2. **Single-trial transfer:** apply the same maps to each centered test trial and compare with the corresponding noiseless generator effect tensor for that trial's $(s,d)$ labels. Also report reconstruction against the noisy observed trial as a separately named descriptive metric.
+
+The second endpoint contains trial noise absent from the fit objective. It is not a likelihood and is not expected to equal condition-mean performance.
+
+## Sanity checks
+
+The implementation and verifier must assert:
+
+1. **Shape and split integrity:** every trial array has shape `(trials, 24, 12)`; all trial identifiers are disjoint across train, validation, and test.
+2. **Generator algebra:** noiseless trial signals equal the sum of the four declared effects within $10^{-12}$.
+3. **Balanced marginal algebra:** grouped marginals sum to the centered condition-mean tensor within $10^{-10}$ and are pairwise Frobenius-orthogonal under uniform cell weighting.
+4. **Truth access boundary:** replacing every retained noiseless signal, effect, profile, and mixing-direction array leaves fitted means, marginalizations, lambda selection, PCA, dPCA, decoders, and observation-only predictions unchanged.
+5. **No test leakage:** poisoning test observations or labels leaves training and validation preprocessing, condition means, selected lambdas, fitted maps, and decoder parameters unchanged.
+6. **No validation leakage into candidates:** candidate dPCA maps use training means only; validation chooses among already fitted grid candidates; test never selects a candidate.
+7. **PCA oracle:** global PCA's projector matches the centered condition-mean SVD rank-four projector within $10^{-10}$.
+8. **Reduced-rank oracle:** every dPCA map has numerical rank at most one and agrees with the declared ridge-map-plus-leading-SVD construction within $10^{-10}$.
+9. **Finite solves:** every regularized Gram matrix is symmetric and positive definite for the positive grid; the selected map is finite. The unregularized boundary is not in this grid.
+10. **Lambda selection:** the stored dPCA lambda equals the minimum validation mean normalized marginal error under the frozen tie rule; decoder lambdas equal their independent validation-accuracy selections.
+11. **Direction applicability:** dPCA and separate-PCA **encoder** directions receive marginal-direction angles; dPCA decoder directions do not masquerade as generative mixing directions. Global PCA receives only a combined-signal-subspace angle.
+12. **Full confusion reporting:** all 16 recovered-marginal/source-marginal energy entries exist; a scalar demixing index cannot replace them.
+13. **Shuffle integrity:** the joint-label permutation preserves cell counts exactly, changes labels, leaves observations unchanged, and refits all supervised steps.
+14. **Missing-cell guard:** the absent-cell design rank is recorded as deficient; no metric from that fit is labelled valid balanced recovery.
+15. **Pseudo-population oracle:** labels and feature-wise cell means are exactly preserved, while at least one off-diagonal trial-noise covariance changes by more than numerical tolerance.
+16. **Trial-averaging labels:** mean-map and single-trial rows use different targets and metric names.
+17. **Metric schema:** all metric keys are unique, labels are nonempty, values are finite, and inapplicable metrics are omitted rather than encoded as zero.
+18. **Determinism:** clean temporary regeneration yields byte-identical `manifest.json`, `metrics.csv`, `diagnostics.json`, and `summary.png`.
+
+These checks establish reproducibility and implementation consistency, not causal or biological validity.
+
+## Failure cases
+
+- **Balanced formulas on a missing cell:** a fabricated or silently extrapolated cell invalidates the factorial estimand.
+- **Trial-frequency weighting called balanced marginalization:** unequal counts then change the target and confound main effects with label prevalence.
+- **Time bins split across folds:** adjacent bins from one trial are not independent held-out units.
+- **Marginal truth passed to fitting:** true effects or directions may be used only for final simulation scoring and implementation oracles.
+- **Separate marginal PCA called demixing:** it receives the marginal target directly and need not isolate that target from full activity.
+- **Global PCA components assigned task labels post hoc:** a rank-four signal subspace does not provide a unique labelled basis.
+- **Decoder aligned to encoder by force:** oblique encoder/decoder geometry is part of the dPCA solution, not an error to rotate away using truth.
+- **Only the largest demixing label reported:** a high maximum can hide substantial cross-marginal energy.
+- **Shuffle performed after fitting:** this does not test the supervised fitting pipeline.
+- **Pseudo-population decoding treated as simultaneous population decoding:** independently permuted features do not coexist on one trial.
+- **Condition-mean recovery generalized to single trials:** trial averaging suppresses noise and is part of the estimand.
+- **Decoding equated with reconstruction or representation:** accuracy tests label predictability under a classifier protocol, not preservation of the mean tensor or a unique internal code.
+- **Demixing equated with independence:** different marginal components can be correlated and axes can be nonorthogonal [@Machens2010; @KobakEtAl2016].
+- **Supervised labels treated as causal variables:** an experimentally supplied label can correlate with omitted variables, choices, errors, or selection procedures.
+- **Time marginal called dynamics:** indexed temporal variation is not a transition law, vector field, autonomous system, or mechanism.
+- **Clean plots replace held-out metrics:** visualization does not verify marginal algebra, transfer, leakage, or label handling.
+
+## Recovery task
+
+### Condition-mean effect estimation
+
+The direct condition-mean record reports empirical train/validation/test marginal tensors and their normalized error against the retained noiseless generator effects. This measures sampling error before dimensionality reduction. It is not a learned projection method.
+
+### Marginal reconstruction
+
+For flattened centered condition means $X\in\mathbb R^{12\times96}$ and each grouped marginal $X_\phi$:
+
+- global PCA fits one rank-four projector $P$ on training $X$ and reconstructs held-out marginal $\phi$ as $PX_\phi^{\mathrm{test}}$; equivalently, linear marginalization of $PX^{\mathrm{test}}$ yields the same term;
+- separate marginal PCA fits a rank-one projector $P_\phi$ on training $X_\phi$ and reconstructs $P_\phi X_\phi^{\mathrm{test}}$;
+- dPCA fits a rank-one map $A_\phi$ from full training $X$ to target $X_\phi$ and reconstructs $A_\phi X^{\mathrm{test}}$.
+
+These are not the same information problem. Separate marginal PCA is a compression reference; dPCA must isolate a marginal from the full input.
+
+### dPCA map
+
+For each positive grid value $\lambda$, compute
+
+$$
+A_{\phi,\lambda}
+=
+X_\phi X^\top(XX^\top+\lambda I)^{-1}
+$$
+
+using a linear solve. Let $u_{\phi,\lambda}$ be the leading left singular vector of $A_{\phi,\lambda}X$. Set
+
+$$
+F_{\phi,\lambda}=u_{\phi,\lambda},
+\qquad
+D_{\phi,\lambda}=u_{\phi,\lambda}^\top A_{\phi,\lambda},
+$$
+
+and
+
+$$
+\widehat X_\phi=F_{\phi,\lambda}D_{\phi,\lambda}X.
+$$
+
+This is a deterministic ridge map followed by rank-one spectral truncation, a bounded reduced-rank regression construction consistent with the stable Method. Reduced-rank regression constrains the rank of a multivariate coefficient matrix; its encoder/decoder factorization is nonunique without a convention [@Izenman2008, sec. 6.3.2].
+
+### Label decoding
+
+Decoding is a separate trial-level endpoint. Flatten each complete trial into $24\times12=288$ features. For stimulus and decision separately:
+
+1. fit feature mean and scale on training trials only;
+2. fit ridge least-squares binary classifiers for the predeclared decoder grid;
+3. select lambda by validation accuracy with smaller-lambda tie breaking; and
+4. report untouched test accuracy and the 32-shuffle null distribution; the exactly balanced test labels make ordinary and balanced accuracy identical.
+
+The classifier is not used to fit dPCA or choose its components. High decoding accuracy does not establish marginal reconstruction, statistical independence, causal relevance, or a unique representation.
+
+## Candidate analysis methods
+
+1. **Empirical condition means and marginal contrasts.** No learned projection; report sampling error and the visible label effects directly.
+2. **Time-only condition-mean baseline.** Retain the training condition-independent time marginal and set label-dependent marginals to zero. This is not a full mean-only reconstruction.
+3. **Global rank-four PCA.** Fit one unsupervised principal subspace to the complete training condition-mean tensor. Score combined reconstruction and the angle to the combined true signal span, not per-label component identity.
+4. **Separate rank-one marginal PCA.** Fit one PCA to each supplied training marginal. This tests compressibility of the marginal but not isolation from the full tensor.
+5. **Regularized rank-one-per-marginal dPCA.** Fit the declared ridge map plus SVD independently for time, stimulus, decision, and interaction. Select one shared dPCA lambda on validation means only.
+6. **Trial-level ridge decoding.** Fit stimulus and decision classifiers independently of the dPCA objective and report as a separate endpoint.
+7. **Joint-label shuffle controls.** Refit supervised condition means, dPCA candidates, lambda selection, and decoders from shuffled training labels.
+8. **Pseudo-population control.** Preserve condition means while destroying simultaneous trial identity, then compare mean maps, noise covariance, and trial decoding.
+
+No method is called an independent-component method, a causal decomposition, or a latent-state model.
+
+## Evaluation
+
+### Held-out marginal reconstruction
+
+For applicable method $m$ and marginal $\phi$, report
+
+$$
+\operatorname{NMSE}_{m,\phi}
+=
+\frac{\lVert X_\phi^{\mathrm{test}}-widehat X_{m,\phi}^{\mathrm{test}}\rVert_F^2}
+{\lVert X_\phi^{\mathrm{test}}\rVert_F^2}.
+$$
+
+A zero-energy denominator is a declared not-applicable boundary rather than replaced by a favorable constant. Report train, validation, and test separately where used.
+
+### Combined mean reconstruction
+
+For dPCA,
+
+$$
+\widehat X^{\mathrm{test}}=\sum_\phi
+F_\phi D_\phi X^{\mathrm{test}}.
+$$
+
+Report normalized combined error against the centered held-out condition-mean tensor. Global PCA uses $PX^{\mathrm{test}}$. Separate marginal PCA uses $\sum_\phi P_\phi X_\phi^{\mathrm{test}}$ and is explicitly labelled as target-supplied marginal compression.
+
+### Marginal variance fractions
+
+For balanced centered condition means,
+
+$$
+q_\phi=\frac{\lVert X_\phi\rVert_F^2}
+{\sum_\psi\lVert X_\psi\rVert_F^2}.
+$$
+
+Report population-truth, train, validation, and test fractions. These describe the chosen equal-cell tensor and are not additive component variances across nonorthogonal dPCA axes.
+
+### Subspace alignment
+
+For a unit estimated encoder $\widehat f_\phi$ and true unit mixing direction $a_\phi$, report the acute rank-one principal angle
+
+$$
+\theta_\phi=
+\arccos\left(\left|\widehat f_\phi^\top a_\phi\right|\right).
+$$
+
+Apply this to separate marginal PCA encoders and dPCA encoders. Do not score dPCA decoder rows against $a_\phi$. For global PCA, compare its complete rank-four subspace with
+
+$$
+\operatorname{span}(a_t,a_s,a_d,a_{sd})
+$$
+
+using all four principal angles and the projector Frobenius distance. In the nearly collinear condition, report conditioning and angle instability without pretending that two almost coincident directions are strongly practically identified.
+
+### Full marginal confusion and demixing profile
+
+For recovered marginal map $A_\phi$ and each true or held-out source marginal $X_\psi$, report all entries
+
+$$
+C_{\phi\leftarrow\psi}
+=
+\frac{\lVert A_\phi X_\psi\rVert_F^2}
+{\sum_{\rho}\lVert A_\phi X_\rho\rVert_F^2}.
+$$
+
+Also report decoder-score profiles
+
+$$
+v_{\phi\leftarrow\psi}
+=
+\lVert D_\phi X_\psi\rVert_F^2.
+$$
+
+Rows and columns are explicitly labelled. The implementation stores raw map-output energy, the row-normalized confusion fraction $C$, and decoder-score energy separately. It also reports an `assigned_marginal_fraction` equal to the diagonal confusion entry. A scalar demixing index
+
+$$
+\max_\psi v_{\phi\leftarrow\psi}/
+\sum_\psi v_{\phi\leftarrow\psi}
+$$
+
+uses the maximum source fraction and may supplement but never replace the complete profile. It differs from the assigned fraction when an off-target source dominates, as in the nearly collinear decision control. Nonzero off-target entries mean cross-marginal sensitivity under this design, not causal mixing.
+
+### Decoding
+
+Report stimulus and decision test accuracy, selected decoder lambda, and the 32-shuffle median, interval, and exceedance count. Test labels are exactly balanced, so ordinary and balanced accuracy coincide and are not duplicated. Interaction decoding is omitted from the primary endpoint because four-way condition classification is a different multiclass task. Decoding results remain separate from marginal reconstruction tables.
+
+### Lambda selection
+
+For every dPCA grid value, report validation NMSE by marginal and their unweighted mean. Store the selected lambda and tie rule. Test metrics are computed once after selection and cannot change the choice.
+
+### Tidy metrics schema
+
+Every `metrics.csv` row contains exactly:
+
+~~~text
+split,condition,method,marginal,target,metric,value
+~~~
+
+Values are finite numeric. Inapplicable rows are omitted and explained in `diagnostics.json`; they are not encoded as zero or NaN. Missing-cell recovery rows contain the exact target prefix `invalid_rank_deficient_balanced_recovery` and cannot be pooled with valid recovery rows.
+
+## Interpretation
+
+The primary balanced condition tests recovery of a declared supervised mean decomposition. A small dPCA marginal reconstruction error means that one regularized linear map transfers from full training means to an independently estimated held-out marginal under the same labels and equal-cell measure. It does not imply that the labelled effect is statistically independent, uniquely represented, anatomically separate, causally generated by the label, or mechanistic.
+
+Global PCA can preserve the combined signal span without assigning task semantics. Separate marginal PCA can recover a marginal direction after the marginal is supplied. dPCA addresses the harder isolation problem by using labels to define a target and fitting an oblique encoder/decoder map. Label supervision is part of the method, not external validation.
+
+::: {.callout-tip title="LDG synthesis"}
+Demixing is relative to a declared label algebra, averaging measure, grouping convention, rank, regularization, and reconstruction loss. Changing any of those choices changes the estimand. A useful demixed display is therefore a reproducible supervised summary, not discovery of independent latent generators.
+:::
+
+## What this toy model does NOT establish
+
+- It does not establish statistical independence among components or effects.
+- It does not establish causal separation, intervention effects, or mechanistic modules.
+- It does not prove that stimulus or decision labels are uniquely represented in the features.
+- It does not turn decoding accuracy into evidence of representation, necessity, or biological meaning.
+- It does not infer latent states, transition dynamics, a vector field, or an autonomous system.
+- It does not claim that smooth mean trajectories are dynamics; they are fixed time-indexed profiles plus trial averaging.
+- It does not prove manifold structure, topology, nonlinear geometry, or intrinsic dimension.
+- It does not identify a unique encoder/decoder factorization beyond the declared rank-one sign convention.
+- It does not make pseudo-population trials simultaneous observations.
+- It does not validate balanced marginalization when a factorial cell is missing.
+- It does not claim that mean-level reconstruction predicts single-trial performance.
+- It does not claim universal superiority of dPCA over PCA, marginal PCA, or decoding.
+
+## Extensions to real data
+
+A real-data analysis would need to define the true independent unit, simultaneity of recording, alignment events, binning/smoothing, feature scaling, label coding, missing cells, label correlations, cell weights, trial exclusions, sessions/subjects, and the grouping of interactions. Trial, session, or subject splits must prevent correlated observations from crossing folds.
+
+If cells are missing, an explicit parametric model, scientifically justified weighting estimand, or redesigned experiment is required; balanced formulas cannot manufacture the absent contrast. If labels are correlated—such as stimulus and decision with few error trials—separate marginal interpretations depend on those rare cells and the chosen estimand. Pseudo-populations cannot estimate simultaneous noise correlations. Condition-mean dPCA should be supplemented by independent single-trial and session-level checks rather than backdating mean-map performance into trial-level claims.
+
+## Reproducibility
+
+### Bounded artifact contract
+
+The implementation scope is exactly:
+
+~~~text
+toy-models/label-dependent-demixing.py
+toy-models/artifacts/label-dependent-demixing/manifest.json
+toy-models/artifacts/label-dependent-demixing/metrics.csv
+toy-models/artifacts/label-dependent-demixing/diagnostics.json
+toy-models/artifacts/label-dependent-demixing/summary.png
+~~~
+
+No additional artifact is authorized. The script uses only the existing bundled Python, NumPy, and Pillow environment and regenerates every artifact from source. JSON ordering, CSV ordering, float formatting, plot dimensions, fonts, and PNG metadata are fixed for byte-comparison determinism.
+
+The manifest records:
+
+- generator equations, dimensions, raw and normalized mixing vectors, their Gram matrix, time profiles, amplitudes, and noise covariance;
+- every seed word, split size, cell count, shuffle count, and pseudo-population permutation convention;
+- the complete balanced marginalization and interaction-grouping rules;
+- PCA ranks, dPCA and decoder grids, lambda selection criteria, tie rules, and numerical tolerances;
+- missing-cell applicability labels and design ranks;
+- runtime/package versions, commands, and SHA-256 hashes; and
+- exact artifact inventory.
+
+`diagnostics.json` contains generator algebra, split/leakage, balanced marginalization, missing-cell rank, ridge solve, SVD/rank, lambda selection, truth-poisoning, label-shuffle, pseudo-population, trial-averaging, metric-applicability, and deterministic-regeneration records.
+
+The expected bundled-runtime command is:
+
+~~~bash
+/Users/bytedance/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3 toy-models/label-dependent-demixing.py
+~~~
+
+The default command should generate and verify the repository artifacts, with explicit `--generate` and `--verify` modes if it follows the established Phase 3 convention. Verification includes clean temporary regeneration and byte comparison.
+
+### Evidence inspected
+
+The following sources were actually retrieved and inspected. Existing LDG Methods supplied terminology but were not treated as external evidence.
+
+- **Machens (2010):** the complete 10-page Frontiers article PDF was inspected for the abstract and introduction; the linear-mixture toy example; PCA covariance discussion; stimulus/decision marginalized covariance construction; extension to multiple task parameters; the marginal confusion matrix; overlap/nonseparability limitations; the distinction from blind source separation and independent-component assumptions; and the discussion. The appendix's optimization derivations were not checked equation by equation. This source supports treating task-labelled covariance sources separately while rejecting an automatic statistical-independence interpretation [@Machens2010].
+- **Brendel, Romo, and Machens (2011):** the complete 9-page NeurIPS paper was inspected for the abstract and introduction; equations 1--7 defining PCA, factorial marginalized averages, exact reconstruction, and covariance decomposition; the demixing loss; the probabilistic orthogonality-constrained formulation; the algorithm summary; empirical illustration; and conclusion. The full EM algebra was not independently rederived line by line. This source supports the factorial marginalization ancestry and documents that the earlier formulation differs from the later reduced-rank method [@BrendelRomoMachens2011].
+- **Kobak et al. (2016):** the 36-page eLife PDF was inspected for the abstract; introduction and conceptual PCA/LDA/dPCA comparison; the condition-mean encoder/decoder objective; grouped time/stimulus/decision/interaction decomposition; discussion and limitations; and Materials and methods sections covering balanced marginalization, reduced-rank regression, ridge regularization, rebalancing, pseudo-trials, cross-validation, decoding, and label shuffles. Dataset-specific result narratives and later method-comparison details were sampled rather than read exhaustively, and every supplementary derivation was not rederived. This source supports the bounded condition-mean objective, nonorthogonal axes, balancing requirement, held-out pseudo-trial principle, and separation of decoding from reconstruction [@KobakEtAl2016].
+- **Izenman (2008):** only Chapter 6 sections 6.3.1--6.3.2, printed pages 175--183, were inspected in the 758-page book. Inspection covered full-rank multivariate regression, the rank constraint, nonunique $AB$ factorization, weighted least-squares criterion, spectral reduced-rank solution, sample estimators, and ridge perturbation for poorly conditioned covariance matrices. The rest of the book and rank-selection section 6.3.4 were not inspected for this object. This source supports the general reduced-rank-regression framing but not this Toy Model's specific lambda grid or dPCA grouping [@Izenman2008, sec. 6.3.2].
+
+The sources do not provide this simulator's feature count, time bins, vectors, profiles, amplitudes, noise covariance, seeds, cell counts, grids, shuffle count, or numerical tolerances. Those are frozen LDG design choices.
+
+### Integration state
+
+The bounded implementation and deterministic artifacts are reconciled with this record at L1/stable after independent scientific and implementation focused PASS, repository validation, target/index/full-site renders, and mechanical promotion under the recorded review decision.
+
+### Historical target-check responsibilities
+
+The executor ran structural, target-render, and diff checks; the implementation owner ran generation and artifact verification; and the parent orchestrator completed repository-wide tests, index/control reconciliation, review integration, and stable promotion. This records completed role separation rather than pending work.
+
+## Maturity checklist
+
+- [x] Complete L1/stable Toy Model schema and bounded artifact contract.
+- [x] Independent trial-level generator with time, binary stimulus/decision, and known grouped interaction effects.
+- [x] Effects, mixing directions, main effects, and time interactions are distinguished.
+- [x] Balanced condition means and grouped ANOVA-style marginalization are explicit.
+- [x] Condition means, PCA, marginal PCA, rank-one dPCA, decoding, and shuffles are defined.
+- [x] Finite lambda grids and leakage-safe validation selection are frozen.
+- [x] Near-collinearity, missing cell, shuffles, pseudo-population, and trial-averaging controls are bounded.
+- [x] Marginal NMSE, combined reconstruction, variance fractions, allowed angles, full confusion, decoding, and lambda metrics are specified.
+- [x] Missing-cell results are labelled invalid rather than silently balanced.
+- [x] Independence, causality, representation, dynamics, and mechanism overclaims are prohibited.
+- [x] External evidence scope and limits are recorded.
+- [x] Deterministic empirical artifacts integrated.
+- [x] Independent scientific review PASS after focused re-review of marginal-PCA fairness, demixing definitions, direct truth records, and pseudo-population tolerance wording.
+- [x] Independent implementation review PASS after focused re-review of scoring, confusion/PNG, solves, poison scope, shuffles, and manifest consistency.

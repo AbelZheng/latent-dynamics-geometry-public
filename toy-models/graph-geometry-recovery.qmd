@@ -1,0 +1,914 @@
+---
+title: "Graph Geometry Recovery Without Manifold Overclaim"
+object_type: toy-model
+maturity: L1
+status: stable
+domain: [dimensionality-reduction, graph-methods, geometry, spectral-methods]
+tags: [isomap, diffusion-maps, classical-mds, graph-distance, out-of-sample-extension, negative-controls]
+prerequisites:
+- knowledge/methods/principal-component-analysis.qmd
+- knowledge/methods/isomap.qmd
+- knowledge/methods/diffusion-maps.qmd
+- knowledge/concepts/metric.qmd
+related:
+- knowledge/concepts/circle-s1.qmd
+- knowledge/concepts/geodesic.qmd
+- knowledge/concepts/manifold.qmd
+- knowledge/concepts/topology.qmd
+- knowledge/concepts/riemannian-metric.qmd
+- toy-models/bounded-nonlinear-reconstruction.qmd
+created: 2026-08-20
+updated: 2026-08-20
+---
+
+# Graph Geometry Recovery Without Manifold Overclaim
+
+This L1/stable Candidate B Toy Model separates finite graph construction,
+shortest-path distance, classical multidimensional scaling (MDS), affinity-
+operator eigenspaces, diffusion-distance truncation, and held-out extension. It
+uses two simulators with known scoring targets: a unit-speed hairpin with analytic
+arc length, and a clean sampled circle whose uniform Gaussian affinity is
+circulant. Numerical values are deterministic outputs under master seed
+`20260820`; the corrected generated artifact contains 197 finite, uniquely keyed
+metrics.
+
+**Assumed background:** Euclidean distance, connected weighted graphs,
+all-pairs shortest paths, symmetric eigendecomposition, classical MDS, reversible
+Markov operators, principal angles, and leakage-safe train/test evaluation.
+
+## Question
+
+The object asks two bounded questions.
+
+1. **Hairpin:** when observations trace a known folded interval, does a fixed
+   $k$-nearest-neighbor Isomap graph approximate analytic arc-length distance and
+   support a useful one-dimensional held-out extension beyond PCA and ambient-
+   distance MDS? How do a connector gap, nonuniform sampling, reduced branch
+   separation, bad $k$, and anisotropic feature scaling break that result?
+2. **Circle:** for a finite clean uniform circle sample, does the declared
+   $\alpha=1$ Diffusion Maps operator recover the known first nonconstant
+   two-dimensional Fourier eigenspace, how much diffusion distance is lost by
+   retaining only two modes, and how accurately does normalized Nyström
+   extension recover held-out midpoint angles? How do nonuniform density and
+   extreme bandwidths change those finite-operator results?
+
+The targets are declared simulator distances and finite graph/operator
+quantities. Graph success is not proof of topology, manifold structure,
+intrinsic dimension, geodesic or Riemannian geometry, unique coordinates,
+dynamics, mechanism, or causality.
+
+## Ground truth
+
+### Unit-speed vertical hairpin
+
+Let
+
+$$
+r=0.175,
+\qquad
+L=6+\pi r=6.549778714378213.
+$$
+
+The two straight branches have length $3$ and separation $2r=0.35$. For true
+arc-length parameter $\ell\in[0,L]$, define
+
+$$
+c_r(\ell)=
+\begin{cases}
+(0,\ell), & 0\leq\ell\leq3,\\[3pt]
+\left(r+r\cos\theta,\ 3+r\sin\theta\right),
+&3<\ell\leq3+\pi r,\\[3pt]
+(2r,3-v), &3+\pi r<\ell\leq L,
+\end{cases}
+$$
+
+where
+
+$$
+\theta=\pi-\frac{\ell-3}{r},
+\qquad
+v=\ell-(3+\pi r).
+$$
+
+The joins are continuous and $\lVert c_r'(\ell)\rVert_2=1$ on the three smooth
+interiors. Therefore the simulator path distance is exactly
+
+$$
+d_\ell(i,j)=|\ell_i-\ell_j|.
+$$
+
+A fixed QR-derived isometry embeds the plane in $\mathbb R^3$. NumPy QR is
+applied to
+
+$$
+A=
+\begin{pmatrix}
+1.0&0.3\\
+-0.2&0.9\\
+0.45&-0.35
+\end{pmatrix},
+$$
+
+and the retained two columns are
+
+$$
+Q=
+\begin{pmatrix}
+-0.8971226080&-0.3267089443\\
+ 0.1794245216&-0.8845629735\\
+-0.4037051736& 0.3328807769
+\end{pmatrix},
+\qquad Q^\top Q=I_2.
+$$
+
+With fixed offset $o=(0.4,-0.7,0.2)^\top$,
+
+$$
+x^0(\ell)=Qc_r(\ell)+o,
+\qquad
+x(\ell)=x^0(\ell)+\epsilon,
+\qquad
+\epsilon\sim\mathcal N(0,0.01^2I_3).
+$$
+
+The implementation retains $\ell$ only for scoring and oracles. Graph fitting,
+PCA, MDS, and raw extension receive noisy observations only.
+
+### Circle and declared finite-operator target
+
+The circle uses 96 clean, uniformly spaced training angles and 96 held-out
+midpoint angles:
+
+$$
+\theta_j=\frac{2\pi j}{96},
+\qquad
+\theta_j^*=\frac{2\pi(j+1/2)}{96},
+\qquad j=0,\ldots,95.
+$$
+
+Planar points $(\cos\theta,\sin\theta)$ are embedded isometrically in
+$\mathbb R^3$ using the same $Q$, without the hairpin offset. For training
+points, the Gaussian affinity is
+
+$$
+W_{ij}=\exp\left(-\frac{\lVert y_i-y_j\rVert_2^2}{\varepsilon}\right).
+$$
+
+Uniform circular spacing makes the clean distance and affinity matrices
+circulant. Hence
+
+$$
+\mathcal F_1
+=\operatorname{span}\{(\cos\theta_j)_j,(\sin\theta_j)_j\}
+$$
+
+is the declared first nonconstant finite-operator eigenspace. The implementation
+checks circulant structure, eigenvalue ordering, subspace angles, and an operator
+residual rather than hard-coding recovery. This is a finite matrix oracle, not a
+topology inference result.
+
+## Generative model
+
+### Hairpin splits
+
+For nominal hairpin data, independently draw and sort
+
+$$
+\ell_i\sim\operatorname{Uniform}[0,L]
+$$
+
+within each split. Split sizes are:
+
+| Split | Rows | Use |
+|---|---:|---|
+| train | 180 | graph, PCA, MDS, and scoring-alignment fit |
+| validation | 80 | fixed-rule extension evaluation |
+| test | 80 | final fixed-rule extension evaluation |
+
+Separate `Generator(PCG64(SeedSequence(words)))` streams generate train,
+validation, test, control, and observation-noise draws. Sorting is only a storage
+convention; no method receives row order as a path edge.
+
+### Circle samples
+
+The nominal training and midpoint grids are deterministic. The nonuniform circle
+control draws 96 deterministic seeded values, sorts them, and applies
+
+$$
+\theta=2\pi u^{2.4},
+\qquad u\sim\operatorname{Uniform}[0,1].
+$$
+
+There is no circle validation grid and no circle metric-rescaling condition.
+
+Generation, feature transformation, graph/affinity construction, spectral
+fitting, extension, scoring alignment, artifact writing, and verification are
+separate functions. Test truth never enters a graph, operator, embedding, or raw
+extension.
+
+## Parameters
+
+### Hairpin graph
+
+- dissimilarity: Euclidean distance in the supplied $\mathbb R^3$ features;
+- nominal graph: undirected **union** $k$NN graph with $k=6$;
+- neighbor candidates: set the distance diagonal to $+\infty$ before stable
+  mergesort, then retain the first $k$ indices;
+- exact distance ties: stable sorting retains lower row indices first;
+- directed candidates are symmetrized by their union, with each retained edge
+  assigned its exact ambient distance;
+- edge weight: ambient Euclidean distance;
+- shortest paths: deterministic vectorized Floyd--Warshall;
+- embedding dimension: one;
+- disconnected pairs: retain $+\infty$ in diagnostics and do not pass them to
+  classical MDS;
+- a **long-arc-separation edge** satisfies
+  $$
+  |\ell_i-\ell_j|>0.70;
+  $$
+- a **material path shortcut** satisfies
+  $$
+  |\ell_i-\ell_j|-w_{ij}>0.50,
+  $$
+  where $w_{ij}$ is the retained ambient edge weight; and
+- both rates use the number of unique undirected off-diagonal graph edges as
+  their denominator.
+
+Both edge labels use simulator truth only after graph construction. The
+long-arc label records separation without asserting underestimation; the term
+**shortcut** is reserved for the material path-underestimation criterion. No
+$k$ is selected from $\ell$, validation, or test results.
+
+### Classical MDS and extension
+
+For finite distance matrix $D$,
+
+$$
+J=I-\frac1n\mathbf1\mathbf1^\top,
+\qquad
+B=-\frac12JD^{\circ2}J.
+$$
+
+For the leading eigenpair $(\lambda_1,v_1)$, the one-dimensional coordinate is
+
+$$
+z=\sqrt{\max(\lambda_1,0)}v_1.
+$$
+
+The implementation reports two direct numerical diagnostics:
+
+$$
+\text{negative eigenmass}=\sum_{\lambda_j<0}|\lambda_j|
+$$
+
+and
+
+$$
+\text{strain}
+=\sqrt{\operatorname{mean}\left(B-zz^\top\right)^2}.
+$$
+
+These are not normalized fractions.
+
+For a held-out point with squared distances $\delta_*^2$ to training points, the
+implemented Gower extension forms
+
+$$
+b_*
+=-\frac12\left[
+\delta_*^2
+-\operatorname{mean}(\delta_*^2)\mathbf1
+-\operatorname{rowmean}(D^{\circ2})
++\operatorname{mean}(D^{\circ2})\mathbf1
+\right]
+$$
+
+and returns
+
+$$
+z_*=\frac{b_*^\top v_1}{\sqrt{\max(\lambda_1,10^{-15})}}.
+$$
+
+Ambient MDS uses $\delta_{*j}=\lVert x_*-x_j\rVert_2$. Isomap attaches the new
+point to its six nearest training vertices without changing the training graph,
+then uses
+
+$$
+\delta_{*j}
+=\min_{i\in N_6(x_*)}
+\left(\lVert x_*-x_i\rVert_2+d_G(i,j)\right).
+$$
+
+### Hairpin scoring alignment
+
+For each of PCA, ambient MDS, and Isomap, fit
+
+$$
+\ell_i=az_i+b
+$$
+
+by least squares on training coordinates and training $\ell$. Freeze $(a,b)$ and
+apply it unchanged to validation and test raw coordinates. The affine map handles
+sign, origin, and scale only for scoring; it is not part of the observation-only
+fit and does not identify a unique latent coordinate.
+
+### Diffusion Maps
+
+The fixed nominal parameters are
+
+$$
+\varepsilon=0.18,
+\qquad
+\alpha=1,
+\qquad
+t=1,
+\qquad
+m=2.
+$$
+
+Self-affinities are retained. Define
+
+$$
+q_i=\sum_jW_{ij},
+\qquad
+K_{ij}=\frac{W_{ij}}{q_iq_j},
+\qquad
+d_i=\sum_jK_{ij},
+$$
+
+$$
+P=D^{-1}K,
+\qquad
+\pi_i=\frac{d_i}{\sum_rd_r},
+\qquad
+S=D^{-1/2}KD^{-1/2}.
+$$
+
+Diagonalize the real symmetric $S$ with Euclidean-orthonormal eigenvectors
+$\phi_l$. The implementation transforms them to right eigenfunctions
+
+$$
+\psi_l
+=\sqrt{\sum_i d_i}\,D^{-1/2}\phi_l,
+$$
+
+so
+
+$$
+\psi_l^\top\Pi\psi_m=\delta_{lm}.
+$$
+
+The two-mode coordinate excludes the trivial constant mode:
+
+$$
+\Phi_{1,2}(y_i)
+=\left(\lambda_1\psi_1(i),\lambda_2\psi_2(i)\right).
+$$
+
+The full finite-operator diffusion distance uses all nonconstant modes,
+
+$$
+D_1(i,j)^2
+=\sum_{l=1}^{95}\lambda_l^2
+\left(\psi_l(i)-\psi_l(j)\right)^2,
+$$
+
+and is independently recomputed from rows of $P$ as
+
+$$
+D_1(i,j)^2
+=\sum_k\frac{(P_{ik}-P_{jk})^2}{\pi_k}.
+$$
+
+Diffusion time is one graph-operator step, not physical time or discovered
+dynamics [@CoifmanLafon2006].
+
+### Normalized Nyström extension and circle alignment
+
+For held-out $y_*$, compute training affinities and
+
+$$
+q_*=\sum_jw_{*j},
+\qquad
+k_{*j}=\frac{w_{*j}}{q_*q_j},
+\qquad
+p_{*j}=\frac{k_{*j}}{\sum_rk_{*r}}.
+$$
+
+For nonzero modes,
+
+$$
+\psi_l(y_*)
+=\frac1{\lambda_l}\sum_jp_{*j}\psi_l(j).
+$$
+
+The two retained coordinates are linearly aligned to training rows
+$(\cos\theta_i,\sin\theta_i)$ by one unconstrained least-squares $2\times2$ map.
+That same map scores all midpoint extensions. There is no second Procrustes,
+radial, angular, or validation alignment in the implementation. Spectral
+out-of-sample extension is an additional algorithm and need not equal a
+transductive full refit [@BengioEtAl2003].
+
+## Simulation
+
+### Nominal hairpin
+
+Fit the training mean, rank-one PCA, ambient-distance MDS, and $k=6$ Isomap on
+noisy training observations. Extend validation and test observations without
+rebuilding the graph.
+
+### Hairpin controls
+
+The implemented controls are exact and predeclared:
+
+1. **Sparse connector gap:** rejection-sample 180 training $\ell$ values outside
+   $$
+   [3-0.18,\ 3+\pi r+0.18].
+   $$
+2. **Reduced branch separation:** set
+   $$
+   r_r=0.06,
+   \qquad
+   L_r=6+\pi r_r=6.188495559215387,
+   $$
+   and preserve the nominal training quantiles by
+   $$
+   \ell_r=\frac{\ell_{\mathrm{nominal}}}{L}\,L_r.
+   $$
+   Evaluate the same piecewise formula $c_{r_r}$ on $[0,L_r]$ and use $k=6$.
+   This retains two straight branches of length 3 and endpoint
+   $c_{r_r}(L_r)=(0.12,0)$.
+3. **Nonuniform sampling:** draw $u\sim U[0,1]$ and transform
+   $$
+   \ell=
+   \begin{cases}
+   L\,0.55(u/0.65)^2,&u<0.65,\\
+   L\left[0.55+0.45((u-0.65)/0.35)^{0.55}\right],&u\geq0.65.
+   \end{cases}
+   $$
+4. **Disconnected small neighborhood:** nominal observations with union $k=1$.
+5. **Wrong larger neighborhood:** nominal observations with union $k=18$.
+6. **Nearly complete graph:** nominal observations with $k=n_{\mathrm{train}}-2=178$.
+7. **Anisotropic feature scaling:** right-multiply nominal observed rows by
+   $$
+   \operatorname{diag}(1,1,3)
+   $$
+   before distance and graph construction, then keep $k=6$. This changes feature
+   geometry and neighbor identities; it is not a harmless global scalar.
+
+### Circle conditions
+
+1. **Uniform nominal:** 96 clean training angles, $\varepsilon=0.18$.
+2. **Nonuniform density:** seeded sorted $2\pi u^{2.4}$ angles, $\varepsilon=0.18$.
+3. **Bandwidth too small:** uniform angles with $\varepsilon=0.005$.
+4. **Bandwidth too large:** uniform angles with $\varepsilon=5.0$.
+
+Failures are reported rather than tuned away. There is no circle metric-rescaling
+condition.
+
+## Visualization
+
+The single generated `summary.png` has exactly four panels:
+
+1. nominal noisy hairpin training points and fixed $k=6$ graph edges;
+2. nominal test true $\ell$ against train-aligned PCA, ambient-MDS, and Isomap
+   coordinates;
+3. the nominal circle's first two nonconstant diffusion eigenfunctions; and
+4. selected numerical controls plus the interpretation boundary.
+
+![Graph geometry recovery diagnostic](artifacts/graph-geometry-recovery/summary.png)
+
+The figure does not draw the sparse-gap, reduced-separation, nonuniform, or
+bandwidth controls. It is diagnostic only; truth ordering and alignment are
+scoring/display aids rather than fitting inputs.
+
+## Expected behavior
+
+- The hairpin is unit-speed and the fixed $Q$ is isometric, so noiseless path
+  distance is exactly $|\Delta\ell|$.
+- PCA and ambient-distance classical MDS should recover equivalent training
+  one-dimensional sample coordinate subspaces for Euclidean distances. This is
+  an implementation oracle, not a path-distance result.
+- A connected local graph without cross-branch edges can approximate analytic
+  arc length better than ambient chords. Isomap separates graph construction,
+  shortest paths, and MDS [@TenenbaumDeSilvaLangford2000].
+- A sparse gap or $k=1$ can disconnect the graph. Reduced separation, $k=18$,
+  or $k=178$ can create material path shortcuts. Graph approximation depends on sampling,
+  separation, curvature, and path conditions [@BernsteinEtAl2000].
+- On the clean uniform circle, circulant affinity makes the cosine/sine span an
+  exact finite-operator target up to floating point and basis rotation.
+- Two modes need not reproduce full finite-operator diffusion distance even when
+  their eigenspace is recovered exactly.
+- Nonuniform density and extreme bandwidths change degrees, spectra, diffusion
+  scale, truncation, and finite-sample eigenspaces. The $\alpha=1$ continuum
+  interpretation remains assumption-dependent rather than a finite guarantee
+  [@CoifmanLafon2006].
+
+The empirical result, including contrary behavior, is retained without tuning.
+
+## Parameter manipulations
+
+| Condition | Implemented change | Primary diagnostic |
+|---|---|---|
+| `hairpin/nominal` | $r=0.175$, $k=6$ | arc-distance and held-out coordinate RMSE |
+| `sparse_connector_gap` | exclude declared connector interval | components and infinite pairs |
+| `reduced_branch_separation` | $r=0.06$, $L_r=6+\pi r$, nominal quantiles reused | long-arc-separation edges and material path shortcuts |
+| `nonuniform_sampling` | fixed piecewise transform of $u$ | gaps/components/distance error |
+| `disconnected_small_k` | $k=1$ | disconnected components |
+| `wrong_k` | $k=18$ | material path shortcuts and distance distortion |
+| `nearly_complete_large_k` | $k=178$ | ambient-chord collapse |
+| `anisotropic_feature_scaling_z3` | feature transform $\operatorname{diag}(1,1,3)$ | neighbor changes and metric dependence |
+| `circle/uniform` | $\varepsilon=0.18$ | Fourier eigenspace and midpoint extension |
+| `nonuniform_density` | $\theta=2\pi u^{2.4}$ | density-sensitive finite operator |
+| `epsilon_too_small` | $\varepsilon=0.005$ | near-localized spectrum and truncation |
+| `epsilon_too_large` | $\varepsilon=5.0$ | nearly uniform affinity and spectral collapse |
+
+No condition is a validation search over $k$ or $\varepsilon$.
+
+## Sanity checks
+
+The executable verifier asserts only the following implemented oracles:
+
+1. hairpin join continuity, finite-difference unit speed, total length, and
+   $Q^\top Q=I$ within declared tolerances;
+2. graph adjacency symmetry, shortest-path symmetry and zero diagonal, finite
+   distances for the nominal connected graph, explicit infinite distances for a
+   disconnected control, and triangle inequality on 500 deterministic sampled
+   triples;
+3. a synthetic exact-tie/duplicate $k$NN case with points
+   $(0,0),(0,0),(1,0),(-1,0)$ verifies that no row selects itself, stable ties
+   prefer lower indices, union symmetrization is exact, and retained edge weights
+   equal the original distances exactly;
+4. the reduced-separation generator has $L_r=6+\pi(0.06)$, two length-3
+   branches, endpoint $(0.12,0)$, zero domain violation, and reused nominal
+   quantiles to numerical precision;
+5. PCA/ambient-MDS sample-projector equivalence and affine coordinate agreement;
+6. ambient-MDS and Isomap training-point Gower extension replay;
+7. uniform-circle affinity and Markov circulant discrepancies;
+8. Markov row sums, stationarity $\pi^\top P=\pi^\top$, detailed balance,
+   $L^2(\pi)$ eigenfunction Gram matrix, and direct-row versus spectral diffusion
+   distance;
+9. uniform-circle training-point Nyström replay;
+10. hairpin graph-distance and circle two-mode-projector invariance under
+   deterministic relabeling;
+11. exact regeneration of hairpin splits/controls and circle grids;
+12. hairpin truth poisoning leaves fits and raw extensions unchanged;
+13. circle angle-truth poisoning changes truth while leaving observed train and
+    midpoint points, fits, and raw Nyström extensions unchanged;
+14. test-observation poisoning leaves the hairpin training fit unchanged;
+15. anisotropic scaling changes at least one undirected neighbor edge;
+16. graph diagnostic/metric records, including both edge semantics, and the
+    $L^2(\pi)$ circle angle/residual records agree exactly between CSV and JSON;
+17. the exact CSV schema, finite values, nonempty labels, unique keys, artifact
+    hashes, and byte-identical temporary regeneration.
+
+These checks establish bounded numerical and leakage properties only.
+
+## Failure cases
+
+- **Material shortcut hidden by a good plot:** edges whose ambient weight
+  underestimates simulator path separation by more than 0.50 can corrupt many
+  graph distances while a one-dimensional display remains visually ordered.
+- **Long separation confused with shortcut:** $|\Delta\ell|>0.70$ is separately
+  reported but does not by itself prove material path underestimation.
+- **Disconnected distance imputed:** replacing $+\infty$ by an arbitrary finite
+  value invents a geometry; this implementation omits MDS for disconnected
+  controls.
+- **Negative eigenstructure hidden:** the raw negative eigenmass and strain are
+  reported rather than silently calling every distance matrix Euclidean.
+- **Training truth used for neighbors:** $\ell$ and angle values are scoring and
+  oracle inputs only.
+- **Transductive refit called extension:** held-out points are not inserted into
+  the training graph or operator.
+- **Unaligned axes compared literally:** train-fitted affine/linear maps handle
+  coordinate conventions only at scoring time.
+- **Two-mode coordinates called full diffusion geometry:** truncation error is
+  explicitly measured against all finite nonconstant modes.
+- **Density normalization treated as a finite guarantee:** $\alpha=1$ does not
+  prove density-free geometry in the nonuniform finite sample.
+- **Circle eigenspace called topology recovery:** the result follows from a
+  generated circulant matrix, not a topology estimator.
+- **Diffusion time called physical time:** $t=1$ is one Markov-operator step.
+- **Feature rescaling ignored:** anisotropic scaling changed 85 undirected
+  neighbor edges in this realization.
+
+## Recovery task
+
+### Hairpin baselines and Isomap
+
+The mean baseline predicts the training mean of $\ell$ only for scoring. PCA
+centers training observations and projects onto the leading right singular
+vector. Ambient MDS applies classical MDS directly to training Euclidean
+distances. Isomap constructs the union-$k$ graph, computes all-pairs shortest
+paths, and applies the same MDS routine only when connected. Held-out points use
+the fixed Gower rules above.
+
+### Circle Diffusion Maps
+
+The circle analysis constructs the dense Gaussian affinity with self-loops,
+applies $\alpha=1$ normalization, diagonalizes the symmetric conjugate,
+normalizes right eigenfunctions in $L^2(\pi)$, and retains the first two
+nonconstant modes. It computes full and truncated diffusion distances and uses
+the fixed normalized Nyström extension without refitting.
+
+## Candidate analysis methods
+
+### Hairpin
+
+1. training-mean scoring reference;
+2. rank-one PCA;
+3. ambient-distance classical MDS in one dimension;
+4. union-$k$ Isomap plus one-dimensional classical MDS; and
+5. direct graph diagnostics without embedding.
+
+### Circle
+
+1. raw Gaussian affinity and normalized Markov diagnostics;
+2. full $\alpha=1$ finite-operator diffusion distance;
+3. first-two-nonconstant-mode Diffusion Maps at $t=1$;
+4. normalized Nyström midpoint extension; and
+5. direct Fourier-subspace/operator diagnostics.
+
+No method uses truth to choose $k$, $\varepsilon$, retained modes, graph edges,
+or extension parameters.
+
+## Evaluation
+
+Every `metrics.csv` row has exactly:
+
+```text
+domain,condition,split,method,target,metric,value
+```
+
+The final artifact contains 197 finite, nonempty, uniquely keyed rows. Infinite
+graph distances are represented by finite pair counts, not by nonfinite CSV
+values.
+
+### Implemented hairpin metrics
+
+For finite unordered training pairs, graph-distance relative RMSE is
+
+$$
+\frac{\sqrt{\operatorname{mean}(d_G-d_\ell)^2}}
+{\sqrt{\operatorname{mean}d_\ell^2}},
+$$
+
+and Pearson correlation is reported with it. Each graph condition also reports
+edge count; long-arc-separation edge count/rate/threshold/denominator; material
+path shortcut count/rate/underestimation threshold/denominator; component count;
+and finite/infinite pair counts. Connected Isomap conditions additionally report
+raw MDS negative eigenmass and strain. The anisotropic condition reports
+undirected neighbor-edge symmetric-difference count and rate. The reduced-
+separation and exact-tie generator/oracle quantities are also emitted as metrics.
+
+Nominal mean, PCA, ambient MDS, and Isomap report only train/validation/test
+affine-aligned coordinate RMSE. No endpoint/interior, MAE, coordinate
+correlation, degree-quantile, or extra stress metric is emitted.
+
+### Implemented circle metrics
+
+The uniform condition reports two $L^2(\pi)$ principal angles, the weighted
+$P$-invariant-subspace residual,
+two-mode truncation relative RMSE, direct-versus-spectral maximum discrepancy,
+midpoint Nyström RMSE, the leading eight eigenvalues, and five Markov/operator
+oracle discrepancies. Each circle control reports the same weighted residual,
+truncation relative RMSE, full-spectrum pairwise distance RMS, four leading
+eigenvalues, and two weighted principal angles. No radial/angular extension
+metric or circle validation metric is emitted.
+
+The declared $L^2(\pi)$ principal angles are computed between
+$\sqrt\Pi\Psi_{1:2}$ and $\sqrt\Pi C$, where
+$C=(\cos\theta,\sin\theta)$. The implemented invariant-subspace residual uses
+$P$ and is
+
+$$
+\min_A\frac{\lVert PC-CA\rVert_{F,\pi}}{\lVert C\rVert_{F,\pi}},
+\qquad
+\lVert M\rVert_{F,\pi}=\lVert\sqrt\Pi M\rVert_F.
+$$
+
+### Empirical results
+
+Nominal hairpin results are:
+
+| Result | Value |
+|---|---:|
+| Components | 1 |
+| Undirected edges | 622 |
+| Long-arc-separation edges / denominator | 0 / 622 |
+| Material path shortcuts / denominator | 0 / 622 |
+| Graph-distance relative RMSE | 0.00851665 |
+| Graph-distance correlation | 0.99989924 |
+| Isomap train / validation / test RMSE | 0.0148988 / 0.0153847 / 0.0176344 |
+| PCA test RMSE | 1.63981 |
+| Ambient-MDS test RMSE | 1.63981 |
+| Mean test RMSE | 1.64913 |
+| PCA/ambient-MDS projector discrepancy | $5.55\times10^{-17}$ |
+| Ambient-MDS / Isomap replay discrepancy | $2.44\times10^{-15}$ / $4.88\times10^{-15}$ |
+| Ambient-MDS negative eigenmass / strain | $4.92\times10^{-13}$ / 0.0295864 |
+| Isomap negative eigenmass / strain | 0.290124 / 0.00258654 |
+
+Hairpin control results are:
+
+| Condition | Components | Infinite pairs | Long edges / denominator | Material shortcuts / denominator | Relative RMSE | Correlation |
+|---|---:|---:|---:|---:|---:|---:|
+| Sparse connector gap | 2 | 8,064 | 0 / 632 | 0 / 632 | 0.01613 within finite pairs | 0.99977 |
+| Reduced separation, $r=0.06$ | 1 | 0 | 80 / 626 (0.12780) | 81 / 626 (0.12939) | 0.67882 | 0.30233 |
+| Nonuniform sampling | 2 | 1,859 | 1 / 630 (0.00159) | 1 / 630 (0.00159) | 0.28507 | 0.96685 |
+| $k=1$ | 57 | 15,883 | 0 / 123 | 0 / 123 | 0.34740 within finite pairs | 0.90867 |
+| $k=18$ | 1 | 0 | 148 / 1,786 (0.08287) | 142 / 1,786 (0.07951) | 0.63832 | 0.41212 |
+| $k=178$ | 1 | 0 | 12,841 / 16,109 (0.79713) | 6,822 / 16,109 (0.42349) | 0.67861 | 0.32399 |
+| Anisotropic $\operatorname{diag}(1,1,3)$ | 1 | 0 | 0 / 625 | 0 / 625 | 0.36367 | 0.99962 |
+
+The anisotropic transform changed 85 undirected graph edges, a symmetric-
+difference rate of 0.13666 relative to the nominal edge denominator.
+
+For the corrected reduced-separation generator,
+$L_r=6.188495559215387$, the endpoint error and maximum domain violation are
+both zero, and normalized nominal-quantile reuse differs by at most
+$1.11\times10^{-16}$. Its evaluated endpoint is exactly $(0.12,0)$ under the
+stored arithmetic.
+
+Nominal uniform-circle results are:
+
+| Result | Value |
+|---|---:|
+| Leading nonconstant eigenvalues | 0.9538803685 / 0.9538803685 |
+| $L^2(\pi)$ Fourier-subspace principal angles | $0^\circ / 1.48\times10^{-6}\,{}^\circ$ |
+| $L^2(\pi)$ $P$-invariant residual | $3.63\times10^{-16}$ |
+| Two-mode diffusion-distance relative RMSE | 0.441705 |
+| Midpoint Nyström RMSE after train linear alignment | $6.47\times10^{-15}$ |
+| Direct-row versus spectral distance discrepancy | $8.88\times10^{-15}$ |
+
+The finite eigenspace claim is made at numerical tolerance, not as exact
+symbolic computation.
+
+Circle controls are:
+
+| Condition | First nonconstant eigenvalues | $L^2(\pi)$ angles | $P$-invariant residual | Truncation relative RMSE | Full-distance RMS |
+|---|---:|---:|---:|---:|---:|
+| Nonuniform density | 0.98250 / 0.93951 | $7.48065^\circ / 13.57104^\circ$ | 0.0460802 | 0.45053 | 2.86095 |
+| $\varepsilon=0.005$ | 0.99875 / 0.99875 | $0^\circ / 0^\circ$ | $2.61\times10^{-16}$ | 0.78720 | 8.36897 |
+| $\varepsilon=5.0$ | 0.19610 / 0.19610 | $0^\circ / 0^\circ$ | $1.31\times10^{-16}$ | 0.00693 | 0.39622 |
+
+Final nominal operator oracles are:
+
+| Oracle | Maximum discrepancy |
+|---|---:|
+| Markov row sum | $2.22\times10^{-16}$ |
+| Stationarity | $8.67\times10^{-18}$ |
+| Detailed balance | $2.17\times10^{-19}$ |
+| $L^2(\pi)$ eigenfunction Gram | $3.11\times10^{-15}$ |
+| Training Nyström replay | $7.99\times10^{-15}$ |
+| Spectral/direct diffusion distance | $8.88\times10^{-15}$ |
+| Hairpin relabeling | $2.66\times10^{-15}$ |
+| Circle projector relabeling | $2.95\times10^{-16}$ |
+| Truth/test poisoning of fitted outputs | 0 |
+| Exact-tie no-self / stable-lower-index / union-symmetry checks | PASS / PASS / PASS |
+| Exact-tie retained edge-weight discrepancy | 0 |
+| Clean temporary artifact regeneration | byte-identical PASS |
+
+## Interpretation
+
+The nominal hairpin graph closely approximated this simulator's arc-length
+distance and its frozen Isomap extension retained low RMSE on independent
+validation and test samples. PCA and ambient MDS were equivalent linear/chord
+baselines and had much larger aligned coordinate error. The negative controls
+show that this result depended on connector coverage, branch separation,
+neighborhood size, sampling density, and feature metric.
+
+The uniform circle supplied an algebraic finite-operator oracle: its first
+nonconstant right-eigenfunction eigenspace matched the cosine/sine span in the
+$L^2(\pi)$ representation, and midpoint Nyström extension was accurate to
+floating-point precision. Nevertheless, two modes
+omitted substantial full diffusion-distance content at $\varepsilon=0.18$.
+Nonuniform density rotated the finite leading eigenspace away from the uniform
+Fourier target, while extreme bandwidths changed the spectrum and diffusion
+scale even when circulant symmetry preserved the Fourier axes.
+
+Graph shortest paths remain finite combinatorial distances, not automatically
+smooth geodesics. Train-fitted alignments change only scoring coordinates and do
+not identify scientifically privileged axes.
+
+::: {.callout-warning title="What this does NOT imply"}
+Accurate graph distances, low MDS strain, Fourier-eigenspace recovery, a circular
+plot, or low held-out extension error does not prove topology, manifold
+structure, intrinsic dimension, geodesic or Riemannian recovery, unique
+coordinates, dynamics, mechanism, causality, or biological validity.
+:::
+
+## What this toy model does NOT establish
+
+- It does not prove that unknown data are sampled from a manifold.
+- It does not recover interval or circle topology from real data.
+- It does not estimate model-free intrinsic dimension.
+- It does not make graph shortest paths smooth or globally minimizing geodesics.
+- It does not estimate a Riemannian metric tensor, curvature, tangent spaces, or
+  an atlas.
+- It does not make graph connectivity evidence for connected latent topology.
+- It does not make a repeated eigenspace two unique coordinates.
+- It does not make diffusion time physical time.
+- It does not discover dynamics, a vector field, transition law, mechanism, or
+  causal structure.
+- It does not establish universal superiority of Isomap or Diffusion Maps.
+- It does not guarantee equality between frozen extension and transductive refit.
+
+## Extensions to real data
+
+Real-data graph geometry requires an independently justified observational unit,
+feature representation, scaling, missing-data policy, distance, neighborhood or
+bandwidth, density normalization, component policy, coordinate count, and
+out-of-sample use. Dependence units such as subjects, sessions, trials, or
+trajectories should be split intact. Building one graph on train and test is
+transductive and cannot be reported as held-out deployment.
+
+Before interpreting coordinates, report neighbor examples, components, edge and
+degree distributions, negative eigenstructure, spectral stability, truncation,
+and metric/hyperparameter sensitivity. Without simulator truth, graph quality
+requires external scientific justification, stability, or held-out tasks rather
+than a compelling visualization.
+
+## Reproducibility
+
+### Bounded implementation and artifacts
+
+The exact inventory is:
+
+```text
+toy-models/graph-geometry-recovery.py
+toy-models/artifacts/graph-geometry-recovery/manifest.json
+toy-models/artifacts/graph-geometry-recovery/metrics.csv
+toy-models/artifacts/graph-geometry-recovery/diagnostics.json
+toy-models/artifacts/graph-geometry-recovery/summary.png
+```
+
+There are exactly four generated artifacts. The implementation uses bundled
+Python, NumPy, and Pillow and directly implements graph construction, components,
+shortest paths, MDS, Isomap extension, Diffusion Maps, and Nyström extension.
+
+The deterministic command is:
+
+```bash
+/Users/bytedance/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3 toy-models/graph-geometry-recovery.py
+```
+
+Default execution generates and verifies artifacts, including temporary
+byte-identical regeneration. Explicit `--generate` and `--verify` modes are also
+available. The manifest records the split/generator contract, graph and circle
+parameters, method inventory, deterministic default/generate/verify commands,
+anisotropic transform, exact metric fields, tolerances, runtime, hashes, and
+artifact inventory. `diagnostics.json` stores
+generator, reduced-separation, exact-tie $k$NN, nominal/control, weighted
+operator, extension, relabeling, regeneration, and poison-oracle records.
+
+The final generated-artifact SHA-256 values are:
+
+| Artifact | SHA-256 |
+|---|---|
+| `metrics.csv` | `83bd6ee740ce384a5071916e463f8095f067f099e874b6cbfd6429843bd4badb` |
+| `diagnostics.json` | `ac37f7e08bac609edb65e6651673cf51f1caf17e9053cc6e7ba349c7066cb7fb` |
+| `summary.png` | `5d17b441f6e0cb9695fbe73d08fd4f67283bde7528d1a94a365c8fde7dedb3b8` |
+
+### Evidence boundary
+
+No new external source was inspected for this object. Scientific statements are
+limited to evidence scopes already recorded in stable prerequisite objects:
+
+- Tenenbaum, de Silva, and Langford for the Isomap separation of neighborhood
+  graph, shortest paths, and classical MDS [@TenenbaumDeSilvaLangford2000];
+- Bernstein et al. for sampling, curvature, branch-separation, and graph-path
+  approximation conditions [@BernsteinEtAl2000];
+- Bengio et al. for explicit spectral out-of-sample extensions
+  [@BengioEtAl2003]; and
+- Coifman and Lafon for normalized affinity/Markov construction, diffusion
+  distance, spectral coordinates, and the assumption-dependent $\alpha=1$
+  continuum interpretation [@CoifmanLafon2006].
+
+The simulators, sample sizes, $k$, bandwidths, transforms, long-arc threshold,
+material-shortcut threshold, alignments, metrics, tolerances, and artifacts are
+LDG design choices.
+
+### Integration state
+
+The QMD, implementation, and generated artifacts are reconciled at L1/stable
+after independent scientific and implementation focused review, deterministic
+verification, repository validation, tests, target/index/full-site renders, and
+mechanical promotion under the recorded review decision.
+
+## Maturity checklist
+
+- [x] Complete Toy Model schema and exact one-script/four-artifact contract.
+- [x] Implemented vertical unit-speed hairpin, fixed QR isometry/offset, analytic
+  arc length, noise, scoring-only $\ell$, and independent splits are exact.
+- [x] Implemented uniform-circle operator target and midpoint holdout are exact.
+- [x] Mean, PCA, ambient MDS, Isomap, graph diagnostics, Diffusion Maps, full and
+  truncated distances, and frozen extensions are reconciled.
+- [x] Implemented controls, metric schema, results, and numerical oracles are
+  reconciled with the final artifacts.
+- [x] Topology, manifold, intrinsic-dimension, geodesic, Riemannian, coordinate,
+  dynamics, mechanism, and causal overclaims are explicitly rejected.
+- [x] Evidence use is confined to existing inspected prerequisite scopes.
+- [x] Independent scientific review PASS.
+- [x] Independent implementation review PASS.
+- [x] Full parent validation and repository-wide checks PASS.
+- [x] Mechanical L1/stable promotion under the recorded review decision.

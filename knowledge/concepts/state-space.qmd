@@ -1,0 +1,146 @@
+---
+title: "State Space"
+object_type: concept
+maturity: L1
+status: stable
+domain:
+- foundations
+- dynamics
+tags:
+- state-space
+- admissible-states
+- coordinates
+prerequisites:
+- knowledge/concepts/state.qmd
+related: []
+created: 2026-08-17
+updated: 2026-08-17
+---
+
+# State Space
+
+## One-sentence definition
+
+A **state space** is the set of all state values admitted by a specified state description of a specified system.
+
+## Why this concept matters
+
+A state description says what information is carried forward; a state space says which realized values of that description are possible or allowed. This distinction is necessary before asking how a system changes: evolution moves among admissible state values, not among alternative variable lists.
+
+The state space also fixes the domain in which later claims are interpreted. It determines what counts as one state, which combinations of values are allowed, and which system boundary and resolution are being represented. Terman and Izhikevich give the standard formulation that a state space is the set of possible states, with each state represented as a point [@TermanIzhikevich2008].
+
+## Intuition
+
+First choose a state description. For an idealized pendulum, that description might contain angle and angular velocity. Then imagine every admissible assignment of those two quantities. Each assignment is one state value, and the collection of all such values is the state space.
+
+This collection is broader than the states observed in one experiment. A recording may visit only a small subset, and finite data contain only sampled measurements. Conversely, not every arbitrary combination of coordinate values need be admissible: physical constraints, logical constraints, or the declared model boundary may exclude some combinations.
+
+A state space is therefore relative to:
+
+1. **the system boundary** — which entities and influences are inside the system;
+2. **the state description** — which future-relevant variables are retained;
+3. **the resolution and admissibility constraints** — which distinctions and combinations the model treats as meaningful.
+
+A coordinate convention is a separate representational choice. It assigns numerical coordinates to state values in the abstract state space. Different coordinate systems can represent the same underlying state information without changing which abstract states are admissible.
+
+## Formal definition
+
+Let a state description specify the structure of a system's state values and let the declared constraints determine which values are admissible. The state space may be written
+
+$$
+\mathcal{X} = \{x : x \text{ is an admissible state value under the specified description and constraints}\}.
+$$
+
+When state values are represented by $n$ coordinates, one may write $x=(x_1,\ldots,x_n)$. The coordinate tuple is a numerical representation of a state value; it is not the abstract state value or state space by itself. Different coordinate systems may represent the same underlying state values, while admissibility constraints determine which represented values belong to $\mathcal{X}$.
+
+The definition requires a set of possible state values but does not require a particular equation of motion, distance, or visualization. No dimension need yet be specified or justified at L1. In Teschl's abstract mathematical formulation, an evolution acts on a set denoted $M$ [@Teschl2012, sec. 6.1]; in LDG notation, that set is $\mathcal{X}$ once its points have been assigned the role of admissible state values.
+
+## Core notation
+
+- $\mathcal{X}$: the state space.
+- $x\in\mathcal{X}$: one admissible state value.
+- $x(t)\in\mathcal{X}$: the state value assigned at time $t$.
+- $x=(x_1,\ldots,x_n)$: a coordinate representation when the description uses $n$ coordinates.
+
+A matrix whose rows are recorded samples is not denoted $\mathcal{X}$ here: it is a dataset drawn from, projected from, or otherwise related to the proposed state space.
+
+## Prerequisites
+
+- [State](state.qmd): distinguishes a state description, state value, and state vector.
+
+**Assumed background:** elementary sets and vector notation.
+
+## Relationship to adjacent concepts
+
+| Concept | Relationship to state space |
+|---|---|
+| **State description** | Specifies what variables or structure constitute a state. The state space contains the admissible values under that description. |
+| **State value** | One member $x\in\mathcal{X}$ of the state space. The space is not itself a single state. |
+| **State vector / coordinates** | A numerical representation of one state value. Coordinate choices do not define the abstract state space and do not by themselves determine which values are admissible. Different coordinates may represent the same underlying state information. |
+| **Observation space or measurement range** | Contains possible sensor outputs or measured values. It can coincide with the state space under an ideal direct measurement, but it is generally distinct when observations are partial, noisy, or indirect. |
+| **Dataset or data matrix** | Contains finitely many recorded values. It samples or represents observed data; it is not automatically the set of all admissible states. |
+| **Trajectory** | A time-parameterized admissible evolution through state values in the state space. The space contains possible states; a trajectory records one system evolution through them. |
+| **Parameter space** | Contains alternative parameter values indexing models or evolution rules. Parameters and states have different modeling roles even when both are represented by vectors. |
+| **Latent space** | A coordinate domain introduced for unobserved or inferred variables. It is a state space only if its values are assigned an adequate state role for the specified evolution. |
+| **Phase space** | Often used as a synonym for state space in dynamical-systems contexts. Usage varies by field, so LDG requires the intended state description and admissible values to be stated rather than relying on the label alone. |
+
+## What this does NOT imply
+
+Calling a set a state space does **not** by itself imply that:
+
+- every admissible state has been observed or can be observed;
+- recorded samples cover the space densely or without bias;
+- every coordinate is a direct measurement;
+- the space is identical to a data matrix, point cloud, or plotted projection;
+- all coordinate combinations are admissible;
+- the representation is unique, minimal, low-dimensional, or Euclidean;
+- a particular distance, geometry, or neighborhood relation has been justified;
+- a rule of evolution, trajectory, or causal mechanism has been identified; or
+- the model-defined space is the complete physical state space of the real system.
+
+## Minimal example
+
+For the pendulum description
+
+$$
+x=(\text{angle},\;\text{angular velocity}),
+$$
+
+one state value is one particular pendulum condition specified by angle and angular velocity. The abstract state space is the set of all such conditions admitted by the chosen pendulum description and its physical assumptions.
+
+Choosing radians rather than degrees, selecting an angular-velocity unit, or using another equivalent numerical encoding changes the coordinate representation, not the underlying set of admissible pendulum states.
+
+A table containing 1,000 camera samples is not that state space. It is a finite collection of observations. Even if angle and angular velocity are estimated from every frame, the resulting 1,000 state estimates show only the values sampled during that recording, not all admissible pendulum states.
+
+## Neuroscience / behavioral relevance
+
+For $D$ recorded neurons, population activity is often represented by $D$ firing-rate coordinates; each time point is then a point in the corresponding population-coordinate domain [@CunninghamYu2014]. The finite set of recorded population vectors is data, not automatically the full neural state space. Calling the coordinate domain a neural state space additionally commits the analysis to treating those population variables as a state description for a declared system and time scale.
+
+Likewise, a pose-estimation matrix or collection of behavioral features is not automatically a behavioral state space. The proposed space must specify which feature combinations are admissible and why the features constitute state rather than partial observations. A lower-dimensional latent representation remains model- and criterion-dependent; its visualization alone does not establish a unique underlying state space.
+
+## Relevance to LDG
+
+LDG will repeatedly compare recorded variables, latent coordinates, and proposed dynamical descriptions. State-space language keeps three objects separate: the state description, the set of admissible state values, and the finite data used to study them. This separation is required before trajectories or initial conditions can be defined consistently and before later work can make defensible claims about latent structure.
+
+## Open questions
+
+- What empirical evidence would show that a proposed state space excludes state values needed for prediction?
+- Which apparent constraints reflect the system and which reflect sampling or measurement limits?
+- When two coordinate systems represent the same future-relevant information, what makes one scientifically preferable?
+
+These are model- and dataset-specific follow-ups, not reasons to enlarge the L1 definition.
+
+## References
+
+- General state-space definition and pendulum example: [@TermanIzhikevich2008].
+- Abstract set acted on by a dynamical system: [@Teschl2012, sec. 6.1].
+- Neural population-coordinate usage: [@CunninghamYu2014].
+
+## Maturity checklist
+
+- [x] Defines state space as admissible state values under a specified description.
+- [x] Distinguishes descriptions, values, vectors, observations, and datasets.
+- [x] Separates the abstract set of admissible states from its coordinate representations.
+- [x] Includes non-implications and a minimal example without importing later formalism.
+- [x] Uses only existing canonical prerequisites.
+- [x] Has received lightweight conceptual review and incorporated the required L1 corrections.

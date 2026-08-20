@@ -1,0 +1,91 @@
+{
+  "applicability_rules": {
+    "nonconverged_fa": "reported as bounded optimizer nonconvergence/computational failure, not method-level population failure",
+    "outlier_reference_labels": {
+      "covariance_target": "nominal_clean_gaussian_covariance",
+      "method": "nominal_clean_gaussian_reference",
+      "scope": "clean generating Gaussian reference, not the covariance model of the contaminated observable law"
+    },
+    "pca_subspace_target": "population principal subspace of the nominal covariance for each declared condition",
+    "ppca_subspace_target": "same population principal subspace; closed-form PPCA uses the fitted PCA basis",
+    "uniqueness_error": "reported only when diagonal residual specification is applicable and the computed sufficient row-deletion rank diagnostic passes"
+  },
+  "artifact": "static-linear-latent-recovery",
+  "artifact_files": [
+    "manifest.json",
+    "metrics.csv",
+    "diagnostics.json",
+    "summary.png"
+  ],
+  "commands": {
+    "generate": "/Users/bytedance/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3 toy-models/static-linear-latent-recovery.py --generate",
+    "python_executable": "/Users/bytedance/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3",
+    "verify": "/Users/bytedance/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3 toy-models/static-linear-latent-recovery.py --verify"
+  },
+  "condition_order": [
+    "matched_diagonal",
+    "repeated_signal_eigenvalues",
+    "near_zero_uniqueness",
+    "correlated_residuals",
+    "high_variance_nuisance",
+    "outliers"
+  ],
+  "date": "2026-08-19",
+  "dimensions": {
+    "ambient": 8,
+    "latent": 2
+  },
+  "fa_selection": {
+    "criterion": "minimum validation Gaussian NLL with deterministic floor/restart tie break",
+    "fit_data": "train observations only",
+    "floors": [
+      1e-05,
+      0.001
+    ],
+    "max_iterations": 250,
+    "relative_nll_tolerance": 1e-08,
+    "restarts": [
+      0,
+      1,
+      2
+    ],
+    "selection_data": "validation observations only"
+  },
+  "files_sha256": {
+    "diagnostics.json": "0a530f3571b5fa51442a764dce6bf5de577123b4839fe7fc71e280e878962b5e",
+    "metrics.csv": "802f724ff8a43d38a567faeac00a41a84d385657062aa95338cbe8d72a033154",
+    "summary.png": "e0eb777de46be6fd67597f6bbd113401599f79204cd0a888a0c1a3716ad9679b"
+  },
+  "master_seed": 20260819,
+  "methods": [
+    "mean",
+    "fixed_orthonormal_projection",
+    "7_deterministic_random_rank_matched_projections",
+    "ordinary_covariance_pca",
+    "probabilistic_pca_isotropic_noise",
+    "bounded_diagonal_noise_fa_em",
+    "oracle_true_gaussian",
+    "nominal_clean_gaussian_reference_for_outlier_condition"
+  ],
+  "project": "Latent Dynamics & Geometry",
+  "rng": "numpy.Generator(PCG64(SeedSequence((master_seed, stage, condition, split))))",
+  "runtime": {
+    "numpy": "2.3.5",
+    "pillow": "12.3.0",
+    "platform": "macOS-26.5.1-arm64-arm-64bit",
+    "python": "3.12.13"
+  },
+  "schema_version": 1,
+  "split_sizes": {
+    "test": 500,
+    "train": 700,
+    "validation": 350
+  },
+  "test_latent_truth_use": "scoring subspace/recovery diagnostics only; never fitting or selection",
+  "tolerances": {
+    "determinism": 0.0,
+    "poison": 1e-12,
+    "psd": 1e-09,
+    "symmetry": 1e-10
+  }
+}

@@ -1,0 +1,461 @@
+{
+  "informative_missingness": {
+    "mean_abs_latent_when_missing": 0.7177937414921971,
+    "mean_abs_latent_when_observed": 0.40602685596073984,
+    "mechanism": "observation omitted when abs(x_t)>0.9; missingness is therefore non-ignorable under the ordinary observation model",
+    "missing_fraction": 0.284375,
+    "skipped_update_filter_rmse": 0.5341488336100039,
+    "threshold": 0.9,
+    "warning": "Skipped Kalman updates condition only on observed x values and ignore information carried by this state/observation-dependent mask; the result is a diagnostic, not a correction."
+  },
+  "leakage_and_resets": {
+    "hidden_update": {
+      "all_innovation_fields_absent": true,
+      "hidden_time_count": 120,
+      "innovation_fields_absent": {
+        "innovation": true,
+        "innovation_var": true,
+        "nll": true
+      },
+      "mean_equals_prediction_max_abs": 0.0,
+      "variance_equals_prediction_max_abs": 0.0
+    },
+    "independent_sequence_invocation": {
+      "by_key": {
+        "filter.innovation": {
+          "max_abs_discrepancy": 0.0,
+          "nan_pattern_equal": true
+        },
+        "filter.innovation_var": {
+          "max_abs_discrepancy": 0.0,
+          "nan_pattern_equal": true
+        },
+        "filter.mean": {
+          "max_abs_discrepancy": 0.0,
+          "nan_pattern_equal": true
+        },
+        "filter.nll": {
+          "max_abs_discrepancy": 0.0,
+          "nan_pattern_equal": true
+        },
+        "filter.pred_mean": {
+          "max_abs_discrepancy": 0.0,
+          "nan_pattern_equal": true
+        },
+        "filter.pred_var": {
+          "max_abs_discrepancy": 0.0,
+          "nan_pattern_equal": true
+        },
+        "filter.var": {
+          "max_abs_discrepancy": 0.0,
+          "nan_pattern_equal": true
+        },
+        "smoother.mean": {
+          "max_abs_discrepancy": 0.0,
+          "nan_pattern_equal": true
+        },
+        "smoother.var": {
+          "max_abs_discrepancy": 0.0,
+          "nan_pattern_equal": true
+        }
+      },
+      "max_abs_discrepancy": 0.0,
+      "nan_patterns_all_equal": true
+    },
+    "latent_poison": {
+      "grid_selection_score_max_abs_discrepancy": 0.0,
+      "recovery_by_key": {
+        "filter.innovation": {
+          "max_abs_discrepancy": 0.0,
+          "nan_pattern_equal": true
+        },
+        "filter.innovation_var": {
+          "max_abs_discrepancy": 0.0,
+          "nan_pattern_equal": true
+        },
+        "filter.mean": {
+          "max_abs_discrepancy": 0.0,
+          "nan_pattern_equal": true
+        },
+        "filter.nll": {
+          "max_abs_discrepancy": 0.0,
+          "nan_pattern_equal": true
+        },
+        "filter.pred_mean": {
+          "max_abs_discrepancy": 0.0,
+          "nan_pattern_equal": true
+        },
+        "filter.pred_var": {
+          "max_abs_discrepancy": 0.0,
+          "nan_pattern_equal": true
+        },
+        "filter.var": {
+          "max_abs_discrepancy": 0.0,
+          "nan_pattern_equal": true
+        },
+        "smoother.mean": {
+          "max_abs_discrepancy": 0.0,
+          "nan_pattern_equal": true
+        },
+        "smoother.var": {
+          "max_abs_discrepancy": 0.0,
+          "nan_pattern_equal": true
+        }
+      },
+      "recovery_max_abs_discrepancy": 0.0,
+      "recovery_nan_patterns_all_equal": true,
+      "selected_parameters_unchanged": true
+    },
+    "test_observation_poison": {
+      "grid_selection_score_max_abs_discrepancy": 0.0,
+      "selected_parameters_unchanged": true
+    }
+  },
+  "learned_vs_known_gap": {
+    "filter_interval_95_coverage": 0.0,
+    "filter_latent_rmse": 0.0,
+    "predictive_nll": 0.0,
+    "smoother_interval_95_coverage": 0.0,
+    "smoother_latent_rmse": 0.0
+  },
+  "missing_block": {
+    "end_exclusive": 45,
+    "filter_information": "observations through current time only; prediction-only inside block",
+    "smoother_information": "all nonmissing observations in sequence; retrospective, not online",
+    "start_inclusive": 30
+  },
+  "near_unit_root_stress": {
+    "all_finite_nonnegative": true,
+    "max_filter_variance": 0.28612303290414864,
+    "max_smoother_variance": 0.0772013877944398,
+    "open_loop_all_finite_nonnegative": true,
+    "open_loop_horizons": [
+      1,
+      10,
+      50,
+      100,
+      200
+    ],
+    "open_loop_predictive_variance": {
+      "stationary": {
+        "1": 1.0050251256281393,
+        "10": 1.0050251256281393,
+        "100": 1.0050251256281393,
+        "200": 1.0050251256281393,
+        "50": 1.0050251256281393
+      },
+      "tight": {
+        "1": 0.069005,
+        "10": 0.2239034497972174,
+        "100": 0.8770711698152979,
+        "200": 0.9878818962315455,
+        "50": 0.6554550429197121
+      }
+    },
+    "parameters": {
+      "a": 0.99,
+      "q": 0.02,
+      "r": 0.4
+    },
+    "stationary_prior_variance": 1.0050251256281393,
+    "tight_vs_stationary_first_20_mean_max_abs": 1.0643200522135612,
+    "tight_vs_stationary_first_20_variance_max_abs": 0.2416785884597042
+  },
+  "oracles": {
+    "all_covariances_finite": true,
+    "batch_covariance_min_eigenvalue": 0.027336938992874333,
+    "batch_covariance_symmetry_max_abs": 0.0,
+    "causal_prefix_by_key": {
+      "innovation": {
+        "max_abs_discrepancy": 0.0,
+        "nan_pattern_equal": true,
+        "original_nan_count": 0,
+        "perturbed_nan_count": 0
+      },
+      "innovation_var": {
+        "max_abs_discrepancy": 0.0,
+        "nan_pattern_equal": true,
+        "original_nan_count": 0,
+        "perturbed_nan_count": 0
+      },
+      "mean": {
+        "max_abs_discrepancy": 0.0,
+        "nan_pattern_equal": true,
+        "original_nan_count": 0,
+        "perturbed_nan_count": 0
+      },
+      "nll": {
+        "max_abs_discrepancy": 0.0,
+        "nan_pattern_equal": true,
+        "original_nan_count": 0,
+        "perturbed_nan_count": 0
+      },
+      "pred_mean": {
+        "max_abs_discrepancy": 0.0,
+        "nan_pattern_equal": true,
+        "original_nan_count": 0,
+        "perturbed_nan_count": 0
+      },
+      "pred_var": {
+        "max_abs_discrepancy": 0.0,
+        "nan_pattern_equal": true,
+        "original_nan_count": 0,
+        "perturbed_nan_count": 0
+      },
+      "var": {
+        "max_abs_discrepancy": 0.0,
+        "nan_pattern_equal": true,
+        "original_nan_count": 0,
+        "perturbed_nan_count": 0
+      }
+    },
+    "causal_prefix_change_max_abs": 0.0,
+    "causal_prefix_length": 13,
+    "causal_prefix_nan_patterns_all_equal": true,
+    "filter_batch_mean_max_abs": 1.942890293094024e-16,
+    "filter_batch_variance_max_abs": 2.7755575615628914e-17,
+    "rts_batch_mean_max_abs": 2.3592239273284576e-16,
+    "rts_batch_variance_max_abs": 1.3877787807814457e-16,
+    "smoother_minus_filter_variance_max": 0.0
+  },
+  "reset_boundary_negative_control": {
+    "artificial_continuity_abs": 0.8723558714112597,
+    "boundary_prediction_from_previous_sequence": -0.8723558714112597,
+    "correct_reset_prior_mean": 0.0,
+    "first_8_proper_rmse": 0.3335353120531301,
+    "first_8_wrong_rmse": 0.38277115251558186,
+    "first_state_estimate_abs_difference": 0.7664171423167074
+  },
+  "scientific_limits": [
+    "Finite-grid selection is a controlled baseline, not general maximum-likelihood estimation.",
+    "Posterior intervals are conditional on fixed parameters and omit parameter uncertainty.",
+    "Smoother gains from future observations and is not an online competitor to filtering.",
+    "Smooth recovery is not evidence of mechanism, causality, or unique latent structure."
+  ],
+  "selection": {
+    "criterion": "minimum mean train innovation NLL + mean validation innovation NLL; deterministic lexicographic tie break",
+    "grid_scores": [
+      {
+        "a": 0.75,
+        "q": 0.05,
+        "r": 0.2,
+        "selection_score": 2.742620501924616,
+        "train_nll": 1.5115615076817377,
+        "validation_nll": 1.2310589942428787
+      },
+      {
+        "a": 0.75,
+        "q": 0.05,
+        "r": 0.4,
+        "selection_score": 2.4268217393343345,
+        "train_nll": 1.3016819404342732,
+        "validation_nll": 1.125139798900061
+      },
+      {
+        "a": 0.75,
+        "q": 0.05,
+        "r": 0.8,
+        "selection_score": 2.4792442848716014,
+        "train_nll": 1.2932733198296367,
+        "validation_nll": 1.1859709650419648
+      },
+      {
+        "a": 0.75,
+        "q": 0.1,
+        "r": 0.2,
+        "selection_score": 2.5168924261904246,
+        "train_nll": 1.3675851381642843,
+        "validation_nll": 1.1493072880261401
+      },
+      {
+        "a": 0.75,
+        "q": 0.1,
+        "r": 0.4,
+        "selection_score": 2.3531228022505344,
+        "train_nll": 1.246687029484982,
+        "validation_nll": 1.1064357727655527
+      },
+      {
+        "a": 0.75,
+        "q": 0.1,
+        "r": 0.8,
+        "selection_score": 2.471409379586179,
+        "train_nll": 1.2798402251766425,
+        "validation_nll": 1.1915691544095364
+      },
+      {
+        "a": 0.75,
+        "q": 0.2,
+        "r": 0.2,
+        "selection_score": 2.387402828466424,
+        "train_nll": 1.2762614673781136,
+        "validation_nll": 1.1111413610883103
+      },
+      {
+        "a": 0.75,
+        "q": 0.2,
+        "r": 0.4,
+        "selection_score": 2.3440500944299876,
+        "train_nll": 1.2265945097495299,
+        "validation_nll": 1.117455584680458
+      },
+      {
+        "a": 0.75,
+        "q": 0.2,
+        "r": 0.8,
+        "selection_score": 2.5049475426934658,
+        "train_nll": 1.2875365855265903,
+        "validation_nll": 1.2174109571668756
+      },
+      {
+        "a": 0.85,
+        "q": 0.05,
+        "r": 0.2,
+        "selection_score": 2.655925709702223,
+        "train_nll": 1.4486865469489423,
+        "validation_nll": 1.2072391627532808
+      },
+      {
+        "a": 0.85,
+        "q": 0.05,
+        "r": 0.4,
+        "selection_score": 2.3701392698851533,
+        "train_nll": 1.2593492821873287,
+        "validation_nll": 1.1107899876978247
+      },
+      {
+        "a": 0.85,
+        "q": 0.05,
+        "r": 0.8,
+        "selection_score": 2.4543634265474243,
+        "train_nll": 1.2726427806484104,
+        "validation_nll": 1.181720645899014
+      },
+      {
+        "a": 0.85,
+        "q": 0.1,
+        "r": 0.2,
+        "selection_score": 2.4972633833701385,
+        "train_nll": 1.346446320152824,
+        "validation_nll": 1.1508170632173147
+      },
+      {
+        "a": 0.85,
+        "q": 0.1,
+        "r": 0.4,
+        "selection_score": 2.335687774822767,
+        "train_nll": 1.228205733460299,
+        "validation_nll": 1.107482041362468
+      },
+      {
+        "a": 0.85,
+        "q": 0.1,
+        "r": 0.8,
+        "selection_score": 2.4658418194777463,
+        "train_nll": 1.270060733361249,
+        "validation_nll": 1.1957810861164975
+      },
+      {
+        "a": 0.85,
+        "q": 0.2,
+        "r": 0.2,
+        "selection_score": 2.413308874310176,
+        "train_nll": 1.283958089145968,
+        "validation_nll": 1.1293507851642082
+      },
+      {
+        "a": 0.85,
+        "q": 0.2,
+        "r": 0.4,
+        "selection_score": 2.3605968095518604,
+        "train_nll": 1.2292057190098076,
+        "validation_nll": 1.1313910905420526
+      },
+      {
+        "a": 0.85,
+        "q": 0.2,
+        "r": 0.8,
+        "selection_score": 2.5221423976630124,
+        "train_nll": 1.2912521218559638,
+        "validation_nll": 1.2308902758070484
+      },
+      {
+        "a": 0.95,
+        "q": 0.05,
+        "r": 0.2,
+        "selection_score": 2.655987070565401,
+        "train_nll": 1.4369485737178946,
+        "validation_nll": 1.2190384968475063
+      },
+      {
+        "a": 0.95,
+        "q": 0.05,
+        "r": 0.4,
+        "selection_score": 2.3712853792877278,
+        "train_nll": 1.2499738143438022,
+        "validation_nll": 1.1213115649439256
+      },
+      {
+        "a": 0.95,
+        "q": 0.05,
+        "r": 0.8,
+        "selection_score": 2.4645130133444013,
+        "train_nll": 1.2704409114116542,
+        "validation_nll": 1.1940721019327474
+      },
+      {
+        "a": 0.95,
+        "q": 0.1,
+        "r": 0.2,
+        "selection_score": 2.543029316762235,
+        "train_nll": 1.3634286793434165,
+        "validation_nll": 1.1796006374188182
+      },
+      {
+        "a": 0.95,
+        "q": 0.1,
+        "r": 0.4,
+        "selection_score": 2.371496118436079,
+        "train_nll": 1.2402255784356369,
+        "validation_nll": 1.1312705400004426
+      },
+      {
+        "a": 0.95,
+        "q": 0.1,
+        "r": 0.8,
+        "selection_score": 2.501285708051688,
+        "train_nll": 1.2828084163758133,
+        "validation_nll": 1.2184772916758748
+      },
+      {
+        "a": 0.95,
+        "q": 0.2,
+        "r": 0.2,
+        "selection_score": 2.4835218497077847,
+        "train_nll": 1.3170081341611075,
+        "validation_nll": 1.1665137155466774
+      },
+      {
+        "a": 0.95,
+        "q": 0.2,
+        "r": 0.4,
+        "selection_score": 2.417733322875904,
+        "train_nll": 1.2548236719191015,
+        "validation_nll": 1.1629096509568022
+      },
+      {
+        "a": 0.95,
+        "q": 0.2,
+        "r": 0.8,
+        "selection_score": 2.5758242326513914,
+        "train_nll": 1.3151508759344943,
+        "validation_nll": 1.2606733567168973
+      }
+    ],
+    "selected": {
+      "a": 0.85,
+      "q": 0.1,
+      "r": 0.4
+    }
+  }
+}

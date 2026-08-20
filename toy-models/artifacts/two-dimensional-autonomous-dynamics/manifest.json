@@ -1,0 +1,93 @@
+{
+  "artifact": "two-dimensional-autonomous-dynamics",
+  "date": "2026-08-18",
+  "files_sha256": {
+    "coefficients.csv": "abc5a5ccb6289ad18f5bec574080b54e2f995ebb2e884e8558cab4188c1cac21",
+    "diagnostics.json": "99aa40259b5ffe2afed599712adcf6708396f5a8574a4916f88b2377ddb5e981",
+    "latent-trajectories.npz": "888b3f468535999ae120b9ba8354ac2be8ec4387ee86b79b85b16d917e435b7e",
+    "metrics.csv": "89361337ab1c65e01e45b149b0062a0139798cd6ea7db777290c5166be93acf0",
+    "observations.npz": "72e2d01c42a198e0119fca25378da683a7ce259239bec40164513e925a2433fa",
+    "summary.png": "dbd5fb679c61b263219ca075cbc16ba2868213804f58637710d15e3f832f889a"
+  },
+  "generator": {
+    "alpha": 1.0,
+    "beta": 1.0,
+    "equations": [
+      "dx=(1-r^2)x-2y",
+      "dy=2x+(1-r^2)y"
+    ],
+    "implementation": "exact analytic polar solution",
+    "independent_check": "fixed-step RK4 h=0.005",
+    "omega": 2.0,
+    "time_interval": [
+      0.0,
+      8.0
+    ]
+  },
+  "master_seed": 20260818,
+  "noise_scales": [
+    0.0,
+    0.02,
+    0.05
+  ],
+  "nonzero_noise_replicates": 10,
+  "observation_storage": "paired standard-normal arrays on dt=0.025 plus representative observations; all conditions reconstruct by subsampling and sigma scaling",
+  "plan_deviations": [
+    "SciPy DOP853 unavailable: exact analytic generator used, checked independently by NumPy RK4.",
+    "SciPy Savitzky-Golay unavailable: identical centered local-cubic coefficients computed by NumPy pseudoinverse.",
+    "Matplotlib unavailable: one composite diagnostic PNG rendered with bundled Pillow."
+  ],
+  "primary_success_passed": true,
+  "project": "Latent Dynamics & Geometry",
+  "recovery": {
+    "features": [
+      "1",
+      "x",
+      "y",
+      "x2",
+      "xy",
+      "y2",
+      "x3",
+      "x2y",
+      "xy2",
+      "y3"
+    ],
+    "fit_interval": [
+      0.3,
+      2.0
+    ],
+    "ridge_lambda": 0.0001,
+    "rk4_step": 0.005,
+    "rollout_interval": [
+      0.3,
+      8.0
+    ],
+    "score_interval": [
+      0.3,
+      7.7
+    ]
+  },
+  "rng": "numpy.Generator(PCG64(SeedSequence(words)))",
+  "runtime": {
+    "numpy": "2.3.5",
+    "pillow": "12.3.0",
+    "platform": "macOS-26.5.1-arm64-arm-64bit",
+    "python": "3.12.13"
+  },
+  "sampling_intervals": [
+    0.025,
+    0.05,
+    0.1
+  ],
+  "schema_version": 1,
+  "smoothing_windows": {
+    "0.025": 21,
+    "0.05": 11,
+    "0.1": 5
+  },
+  "splits": {
+    "extrapolation": 16,
+    "test": 40,
+    "train": 64
+  }
+}

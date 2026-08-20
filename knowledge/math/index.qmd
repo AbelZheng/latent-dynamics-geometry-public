@@ -1,0 +1,9 @@
+---
+title: "Math"
+---
+
+Math Objects provide the definitions, notation, derivations, examples, geometric intuition, and computational interpretation required by LDG problems.
+
+## Foundational dynamics
+
+- [First-Order Autonomous Dynamical System](first-order-autonomous-dynamical-system.qmd) — the Euclidean autonomous IVP, its regularity ladder, maximal solutions, and induced local flow. *(L2, stable)*

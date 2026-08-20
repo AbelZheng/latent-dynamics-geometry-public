@@ -1,0 +1,86 @@
+---
+title: "Ambient Dimension"
+object_type: concept
+maturity: L1
+status: stable
+domain: [geometry, representation]
+tags: [ambient-dimension, coordinates, data-space]
+prerequisites:
+- knowledge/concepts/state-space.qmd
+related:
+- knowledge/concepts/observation-model.qmd
+created: 2026-08-18
+updated: 2026-08-18
+---
+
+# Ambient Dimension
+
+## One-sentence definition
+
+The **ambient dimension** is the dimension of the surrounding coordinate or vector space in which states, observations, or a candidate structure are represented.
+
+## Why this concept matters
+
+Ambient dimension records how many coordinates the chosen representation provides, not how many degrees of freedom the represented system actually uses. Keeping those questions separate prevents high-dimensional recordings from being equated with high intrinsic complexity.
+
+## Intuition
+
+A curve drawn in three-dimensional space has ambient dimension three even though motion along the curve may require only one local coordinate.
+
+## Formal definition
+
+If an object is represented as a subset $S\subseteq\mathbb R^D$, then $D$ is the ambient dimension of that representation. Changing the representation can change $D$ without changing the underlying object.
+
+For a data matrix with $D$ measured features, $D$ is often the observation-space ambient dimension. This does not make the observations a complete state.
+
+## Core notation
+
+- $\mathbb R^D$: ambient coordinate space.
+- $D$: ambient dimension.
+- $S\subseteq\mathbb R^D$: represented set.
+
+## Prerequisites
+
+[State Space](state-space.qmd) establishes that a space and its coordinates depend on a declared system description.
+
+## Relationship to adjacent concepts
+
+| Concept | Distinction |
+|---|---|
+| **Intrinsic dimension** | Degrees of freedom assigned to the object under a model or criterion, not the surrounding coordinate count. |
+| **Number of observations** | Sample count is not coordinate dimension. |
+| **Rank** | A linear-algebraic property of a matrix or map that may be below ambient dimension. |
+| **State dimension** | Dimension of a specified state representation; an observation space can have a different ambient dimension. |
+
+## What this does NOT imply
+
+Ambient dimension does not imply intrinsic dimension, manifold structure, effective rank, independent coordinates, mechanistic variables, or adequate sampling of the space.
+
+## Minimal example
+
+The unit circle represented in $\mathbb R^2$ has ambient dimension two. The same circle embedded in $\mathbb R^3$ has ambient dimension three although its local degree of freedom remains one.
+
+## Neuroscience / behavioral relevance
+
+The number of recorded neurons, sensors, time bins, or engineered features can define an ambient data dimension. It does not determine latent dimensionality.
+
+## Relevance to LDG
+
+Ambient Dimension supplies the reference quantity needed for careful claims about dimension reduction, subspaces, embeddings, and manifolds.
+
+## Open questions
+
+- Which preprocessing steps change the declared ambient space?
+- Should missing or constrained coordinates count toward $D$?
+- Which representation is appropriate for cross-modal comparisons?
+
+## References
+
+- Levina and Bickel explicitly distinguish high-dimensional embedding from lower intrinsic dimension in their inspected estimator study [@LevinaBickel2004].
+
+## Maturity checklist
+
+- [x] Defines the surrounding coordinate-space dimension.
+- [x] Separates ambient dimension from samples, rank, and intrinsic dimension.
+- [x] States representation dependence.
+- [x] Independent bounded review completed; initial findings were corrected and focused re-review passed.

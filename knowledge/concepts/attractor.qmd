@@ -1,0 +1,180 @@
+---
+title: "Attractor"
+object_type: concept
+maturity: L2
+status: stable
+domain:
+- dynamics
+tags:
+- attractor
+- invariant-set
+- basin-of-attraction
+prerequisites:
+- knowledge/concepts/stability.qmd
+- knowledge/concepts/flow.qmd
+related:
+- knowledge/concepts/fixed-point.qmd
+- knowledge/concepts/trajectory.qmd
+- knowledge/concepts/limit-cycle.qmd
+- knowledge/concepts/metric.qmd
+created: 2026-08-18
+updated: 2026-08-18
+---
+
+# Attractor
+
+## One-sentence definition
+
+An **attractor** is an invariant dynamical set toward which states from a surrounding basin approach under the specified forward evolution, with any additional minimality or transitivity convention stated explicitly.
+
+## Why this concept matters
+
+Attractors organize long-time behavior across many initial conditions. They may be fixed points, periodic orbits, or more complicated invariant sets. The term is also used inconsistently, so LDG must specify the adopted convention rather than label any frequently visited region an attractor.
+
+## Intuition
+
+An attractor is not merely a place where trajectories are often seen. It is a set that the dynamics preserves and toward which a nontrivial collection of nearby initial states evolves.
+
+## Formal definition
+
+Let $(\mathcal X,d)$ be a metric state space and let $I_x$ be the supported elapsed-time interval through $x$. For a nonempty closed set $\Lambda\subseteq\mathcal X$, define its forward basin (or forward stable set in Teschl's terminology) by
+
+$$
+B^+(\Lambda)
+=
+\left\{
+ x\in\mathcal X:
+ [0,\infty)\subseteq I_x
+ \text{ and }
+ \lim_{t\to\infty}d(\phi_t(x),\Lambda)=0
+\right\},
+$$
+
+where
+
+$$
+d(x,\Lambda)=\inf_{z\in\Lambda}d(x,z).
+$$
+
+The support condition prevents finite-time termination from being mistaken for long-time attraction. Convergence is to the set: it does not require convergence to one point, one phase, or a specified rate.
+
+A set $\Lambda$ is **attracting** when it is invariant and $B^+(\Lambda)$ contains a neighborhood of $\Lambda$. This is local attraction unless $B^+(\Lambda)$ equals the declared full forward domain.
+
+### Adopted attractor convention
+
+**LDG follows Teschl's convention for this object:** under a complete two-sided flow, an **attractor** is a nonempty closed invariant attracting set that is also topologically transitive. Topological transitivity means that for any nonempty relatively open $U,V\subseteq\Lambda$, there exists $t\in\mathbb R$ such that
+
+$$
+\phi_t(U)\cap V\ne\varnothing.
+$$
+
+This added condition excludes attracting supersets that decompose into dynamically separate invariant pieces. It is one established convention, not the unique definition used throughout dynamics. Forward semiflows, stochastic systems, random attractors, and input-driven systems require separately declared variants [@Teschl2012, sec. 8.1].
+
+### Trapping-region construction
+
+A **trapping region** $E$ is an open connected set with compact closure such that
+
+$$
+\phi_t(\overline E)\subset E,
+\qquad t>0.
+$$
+
+Under Teschl's complete-flow assumptions,
+
+$$
+\Lambda_E
+=
+\omega^+(E)
+=
+\bigcap_{t\ge0}\phi_t(\overline E)
+$$
+
+is a nonempty compact connected invariant attracting set [@Teschl2012, sec. 8.1]. This is a sufficient construction of an attracting set, not a necessary characterization and not, by itself, proof of topological transitivity. The omega-limit and trapping-region proofs remain deferred.
+
+### Attraction and stability
+
+Attraction and Lyapunov stability are different predicates. A point or set can be Lyapunov stable without attracting a neighborhood, and convergence toward a set does not by itself establish Lyapunov stability. When both properties are required, they must be checked separately using the [Stability](stability.qmd) definitions.
+
+## Core notation
+
+- $\Lambda$: the candidate invariant set.
+- $d(x,\Lambda)=\inf_{z\in\Lambda}d(x,z)$: distance from a point to the set.
+- $I_x$: supported elapsed-time interval through $x$.
+- $B^+(\Lambda)$ or $W^+(\Lambda)$: forward basin/stable set of $\Lambda$.
+- $E$: trapping region with compact closure.
+- $\omega^+(E)$: forward omega-limit set of $E$.
+- $\phi_t$: forward evolution; a complete two-sided flow is required for the adopted transitivity convention.
+- $t\to\infty$: the long-time limit in scope.
+
+## Prerequisites
+
+[Stability](stability.qmd) supplies perturbation and closeness distinctions. [Flow](flow.qmd) supplies finite-time evolution and supported domains across initial states. [Metric](metric.qmd) supplies the distance-to-set construction.
+
+## Relationship to adjacent concepts
+
+| Concept | Distinction |
+|---|---|
+| **Attracting set** | Has an invariant set with a neighborhood basin. Under the adopted convention it becomes an attractor only after topological transitivity is also established. |
+| **Lyapunov-stable object** | Stability means nearby trajectories remain close; attraction concerns convergence toward a set. Either property can require separate verification. |
+| **Limit cycle** | An attracting periodic orbit can be an attractor, but attractors need not be periodic. |
+| **Basin** | The basin is the set of initial states approaching the attractor, not the attractor itself. |
+| **Frequently visited region** | High occupancy can arise from sampling, noise, slow motion, or external input without invariance, a neighborhood basin, forward support, or transitivity. |
+| **Trapping-region limit set** | A sufficient construction of a compact connected attracting set; it is not automatically transitive and therefore not automatically an attractor under the adopted convention. |
+
+## What this does NOT imply
+
+An attractor does **not** imply:
+
+- that every initial state approaches it;
+- a unique attractor or basin;
+- a fixed point rather than a periodic or more complex set;
+- robustness to parameter changes or stochastic forcing;
+- that an empirical density peak is an attractor;
+- that finite trajectories identify the full basin;
+- that one trajectory approaching $\Lambda$ establishes attraction from a neighborhood;
+- that recurrence, slow motion, clustering, decoding, low reconstruction error, or a density peak establishes invariance or transitivity;
+- that attraction implies Lyapunov stability or robustness to perturbations; or
+- that attraction explains the biological mechanism producing the data.
+
+## Minimal example
+
+For $\dot x=-x$, $\Lambda=\{0\}$ is invariant and
+
+$$
+x(t)=x_0e^{-t}\longrightarrow0
+$$
+
+for every $x_0\in\mathbb R$. Thus $B^+(\Lambda)=\mathbb R$, and the singleton is topologically transitive, so it is a point attractor under the adopted convention.
+
+By contrast, for $\dot x=0$, every singleton is Lyapunov stable, but the basin of $\{p\}$ is only $\{p\}$ and does not contain a neighborhood in $\mathbb R$; it is not an attractor. An attracting periodic orbit supplies a non-point example, but a repelling or merely isolated periodic orbit does not.
+
+## Neuroscience / behavioral relevance
+
+Attractor language is used for persistent activity, categorical decisions, memories, and recurring population states. A defensible claim requires evidence for an invariant model set and attraction from perturbed initial states, not only clustering, decoding, or repeated visitation.
+
+## Relevance to LDG
+
+At L2, Attractor provides an explicit basin, support condition, distance-to-set convergence, selected transitivity convention, and trapping-region construction. It preserves LDG's prohibition against treating visualization, occupancy, recurrence, or one convergent trace as dynamical evidence.
+
+## Open questions
+
+- Which attractor convention is appropriate for noisy or input-driven models?
+- How can basins be inferred from limited interventions and partial observations?
+- What baseline explanations should an attractor model beat?
+
+## References
+
+- Teschl develops forward stable sets/basins, attracting sets, trapping regions, and the adopted transitive attractor convention [@Teschl2012, sec. 8.1].
+- Teschl's trapping-region and omega-limit proofs are cited as source context but are not reproduced in this Concept.
+
+## Maturity checklist
+
+- [x] Requires invariance and attraction from a basin.
+- [x] Flags variation in attractor conventions.
+- [x] Separates attractor, basin, fixed point, limit cycle, and occupancy.
+- [x] States empirical non-implications.
+- [x] Types the basin with forward completeness and distance-to-set convergence.
+- [x] Adopts and labels the attracting-plus-transitive convention.
+- [x] Separates attracting sets, trapping-region limit sets, and transitive attractors.
+- [x] Separates attraction from Lyapunov stability and empirical occupancy.
+- [x] Independent L2 scientific review completed with PASS under the recorded review decision.

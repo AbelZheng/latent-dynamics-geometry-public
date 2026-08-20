@@ -1,0 +1,227 @@
+---
+title: "Observation Model"
+object_type: concept
+maturity: L2
+status: stable
+domain: [latent-modeling, statistics]
+tags: [observation-model, measurement, emission]
+prerequisites:
+- knowledge/concepts/latent-variable.qmd
+related:
+- knowledge/concepts/state.qmd
+- knowledge/concepts/observation-noise.qmd
+- knowledge/concepts/state-space-model.qmd
+- knowledge/concepts/identifiability.qmd
+created: 2026-08-18
+updated: 2026-08-18
+---
+
+# Observation Model
+
+## One-sentence definition
+
+An **observation model** specifies how latent or system variables are related probabilistically or deterministically to the measurements available to an analyst.
+
+## Why this concept matters
+
+The observation model separates what a system is modeled as doing from how that activity becomes data. Without this separation, measurement distortion, subsampling, and noise can be mistaken for latent dynamics.
+
+## Intuition
+
+The latent quantity is what the model posits; the observation model is the measurement channel. Two experiments can observe the same latent process through different sensors and therefore produce different data.
+
+## Formal definition
+
+Let $(\mathcal Z,\Sigma_{\mathcal Z})$ be a latent or state space, $(\mathcal Y,\Sigma_{\mathcal Y})$ an observation space, and $(\Theta_y,\Sigma_{\Theta_y})$ an observation-parameter space.
+
+A deterministic observation model is a measurable map
+
+$$
+y=g(z;\theta_y),
+\qquad
+g:\mathcal Z\times\Theta_y\to\mathcal Y.
+$$
+
+A probabilistic observation model is a conditional probability law
+
+$$
+p(y\mid z,\theta_y),
+$$
+
+or, more generally, a probability kernel
+
+$$
+K_{\theta_y}(z,A)
+=
+\Pr(Y\in A\mid Z=z,\theta_y),
+\qquad A\in\Sigma_{\mathcal Y},
+$$
+
+assigning an observation distribution to each $(z,\theta_y)$. For each fixed $\theta_y$ and $z$, the map $A\mapsto K_{\theta_y}(z,A)$ is a probability measure; for each $A\in\Sigma_{\mathcal Y}$, the map $z\mapsto K_{\theta_y}(z,A)$ is measurable. If $\theta_y$ varies as part of the kernel argument, joint measurability in $(z,\theta_y)$ is required. Density notation $p(y\mid z,\theta_y)$ requires a suitable dominating measure; the kernel formulation does not. This is a **forward** model from latent/state variables to possible observations. It does not by itself specify how to infer $z$ from $y$.
+
+For a realized observation $y$, the conditional density can be viewed as a likelihood in $(z,\theta_y)$,
+
+$$
+\mathcal L(z,\theta_y;y)=p(y\mid z,\theta_y),
+$$
+
+but a posterior such as $p(z\mid y)$ additionally requires a latent prior or state model and Bayes's rule. Tipping and Bishop explicitly distinguish the conditional observation distribution, the marginal observation distribution obtained by integrating out the latent variable, and the conditional latent distribution used for inference [@TippingBishop1999, sec. 3.1].
+
+### Conditional independence and factorization
+
+For observations $y_{1:T}$ associated with latent variables $z_{1:T}$, the factorization
+
+$$
+p(y_{1:T}\mid z_{1:T},\theta_y)
+=
+\prod_{t=1}^{T}p(y_t\mid z_t,\theta_y)
+$$
+
+holds only when observations are conditionally independent across time given the corresponding latent variables and parameters. Likewise, a channel factorization
+
+$$
+p(y_t\mid z_t,\theta_y)
+=
+\prod_{j=1}^{D}p(y_{tj}\mid z_t,\theta_y)
+$$
+
+requires conditional independence across channels; channel-specific parameter blocks may be used only when that partition of $\theta_y$ is declared. Correlated sensor errors, temporal filtering, shared observation noise, or history-dependent measurement processes require a joint observation model instead. Tipping and Bishop's factor-analysis discussion makes conditional independence a consequence of a diagonal error-covariance assumption, not a universal property [@TippingBishop1999, sec. 2.1].
+
+### Noise as part of the forward model
+
+An additive-noise model
+
+$$
+y=g(z;\theta_y)+v,
+\qquad
+v\mid z,\theta_y\sim p_v(\,\cdot\mid z,\theta_y),
+$$
+
+induces $p(y\mid z,\theta_y)$ through the conditional distribution of $v$. The common fixed-noise-law special case additionally assumes $v\perp z\mid\theta_y$. Additivity, independence, Gaussianity, homoscedasticity, and zero bias are extra assumptions. Observation noise enters the measurement relation; process noise enters state evolution. Preprocessing artifacts, calibration error, censoring, missingness, and model misspecification are not automatically represented by $v$.
+
+### Invertibility and information loss
+
+A deterministic map $g$ is invertible on its image only when the relevant restriction is one-to-one and has an appropriate inverse. A many-to-one map can make distinct latent values observationally indistinguishable. In probabilistic models, overlapping conditional distributions can likewise limit information about $z$. These are properties of the forward model; **observability** additionally uses observations across time and a transition model, while **identifiability** asks whether model specifications induce distinct observable distributions.
+
+### Latent-coordinate reparameterization
+
+Let $z'=h(z)$ be a bimeasurable bijective change of latent coordinates. The same deterministic observation relation is represented by
+
+$$
+g'(z';\theta_y)=g(h^{-1}(z');\theta_y),
+$$
+
+and the same probabilistic kernel by
+
+$$
+K'_{\theta_y}(z',A)
+=
+K_{\theta_y}(h^{-1}(z'),A),
+$$
+
+or, when conditional densities exist,
+
+$$
+p'(y\mid z',\theta_y)
+=
+p(y\mid h^{-1}(z'),\theta_y).
+$$
+
+To preserve the marginal observable distribution, the latent law must also be pushed forward consistently, $P_{Z'}=h_\#P_Z$. For a $C^1$ diffeomorphism between Euclidean coordinate domains, the transformed latent density is
+
+$$
+p_{Z'}(z')
+=
+p_Z(h^{-1}(z'))
+\left|\det Dh^{-1}(z')\right|.
+$$ No latent-coordinate Jacobian is inserted into $p(y\mid z')$ itself because that density is still taken with respect to the observation variable $y$. Changing latent coordinates without transforming the observation model and latent law generally defines a different generative model.
+
+## Core notation
+
+- $z$: latent variable or latent state.
+- $y$: observation.
+- $\mathcal Z,\mathcal Y$: latent/state and observation spaces.
+- $g$ or $W$: deterministic observation mapping.
+- $\theta_y$: observation-model parameters.
+- $v$ or $\varepsilon$: observation noise.
+- $p(y\mid z,\theta_y)$: conditional forward model or likelihood for observed $y$.
+- $K_{\theta_y}(z,A)$: probability-kernel form of the forward model.
+- $p(z\mid y)$: posterior inference quantity requiring additional prior/model assumptions.
+- $h$: bijective latent-coordinate reparameterization.
+
+## Prerequisites
+
+[Latent Variable](latent-variable.qmd) defines the unobserved quantity being related to data.
+
+## Relationship to adjacent concepts
+
+| Concept | Distinction |
+|---|---|
+| **Dynamics / transition model** | Describes how state changes; the observation model describes how state produces measurements. |
+| **Decoder** | Predicts a target or latent summary from data. It need not be the generative forward measurement relation or its inverse. |
+| **Inference model / posterior** | Maps observations to uncertainty about latent variables and requires prior or state-model assumptions beyond $p(y\mid z)$. |
+| **Observability** | Uses a transition model and observations over time to ask whether state can be recovered; it is not a property of one observation map alone. |
+| **Identifiability** | Asks whether distinct model specifications imply distinct observable distributions; an explicit observation model is necessary but not sufficient. |
+| **Observation noise** | One stochastic component of an observation model, not the whole mapping. |
+| **Process noise** | Perturbs state evolution rather than the conditional measurement relation. |
+| **Preprocessing / calibration** | Operations and uncertainties applied to recorded data or sensors; they must be modeled explicitly rather than silently labeled observation noise. |
+| **Sensor** | A physical device; the observation model is a mathematical description of its relevant relation to variables. |
+
+## What this does NOT imply
+
+An observation model does not imply that the latent variable is identifiable, the mapping is invertible, noise is independent, measurements are unbiased, or a good reconstruction establishes mechanism. Nor does it imply conditional independence across times or channels, observability from a time series, a unique posterior, calibrated uncertainty, or preservation of latent geometry in observation space.
+
+## Minimal example
+
+In probabilistic PCA,
+
+$$
+z\sim\mathcal N(0,I),
+\qquad
+y=Wz+\mu+\varepsilon,
+\qquad
+\varepsilon\sim\mathcal N(0,\sigma^2I),
+\qquad
+\varepsilon\perp z,
+$$
+
+so
+
+$$
+p(y\mid z)=\mathcal N(Wz+\mu,\sigma^2I).
+$$
+
+The isotropic covariance makes observation channels conditionally independent in the chosen coordinate system; a non-diagonal covariance in those declared channel coordinates would prevent this product factorization. Inferring $p(z\mid y)$ additionally uses the latent prior $p(z)$ [@TippingBishop1999, secs. 2.1, 3.1].
+
+For a deterministic information-loss example, $y=z^2$ cannot distinguish $z$ from $-z$. Accurate forward prediction of $y$ therefore does not make the latent coordinate uniquely recoverable.
+
+## Neuroscience / behavioral relevance
+
+Spike counts, fluorescence, EEG sensors, eye position, and behavioral labels are observation channels with different sampling and distortion. Analyses should not transfer geometric or dynamical properties from data space to latent space without checking the observation model.
+
+## Relevance to LDG
+
+At L2, Observation Model anchors a typed forward relation between latent/state variables and data, states when likelihood factorizations are valid, and separates information loss from inference, observability, and identifiability. It prepares explicit treatment of observation noise without confusing the measurement channel with dynamics.
+
+## Open questions
+
+- Which parts of an observation model can be calibrated independently?
+- When is a nonlinear mapping necessary?
+- How sensitive are latent conclusions to alternative observation models?
+
+## References
+
+- Tipping and Bishop provide the inspected linear Gaussian conditional observation model, marginalization, posterior calculation, likelihood, and conditional-independence example [@TippingBishop1999, secs. 2.1, 3.1].
+- Estimation algorithms, posterior approximations, observability tests, and identifiability theorems are intentionally deferred.
+
+## Maturity checklist
+
+- [x] Separates observation from transition roles.
+- [x] Includes deterministic and probabilistic forms.
+- [x] States inversion and mechanism non-implications.
+- [x] Types deterministic maps and probabilistic conditional kernels.
+- [x] Separates forward likelihood from posterior inference.
+- [x] Conditions temporal and channel factorization on explicit independence assumptions.
+- [x] Separates invertibility, observability, identifiability, and reconstruction.
+- [x] States consistent latent-coordinate reparameterization of the observation model and latent law.
+- [x] Independent L2 scientific review completed; initial findings were corrected and focused re-review passed under the recorded review decision.

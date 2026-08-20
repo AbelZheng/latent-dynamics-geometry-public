@@ -1,0 +1,470 @@
+---
+title: "P4-U02 — Static Linear Latent Recovery Benchmark"
+object_type: benchmark
+maturity: L1
+status: stable
+domain: [statistics, dimensionality-reduction, latent-variable-models, benchmarking]
+tags: [pca, ppca, factor-analysis, subspace-recovery, covariance, robustness, synthetic-ground-truth]
+prerequisites:
+- knowledge/methods/principal-component-analysis.qmd
+- knowledge/methods/factor-analysis.qmd
+- toy-models/static-linear-latent-recovery.qmd
+related:
+- benchmarks/linear-gaussian-robustness.qmd
+created: 2026-08-20
+updated: 2026-08-20
+---
+
+# P4-U02 — Static Linear Latent Recovery Benchmark
+
+## Scientific question
+
+Across a bounded grid of independent rank-two Gaussian-factor simulations and
+declared misspecification controls, when do mean and rank-matched projection
+references, ordinary PCA, probabilistic PCA (PPCA), bounded diagonal-noise
+factor analysis (FA), and known-parameter Gaussian references recover the
+**different targets their criteria define**, and where are they inapplicable,
+numerically nonconvergent, or observably brittle?
+
+This is not a shared-target leaderboard. In particular, ordinary PCA is judged
+against the population principal subspace of the observable covariance, while
+FA loading recovery is judged against the common-loading structure only when
+the diagonal-residual model and the declared structural-identification
+diagnostic apply. Reconstruction, likelihood, covariance recovery, subspace
+recovery, uniqueness recovery, convergence, and leakage are separate tasks and
+are never collapsed into one score.
+
+## Ground truth
+
+Each independent row is generated in ambient dimension $p=8$ with latent rank
+$q=2$:
+
+$$
+z_i\sim\mathcal N(0,I_2),\qquad
+\epsilon_i\sim\mathcal N(0,\Sigma_\epsilon),\qquad
+x_i=\Lambda z_i+\epsilon_i.
+$$
+
+The retained truth includes $z$, $\Lambda$, the common covariance
+$C_{\mathrm{common}}=\Lambda\Lambda^\top$, residual covariance
+$\Sigma_\epsilon$, observable covariance
+$C=C_{\mathrm{common}}+\Sigma_\epsilon$, the loading subspace
+$\operatorname{col}(\Lambda)$, and the rank-two population principal subspace
+of $C$. These are not interchangeable targets.
+
+Population parameters and latent arrays are available only to generation,
+scoring, and implementation-oracle checks. They are not supplied to lawful
+preprocessing, fitting, validation selection, or held-out recovery. The
+executable reuses the stable numerical definitions and routines in
+`toy-models/static-linear-latent-recovery.py` without editing the stable Toy
+Model or changing its scientific conclusions.
+
+### Identification, recovery, and convergence are different claims
+
+Three boundaries are recorded separately:
+
+1. **Structural identification applicability.** For diagonal-noise FA,
+   uniqueness and common-loading targets are eligible only when the residual
+   covariance is diagonal and the displayed loading matrix passes the retained
+   Anderson--Rubin-style sufficient row-deletion rank diagnostic. Loading
+   columns remain equivalent under orthogonal rotation.
+2. **Finite-sample recovery.** Principal angles and covariance errors describe
+   one bounded fitted sample relative to known synthetic truth. Identification
+   does not guarantee that these errors are small.
+3. **Optimizer convergence.** The bounded EM implementation can reach its
+   iteration limit or a numerical boundary. Convergence is a computational
+   label, not proof of structural identification, population correctness, or
+   global maximum likelihood; nonconvergence is not evidence that the
+   population model class cannot represent the truth.
+
+## Generation
+
+Generation receives only a scenario identifier, replicate identifier, split,
+and deterministic seed words. It produces independent train, validation, and
+test observations and retains truth in a separate scoring payload. Outlier
+contamination and residual correlation are applied only in their predeclared
+scenario classes. Generation does not call preprocessing, fitting, selection,
+recovery, or scoring.
+
+The primary model uses the stable Toy Model's deterministic rank-two loading
+basis and heterogeneous diagonal uniquenesses. Scenario-specific changes are
+fixed before outcome interpretation and are recorded in `manifest.json`.
+
+## Scenario grid
+
+The grid is a bounded core-plus-stress design rather than a complete factorial
+experiment. It covers every Phase 4 contract factor while keeping independent
+replicates and byte-level regeneration practical.
+
+| Scenario class | Declared variation | Main target boundary |
+|---|---|---|
+| Sample size | `small_sample`: 60/60/180 rows; `reference`: 240/120/180; `large_sample`: 600/200/240 | finite recovery and optimizer stability |
+| Signal strength / eigenvalue separation | `weak_separation`: $(1.25,0.95)$; `repeated_signal`: $(1.50,1.50)$ with homogeneous uniqueness $0.45I$ | whole principal/loading subspaces, never arbitrary axes inside a repeated block |
+| Heterogeneous uniqueness | strengths $(2.0,1.25)$ with $(0.12,0.20,0.32,0.48,0.70,0.95,1.25,1.60)$ | FA loading/common-structure target versus PCA population-principal target |
+| Near-zero uniqueness | $(10^{-5},2\times10^{-5},5\times10^{-5},10^{-4},0.02,0.04,0.08,0.12)$ | boundary behavior and bounded convergence |
+| Correlated residuals | $R_{ij}=0.42^{|i-j|}$ with heterogeneous marginal uniquenesses | deliberate diagonal-FA misspecification; loading/uniqueness identification metrics inapplicable |
+| High-variance nuisance | eighth residual variance set to $7.5$ | the population PCA target changes even if the scientific loading target does not |
+| Outliers | random-direction contamination of magnitude $9.0$ in 2.5% of each split | Gaussian-model and covariance sensitivity; nominal clean reference is not a contamination oracle |
+| Preprocessing leakage | training-only scaling versus pooled train/test scaling | lawful invariance versus invalid test dependence |
+
+Changing one named scenario can also change the observable covariance,
+eigengap, or effective signal-to-noise ratio. Consequently, differences across
+scenario rows are conditional robustness observations, not isolated causal
+effects of one factor. Exact scenario values, split sizes, expected
+applicability, replicate count, and seed mapping are frozen in the manifest.
+
+## Negative controls and stress cases
+
+- **Fixed and seed-derived random rank-two projections** show what rank matching
+  alone can achieve without estimating a population target. There is exactly
+  one random basis for each scenario-replicate.
+- **Correlated residuals** deliberately violate diagonal-noise FA. A fitted
+  factor under this condition cannot be called a recovered common cause.
+- **High-variance nuisance** tests whether a variance-defined PCA target
+  diverges from the unchanged loading target; correct PCA recovery is not a
+  semantic error.
+- **Near-zero uniqueness** stresses positivity floors, boundary behavior, and
+  finite iteration budgets.
+- **Outliers** violate the clean Gaussian law. The true clean parameters remain
+  a nominal reference only, not the true distribution of contaminated data.
+- **Pooled train/test preprocessing** is explicitly invalid. Leakage is proved
+  by dependence on poisoned test observations, not by whether one finite test
+  score improves.
+
+Failures are retained and labelled rather than tuned away.
+
+## Replicates and deterministic seeds
+
+Each of the 11 declared scenarios uses four independent deterministic
+replicates. Seed words
+include the master seed, a stable scenario code, replicate, split, and any
+sequence or baseline index needed by the generator. Mapping does not depend on
+execution order. Methods share a replicate's generated data to support paired,
+target-specific comparisons, while different replicates use independent random
+streams.
+
+One raw record is produced per scenario $\times$ replicate $\times$ method
+$\times$ metric. Its value is computed from the metric-specific provenance
+declared under **Scoring**—test rows, validation rows, training optimization,
+population truth, or the train/test poison intervention as appropriate.
+Replicate identity is never discarded.
+
+## Split discipline
+
+Train, validation, and test samples are generated independently. Training data
+fit means, lawful preprocessing, PCA/PPCA, and each bounded FA candidate.
+Validation observations select only among the predeclared FA floors and
+restarts. Test observations are used only by the frozen test-time recovery or
+likelihood calculation. Retained clean test signal and population parameters
+are joined only in the separate metric-specific scoring stage.
+
+Lawful selection accepts restricted train/validation observation payloads. It
+has no capability to read test observations or any latent/population truth.
+Poison checks replace excluded test observations and retained latent arrays and
+require lawful fitted states, selected FA settings, and observation-only
+recoveries to remain unchanged. The pooled-scaling negative control is kept
+separate and explicitly labelled invalid.
+
+## Methods and information sets
+
+- **Training mean:** rank-zero reconstruction reference fitted on training
+  observations.
+- **Fixed rank-two projection:** predeclared orthonormal compression reference;
+  it is not fitted to outcomes.
+- **Random rank-two projection:** exactly one rank-two orthonormal basis is
+  deterministically derived from the scenario and replicate seed, independently
+  of that replicate's generated observations. It is a rank-matched reference,
+  not a validation-selected method. Across replicates, both the generated data
+  and the seed-derived basis vary jointly; the replicate summary therefore does
+  not isolate basis variability from sampling variability or average a family
+  of bases within one replicate.
+- **Ordinary covariance PCA:** deterministic rank-two orthogonal projection
+  fitted on training observations. Its population target is the leading
+  rank-two eigenspace of the observable covariance under the declared
+  preprocessing and Euclidean metric.
+- **PPCA:** the isotropic-residual Gaussian restriction
+  $C=WW^\top+\sigma^2I$. Its maximum-likelihood loading space is the PCA
+  principal subspace, but it additionally supplies a Gaussian covariance,
+  likelihood, and posterior mean. It is not general diagonal-noise FA, and its
+  likelihood does not retroactively make ordinary PCA probabilistic.
+- **Bounded diagonal-noise FA:** a rank-two Gaussian model
+  $C=\Lambda\Lambda^\top+\operatorname{diag}(\psi)$ fitted by deterministic
+  bounded EM candidates and validation selection. Loading columns are compared
+  only through rotation-invariant subspace/common-covariance targets.
+- **True-parameter Gaussian reference:** uses known simulator parameters for
+  likelihood and posterior reconstruction. It is an unavailable
+  implementation/reference oracle, not a deployable fitted competitor. Under
+  outlier contamination it is named and interpreted as a nominal clean
+  Gaussian reference.
+
+All lawful methods use the same frozen test observations. Population
+eigenspaces, loadings, covariances, uniquenesses, and latent scores are scoring
+truth or oracle inputs, never fitting information.
+
+## Parameter selection
+
+PCA and closed-form PPCA use the predeclared rank two and require no validation
+selection. Fixed/random projections are frozen before data generation. For FA,
+the training split fits every predeclared uniqueness-floor $\times$ restart
+candidate; validation Gaussian NLL selects one candidate with a deterministic
+tie rule. The selected floor and restart are frozen before test recovery and
+scoring.
+
+This finite candidate set is a bounded numerical procedure. It does not prove
+global optimization, and validation selection cannot turn a misspecified
+diagonal residual model into a correct one.
+
+## Inference
+
+For reconstruction methods, recovery receives frozen preprocessing and fitted
+states plus test observations. PCA and projection baselines return Euclidean
+reconstructions in original coordinates. PPCA and FA return model-conditional
+Gaussian posterior-mean reconstructions. These are different estimators even
+at the same rank.
+
+No method receives test latent truth. The true-parameter Gaussian reference is
+invoked through an explicitly oracle-labelled path. There is no temporal
+information set: observations are independent static rows, and their ordering
+has no scientific meaning.
+
+## Scoring
+
+Raw rows use metric-specific `target` metadata. The following task families
+remain separate:
+
+| Raw metric | Provenance, target, and interpretation |
+|---|---|
+| `heldout_reconstruction_mse` | Test observations and frozen reconstructions; original-coordinate observed reconstruction, including contaminated observations in `outliers`; not loading or covariance recovery |
+| `latent_signal_reconstruction_mse` | Test clean common signal $\Lambda z$ retained by the generator, compared with the fitted reconstruction after subtracting the declared population mean; defined for every method that returns a finite test reconstruction, including mean, fixed/random projection, PCA, PPCA, selected FA, and the true-parameter reference. The two scaled-PCA controls are applicable only in `preprocessing_leakage`. In `outliers`, observations and fitted reconstructions include contamination while the target remains the uncontaminated $\Lambda z$, so the metric measures recovery of the clean simulated common contribution rather than reconstruction of the contaminated observation law |
+| `heldout_gaussian_nll` | Test observations under a frozen PPCA, FA, or true-parameter Gaussian density; ordinary PCA and pure projections do not define this score. In `outliers`, this is a Gaussian score on contaminated observations, and the clean true-parameter model is only a nominal reference |
+| `covariance_relative_frobenius` | Fitted model covariance versus population observable covariance; for `outliers`, the target is explicitly the nominal clean Gaussian covariance rather than the covariance of the contaminated law |
+| `principal_subspace_angle_max_degrees` | Training-fitted PCA/PPCA space versus the population rank-two principal subspace of observable $C$; the value combines fitted training output with population scoring truth, not test observations |
+| `loading_subspace_angle_max_degrees` | Training/validation-selected FA loading space versus $\operatorname{col}(\Lambda)$, or the exact reference against itself, only where the diagonal-residual and sufficient-rank identification conditions apply; population-truth scoring, not a test-split loss |
+| `uniqueness_rmse` | Selected FA diagonal uniqueness versus population diagonal uniqueness only where the same identification conditions apply; the implementation emits RMSE, not uniqueness relative error |
+| `selected_validation_nll` | Validation observations and the selected bounded FA candidate; a selection diagnostic, not held-out test performance |
+| `optimizer_iterations` | Training optimization history of the selected FA candidate; a computational diagnostic. A run that reaches the bound is labelled `nonconvergence` |
+| `identification_applicable` | Population scenario specification plus the sufficient rank diagnostic; a binary applicability record, not empirical recovery performance |
+| `preprocessing_test_poison_parameter_change` | Difference between preprocessing/model parameters before and after deterministic test poisoning; uses training and test observations only for the declared leakage control and is not a candidate-method score |
+
+Provenance is therefore metric-specific: only the held-out reconstruction,
+clean-signal reconstruction, and Gaussian NLL metrics are direct test-row
+aggregates. Subspace, covariance, uniqueness, and identification metrics join
+fitted states to population truth; validation NLL comes from validation data;
+optimizer iterations come from training optimization; and the poison metric is
+a train/test perturbation diagnostic. The raw `split`/provenance field must be
+read with the metric and target rather than interpreted as saying that every
+numeric value is a test loss.
+
+For observation-level losses, the relevant rows are first aggregated within
+one scenario-replicate. Every other metric likewise contributes at most one
+value for that scenario-replicate-method-metric key. `diagnostics.json` then
+reports median, q10, and q90 across the four independent replicate-level
+values, together with `ok`, failure, and applicability rates for each scenario
+$\times$ method $\times$ metric group. Test rows, features, and EM iterations
+are not treated as independent replicates. The random-projection row uses one
+seed-derived basis per scenario-replicate, so its across-replicate quantiles
+reflect joint data-and-basis variation. Unlike targets are not normalized,
+averaged, ranked, or pooled.
+
+The FA **loading subspace** and **common covariance** are conceptually distinct:
+the former ignores loading magnitudes, whereas
+$\Lambda\Lambda^\top$ retains them while remaining invariant to orthogonal
+loading rotations. This first bounded implementation directly emits the
+loading-subspace angle, observable-covariance error, and uniqueness error, but
+does not emit a separate common-covariance norm. Therefore it makes no
+numerical common-covariance-magnitude recovery claim; “common structure” in the
+reported results refers only to the declared loading-subspace target.
+
+Likewise, residual off-diagonal error and uniqueness relative error are not raw
+metrics in this benchmark. Selected floor, restart, and convergence state are
+row metadata that identify the frozen FA candidate; convergence state is also
+used to assign failure labels. Candidate train NLL may be retained in bounded
+selection diagnostics for verification, but neither train NLL nor a standalone
+convergence flag is emitted as a scored raw metric. The only scored FA
+selection/computation metrics are `selected_validation_nll` and
+`optimizer_iterations`.
+
+## Failure and applicability labels
+
+Every expected scenario $\times$ replicate $\times$ method $\times$ metric row
+is retained with exactly one status:
+
+- `ok`: the target applies and the value is finite and valid;
+- `nonconvergence`: the bounded optimizer or numerical procedure did not meet
+  its declared convergence contract;
+- `invalid`: the computation, covariance, preprocessing, or value is invalid,
+  including the deliberate pooled-preprocessing control where appropriate;
+- `inapplicable`: the method does not define that likelihood, target, or
+  identified quantity under the scenario.
+
+Every non-`ok` row has a machine-readable reason. Structural-identification
+inapplicability, model misspecification, finite recovery error, and optimizer
+nonconvergence use different reasons and are not substituted for one another.
+Rows do not disappear because a method failed or a target does not apply.
+
+## Artifact contract
+
+The generated directory is
+`benchmarks/artifacts/static-linear-latent-robustness/` and contains exactly:
+
+```text
+manifest.json
+results.csv
+diagnostics.json
+summary.png
+```
+
+The manifest freezes scenarios, method/target applicability, split sizes,
+replicate and seed rules, FA search bounds, tolerances, commands, canonical row
+ordering, strict resume semantics, runtime versions, and SHA-256 hashes. The
+figure is a diagnostic view only and separates target families; it is not
+acceptance evidence or a ranking.
+
+## Results
+
+The verified raw artifact contains 4,356 unique canonical rows from 11
+scenarios, four replicates, nine methods, and 11 metrics. Status counts are
+1,260 `ok`, 3,044 `inapplicable`, 52 `nonconvergence`, and zero `invalid` in the
+natural run. Fault injection separately verifies the `invalid` paths. The
+following q10/median/q90 values are descriptive summaries over only four
+independent replicate-level values, not confidence intervals or stable tail
+estimates.
+
+| Scenario and target | Method | q10 | Median | q90 | Applicability / failure |
+|---|---|---:|---:|---:|---:|
+| Reference observed reconstruction MSE | mean | 1.2943 | 1.3591 | 1.4349 | 1.00 / 0.00 |
+| Reference observed reconstruction MSE | PCA | 0.5049 | 0.5225 | 0.5507 | 1.00 / 0.00 |
+| Reference observed reconstruction MSE | PPCA posterior mean | 0.5400 | 0.5653 | 0.5885 | 1.00 / 0.00 |
+| Reference observed reconstruction MSE | selected FA posterior mean | 0.5946 | 0.6133 | 0.6155 | 1.00 / 0.00 |
+| Reference population-principal angle | PCA / PPCA | $6.27^\circ$ | $7.28^\circ$ | $13.46^\circ$ | 1.00 / 0.00 |
+| Reference identified loading-subspace angle | selected FA | $5.34^\circ$ | $6.21^\circ$ | $9.55^\circ$ | 1.00 / 0.00 |
+| Reference observable-covariance relative error | selected FA | 0.0843 | 0.0949 | 0.1143 | 1.00 / 0.00 |
+| Reference uniqueness RMSE | selected FA | 0.0472 | 0.0733 | 0.0938 | 1.00 / 0.00 |
+| Reference held-out Gaussian NLL | PPCA | 11.2800 | 11.4920 | 11.5296 | 1.00 / 0.00 |
+| Reference held-out Gaussian NLL | selected FA | 10.7271 | 10.7888 | 10.8820 | 1.00 / 0.00 |
+| Reference held-out Gaussian NLL | true-parameter reference | 10.6654 | 10.7450 | 10.8299 | 1.00 / 0.00 |
+
+Within this frozen simulator, the median PCA population-principal angle is
+$15.10^\circ$ in `small_sample` and $4.00^\circ$ in `large_sample`. These are
+finite-sample observations under different split sizes, not a rate theorem.
+The repeated-signal scenario reports the complete rank-two subspace; its median
+PCA angle is $5.65^\circ$ and does not identify ordered axes within that block.
+
+The failure labels expose boundaries that a success-only table would hide:
+
+- selected FA fails its bounded convergence contract in one of four
+  `small_sample` replicates, three of four `near_zero_uniqueness` replicates,
+  two of four `correlated_residuals` replicates, and one of four
+  `high_nuisance` replicates;
+- in `near_zero_uniqueness`, applicable FA recovery and likelihood metrics have
+  an `ok` rate of only 0.25; the sole converged replicate cannot establish
+  robust population recovery;
+- FA loading-subspace and uniqueness recovery are explicitly inapplicable in
+  `correlated_residuals` and `outliers`, even when a bounded numerical fit
+  converges;
+- the proper training-only scaler has median test-poison parameter change
+  $0.0$, whereas the invalid pooled train/test control has median change
+  $23.6590$; the latter is a leakage diagnostic, not an improved candidate; and
+- the true-parameter reference has observable-covariance relative error $0.0$
+  and loading-projector discrepancy $0.0$ in the independent numerical checks.
+  It is a correctness anchor, not a deployable winner.
+
+![Target-specific static linear robustness summaries](artifacts/static-linear-latent-robustness/summary.png)
+
+The figure separates the shared observed-reconstruction target, PCA/PPCA
+population-principal target, FA loading target, and leakage/applicability
+diagnostics. It does not display a cross-target score or rank.
+
+## Interpretation limits
+
+This benchmark can establish only simulator-, scenario-, preprocessing-,
+target-, metric-, and implementation-conditional behavior.
+
+- Close PCA recovery of the population principal subspace does not imply
+  recovery of $\operatorname{col}(\Lambda)$ when residual variances are
+  heterogeneous.
+- Close FA loading-subspace recovery under applicable assumptions does not
+  identify uniquely oriented loading columns or latent causes. Observable-
+  covariance recovery is reported separately, and no common-covariance-
+  magnitude recovery metric is emitted.
+- PPCA is restricted to isotropic residual variance; its principal-subspace
+  relation does not make it equivalent to heterogeneous-noise FA.
+- Structural identification does not imply accurate finite recovery or
+  optimizer convergence; convergence does not prove identification or correct
+  specification.
+- Lower reconstruction error is not evidence of a better likelihood model,
+  latent mechanism, or scientific representation.
+- Better held-out Gaussian NLL does not prove causal factors, robustness to
+  contamination, or correctness outside the declared distribution.
+- High nuisance variance can make PCA scientifically unhelpful while still
+  correct for its variance-defined target.
+- Neither rank two nor compact recovery proves model-free intrinsic dimension,
+  a manifold, topology, dynamics, mechanism, biological representation, or
+  real-data transfer.
+
+There is no cross-target total score, universal winner, or authorization for
+Phase 5.
+
+## Reproducibility
+
+Generate and verify with the bundled workspace Python runtime:
+
+```bash
+/Users/bytedance/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3 benchmarks/static-linear-latent-robustness.py --generate
+/Users/bytedance/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3 benchmarks/static-linear-latent-robustness.py --verify
+```
+
+The verifier contract includes:
+
+- exact four-file artifact inventory and SHA-256 consistency;
+- unique expected raw keys, complete rows, and canonical ordering;
+- byte-identical clean regeneration;
+- byte-identical reversed scenario/replicate traversal;
+- byte-identical resume from a valid partial result and rejection of corrupted,
+  stale, duplicate, unknown-key, or incomplete partial rows;
+- restricted fitting/selection capability plus test-observation and latent-truth
+  poison checks;
+- deterministic split and baseline regeneration independent of traversal order;
+- PCA/PPCA principal-space consistency and independent population-target checks;
+- covariance symmetry, positive-semidefiniteness, and finite-value checks;
+- FA validation-selection consistency, likelihood monotonicity within tolerance,
+  and explicit bounded convergence labels;
+- sufficient-rank/application checks before common-loading or uniqueness metrics
+  are emitted; and
+- explicit failure labels under numerical or non-finite fault injection rather
+  than silent row omission.
+
+## Review record
+
+Independent scientific and implementation reviewers were read-only and independent of the executors. Their initial
+reviews returned `REVISE` on applicability precedence, metric provenance and inventory, fitting/recovery capability separation, complete poison coverage, actual true-reference checks, and record reconciliation. The bounded correction pass addressed only
+those findings; focused scientific and implementation re-reviews both returned
+`PASS` with no unresolved finding.
+
+The accepted validation record includes 59-object structural validation, 33 repository tests, the full artifact verifier, target/index renders, workflow validation, and `git diff --check`. The recorded review decision then authorized the
+mechanical promotion to `L1/stable`. Stable status records bounded acceptance of
+this declared synthetic Benchmark Object; it does not expand its evidence,
+information-set, target, or interpretation boundaries.
+
+## Maturity checklist
+
+- [x] Scientific question and known static synthetic ground truth are bounded.
+- [x] PCA population-principal, FA loading-subspace, observable-covariance,
+  unreported common-covariance magnitude, PPCA, likelihood, reconstruction,
+  convergence, and leakage targets are distinguished.
+- [x] Structural identification, finite-sample recovery, and optimizer
+  convergence are explicitly separate.
+- [x] Generation, preprocessing, fitting/selection, recovery, and scoring have
+  separate contracts.
+- [x] Train, validation, test, replicate, oracle, and leakage boundaries are
+  declared.
+- [x] Scenario classes cover sample size, signal/eigengap, heterogeneous and
+  near-zero uniqueness, correlated residuals, nuisance variance, outliers, and
+  preprocessing leakage.
+- [x] Raw metric targets, two-level summaries, and failure/applicability labels
+  are defined without a pooled score.
+- [x] Four artifacts exist and the full verifier passes.
+- [x] Bounded numerical results have been reconciled from verified artifacts.
+- [x] Independent scientific review PASS is recorded.
+- [x] Independent implementation review PASS is recorded.
+- [x] review-authorized mechanical promotion to `L1/stable` is complete.

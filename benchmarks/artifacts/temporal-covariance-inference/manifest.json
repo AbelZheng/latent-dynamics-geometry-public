@@ -1,0 +1,396 @@
+{
+  "aggregation": {
+    "across_replicates": "q10, median and q90 across three independent replicate-level values",
+    "rates": "ok, failure=(invalid+nonconvergence), and applicability rates retain scenario/method/metric strata",
+    "within_replicate": "pool declared held-out test trials/targets for one scenario replicate"
+  },
+  "artifact": "temporal-covariance-inference",
+  "artifact_files": [
+    "manifest.json",
+    "results.csv",
+    "diagnostics.json",
+    "summary.png"
+  ],
+  "canonical_row_order": [
+    "scenario",
+    "replicate",
+    "provenance",
+    "method",
+    "metric"
+  ],
+  "capability_separation": {
+    "frozen_inference": "infer_frozen_states receives frozen states, test observations and masks only",
+    "lawful_fit": "fit_lawful_states receives train and validation observations only",
+    "scoring": "score_metric receives latent and observation truth only after inference"
+  },
+  "commands": {
+    "generate": "/Users/bytedance/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3 benchmarks/temporal-covariance-inference.py --generate",
+    "python_executable": "/Users/bytedance/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3",
+    "resume": "/Users/bytedance/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3 benchmarks/temporal-covariance-inference.py --generate --resume",
+    "verify": "/Users/bytedance/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3 benchmarks/temporal-covariance-inference.py --verify"
+  },
+  "date": "2026-08-20",
+  "dimensions": {
+    "channels": 6,
+    "latent": 2,
+    "time_bins": 16
+  },
+  "failure_label_semantics": "method\u00d7metric\u00d7scenario applicability is resolved before inference/scoring failure; every non-ok row has a machine-readable reason",
+  "files_sha256": {
+    "diagnostics.json": "2f195f1d7556d42d3c9bfd5866e3443bcd7dd769f20dc9558eabd82b9828915a",
+    "results.csv": "5d02e270a36e165c10d92fe28b95df03cfbc263eca448c5f4138766ff5e635b5",
+    "summary.png": "8ae2d382daa1280313bd1f12efe0ef9c06ee6af0780929049e9adc07ee0a213c"
+  },
+  "ground_truth": "two latent finite-grid temporal processes observed through a six-channel loading map, with declared Gaussian and misspecified stress generators",
+  "implementation": "benchmark-local deterministic implementation in benchmarks/temporal-covariance-inference.py",
+  "interpretation_boundary": "Scenario/target/information-set conditional; not transition-mechanism evidence, causality, biology, real-data validity, intrinsic dimension, or universal superiority.",
+  "latent_alignment": "static-factor and two-stage rotations are fit once from training estimates/truth in the scoring stage and frozen for test; known-layer GPFA and AR methods retain declared coordinates",
+  "master_seed": 20260820,
+  "maturity": "L1",
+  "methods": [
+    {
+      "family": "mean_diagonal",
+      "id": "mean_diagonal",
+      "information_set": "static_observation",
+      "parameter_source": "train"
+    },
+    {
+      "family": "static_factor",
+      "id": "static_factor",
+      "information_set": "static_observation",
+      "parameter_source": "train"
+    },
+    {
+      "family": "two_stage",
+      "id": "two_stage_pca_smooth",
+      "information_set": "retrospective",
+      "parameter_source": "train_validation"
+    },
+    {
+      "family": "independent_channel",
+      "id": "independent_channel_gp",
+      "information_set": "retrospective",
+      "parameter_source": "train_validation"
+    },
+    {
+      "family": "gpfa",
+      "id": "known_gpfa",
+      "information_set": "retrospective",
+      "parameter_source": "known_nominal"
+    },
+    {
+      "family": "gpfa",
+      "id": "selected_gpfa",
+      "information_set": "retrospective",
+      "parameter_source": "train_validation"
+    },
+    {
+      "family": "gpfa_wrong_timescale",
+      "id": "wrong_timescale_gpfa",
+      "information_set": "retrospective",
+      "parameter_source": "fixed_wrong"
+    },
+    {
+      "family": "gpfa_wrong_family",
+      "id": "wrong_ar_gpfa",
+      "information_set": "retrospective",
+      "parameter_source": "fixed_wrong"
+    },
+    {
+      "family": "ar_lgssm",
+      "id": "ar_kalman_filter",
+      "information_set": "online",
+      "parameter_source": "known_nominal"
+    },
+    {
+      "family": "ar_lgssm",
+      "id": "ar_rts_smoother",
+      "information_set": "retrospective",
+      "parameter_source": "known_nominal"
+    },
+    {
+      "family": "exact_oracle",
+      "id": "exact_gaussian_oracle",
+      "information_set": "oracle_retrospective",
+      "parameter_source": "true_scenario"
+    }
+  ],
+  "metric_provenance": {
+    "covariance_relative_frobenius": "fit_diagnostic",
+    "latent_90_coverage": "test",
+    "latent_rmse": "test",
+    "loading_subspace_angle_degrees": "fit_diagnostic",
+    "marginal_nll_per_entry": "test",
+    "masked_prediction_nll_per_entry": "test",
+    "masked_prediction_rmse": "test",
+    "posterior_mean_oracle_max_abs": "oracle_diagnostic",
+    "selected_combined_nll_per_entry": "fit_diagnostic",
+    "timescale_l1": "fit_diagnostic"
+  },
+  "metrics": [
+    "marginal_nll_per_entry",
+    "masked_prediction_rmse",
+    "masked_prediction_nll_per_entry",
+    "latent_rmse",
+    "latent_90_coverage",
+    "loading_subspace_angle_degrees",
+    "timescale_l1",
+    "selected_combined_nll_per_entry",
+    "covariance_relative_frobenius",
+    "posterior_mean_oracle_max_abs"
+  ],
+  "object_id": "P4-U03",
+  "oracle_rule": "exact Gaussian oracle is emitted only for finite Gaussian, non-jitter, ignorable-mask scenarios; changepoint and correlated-residual truth are included explicitly when Gaussian",
+  "provenance_vocabulary": [
+    "test",
+    "fit_diagnostic",
+    "oracle_diagnostic"
+  ],
+  "replicates": 3,
+  "resume": "partial rows must exactly match freshly recomputed canonical rows; duplicate, unknown, stale, corrupted, or incomplete rows are rejected",
+  "row_key": [
+    "scenario",
+    "replicate",
+    "provenance",
+    "method",
+    "metric"
+  ],
+  "runtime": {
+    "numpy": "2.3.5",
+    "pillow": "12.3.0",
+    "platform": "macOS-26.5.1-arm64-arm-64bit",
+    "python": "3.12.13",
+    "python_executable": "/Users/bytedance/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3"
+  },
+  "scenarios": [
+    {
+      "class": "timescale_separation",
+      "id": "reference_distinct",
+      "sizes": [
+        5,
+        3,
+        3
+      ],
+      "taus": [
+        0.1,
+        0.32
+      ]
+    },
+    {
+      "class": "timescale_separation",
+      "id": "close_timescales",
+      "sizes": [
+        5,
+        3,
+        3
+      ],
+      "taus": [
+        0.18,
+        0.24
+      ]
+    },
+    {
+      "class": "trial_sample_size",
+      "id": "low_trial_count",
+      "sizes": [
+        2,
+        1,
+        2
+      ],
+      "taus": [
+        0.1,
+        0.32
+      ]
+    },
+    {
+      "class": "trial_sample_size",
+      "id": "high_trial_count",
+      "sizes": [
+        8,
+        4,
+        4
+      ],
+      "taus": [
+        0.1,
+        0.32
+      ]
+    },
+    {
+      "class": "channel_time_masks",
+      "id": "channel_mask",
+      "mask": "channel",
+      "sizes": [
+        5,
+        3,
+        3
+      ],
+      "taus": [
+        0.1,
+        0.32
+      ]
+    },
+    {
+      "class": "channel_time_masks",
+      "id": "time_block_mask",
+      "mask": "time",
+      "sizes": [
+        5,
+        3,
+        3
+      ],
+      "taus": [
+        0.1,
+        0.32
+      ]
+    },
+    {
+      "class": "changepoints",
+      "generator": "changepoint",
+      "id": "latent_changepoint",
+      "sizes": [
+        5,
+        3,
+        3
+      ],
+      "taus": [
+        0.1,
+        0.32
+      ]
+    },
+    {
+      "class": "correlated_residuals",
+      "id": "correlated_residuals",
+      "residual": "correlated",
+      "sizes": [
+        5,
+        3,
+        3
+      ],
+      "taus": [
+        0.1,
+        0.32
+      ]
+    },
+    {
+      "class": "poisson_misspecification",
+      "id": "low_rate_poisson",
+      "observation": "poisson",
+      "sizes": [
+        5,
+        3,
+        3
+      ],
+      "taus": [
+        0.1,
+        0.32
+      ]
+    },
+    {
+      "class": "equal_kernels",
+      "id": "equal_kernels",
+      "sizes": [
+        5,
+        3,
+        3
+      ],
+      "taus": [
+        0.2,
+        0.2
+      ]
+    },
+    {
+      "class": "alignment_jitter",
+      "generator": "jitter",
+      "id": "alignment_jitter",
+      "sizes": [
+        5,
+        3,
+        3
+      ],
+      "taus": [
+        0.1,
+        0.32
+      ]
+    },
+    {
+      "class": "informative_missingness",
+      "id": "informative_missingness",
+      "mask": "informative",
+      "sizes": [
+        5,
+        3,
+        3
+      ],
+      "taus": [
+        0.1,
+        0.32
+      ]
+    }
+  ],
+  "schema_version": 1,
+  "scientific_question": "Where are bounded temporal covariance and inference methods applicable, robust, misspecified, or numerically brittle under declared synthetic trajectory scenarios?",
+  "seed_mapping": "PCG64(SeedSequence(master_seed, sha256(scenario_id)[:4], replicate, stage, split_code, trial_index))",
+  "selection": {
+    "candidate_timescales": [
+      [
+        0.07,
+        0.22
+      ],
+      [
+        0.07,
+        0.32
+      ],
+      [
+        0.1,
+        0.22
+      ],
+      [
+        0.1,
+        0.32
+      ],
+      [
+        0.1,
+        0.45
+      ],
+      [
+        0.16,
+        0.32
+      ],
+      [
+        0.16,
+        0.45
+      ]
+    ],
+    "criterion": "minimum combined train-plus-validation total Gaussian observation NLL with lexicographic tau tie-break",
+    "criterion_data": [
+      "train observations",
+      "validation observations"
+    ],
+    "latent_truth_allowed": false,
+    "test_inputs_allowed": false
+  },
+  "split_policy": "independent train, validation, and test trials per scenario replicate; test observations never enter lawful fitting/selection and latent truth is scoring-only",
+  "stable_scientific_design_provenance": {
+    "relationship": "scientific design, scenario vocabulary, and formula provenance only; no executable import or call",
+    "source": "toy-models/covariance-prior-trajectories.py",
+    "source_sha256": "bf28eadd652d09a5e5993b3b82918d69d836498e48b526654444e4e442218e31"
+  },
+  "stages": [
+    "generation",
+    "fitting_selection",
+    "inference",
+    "scoring"
+  ],
+  "status": "stable",
+  "status_vocabulary": [
+    "ok",
+    "nonconvergence",
+    "invalid",
+    "inapplicable"
+  ],
+  "tolerances": {
+    "oracle": 2e-08,
+    "ordering": 0.0,
+    "poison": 1e-12
+  }
+}

@@ -1,0 +1,315 @@
+---
+title: "Diffusion Maps"
+object_type: method
+maturity: L2
+status: stable
+domain: [dimensionality-reduction, spectral-methods, graph-methods, geometry]
+tags: [diffusion-maps, affinity-graph, markov-operator, diffusion-distance]
+prerequisites:
+- knowledge/methods/principal-component-analysis.qmd
+- knowledge/concepts/embedding.qmd
+- knowledge/concepts/metric.qmd
+related:
+- knowledge/concepts/intrinsic-dimension.qmd
+- knowledge/concepts/manifold.qmd
+- knowledge/concepts/identifiability.qmd
+created: 2026-08-19
+updated: 2026-08-19
+---
+
+# Diffusion Maps
+
+## Problem
+
+Diffusion Maps construct data-dependent spectral coordinates from a random walk on a weighted similarity graph. The method replaces direct ambient distance by **diffusion distance**: two sampled observations are close when their distributions over destinations after a declared number of graph-walk steps are similar. Truncated eigenvectors of the resulting Markov operator provide Euclidean coordinates that approximate this distance [@CoifmanLafon2006].
+
+The unit of analysis is a sampled observation or graph vertex. This object covers the finite-sample, symmetric-affinity, reversible construction. Directed affinities and nonreversible operators are discussed as a boundary, not silently treated as the same algorithm.
+
+**Assumed background:** a similarity or affinity kernel is a nonnegative function used to weight pairs of observations, and a Markov operator maps a function or probability distribution through one step of a stochastic transition rule. These meanings are not supplied by `knowledge/concepts/kernel.qmd`: that repository object defines a temporal impulse-response/filter kernel and is **not** a prerequisite for Diffusion Maps.
+
+## Input
+
+Let $x_1,\ldots,x_n$ be observations and let $\rho(x_i,x_j)$ be a declared dissimilarity, commonly a metric after fixed preprocessing. A reproducible analysis must specify:
+
+- the observational unit, selected sample, features, centering/scaling, missing-data treatment, and dependence structure;
+- the dissimilarity $\rho$ and whether it is scientifically meaningful locally;
+- the affinity family and bandwidth convention;
+- whether the graph is fully connected, $k$-nearest-neighbor, mutual-neighbor, radius-truncated, or otherwise sparsified and symmetrized;
+- treatment of self-affinities, isolated vertices, duplicate observations, and connected components;
+- density-normalization exponent $\alpha$;
+- diffusion time $t$, retained coordinate count $m$, and truncation rule; and
+- any out-of-sample extension and all parameters fitted from training data.
+
+This object uses the Gaussian-style convention
+
+$$
+K_{ij}=\exp\!\left[-\frac{\rho(x_i,x_j)^2}{\varepsilon}\right],
+$$
+
+possibly followed by declared sparsification. Other conventions place $2\sigma^2$ or $4\varepsilon$ in the denominator, so a reported bandwidth value is meaningless without its formula.
+
+## Output
+
+For fixed choices, Diffusion Maps return:
+
+- a normalized affinity matrix $K^{(\alpha)}$;
+- a row-stochastic Markov matrix $P$ and, for a connected reversible graph, stationary weights $\pi$;
+- eigenvalues and eigenvectors of $P$ or its symmetric conjugate;
+- a diffusion distance $D_t$ on, or in degenerate cases a pseudometric over, the training vertices; and
+- truncated coordinates
+
+$$
+\Phi_{t,m}(x_i)
+=\bigl(\lambda_1^t\psi_1(i),\ldots,\lambda_m^t\psi_m(i)\bigr),
+$$
+
+excluding the trivial constant eigenvector. The output is initially transductive: it assigns coordinates to the fitted sample. A separate extension rule is needed for new observations.
+
+## Core idea
+
+A local affinity defines one-step connectivity. Row normalization turns that affinity into a random walk. Powers $P^t$ aggregate all length-$t$ paths, so comparing rows of $P^t$ compares how similarly two starting vertices communicate with the rest of the graph. Spectral decomposition makes these comparisons computationally and geometrically explicit: modes with $|\lambda_\ell|<1$ are attenuated by $|\lambda_\ell|^t$, producing a family of scale-dependent embeddings [@CoifmanLafon2006].
+
+Here **diffusion time** $t$ counts applications of the constructed Markov operator. It is an algorithmic scale parameter. It is not elapsed experimental time, a learned transition law for the observed system, or evidence of physical diffusion or biological dynamics.
+
+## Generative / modeling assumptions
+
+Canonical Diffusion Maps are not a generative probability model for observations. Their operative assumptions and design commitments are:
+
+- the chosen dissimilarity and affinity encode useful local relationships;
+- graph connectivity at the selected bandwidth is scientifically meaningful rather than an artifact of units, nuisance variables, or sampling gaps;
+- the symmetric nonnegative affinity supports a reversible Markov construction;
+- finite-sample spectral modes are stable enough to summarize the target relationships; and
+- when a continuum or manifold interpretation is invoked, additional smoothness, sampling, boundary, bandwidth, and asymptotic conditions hold.
+
+The last point is optional and demanding. The finite graph algorithm can be computed without assuming a manifold. Conversely, successful computation or an appealing embedding does not verify the assumptions needed for a Laplace--Beltrami limit.
+
+## Mathematical formulation
+
+Starting from symmetric $K_{ij}\geq0$, define the kernel-density proxy
+
+$$
+q_i=\sum_{j=1}^n K_{ij}.
+$$
+
+For a declared $\alpha\in\mathbb R$, apply the anisotropic density normalization
+
+$$
+K^{(\alpha)}_{ij}
+=\frac{K_{ij}}{q_i^\alpha q_j^\alpha},
+\qquad
+d_i^{(\alpha)}=\sum_{j=1}^n K^{(\alpha)}_{ij}.
+$$
+
+If every $d_i^{(\alpha)}>0$, the row-stochastic matrix is
+
+$$
+P_{ij}=\frac{K^{(\alpha)}_{ij}}{d_i^{(\alpha)}},
+\qquad
+\sum_jP_{ij}=1.
+$$
+
+For a connected undirected graph this chain is reversible with
+
+$$
+\pi_i=\frac{d_i^{(\alpha)}}{\sum_jd_j^{(\alpha)}}
+$$
+
+and is similar to the real symmetric matrix
+
+$$
+S=(D^{(\alpha)})^{-1/2}K^{(\alpha)}(D^{(\alpha)})^{-1/2}.
+$$
+
+Thus one may compute a Euclidean-orthonormal eigendecomposition of $S$ and
+transform it to right eigenvectors $P\psi_\ell=\lambda_\ell\psi_\ell$. Here the
+right eigenvectors are scaled to be orthonormal in $L^2(\pi)$,
+
+$$
+\sum_i \pi_i\psi_\ell(i)\psi_r(i)=\delta_{\ell r}.
+$$
+
+They are not generally orthogonal in the ordinary Euclidean inner product.
+With self-loops or another aperiodicity condition and a connected graph,
+$\lambda_0=1$ is simple and $|\lambda_\ell|<1$ for nontrivial modes
+[@CoifmanLafon2006; @VonLuxburg2007].
+
+For integer $t\geq1$, define
+
+$$
+D_t(i,j)^2
+=\sum_{k=1}^n
+\frac{\left(P^t_{ik}-P^t_{jk}\right)^2}{\pi_k}.
+$$
+
+Under the reversible spectral normalization,
+
+$$
+D_t(i,j)^2
+=\sum_{\ell\geq1}\lambda_\ell^{2t}
+\left(\psi_\ell(i)-\psi_\ell(j)\right)^2.
+$$
+
+The full diffusion map is therefore an isometric representation of this graph-defined distance when the spectral assumptions separate vertices; truncating after $m$ modes omits the corresponding tail. If distinct vertices have identical $t$-step transition profiles, $D_t$ is only a pseudometric on vertex labels.
+
+The role of $\alpha$ must not be hidden. In the smooth-manifold, independent-sampling, large-$n$, small-bandwidth regime studied by Coifman and Lafon, $\alpha=0$ retains sampling-density influence, while $\alpha=1$ removes the leading density drift and targets a Laplace--Beltrami operator. This is an asymptotic, assumption-dependent result—not a finite-data guarantee that density, geometry, or a manifold has been recovered [@CoifmanLafon2006, sec. 3]. Singer's convergence analysis further exposes a bias--variance tradeoff: shrinking bandwidth reduces one approximation error while increasing sampling variance unless sample size grows appropriately [@Singer2006].
+
+## What is learned?
+
+From the fitted sample, the method learns a graph-dependent empirical Markov operator, its spectrum, diffusion distances, and coordinate values on training vertices. “Learns” here means data-adaptive construction and eigendecomposition; it does not mean estimating the physical transition mechanism that generated the observations.
+
+The identifiable output is best viewed as eigenspaces and diffusion distances under fixed graph choices. Individual eigenvector signs, bases inside repeated eigenspaces, and coordinates across independently fitted samples require alignment conventions.
+
+## What is fixed?
+
+The analyst fixes the sample and representation, dissimilarity, affinity form, bandwidth, graph construction, symmetrization, $\alpha$, self-loop policy, diffusion time, coordinate count, spectral ordering, numerical solver, and out-of-sample rule. Data may determine numerical values of $q_i$, $P$, and the eigenpairs, but it does not make the preceding design choices model-free.
+
+If hyperparameters are selected using an outcome or evaluation set, that selection is supervision and must be nested inside the training procedure.
+
+## Temporal assumptions
+
+Ordinary Diffusion Maps are order-blind with respect to the input rows. Permuting observations and applying the same permutation to the graph changes no fitted relation. The symbol $t$ denotes random-walk steps on the constructed affinity graph, not sample timestamps. A temporal sequence can influence the method only if time, lag, or transition information is explicitly encoded in the representation or affinity; doing so defines a different, application-specific operator.
+
+Smooth trajectories in diffusion coordinates can arise from local similarity and spectral smoothing alone. They do not establish temporal dynamics, a vector field, process noise, or a state-space model.
+
+## Geometry assumptions
+
+Diffusion geometry is defined by the complete pipeline
+
+$$
+\text{representation}\to\rho\to K\to K^{(\alpha)}\to P\to(P^t,D_t).
+$$
+
+It reflects multistep graph connectivity rather than direct ambient distance or single shortest paths. Changing feature units, bandwidth, neighborhood rule, density normalization, or $t$ changes the geometry.
+
+Under additional continuum assumptions, normalized graph operators can approximate differential operators on a smooth sampled manifold [@CoifmanLafon2006; @Singer2006]. The finite embedding itself, however, does not prove a manifold, recover topology, identify a Riemannian metric, estimate intrinsic dimension without a criterion, or show that the chosen ambient metric corresponds to scientific similarity.
+
+## Supervision
+
+The canonical construction is unsupervised: labels and outcomes do not enter the affinity or eigendecomposition. It becomes supervised or task-adaptive if labels choose features, distances, bandwidths, edges, $\alpha$, $t$, or retained modes. Such choices may be legitimate, but the resulting embedding is no longer evidence from a label-free method.
+
+## Optimization / inference
+
+The main computation is a sparse or dense eigenproblem, not likelihood maximization and not latent posterior inference. A common implementation diagonalizes the symmetric conjugate $S$, whose eigenvectors can be Euclidean-orthonormal, then maps and rescales them to right eigenvectors of $P$ that are orthonormal in the $\pi$-weighted inner product. Approximate nearest-neighbor graphs, sparse eigensolvers, randomized methods, and convergence tolerances introduce additional numerical error.
+
+For the canonical reversible operator, eigenvalues are real, $S$ has a real Euclidean-orthogonal eigenbasis, and $P$ has the corresponding real $\pi$-weighted-orthogonal right eigenbasis. Sparsification can yield negative eigenvalues; their signs affect odd-$t$ coordinates even though diffusion distance uses $\lambda_\ell^{2t}$. If a directed or asymmetric affinity produces a nonreversible $P$, eigenvalues and eigenvectors can be complex or defective, the reversible weighted-orthogonality formula need not hold, and a singular-vector, Schur, or explicitly real representation must be specified. A nonreversible result must not be reported using the canonical formulas without this qualification.
+
+## Strengths
+
+- It converts local similarities into a multiscale connectivity distance that aggregates multiple paths.
+- The relationship between the Markov operator, diffusion distance, and spectral coordinates is explicit.
+- The $\alpha$ family exposes rather than hides one choice about sampling-density influence.
+- Sparse graphs and partial eigensolvers can make leading-coordinate computation practical.
+- It provides a structured nonlinear comparison to PCA without requiring a decoder or generative observation model.
+
+## Failure modes
+
+- **Bandwidth too small:** the graph fragments, creates isolated vertices, or yields unstable local degrees and repeated unit eigenvalues.
+- **Bandwidth too large:** affinities become nearly uniform, local structure is washed out, and nontrivial eigenvalues collapse.
+- **Sampling-density confounding:** dense regions dominate degrees and transitions unless the chosen normalization and its assumptions are appropriate.
+- **Disconnected graph:** each component contributes a stationary mode; a unique global stationary distribution and ordinary between-component interpretation fail.
+- **Near-disconnection:** small graph changes can rotate a cluster of nearly repeated eigenvectors, even when the invariant subspace is more stable.
+- **Metric or feature failure:** nuisance variables, scaling, artifacts, or mixed data types can define the wrong neighborhoods before spectral analysis begins.
+- **Boundary and finite-sample effects:** continuum approximations can be biased near boundaries or under sparse, nonuniform, dependent, or noisy sampling.
+- **Spectral truncation:** omitting slowly decaying modes distorts diffusion distance; retaining tiny modes can amplify numerical and out-of-sample instability.
+- **Large diffusion time:** on a connected ergodic graph, $P^t$ approaches stationarity and all diffusion distances collapse toward zero.
+- **Leakage:** constructing the graph on training plus test observations makes a nominally held-out evaluation transductive.
+- **Interpretive overreach:** visually smooth coordinates can be mistaken for intrinsic coordinates, topology, dynamics, or mechanism.
+
+## Identifiability issues
+
+For a simple real eigenvalue, $\psi_\ell$ and $-\psi_\ell$ are equivalent coordinate conventions. If an eigenvalue has multiplicity greater than one, any orthogonal basis of its eigenspace is valid; the stable target is the eigenspace and the diffusion distance contribution, not named individual axes. Close eigenvalues create a practical version of this instability under sampling or numerical perturbations [@VonLuxburg2007, sec. 7].
+
+Disconnected components make $\lambda=1$ multiple, and no unique global stationary vector is selected without component weights or another convention. Negative eigenvalues introduce parity-dependent coordinate signs. Nonreversible operators may have complex eigenpairs and nonorthogonal modes, so phase, scaling, ordering, and even diagonalizability require explicit treatment.
+
+The coordinate count $m$ is not identified as an intrinsic dimension. It depends on $t$, truncation tolerance, eigengaps, sample size, bandwidth, normalization, and the purpose of the representation.
+
+## Comparison with simpler methods
+
+- **PCA:** a global linear Euclidean baseline. Compare at matched coordinate count using training-only preprocessing. Improvement on a chosen neighborhood or prediction criterion supports the nonlinear graph representation, not a manifold claim.
+- **Raw affinity and graph diagnostics:** before embedding, inspect connected components, isolated vertices, degree distribution, stationary mass, neighborhood examples, and spectra. If these are pathological, coordinates cannot repair the graph.
+- **Laplacian eigenmaps / normalized spectral coordinates:** use closely related graph eigenvectors but differ in normalization, eigenvalue weighting, and objective interpretation. They test whether the diffusion-time scaling $\lambda_\ell^t$ and diffusion-distance target add value.
+- **Isomap:** uses graph shortest-path distances and classical scaling, whereas Diffusion Maps aggregate transition probabilities across many paths. Neither is uniformly superior; both depend on graph construction.
+- **Unembedded diffusion distance:** if the task only needs pairwise distances, using $D_t$ directly separates the value of the distance from the additional truncation choice.
+
+## Evaluation criteria
+
+Evaluation must match the intended use and include graph diagnostics before downstream scores:
+
+1. report connectivity, isolated vertices, degree/stationary-mass distributions, leading eigenvalues, eigengaps, and sensitivity to bandwidth, graph rule, $\alpha$, $t$, and $m$;
+2. quantify the truncated-coordinate error relative to the full or higher-rank diffusion distance on the fitted graph;
+3. compare eigenspaces across resamples or folds using principal angles rather than unaligned eigenvectors when signs or multiplicities are ambiguous;
+4. compare with PCA and declared spectral/graph baselines at matched dimension and without test-set graph leakage;
+5. if new-point deployment is intended, evaluate a training-fitted extension on held-out dependence units and compare it with a full refit after alignment; and
+6. when synthetic ground truth is available, separately assess operator/eigenspace recovery, diffusion-distance recovery, neighborhood behavior, and downstream task performance.
+
+No universal reconstruction objective is part of Diffusion Maps. Classification, regression, clustering, or visualization scores are application-specific and must be predeclared. Subjects, sessions, trajectories, or trials should be split as whole units when within-unit observations are dependent.
+
+For a fixed training operator, a Nyström/eigenfunction extension can evaluate a new point by its normalized affinities to training points and divide by the relevant retained **nonzero** eigenvalue. A zero mode is not defined by that formula; very small nonzero modes are unstable. The extension is approximate, can also fail for poorly connected new points, and need not equal recomputing the graph and spectrum with the point included [@BengioEtAl2003].
+
+## Minimal toy model
+
+A future non-executable toy contract would sample points at known angles on a circle embedded in $\mathbb R^2$, with both uniform and deliberately nonuniform angular densities. It would:
+
+1. construct Gaussian affinities over a bandwidth grid with explicitly retained self-loops;
+2. compare $\alpha=0$ and $\alpha=1$, several integer diffusion times, and rank-two coordinates;
+3. compare with rank-two PCA and unscaled normalized-Laplacian coordinates;
+4. align the first nontrivial two-dimensional eigenspace to the known span of $\sin\theta$ and $\cos\theta$, recognizing that the repeated continuum eigenvalue permits arbitrary rotation;
+5. score graph connectivity, operator/eigenspace error, diffusion-distance truncation error, resampling stability, and held-out Nyström error; and
+6. add negative controls consisting of a disconnected two-arc sample, a bandwidth that nearly completes the graph, and an asymmetric affinity requiring a nonreversible treatment.
+
+The contract would test how density, bandwidth, connectivity, spectral multiplicity, and extension error affect recovery. It would not treat a circular visualization as proof of topology, manifold structure, or intrinsic dimension. No data, code, result, or benchmark is produced in this Method Object.
+
+## Relevance to LDG
+
+Diffusion Maps are LDG's canonical affinity-operator embedding method. They make a useful distinction between ambient distance, local similarity, graph connectivity, an algorithmic diffusion scale, and spectral coordinates. That distinction is necessary before asking whether a representation reflects merely a chosen graph operator or supports stronger geometric or dynamical claims.
+
+::: {.callout-warning title="What this does NOT imply"}
+A stable Diffusion Maps embedding does not prove that the data lie on a manifold, recover topology or a Riemannian metric, determine model-free intrinsic dimension, identify physical time, learn system dynamics, or reveal a biological mechanism. Diffusion time is a graph-scale parameter, and density correction is conditional on explicit asymptotic assumptions.
+:::
+
+### Mouse trajectory
+
+Diffusion Maps can organize declared trajectory features or time samples by affinity, but the canonical method ignores temporal order. Whole animals or trajectories should be held out when dependence requires it. No modality-specific empirical result is retained here.
+
+### Eye movement
+
+The method can embed eye-position, velocity, event, or window features after a scientifically justified metric is declared. Sampling rate, event imbalance, filtering, and repeated observations can dominate local density. No modality-specific empirical result is retained here.
+
+### EEG
+
+Sensor, spectral, covariance, or trial features require different metrics and preprocessing. A smooth diffusion coordinate is not automatically a neural source, temporal process, or disease axis. No modality-specific empirical result is retained here.
+
+### MEG / neural population data
+
+Diffusion Maps may provide a nonlinear affinity baseline for population-state representations, but neuron/sensor scaling, trial dependence, condition imbalance, and graph leakage must be controlled. No modality-specific empirical result is retained here.
+
+## Primary sources
+
+- Coifman and Lafon define the reversible Markov construction, diffusion distance, diffusion coordinates, diffusion-time scaling, anisotropic $\alpha$ normalization, and finite-sample/continuum distinctions used here [@CoifmanLafon2006].
+- Singer analyzes convergence of a Gaussian graph Laplacian toward a manifold Laplacian under explicit uniform-sampling and bandwidth/sample-size assumptions, exposing the relevant bias--variance tradeoff [@Singer2006].
+- Bengio et al. give a general eigenfunction/Nyström framework for extending spectral embeddings to new observations without recomputing the training eigendecomposition [@BengioEtAl2003].
+
+## Reviews / secondary sources
+
+- von Luxburg reviews similarity-graph construction, normalized graph Laplacians, random-walk operators, connected-component multiplicity, perturbation/eigenspace stability, and practical graph-parameter failures [@VonLuxburg2007].
+
+## Open methodological questions
+
+- Which bandwidth, graph, and $\alpha$ selection rules remain reliable under heterogeneous density and dependent observations?
+- When should stability target individual coordinates, invariant eigenspaces, diffusion distances, or downstream predictions?
+- How should nonreversible affinities be represented without importing reversible diffusion-distance claims?
+- Which out-of-sample diagnostics reveal when a fixed training graph no longer covers new observations?
+
+## Maturity checklist
+
+- [x] Schema-complete Method Object at `L2/review`.
+- [x] Affinity, bandwidth, $\alpha$ normalization, row-stochastic operator, stationary weights, eigenpairs, diffusion distance/time, and coordinates defined.
+- [x] Similarity-kernel and Markov-operator background declared without using the temporal Kernel Concept as a prerequisite.
+- [x] Learned and fixed quantities, time, geometry, supervision, and computation distinguished.
+- [x] Sampling density, connectivity, bandwidth, multiplicity/sign, negative/complex eigenvalues, and nonreversible boundaries stated.
+- [x] Nyström/out-of-sample limits, baselines, evaluation, and non-executable toy contract included.
+- [x] No manifold, topology, Riemannian, intrinsic-dimension, dynamics, causal, or mechanism overclaim made.
+- [x] Four retained sources inspected; metadata and DOI or stable identifiers verified; no empirical result retained.
+- [x] Independent mixed review completed after one bounded correction round;
+  focused re-review returned PASS.
+- [x] Stable promotion authorized by the human owner under the recorded review decision after published-site review.

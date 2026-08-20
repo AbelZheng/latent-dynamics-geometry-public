@@ -1,0 +1,98 @@
+---
+title: "Kernel"
+object_type: concept
+maturity: L1
+status: stable
+domain: [temporal-modeling, linear-systems]
+tags: [kernel, impulse-response, temporal-filter]
+prerequisites: []
+related:
+- knowledge/concepts/input-driven-dynamics.qmd
+- knowledge/concepts/linear-dynamical-system.qmd
+created: 2026-08-18
+updated: 2026-08-18
+---
+
+# Kernel
+
+## One-sentence definition
+
+In LDG's temporal-modeling context, a **kernel** is a weighting function that specifies how input values at different lags contribute to an output through a linear operator.
+
+## Why this concept matters
+
+Kernels provide a simple alternative to latent state dynamics: output can depend on a weighted history of inputs without positing an evolving hidden state. The word is overloaded, so the temporal convention must be explicit.
+
+## Intuition
+
+Slide a weighting curve over the recent input history. Multiply input values by lag-dependent weights and sum them to produce the current output.
+
+## Formal definition
+
+For a causal continuous-time linear time-invariant system with zero initial state, no direct feedthrough, and input taken as zero before initialization,
+
+$$
+y(t)=\int_0^\infty k(\tau)u(t-\tau)\,d\tau.
+$$
+
+In discrete time,
+
+$$
+y_k=\sum_{\ell\ge0}k_\ell u_{k-\ell}.
+$$
+
+The function $k$ is the temporal kernel; under these conventions it is the ordinary function-valued impulse response. A direct-feedthrough term requires separate treatment or a generalized kernel containing an impulse. Åström and Murray derive the state-space convolution representation [@AstromMurray2021, sec. 6.3].
+
+## Core notation
+
+- $k(\tau)$ or $k_\ell$: kernel weight at lag.
+- $u$: input signal.
+- $y$: output signal.
+- $\tau$ or $\ell$: lag.
+
+## Prerequisites
+
+**Assumed background:** elementary sums, integrals, and linear weighting. Convolution is the next planned Concept Object and is therefore not used as metadata.
+
+## Relationship to adjacent concepts
+
+| Concept | Distinction |
+|---|---|
+| **Impulse response** | For an LTI system, the temporal kernel equals the impulse response. |
+| **State-space model** | Represents internal evolving state; a kernel is an input-output operator and may omit an explicit state representation. |
+| **Machine-learning kernel** | A similarity or positive-definite function used by kernel methods; not the temporal meaning adopted here. |
+| **Smoothing window** | A chosen kernel used for preprocessing; it need not be a generative system response. |
+
+## What this does NOT imply
+
+A kernel does not imply causality unless its support is restricted, time invariance unless it depends only on lag, linearity of the underlying biological mechanism, finite memory, or uniqueness from finite noisy data.
+
+## Minimal example
+
+For $k(\tau)=e^{-\tau}\mathbf 1_{\tau\ge0}$, recent input receives more weight than distant input. For zero initial state and input zero before initialization, the same response is represented by $\dot x=-x+u$, $y=x$, showing that kernel and state-space descriptions can be alternative representations.
+
+## Neuroscience / behavioral relevance
+
+Temporal receptive fields, hemodynamic response functions, and stimulus-response filters are often represented by kernels. A fitted kernel can predict time-locked responses without establishing a latent dynamical mechanism.
+
+## Relevance to LDG
+
+Kernel establishes the fixed-filter baseline needed to ask when a latent dynamical-system model is warranted.
+
+## Open questions
+
+- When are kernel and latent-state representations empirically distinguishable?
+- How should nonlinear or time-varying response operators be represented?
+- What regularization preserves interpretable lag structure?
+
+## References
+
+- Åström and Murray give the inspected impulse-response and convolution representation of LTI systems [@AstromMurray2021, sec. 6.3].
+
+## Maturity checklist
+
+- [x] Declares the temporal linear-operator convention.
+- [x] Gives continuous and discrete causal forms.
+- [x] Separates temporal and machine-learning kernels.
+- [x] Connects kernel and state-space alternatives without equating them.
+- [x] Independent bounded review completed; initial findings were corrected and focused re-review passed.

@@ -1,0 +1,1843 @@
+{
+  "architectures": {
+    "all_runtime_code_shapes_n_by_1": true,
+    "allowed_parameter_keys": {
+      "frozen_random_encoder_fixed": [
+        "b1",
+        "b2",
+        "w1",
+        "w2"
+      ],
+      "frozen_random_encoder_trainable": [
+        "b3",
+        "b4",
+        "w3",
+        "w4"
+      ],
+      "linear_ae": [
+        "bd",
+        "be",
+        "wd",
+        "we"
+      ],
+      "mean": [
+        "mean"
+      ],
+      "nonlinear_ae": [
+        "b1",
+        "b2",
+        "b3",
+        "b4",
+        "w1",
+        "w2",
+        "w3",
+        "w4"
+      ],
+      "pca": [
+        "basis",
+        "eigenvalues",
+        "mean"
+      ]
+    },
+    "behavioral_no_skip_pass": true,
+    "behavioral_no_skip_records": [
+      {
+        "condition": "nominal_curved",
+        "distinct_input_norm": 1.293807528430953,
+        "method": "linear_ae",
+        "passes": true,
+        "seed": 0,
+        "zero_decoder_output_difference": 0.0,
+        "zero_decoder_output_max_abs": 0.0
+      },
+      {
+        "condition": "nominal_curved",
+        "distinct_input_norm": 1.293807528430953,
+        "method": "linear_ae",
+        "passes": true,
+        "seed": 1,
+        "zero_decoder_output_difference": 0.0,
+        "zero_decoder_output_max_abs": 0.0
+      },
+      {
+        "condition": "nominal_curved",
+        "distinct_input_norm": 1.293807528430953,
+        "method": "linear_ae",
+        "passes": true,
+        "seed": 2,
+        "zero_decoder_output_difference": 0.0,
+        "zero_decoder_output_max_abs": 0.0
+      },
+      {
+        "condition": "nominal_curved",
+        "distinct_input_norm": 1.293807528430953,
+        "method": "linear_ae",
+        "passes": true,
+        "seed": 3,
+        "zero_decoder_output_difference": 0.0,
+        "zero_decoder_output_max_abs": 0.0
+      },
+      {
+        "condition": "nominal_curved",
+        "distinct_input_norm": 1.293807528430953,
+        "method": "linear_ae",
+        "passes": true,
+        "seed": 4,
+        "zero_decoder_output_difference": 0.0,
+        "zero_decoder_output_max_abs": 0.0
+      },
+      {
+        "condition": "nominal_curved",
+        "distinct_input_norm": 1.293807528430953,
+        "method": "nonlinear_ae",
+        "passes": true,
+        "seed": 0,
+        "zero_decoder_output_difference": 0.0,
+        "zero_decoder_output_max_abs": 0.0
+      },
+      {
+        "condition": "nominal_curved",
+        "distinct_input_norm": 1.293807528430953,
+        "method": "nonlinear_ae",
+        "passes": true,
+        "seed": 1,
+        "zero_decoder_output_difference": 0.0,
+        "zero_decoder_output_max_abs": 0.0
+      },
+      {
+        "condition": "nominal_curved",
+        "distinct_input_norm": 1.293807528430953,
+        "method": "nonlinear_ae",
+        "passes": true,
+        "seed": 2,
+        "zero_decoder_output_difference": 0.0,
+        "zero_decoder_output_max_abs": 0.0
+      },
+      {
+        "condition": "nominal_curved",
+        "distinct_input_norm": 1.293807528430953,
+        "method": "nonlinear_ae",
+        "passes": true,
+        "seed": 3,
+        "zero_decoder_output_difference": 0.0,
+        "zero_decoder_output_max_abs": 0.0
+      },
+      {
+        "condition": "nominal_curved",
+        "distinct_input_norm": 1.293807528430953,
+        "method": "nonlinear_ae",
+        "passes": true,
+        "seed": 4,
+        "zero_decoder_output_difference": 0.0,
+        "zero_decoder_output_max_abs": 0.0
+      },
+      {
+        "condition": "nominal_curved",
+        "distinct_input_norm": 1.293807528430953,
+        "method": "frozen_random_encoder",
+        "passes": true,
+        "seed": 0,
+        "zero_decoder_output_difference": 0.0,
+        "zero_decoder_output_max_abs": 0.0
+      },
+      {
+        "condition": "nominal_curved",
+        "distinct_input_norm": 1.293807528430953,
+        "method": "frozen_random_encoder",
+        "passes": true,
+        "seed": 1,
+        "zero_decoder_output_difference": 0.0,
+        "zero_decoder_output_max_abs": 0.0
+      },
+      {
+        "condition": "nominal_curved",
+        "distinct_input_norm": 1.293807528430953,
+        "method": "frozen_random_encoder",
+        "passes": true,
+        "seed": 2,
+        "zero_decoder_output_difference": 0.0,
+        "zero_decoder_output_max_abs": 0.0
+      },
+      {
+        "condition": "nominal_curved",
+        "distinct_input_norm": 1.293807528430953,
+        "method": "frozen_random_encoder",
+        "passes": true,
+        "seed": 3,
+        "zero_decoder_output_difference": 0.0,
+        "zero_decoder_output_max_abs": 0.0
+      },
+      {
+        "condition": "nominal_curved",
+        "distinct_input_norm": 1.293807528430953,
+        "method": "frozen_random_encoder",
+        "passes": true,
+        "seed": 4,
+        "zero_decoder_output_difference": 0.0,
+        "zero_decoder_output_max_abs": 0.0
+      },
+      {
+        "condition": "full_dimensional_gaussian",
+        "distinct_input_norm": 2.4741894195722947,
+        "method": "linear_ae",
+        "passes": true,
+        "seed": 0,
+        "zero_decoder_output_difference": 0.0,
+        "zero_decoder_output_max_abs": 0.0
+      },
+      {
+        "condition": "full_dimensional_gaussian",
+        "distinct_input_norm": 2.4741894195722947,
+        "method": "linear_ae",
+        "passes": true,
+        "seed": 1,
+        "zero_decoder_output_difference": 0.0,
+        "zero_decoder_output_max_abs": 0.0
+      },
+      {
+        "condition": "full_dimensional_gaussian",
+        "distinct_input_norm": 2.4741894195722947,
+        "method": "linear_ae",
+        "passes": true,
+        "seed": 2,
+        "zero_decoder_output_difference": 0.0,
+        "zero_decoder_output_max_abs": 0.0
+      },
+      {
+        "condition": "full_dimensional_gaussian",
+        "distinct_input_norm": 2.4741894195722947,
+        "method": "linear_ae",
+        "passes": true,
+        "seed": 3,
+        "zero_decoder_output_difference": 0.0,
+        "zero_decoder_output_max_abs": 0.0
+      },
+      {
+        "condition": "full_dimensional_gaussian",
+        "distinct_input_norm": 2.4741894195722947,
+        "method": "linear_ae",
+        "passes": true,
+        "seed": 4,
+        "zero_decoder_output_difference": 0.0,
+        "zero_decoder_output_max_abs": 0.0
+      },
+      {
+        "condition": "full_dimensional_gaussian",
+        "distinct_input_norm": 2.4741894195722947,
+        "method": "nonlinear_ae",
+        "passes": true,
+        "seed": 0,
+        "zero_decoder_output_difference": 0.0,
+        "zero_decoder_output_max_abs": 0.0
+      },
+      {
+        "condition": "full_dimensional_gaussian",
+        "distinct_input_norm": 2.4741894195722947,
+        "method": "nonlinear_ae",
+        "passes": true,
+        "seed": 1,
+        "zero_decoder_output_difference": 0.0,
+        "zero_decoder_output_max_abs": 0.0
+      },
+      {
+        "condition": "full_dimensional_gaussian",
+        "distinct_input_norm": 2.4741894195722947,
+        "method": "nonlinear_ae",
+        "passes": true,
+        "seed": 2,
+        "zero_decoder_output_difference": 0.0,
+        "zero_decoder_output_max_abs": 0.0
+      },
+      {
+        "condition": "full_dimensional_gaussian",
+        "distinct_input_norm": 2.4741894195722947,
+        "method": "nonlinear_ae",
+        "passes": true,
+        "seed": 3,
+        "zero_decoder_output_difference": 0.0,
+        "zero_decoder_output_max_abs": 0.0
+      },
+      {
+        "condition": "full_dimensional_gaussian",
+        "distinct_input_norm": 2.4741894195722947,
+        "method": "nonlinear_ae",
+        "passes": true,
+        "seed": 4,
+        "zero_decoder_output_difference": 0.0,
+        "zero_decoder_output_max_abs": 0.0
+      },
+      {
+        "condition": "full_dimensional_gaussian",
+        "distinct_input_norm": 2.4741894195722947,
+        "method": "frozen_random_encoder",
+        "passes": true,
+        "seed": 0,
+        "zero_decoder_output_difference": 0.0,
+        "zero_decoder_output_max_abs": 0.0
+      },
+      {
+        "condition": "full_dimensional_gaussian",
+        "distinct_input_norm": 2.4741894195722947,
+        "method": "frozen_random_encoder",
+        "passes": true,
+        "seed": 1,
+        "zero_decoder_output_difference": 0.0,
+        "zero_decoder_output_max_abs": 0.0
+      },
+      {
+        "condition": "full_dimensional_gaussian",
+        "distinct_input_norm": 2.4741894195722947,
+        "method": "frozen_random_encoder",
+        "passes": true,
+        "seed": 2,
+        "zero_decoder_output_difference": 0.0,
+        "zero_decoder_output_max_abs": 0.0
+      },
+      {
+        "condition": "full_dimensional_gaussian",
+        "distinct_input_norm": 2.4741894195722947,
+        "method": "frozen_random_encoder",
+        "passes": true,
+        "seed": 3,
+        "zero_decoder_output_difference": 0.0,
+        "zero_decoder_output_max_abs": 0.0
+      },
+      {
+        "condition": "full_dimensional_gaussian",
+        "distinct_input_norm": 2.4741894195722947,
+        "method": "frozen_random_encoder",
+        "passes": true,
+        "seed": 4,
+        "zero_decoder_output_difference": 0.0,
+        "zero_decoder_output_max_abs": 0.0
+      },
+      {
+        "condition": "high_variance_nuisance",
+        "distinct_input_norm": 4.0881481118569125,
+        "method": "linear_ae",
+        "passes": true,
+        "seed": 0,
+        "zero_decoder_output_difference": 0.0,
+        "zero_decoder_output_max_abs": 0.0
+      },
+      {
+        "condition": "high_variance_nuisance",
+        "distinct_input_norm": 4.0881481118569125,
+        "method": "linear_ae",
+        "passes": true,
+        "seed": 1,
+        "zero_decoder_output_difference": 0.0,
+        "zero_decoder_output_max_abs": 0.0
+      },
+      {
+        "condition": "high_variance_nuisance",
+        "distinct_input_norm": 4.0881481118569125,
+        "method": "linear_ae",
+        "passes": true,
+        "seed": 2,
+        "zero_decoder_output_difference": 0.0,
+        "zero_decoder_output_max_abs": 0.0
+      },
+      {
+        "condition": "high_variance_nuisance",
+        "distinct_input_norm": 4.0881481118569125,
+        "method": "linear_ae",
+        "passes": true,
+        "seed": 3,
+        "zero_decoder_output_difference": 0.0,
+        "zero_decoder_output_max_abs": 0.0
+      },
+      {
+        "condition": "high_variance_nuisance",
+        "distinct_input_norm": 4.0881481118569125,
+        "method": "linear_ae",
+        "passes": true,
+        "seed": 4,
+        "zero_decoder_output_difference": 0.0,
+        "zero_decoder_output_max_abs": 0.0
+      },
+      {
+        "condition": "high_variance_nuisance",
+        "distinct_input_norm": 4.0881481118569125,
+        "method": "nonlinear_ae",
+        "passes": true,
+        "seed": 0,
+        "zero_decoder_output_difference": 0.0,
+        "zero_decoder_output_max_abs": 0.0
+      },
+      {
+        "condition": "high_variance_nuisance",
+        "distinct_input_norm": 4.0881481118569125,
+        "method": "nonlinear_ae",
+        "passes": true,
+        "seed": 1,
+        "zero_decoder_output_difference": 0.0,
+        "zero_decoder_output_max_abs": 0.0
+      },
+      {
+        "condition": "high_variance_nuisance",
+        "distinct_input_norm": 4.0881481118569125,
+        "method": "nonlinear_ae",
+        "passes": true,
+        "seed": 2,
+        "zero_decoder_output_difference": 0.0,
+        "zero_decoder_output_max_abs": 0.0
+      },
+      {
+        "condition": "high_variance_nuisance",
+        "distinct_input_norm": 4.0881481118569125,
+        "method": "nonlinear_ae",
+        "passes": true,
+        "seed": 3,
+        "zero_decoder_output_difference": 0.0,
+        "zero_decoder_output_max_abs": 0.0
+      },
+      {
+        "condition": "high_variance_nuisance",
+        "distinct_input_norm": 4.0881481118569125,
+        "method": "nonlinear_ae",
+        "passes": true,
+        "seed": 4,
+        "zero_decoder_output_difference": 0.0,
+        "zero_decoder_output_max_abs": 0.0
+      },
+      {
+        "condition": "high_variance_nuisance",
+        "distinct_input_norm": 4.0881481118569125,
+        "method": "frozen_random_encoder",
+        "passes": true,
+        "seed": 0,
+        "zero_decoder_output_difference": 0.0,
+        "zero_decoder_output_max_abs": 0.0
+      },
+      {
+        "condition": "high_variance_nuisance",
+        "distinct_input_norm": 4.0881481118569125,
+        "method": "frozen_random_encoder",
+        "passes": true,
+        "seed": 1,
+        "zero_decoder_output_difference": 0.0,
+        "zero_decoder_output_max_abs": 0.0
+      },
+      {
+        "condition": "high_variance_nuisance",
+        "distinct_input_norm": 4.0881481118569125,
+        "method": "frozen_random_encoder",
+        "passes": true,
+        "seed": 2,
+        "zero_decoder_output_difference": 0.0,
+        "zero_decoder_output_max_abs": 0.0
+      },
+      {
+        "condition": "high_variance_nuisance",
+        "distinct_input_norm": 4.0881481118569125,
+        "method": "frozen_random_encoder",
+        "passes": true,
+        "seed": 3,
+        "zero_decoder_output_difference": 0.0,
+        "zero_decoder_output_max_abs": 0.0
+      },
+      {
+        "condition": "high_variance_nuisance",
+        "distinct_input_norm": 4.0881481118569125,
+        "method": "frozen_random_encoder",
+        "passes": true,
+        "seed": 4,
+        "zero_decoder_output_difference": 0.0,
+        "zero_decoder_output_max_abs": 0.0
+      },
+      {
+        "condition": "few_sample_high_capacity",
+        "distinct_input_norm": 3.3562678785533353,
+        "method": "linear_ae",
+        "passes": true,
+        "seed": 0,
+        "zero_decoder_output_difference": 0.0,
+        "zero_decoder_output_max_abs": 0.0
+      },
+      {
+        "condition": "few_sample_high_capacity",
+        "distinct_input_norm": 3.3562678785533353,
+        "method": "linear_ae",
+        "passes": true,
+        "seed": 1,
+        "zero_decoder_output_difference": 0.0,
+        "zero_decoder_output_max_abs": 0.0
+      },
+      {
+        "condition": "few_sample_high_capacity",
+        "distinct_input_norm": 3.3562678785533353,
+        "method": "linear_ae",
+        "passes": true,
+        "seed": 2,
+        "zero_decoder_output_difference": 0.0,
+        "zero_decoder_output_max_abs": 0.0
+      },
+      {
+        "condition": "few_sample_high_capacity",
+        "distinct_input_norm": 3.3562678785533353,
+        "method": "linear_ae",
+        "passes": true,
+        "seed": 3,
+        "zero_decoder_output_difference": 0.0,
+        "zero_decoder_output_max_abs": 0.0
+      },
+      {
+        "condition": "few_sample_high_capacity",
+        "distinct_input_norm": 3.3562678785533353,
+        "method": "linear_ae",
+        "passes": true,
+        "seed": 4,
+        "zero_decoder_output_difference": 0.0,
+        "zero_decoder_output_max_abs": 0.0
+      },
+      {
+        "condition": "few_sample_high_capacity",
+        "distinct_input_norm": 3.3562678785533353,
+        "method": "nonlinear_ae",
+        "passes": true,
+        "seed": 0,
+        "zero_decoder_output_difference": 0.0,
+        "zero_decoder_output_max_abs": 0.0
+      },
+      {
+        "condition": "few_sample_high_capacity",
+        "distinct_input_norm": 3.3562678785533353,
+        "method": "nonlinear_ae",
+        "passes": true,
+        "seed": 1,
+        "zero_decoder_output_difference": 0.0,
+        "zero_decoder_output_max_abs": 0.0
+      },
+      {
+        "condition": "few_sample_high_capacity",
+        "distinct_input_norm": 3.3562678785533353,
+        "method": "nonlinear_ae",
+        "passes": true,
+        "seed": 2,
+        "zero_decoder_output_difference": 0.0,
+        "zero_decoder_output_max_abs": 0.0
+      },
+      {
+        "condition": "few_sample_high_capacity",
+        "distinct_input_norm": 3.3562678785533353,
+        "method": "nonlinear_ae",
+        "passes": true,
+        "seed": 3,
+        "zero_decoder_output_difference": 0.0,
+        "zero_decoder_output_max_abs": 0.0
+      },
+      {
+        "condition": "few_sample_high_capacity",
+        "distinct_input_norm": 3.3562678785533353,
+        "method": "nonlinear_ae",
+        "passes": true,
+        "seed": 4,
+        "zero_decoder_output_difference": 0.0,
+        "zero_decoder_output_max_abs": 0.0
+      },
+      {
+        "condition": "few_sample_high_capacity",
+        "distinct_input_norm": 3.3562678785533353,
+        "method": "frozen_random_encoder",
+        "passes": true,
+        "seed": 0,
+        "zero_decoder_output_difference": 0.0,
+        "zero_decoder_output_max_abs": 0.0
+      },
+      {
+        "condition": "few_sample_high_capacity",
+        "distinct_input_norm": 3.3562678785533353,
+        "method": "frozen_random_encoder",
+        "passes": true,
+        "seed": 1,
+        "zero_decoder_output_difference": 0.0,
+        "zero_decoder_output_max_abs": 0.0
+      },
+      {
+        "condition": "few_sample_high_capacity",
+        "distinct_input_norm": 3.3562678785533353,
+        "method": "frozen_random_encoder",
+        "passes": true,
+        "seed": 2,
+        "zero_decoder_output_difference": 0.0,
+        "zero_decoder_output_max_abs": 0.0
+      },
+      {
+        "condition": "few_sample_high_capacity",
+        "distinct_input_norm": 3.3562678785533353,
+        "method": "frozen_random_encoder",
+        "passes": true,
+        "seed": 3,
+        "zero_decoder_output_difference": 0.0,
+        "zero_decoder_output_max_abs": 0.0
+      },
+      {
+        "condition": "few_sample_high_capacity",
+        "distinct_input_norm": 3.3562678785533353,
+        "method": "frozen_random_encoder",
+        "passes": true,
+        "seed": 4,
+        "zero_decoder_output_difference": 0.0,
+        "zero_decoder_output_max_abs": 0.0
+      },
+      {
+        "condition": "shifted_range",
+        "distinct_input_norm": 1.293807528430953,
+        "method": "linear_ae",
+        "passes": true,
+        "seed": 0,
+        "zero_decoder_output_difference": 0.0,
+        "zero_decoder_output_max_abs": 0.0
+      },
+      {
+        "condition": "shifted_range",
+        "distinct_input_norm": 1.293807528430953,
+        "method": "linear_ae",
+        "passes": true,
+        "seed": 1,
+        "zero_decoder_output_difference": 0.0,
+        "zero_decoder_output_max_abs": 0.0
+      },
+      {
+        "condition": "shifted_range",
+        "distinct_input_norm": 1.293807528430953,
+        "method": "linear_ae",
+        "passes": true,
+        "seed": 2,
+        "zero_decoder_output_difference": 0.0,
+        "zero_decoder_output_max_abs": 0.0
+      },
+      {
+        "condition": "shifted_range",
+        "distinct_input_norm": 1.293807528430953,
+        "method": "linear_ae",
+        "passes": true,
+        "seed": 3,
+        "zero_decoder_output_difference": 0.0,
+        "zero_decoder_output_max_abs": 0.0
+      },
+      {
+        "condition": "shifted_range",
+        "distinct_input_norm": 1.293807528430953,
+        "method": "linear_ae",
+        "passes": true,
+        "seed": 4,
+        "zero_decoder_output_difference": 0.0,
+        "zero_decoder_output_max_abs": 0.0
+      },
+      {
+        "condition": "shifted_range",
+        "distinct_input_norm": 1.293807528430953,
+        "method": "nonlinear_ae",
+        "passes": true,
+        "seed": 0,
+        "zero_decoder_output_difference": 0.0,
+        "zero_decoder_output_max_abs": 0.0
+      },
+      {
+        "condition": "shifted_range",
+        "distinct_input_norm": 1.293807528430953,
+        "method": "nonlinear_ae",
+        "passes": true,
+        "seed": 1,
+        "zero_decoder_output_difference": 0.0,
+        "zero_decoder_output_max_abs": 0.0
+      },
+      {
+        "condition": "shifted_range",
+        "distinct_input_norm": 1.293807528430953,
+        "method": "nonlinear_ae",
+        "passes": true,
+        "seed": 2,
+        "zero_decoder_output_difference": 0.0,
+        "zero_decoder_output_max_abs": 0.0
+      },
+      {
+        "condition": "shifted_range",
+        "distinct_input_norm": 1.293807528430953,
+        "method": "nonlinear_ae",
+        "passes": true,
+        "seed": 3,
+        "zero_decoder_output_difference": 0.0,
+        "zero_decoder_output_max_abs": 0.0
+      },
+      {
+        "condition": "shifted_range",
+        "distinct_input_norm": 1.293807528430953,
+        "method": "nonlinear_ae",
+        "passes": true,
+        "seed": 4,
+        "zero_decoder_output_difference": 0.0,
+        "zero_decoder_output_max_abs": 0.0
+      },
+      {
+        "condition": "shifted_range",
+        "distinct_input_norm": 1.293807528430953,
+        "method": "frozen_random_encoder",
+        "passes": true,
+        "seed": 0,
+        "zero_decoder_output_difference": 0.0,
+        "zero_decoder_output_max_abs": 0.0
+      },
+      {
+        "condition": "shifted_range",
+        "distinct_input_norm": 1.293807528430953,
+        "method": "frozen_random_encoder",
+        "passes": true,
+        "seed": 1,
+        "zero_decoder_output_difference": 0.0,
+        "zero_decoder_output_max_abs": 0.0
+      },
+      {
+        "condition": "shifted_range",
+        "distinct_input_norm": 1.293807528430953,
+        "method": "frozen_random_encoder",
+        "passes": true,
+        "seed": 2,
+        "zero_decoder_output_difference": 0.0,
+        "zero_decoder_output_max_abs": 0.0
+      },
+      {
+        "condition": "shifted_range",
+        "distinct_input_norm": 1.293807528430953,
+        "method": "frozen_random_encoder",
+        "passes": true,
+        "seed": 3,
+        "zero_decoder_output_difference": 0.0,
+        "zero_decoder_output_max_abs": 0.0
+      },
+      {
+        "condition": "shifted_range",
+        "distinct_input_norm": 1.293807528430953,
+        "method": "frozen_random_encoder",
+        "passes": true,
+        "seed": 4,
+        "zero_decoder_output_difference": 0.0,
+        "zero_decoder_output_max_abs": 0.0
+      }
+    ],
+    "bottleneck_dimension": 1,
+    "capacity_registry": {
+      "few_sample_width_32": {
+        "frozen_decoder_trainable": 262,
+        "frozen_encoder_fixed": 257,
+        "frozen_total": 519,
+        "nonlinear_total_and_trainable": 519
+      },
+      "ordinary_width_8": {
+        "frozen_decoder_trainable": 70,
+        "frozen_encoder_fixed": 65,
+        "frozen_total": 135,
+        "nonlinear_total_and_trainable": 135
+      }
+    },
+    "condition_hidden_widths": {
+      "few_sample_high_capacity": 32,
+      "full_dimensional_gaussian": 8,
+      "high_variance_nuisance": 8,
+      "nominal_curved": 8,
+      "shifted_range": 8
+    },
+    "direct_input_to_output_edges": [],
+    "few_sample_high_capacity_architecture": "6->32->1->32->6",
+    "forward_graph_edges": {
+      "frozen_random_encoder": [
+        "x->fixed_hidden_encoder",
+        "fixed_hidden_encoder->code",
+        "code->trained_hidden_decoder",
+        "trained_hidden_decoder->output"
+      ],
+      "linear_ae": [
+        "x->code",
+        "code->output"
+      ],
+      "nonlinear_ae": [
+        "x->hidden_encoder",
+        "hidden_encoder->code",
+        "code->hidden_decoder",
+        "hidden_decoder->output"
+      ]
+    },
+    "frozen_random_encoder": "6->H->1 fixed; 1->H->6 trained",
+    "linear_architecture": "6->1->6",
+    "runtime_code_shape_records": [
+      {
+        "condition": "nominal_curved",
+        "method": "mean",
+        "observed_shape": [
+          7,
+          1
+        ],
+        "seed": "deterministic"
+      },
+      {
+        "condition": "nominal_curved",
+        "method": "pca",
+        "observed_shape": [
+          7,
+          1
+        ],
+        "seed": "deterministic"
+      },
+      {
+        "condition": "nominal_curved",
+        "method": "linear_ae",
+        "observed_shape": [
+          7,
+          1
+        ],
+        "seed": 0
+      },
+      {
+        "condition": "nominal_curved",
+        "method": "linear_ae",
+        "observed_shape": [
+          7,
+          1
+        ],
+        "seed": 1
+      },
+      {
+        "condition": "nominal_curved",
+        "method": "linear_ae",
+        "observed_shape": [
+          7,
+          1
+        ],
+        "seed": 2
+      },
+      {
+        "condition": "nominal_curved",
+        "method": "linear_ae",
+        "observed_shape": [
+          7,
+          1
+        ],
+        "seed": 3
+      },
+      {
+        "condition": "nominal_curved",
+        "method": "linear_ae",
+        "observed_shape": [
+          7,
+          1
+        ],
+        "seed": 4
+      },
+      {
+        "condition": "nominal_curved",
+        "method": "linear_ae",
+        "observed_shape": [
+          7,
+          1
+        ],
+        "seed": "selected",
+        "selected_seed": 1
+      },
+      {
+        "condition": "nominal_curved",
+        "method": "nonlinear_ae",
+        "observed_shape": [
+          7,
+          1
+        ],
+        "seed": 0
+      },
+      {
+        "condition": "nominal_curved",
+        "method": "nonlinear_ae",
+        "observed_shape": [
+          7,
+          1
+        ],
+        "seed": 1
+      },
+      {
+        "condition": "nominal_curved",
+        "method": "nonlinear_ae",
+        "observed_shape": [
+          7,
+          1
+        ],
+        "seed": 2
+      },
+      {
+        "condition": "nominal_curved",
+        "method": "nonlinear_ae",
+        "observed_shape": [
+          7,
+          1
+        ],
+        "seed": 3
+      },
+      {
+        "condition": "nominal_curved",
+        "method": "nonlinear_ae",
+        "observed_shape": [
+          7,
+          1
+        ],
+        "seed": 4
+      },
+      {
+        "condition": "nominal_curved",
+        "method": "nonlinear_ae",
+        "observed_shape": [
+          7,
+          1
+        ],
+        "seed": "selected",
+        "selected_seed": 4
+      },
+      {
+        "condition": "nominal_curved",
+        "method": "frozen_random_encoder",
+        "observed_shape": [
+          7,
+          1
+        ],
+        "seed": 0
+      },
+      {
+        "condition": "nominal_curved",
+        "method": "frozen_random_encoder",
+        "observed_shape": [
+          7,
+          1
+        ],
+        "seed": 1
+      },
+      {
+        "condition": "nominal_curved",
+        "method": "frozen_random_encoder",
+        "observed_shape": [
+          7,
+          1
+        ],
+        "seed": 2
+      },
+      {
+        "condition": "nominal_curved",
+        "method": "frozen_random_encoder",
+        "observed_shape": [
+          7,
+          1
+        ],
+        "seed": 3
+      },
+      {
+        "condition": "nominal_curved",
+        "method": "frozen_random_encoder",
+        "observed_shape": [
+          7,
+          1
+        ],
+        "seed": 4
+      },
+      {
+        "condition": "nominal_curved",
+        "method": "frozen_random_encoder",
+        "observed_shape": [
+          7,
+          1
+        ],
+        "seed": "selected",
+        "selected_seed": 4
+      },
+      {
+        "condition": "full_dimensional_gaussian",
+        "method": "mean",
+        "observed_shape": [
+          7,
+          1
+        ],
+        "seed": "deterministic"
+      },
+      {
+        "condition": "full_dimensional_gaussian",
+        "method": "pca",
+        "observed_shape": [
+          7,
+          1
+        ],
+        "seed": "deterministic"
+      },
+      {
+        "condition": "full_dimensional_gaussian",
+        "method": "linear_ae",
+        "observed_shape": [
+          7,
+          1
+        ],
+        "seed": 0
+      },
+      {
+        "condition": "full_dimensional_gaussian",
+        "method": "linear_ae",
+        "observed_shape": [
+          7,
+          1
+        ],
+        "seed": 1
+      },
+      {
+        "condition": "full_dimensional_gaussian",
+        "method": "linear_ae",
+        "observed_shape": [
+          7,
+          1
+        ],
+        "seed": 2
+      },
+      {
+        "condition": "full_dimensional_gaussian",
+        "method": "linear_ae",
+        "observed_shape": [
+          7,
+          1
+        ],
+        "seed": 3
+      },
+      {
+        "condition": "full_dimensional_gaussian",
+        "method": "linear_ae",
+        "observed_shape": [
+          7,
+          1
+        ],
+        "seed": 4
+      },
+      {
+        "condition": "full_dimensional_gaussian",
+        "method": "linear_ae",
+        "observed_shape": [
+          7,
+          1
+        ],
+        "seed": "selected",
+        "selected_seed": 0
+      },
+      {
+        "condition": "full_dimensional_gaussian",
+        "method": "nonlinear_ae",
+        "observed_shape": [
+          7,
+          1
+        ],
+        "seed": 0
+      },
+      {
+        "condition": "full_dimensional_gaussian",
+        "method": "nonlinear_ae",
+        "observed_shape": [
+          7,
+          1
+        ],
+        "seed": 1
+      },
+      {
+        "condition": "full_dimensional_gaussian",
+        "method": "nonlinear_ae",
+        "observed_shape": [
+          7,
+          1
+        ],
+        "seed": 2
+      },
+      {
+        "condition": "full_dimensional_gaussian",
+        "method": "nonlinear_ae",
+        "observed_shape": [
+          7,
+          1
+        ],
+        "seed": 3
+      },
+      {
+        "condition": "full_dimensional_gaussian",
+        "method": "nonlinear_ae",
+        "observed_shape": [
+          7,
+          1
+        ],
+        "seed": 4
+      },
+      {
+        "condition": "full_dimensional_gaussian",
+        "method": "nonlinear_ae",
+        "observed_shape": [
+          7,
+          1
+        ],
+        "seed": "selected",
+        "selected_seed": 1
+      },
+      {
+        "condition": "full_dimensional_gaussian",
+        "method": "frozen_random_encoder",
+        "observed_shape": [
+          7,
+          1
+        ],
+        "seed": 0
+      },
+      {
+        "condition": "full_dimensional_gaussian",
+        "method": "frozen_random_encoder",
+        "observed_shape": [
+          7,
+          1
+        ],
+        "seed": 1
+      },
+      {
+        "condition": "full_dimensional_gaussian",
+        "method": "frozen_random_encoder",
+        "observed_shape": [
+          7,
+          1
+        ],
+        "seed": 2
+      },
+      {
+        "condition": "full_dimensional_gaussian",
+        "method": "frozen_random_encoder",
+        "observed_shape": [
+          7,
+          1
+        ],
+        "seed": 3
+      },
+      {
+        "condition": "full_dimensional_gaussian",
+        "method": "frozen_random_encoder",
+        "observed_shape": [
+          7,
+          1
+        ],
+        "seed": 4
+      },
+      {
+        "condition": "full_dimensional_gaussian",
+        "method": "frozen_random_encoder",
+        "observed_shape": [
+          7,
+          1
+        ],
+        "seed": "selected",
+        "selected_seed": 3
+      },
+      {
+        "condition": "high_variance_nuisance",
+        "method": "mean",
+        "observed_shape": [
+          7,
+          1
+        ],
+        "seed": "deterministic"
+      },
+      {
+        "condition": "high_variance_nuisance",
+        "method": "pca",
+        "observed_shape": [
+          7,
+          1
+        ],
+        "seed": "deterministic"
+      },
+      {
+        "condition": "high_variance_nuisance",
+        "method": "linear_ae",
+        "observed_shape": [
+          7,
+          1
+        ],
+        "seed": 0
+      },
+      {
+        "condition": "high_variance_nuisance",
+        "method": "linear_ae",
+        "observed_shape": [
+          7,
+          1
+        ],
+        "seed": 1
+      },
+      {
+        "condition": "high_variance_nuisance",
+        "method": "linear_ae",
+        "observed_shape": [
+          7,
+          1
+        ],
+        "seed": 2
+      },
+      {
+        "condition": "high_variance_nuisance",
+        "method": "linear_ae",
+        "observed_shape": [
+          7,
+          1
+        ],
+        "seed": 3
+      },
+      {
+        "condition": "high_variance_nuisance",
+        "method": "linear_ae",
+        "observed_shape": [
+          7,
+          1
+        ],
+        "seed": 4
+      },
+      {
+        "condition": "high_variance_nuisance",
+        "method": "linear_ae",
+        "observed_shape": [
+          7,
+          1
+        ],
+        "seed": "selected",
+        "selected_seed": 2
+      },
+      {
+        "condition": "high_variance_nuisance",
+        "method": "nonlinear_ae",
+        "observed_shape": [
+          7,
+          1
+        ],
+        "seed": 0
+      },
+      {
+        "condition": "high_variance_nuisance",
+        "method": "nonlinear_ae",
+        "observed_shape": [
+          7,
+          1
+        ],
+        "seed": 1
+      },
+      {
+        "condition": "high_variance_nuisance",
+        "method": "nonlinear_ae",
+        "observed_shape": [
+          7,
+          1
+        ],
+        "seed": 2
+      },
+      {
+        "condition": "high_variance_nuisance",
+        "method": "nonlinear_ae",
+        "observed_shape": [
+          7,
+          1
+        ],
+        "seed": 3
+      },
+      {
+        "condition": "high_variance_nuisance",
+        "method": "nonlinear_ae",
+        "observed_shape": [
+          7,
+          1
+        ],
+        "seed": 4
+      },
+      {
+        "condition": "high_variance_nuisance",
+        "method": "nonlinear_ae",
+        "observed_shape": [
+          7,
+          1
+        ],
+        "seed": "selected",
+        "selected_seed": 1
+      },
+      {
+        "condition": "high_variance_nuisance",
+        "method": "frozen_random_encoder",
+        "observed_shape": [
+          7,
+          1
+        ],
+        "seed": 0
+      },
+      {
+        "condition": "high_variance_nuisance",
+        "method": "frozen_random_encoder",
+        "observed_shape": [
+          7,
+          1
+        ],
+        "seed": 1
+      },
+      {
+        "condition": "high_variance_nuisance",
+        "method": "frozen_random_encoder",
+        "observed_shape": [
+          7,
+          1
+        ],
+        "seed": 2
+      },
+      {
+        "condition": "high_variance_nuisance",
+        "method": "frozen_random_encoder",
+        "observed_shape": [
+          7,
+          1
+        ],
+        "seed": 3
+      },
+      {
+        "condition": "high_variance_nuisance",
+        "method": "frozen_random_encoder",
+        "observed_shape": [
+          7,
+          1
+        ],
+        "seed": 4
+      },
+      {
+        "condition": "high_variance_nuisance",
+        "method": "frozen_random_encoder",
+        "observed_shape": [
+          7,
+          1
+        ],
+        "seed": "selected",
+        "selected_seed": 2
+      },
+      {
+        "condition": "few_sample_high_capacity",
+        "method": "mean",
+        "observed_shape": [
+          7,
+          1
+        ],
+        "seed": "deterministic"
+      },
+      {
+        "condition": "few_sample_high_capacity",
+        "method": "pca",
+        "observed_shape": [
+          7,
+          1
+        ],
+        "seed": "deterministic"
+      },
+      {
+        "condition": "few_sample_high_capacity",
+        "method": "linear_ae",
+        "observed_shape": [
+          7,
+          1
+        ],
+        "seed": 0
+      },
+      {
+        "condition": "few_sample_high_capacity",
+        "method": "linear_ae",
+        "observed_shape": [
+          7,
+          1
+        ],
+        "seed": 1
+      },
+      {
+        "condition": "few_sample_high_capacity",
+        "method": "linear_ae",
+        "observed_shape": [
+          7,
+          1
+        ],
+        "seed": 2
+      },
+      {
+        "condition": "few_sample_high_capacity",
+        "method": "linear_ae",
+        "observed_shape": [
+          7,
+          1
+        ],
+        "seed": 3
+      },
+      {
+        "condition": "few_sample_high_capacity",
+        "method": "linear_ae",
+        "observed_shape": [
+          7,
+          1
+        ],
+        "seed": 4
+      },
+      {
+        "condition": "few_sample_high_capacity",
+        "method": "linear_ae",
+        "observed_shape": [
+          7,
+          1
+        ],
+        "seed": "selected",
+        "selected_seed": 2
+      },
+      {
+        "condition": "few_sample_high_capacity",
+        "method": "nonlinear_ae",
+        "observed_shape": [
+          7,
+          1
+        ],
+        "seed": 0
+      },
+      {
+        "condition": "few_sample_high_capacity",
+        "method": "nonlinear_ae",
+        "observed_shape": [
+          7,
+          1
+        ],
+        "seed": 1
+      },
+      {
+        "condition": "few_sample_high_capacity",
+        "method": "nonlinear_ae",
+        "observed_shape": [
+          7,
+          1
+        ],
+        "seed": 2
+      },
+      {
+        "condition": "few_sample_high_capacity",
+        "method": "nonlinear_ae",
+        "observed_shape": [
+          7,
+          1
+        ],
+        "seed": 3
+      },
+      {
+        "condition": "few_sample_high_capacity",
+        "method": "nonlinear_ae",
+        "observed_shape": [
+          7,
+          1
+        ],
+        "seed": 4
+      },
+      {
+        "condition": "few_sample_high_capacity",
+        "method": "nonlinear_ae",
+        "observed_shape": [
+          7,
+          1
+        ],
+        "seed": "selected",
+        "selected_seed": 1
+      },
+      {
+        "condition": "few_sample_high_capacity",
+        "method": "frozen_random_encoder",
+        "observed_shape": [
+          7,
+          1
+        ],
+        "seed": 0
+      },
+      {
+        "condition": "few_sample_high_capacity",
+        "method": "frozen_random_encoder",
+        "observed_shape": [
+          7,
+          1
+        ],
+        "seed": 1
+      },
+      {
+        "condition": "few_sample_high_capacity",
+        "method": "frozen_random_encoder",
+        "observed_shape": [
+          7,
+          1
+        ],
+        "seed": 2
+      },
+      {
+        "condition": "few_sample_high_capacity",
+        "method": "frozen_random_encoder",
+        "observed_shape": [
+          7,
+          1
+        ],
+        "seed": 3
+      },
+      {
+        "condition": "few_sample_high_capacity",
+        "method": "frozen_random_encoder",
+        "observed_shape": [
+          7,
+          1
+        ],
+        "seed": 4
+      },
+      {
+        "condition": "few_sample_high_capacity",
+        "method": "frozen_random_encoder",
+        "observed_shape": [
+          7,
+          1
+        ],
+        "seed": "selected",
+        "selected_seed": 4
+      },
+      {
+        "condition": "shifted_range",
+        "method": "mean",
+        "observed_shape": [
+          7,
+          1
+        ],
+        "seed": "deterministic"
+      },
+      {
+        "condition": "shifted_range",
+        "method": "pca",
+        "observed_shape": [
+          7,
+          1
+        ],
+        "seed": "deterministic"
+      },
+      {
+        "condition": "shifted_range",
+        "method": "linear_ae",
+        "observed_shape": [
+          7,
+          1
+        ],
+        "seed": 0
+      },
+      {
+        "condition": "shifted_range",
+        "method": "linear_ae",
+        "observed_shape": [
+          7,
+          1
+        ],
+        "seed": 1
+      },
+      {
+        "condition": "shifted_range",
+        "method": "linear_ae",
+        "observed_shape": [
+          7,
+          1
+        ],
+        "seed": 2
+      },
+      {
+        "condition": "shifted_range",
+        "method": "linear_ae",
+        "observed_shape": [
+          7,
+          1
+        ],
+        "seed": 3
+      },
+      {
+        "condition": "shifted_range",
+        "method": "linear_ae",
+        "observed_shape": [
+          7,
+          1
+        ],
+        "seed": 4
+      },
+      {
+        "condition": "shifted_range",
+        "method": "linear_ae",
+        "observed_shape": [
+          7,
+          1
+        ],
+        "seed": "selected",
+        "selected_seed": 1
+      },
+      {
+        "condition": "shifted_range",
+        "method": "nonlinear_ae",
+        "observed_shape": [
+          7,
+          1
+        ],
+        "seed": 0
+      },
+      {
+        "condition": "shifted_range",
+        "method": "nonlinear_ae",
+        "observed_shape": [
+          7,
+          1
+        ],
+        "seed": 1
+      },
+      {
+        "condition": "shifted_range",
+        "method": "nonlinear_ae",
+        "observed_shape": [
+          7,
+          1
+        ],
+        "seed": 2
+      },
+      {
+        "condition": "shifted_range",
+        "method": "nonlinear_ae",
+        "observed_shape": [
+          7,
+          1
+        ],
+        "seed": 3
+      },
+      {
+        "condition": "shifted_range",
+        "method": "nonlinear_ae",
+        "observed_shape": [
+          7,
+          1
+        ],
+        "seed": 4
+      },
+      {
+        "condition": "shifted_range",
+        "method": "nonlinear_ae",
+        "observed_shape": [
+          7,
+          1
+        ],
+        "seed": "selected",
+        "selected_seed": 4
+      },
+      {
+        "condition": "shifted_range",
+        "method": "frozen_random_encoder",
+        "observed_shape": [
+          7,
+          1
+        ],
+        "seed": 0
+      },
+      {
+        "condition": "shifted_range",
+        "method": "frozen_random_encoder",
+        "observed_shape": [
+          7,
+          1
+        ],
+        "seed": 1
+      },
+      {
+        "condition": "shifted_range",
+        "method": "frozen_random_encoder",
+        "observed_shape": [
+          7,
+          1
+        ],
+        "seed": 2
+      },
+      {
+        "condition": "shifted_range",
+        "method": "frozen_random_encoder",
+        "observed_shape": [
+          7,
+          1
+        ],
+        "seed": 3
+      },
+      {
+        "condition": "shifted_range",
+        "method": "frozen_random_encoder",
+        "observed_shape": [
+          7,
+          1
+        ],
+        "seed": 4
+      },
+      {
+        "condition": "shifted_range",
+        "method": "frozen_random_encoder",
+        "observed_shape": [
+          7,
+          1
+        ],
+        "seed": "selected",
+        "selected_seed": 4
+      }
+    ],
+    "skip_paths_derived": false,
+    "small_architecture": "6->8->1->8->6",
+    "unexpected_parameter_keys": []
+  },
+  "artifact": "bounded-nonlinear-reconstruction",
+  "artifact_files": [
+    "manifest.json",
+    "metrics.csv",
+    "diagnostics.json",
+    "summary.png"
+  ],
+  "artifact_hashes_sha256": {
+    "diagnostics.json": "b5085b20392a692313a383b98d0b08da01fbf75a89e871d7d0eeb2f8a70bfc8d",
+    "metrics.csv": "17fab5f87f70be776163e428f720d5b756086aebfcc7e2a99a6cf014a67a6588",
+    "summary.png": "a766ef8b86302c9d99a4dcbff8227e2a056a4fc8867056d4c2eec745cd527199"
+  },
+  "conditions": [
+    "nominal_curved",
+    "full_dimensional_gaussian",
+    "high_variance_nuisance",
+    "few_sample_high_capacity",
+    "shifted_range"
+  ],
+  "date": "2026-08-19",
+  "default_command": "python3 toy-models/bounded-nonlinear-reconstruction.py",
+  "dimensions": {
+    "ambient": 6,
+    "bottleneck": 1
+  },
+  "explicit_commands": [
+    "python3 toy-models/bounded-nonlinear-reconstruction.py --generate",
+    "python3 toy-models/bounded-nonlinear-reconstruction.py --verify",
+    "python3 toy-models/bounded-nonlinear-reconstruction.py --generate --verify"
+  ],
+  "initialization_registry": {
+    "frozen_random_encoder": {
+      "decoder_b3": "zeros",
+      "decoder_b4": "zeros",
+      "decoder_w3": "N(0,2/(H+1))",
+      "decoder_w4": "N(0,2/(H+6))",
+      "encoder_b1": "N(0,0.08^2)",
+      "encoder_b2": "N(0,0.05^2)",
+      "encoder_w1": "N(0,1/6)",
+      "encoder_w2": "N(0,1/H)",
+      "rng": "rng_for(32, hidden_width, seed)"
+    },
+    "linear_ae": {
+      "decoder_bias": "zeros",
+      "decoder_weights": "transpose of rank-1 training PCA basis plus N(0,0.02^2) seed noise",
+      "encoder_bias": "zeros",
+      "encoder_weights": "rank-1 training PCA basis plus N(0,0.02^2) seed noise",
+      "rng": "rng_for(30, seed)"
+    },
+    "nonlinear_ae": {
+      "all_biases": "zeros",
+      "rng": "rng_for(31, hidden_width, seed)",
+      "w1_scale": "sqrt(2/(6+H))",
+      "w2_scale": "sqrt(2/(H+1))",
+      "w3_scale": "sqrt(2/(1+H))",
+      "w4_scale": "sqrt(2/(H+6))",
+      "weight_distribution": "independent centered Normal with Glorot-like scale sqrt(2/(fan_in+fan_out))"
+    }
+  },
+  "interpretation_boundary": "Reconstruction and simulation-side code diagnostics do not prove a manifold, intrinsic dimension, recovered coordinate, mechanism, or causal generator.",
+  "master_seed": 20260819,
+  "methods": [
+    "mean",
+    "rank_1_pca",
+    "linear_autoencoder",
+    "small_or_bounded_high_capacity_tanh_autoencoder",
+    "frozen_random_tanh_encoder_trained_decoder"
+  ],
+  "metric_rows": 6920,
+  "metric_schema": [
+    "split",
+    "condition",
+    "preprocessing",
+    "method",
+    "seed",
+    "selection",
+    "target",
+    "metric",
+    "value"
+  ],
+  "moment_matching_contract": {
+    "observable_covariance_includes_noise_variance": 0.0036,
+    "quadrature_family": "numpy.polynomial.legendre.leggauss",
+    "quadrature_nodes": 256
+  },
+  "optimizer_contract": {
+    "checkpoint_rule": "minimum validation transformed-coordinate MSE per seed",
+    "learning_rates": {
+      "frozen_random_encoder": 0.015,
+      "linear_ae": 0.025,
+      "nonlinear_ae": 0.012
+    },
+    "maximum_epochs": {
+      "frozen_random_encoder": 900,
+      "linear_ae": 900,
+      "nonlinear_ae": 900
+    },
+    "minimum_validation_improvement": 1e-10,
+    "optimizer": "manual deterministic full-batch Adam",
+    "patience": {
+      "frozen_random_encoder": 120,
+      "linear_ae": 120,
+      "nonlinear_ae": 120
+    },
+    "seed_selection_rule": "minimum selected validation MSE, then lower seed",
+    "seeds": [
+      0,
+      1,
+      2,
+      3,
+      4
+    ],
+    "test_excluded_from_checkpoint_and_seed_selection": true
+  },
+  "project": "Latent Dynamics & Geometry",
+  "runtime": {
+    "numpy": "2.3.5",
+    "pillow": "12.3.0",
+    "platform": "macOS-26.5.1-arm64-arm-64bit",
+    "python": "3.12.13"
+  },
+  "schema_version": 1,
+  "shifted_range_fit_policy": "reuse exact nominal train/validation bundles, standardizer, candidate histories/checkpoints, selected seeds, and fitted models; only test differs",
+  "split_sizes": {
+    "few_sample_high_capacity": {
+      "test": 240,
+      "train": 40,
+      "validation": 80
+    },
+    "full_dimensional_gaussian": {
+      "test": 240,
+      "train": 320,
+      "validation": 160
+    },
+    "high_variance_nuisance": {
+      "test": 240,
+      "train": 320,
+      "validation": 160
+    },
+    "nominal_curved": {
+      "test": 240,
+      "train": 320,
+      "validation": 160
+    },
+    "shifted_range": {
+      "test": 240,
+      "train": 320,
+      "validation": 160
+    }
+  },
+  "tolerances": {
+    "checkpoint": 2e-12,
+    "gradient_relative": 3e-05,
+    "linear_pca_angle_degrees": 3.0,
+    "linear_pca_mse": 0.002,
+    "linear_pca_projector": 0.07,
+    "poison": 0.0
+  }
+}

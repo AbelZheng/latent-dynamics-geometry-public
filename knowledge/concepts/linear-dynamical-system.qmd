@@ -1,0 +1,269 @@
+---
+title: "Linear Dynamical System"
+object_type: concept
+maturity: L2
+status: stable
+domain: [dynamics, latent-modeling]
+tags: [linear-dynamics, state-space-model, superposition]
+prerequisites:
+- knowledge/concepts/state-space-model.qmd
+- knowledge/concepts/linear-subspace.qmd
+related:
+- knowledge/concepts/vector-field.qmd
+- knowledge/concepts/input-driven-dynamics.qmd
+- knowledge/concepts/stability.qmd
+- knowledge/concepts/convolution.qmd
+- knowledge/concepts/kernel.qmd
+created: 2026-08-18
+updated: 2026-08-18
+---
+
+# Linear Dynamical System
+
+## One-sentence definition
+
+A **linear dynamical system** has state evolution that is linear in the state and declared inputs, optionally paired with a linear observation model.
+
+## Why this concept matters
+
+Linear systems are interpretable baselines with tractable propagation and solution structure; exact probabilistic inference requires additional assumptions such as Gaussian noise. They can be exact models or local approximations, but linearity is a structural assumption—not a synonym for low dimension or simplicity in observed behavior.
+
+## Intuition
+
+For a linear system, weighted sums of zero-input solutions remain solutions. Matrices specify how state components interact and how inputs enter.
+
+## Formal definition
+
+For $x(t)\in\mathbb R^n$, $u(t)\in\mathbb R^m$, and $y(t)\in\mathbb R^q$, a continuous-time linear time-invariant state-space model has the form
+
+$$
+\dot x(t)=Ax(t)+Bu(t),
+\qquad
+y(t)=Cx(t)+Du(t),
+$$
+
+with
+
+$$
+A\in\mathbb R^{n\times n},\quad
+B\in\mathbb R^{n\times m},\quad
+C\in\mathbb R^{q\times n},\quad
+D\in\mathbb R^{q\times m}.
+$$
+
+A discrete-time counterpart is
+
+$$
+x_{k+1}=Ax_k+Bu_k,
+\qquad
+y_k=Cx_k+Du_k.
+$$
+
+The state evolution alone, $\dot x=Ax+Bu$ or $x_{k+1}=Ax_k+Bu_k$, is often called a linear dynamical system even when no observation equation is included. A **linear state-space model** additionally declares the linear observation relation. Åström and Murray use these forms and explicitly separate state, input, and output roles [@AstromMurray2021, secs. 3.2, 6.1].
+
+### Superposition and affine systems
+
+For the homogeneous system $\dot x=Ax$, linear combinations of solutions are solutions. For the input-driven system, the complete response is jointly linear in the initial state and input:
+
+$$
+x(t;\alpha x_{0,1}+\beta x_{0,2},\delta u_1+\gamma u_2)
+=
+\alpha x(t;x_{0,1},0)+\beta x(t;x_{0,2},0)
++
+\delta x(t;0,u_1)+\gamma x(t;0,u_2),
+$$
+
+with corresponding linearity of the output, when the same matrices, parameters, time origin, admissible input class, and zero affine offsets are used. Superposition does not combine responses from different systems or parameter settings. This separates the homogeneous initial-condition response from the forced zero-initial-state response [@AstromMurray2021, sec. 6.1].
+
+An offset model
+
+$$
+\dot x=Ax+Bu+c,
+\qquad
+y=Cx+Du+d
+$$
+
+is **affine**, not linear, because it does not preserve zero or arbitrary linear combinations. Translating to deviation coordinates around an operating point or augmenting coordinates with a constant component can produce a linear representation, but both change the representation and must be stated explicitly.
+
+### Continuous-time solution
+
+For constant $A$ and an admissible input, the solution from time $t_0$ is
+
+$$
+x(t)
+=
+e^{A(t-t_0)}x(t_0)
++
+\int_{t_0}^{t}e^{A(t-s)}Bu(s)\,ds.
+$$
+
+The first term is the initial-condition response and the integral is the forced response. The output is
+
+$$
+y(t)
+=
+Ce^{A(t-t_0)}x(t_0)
++
+\int_{t_0}^{t}Ce^{A(t-s)}Bu(s)\,ds
++
+Du(t).
+$$
+
+These formulas require constant $A$; time-varying linear systems use a state-transition operator rather than simply $e^{A(t-t_0)}$ [@AstromMurray2021, secs. 6.2–6.3].
+
+The $D u(t)$ term is direct feedthrough. In an impulse-response representation it must be kept separate from an ordinary function-valued convolution kernel, or represented using a generalized impulse term.
+
+### Discrete-time multi-step solution
+
+For $k>j$,
+
+$$
+x_k
+=
+A^{k-j}x_j
++
+\sum_{r=j}^{k-1}A^{k-1-r}Bu_r.
+$$
+
+Again, the first term propagates the initial state and the sum accumulates input effects. This formula does not imply stability: powers $A^n$ can decay, remain bounded, or grow depending on $A$.
+
+### State-coordinate changes
+
+Let $z=Tx$ for an invertible matrix $T$, while input and output coordinates are left unchanged. The same state evolution in $z$ coordinates has
+
+$$
+A'=TAT^{-1},
+\qquad
+B'=TB,
+\qquad
+C'=CT^{-1},
+\qquad
+D'=D.
+$$
+
+For an affine state offset, $c'=Tc$. If input or output bases are also changed, the formulas for $B,C,D$ change accordingly. Thus similar dynamics matrices can represent the same abstract linear evolution in different state coordinates. Eigenvalues are preserved by similarity, but state axes, matrix entries, loadings, and component interpretations are not unique or automatically mechanistic.
+
+### Exact linearity and local linearization
+
+For a nonlinear model $\dot x=f(x,u)$, first choose an equilibrium operating point satisfying $f(x_e,u_e)=0$ and define
+
+$$
+\delta x=x-x_e,
+\qquad
+\delta u=u-u_e,
+\qquad
+\delta y=y-h(x_e,u_e).
+$$
+
+Then define
+
+$$
+A=\left.\frac{\partial f}{\partial x}\right|_{(x_e,u_e)},
+\qquad
+B=\left.\frac{\partial f}{\partial u}\right|_{(x_e,u_e)}.
+$$
+
+The residual-free first-order deviation model is
+
+$$
+\delta\dot x
+\approx
+A\,\delta x+B\,\delta u.
+$$
+
+If $y=h(x,u)$, define
+
+$$
+C=\left.\frac{\partial h}{\partial x}\right|_{(x_e,u_e)},
+\qquad
+D=\left.\frac{\partial h}{\partial u}\right|_{(x_e,u_e)},
+$$
+
+so $\delta y\approx C\delta x+D\delta u$. Around a non-equilibrium nominal trajectory $(\bar x(t),\bar u(t))$ satisfying $\dot{\bar x}(t)=f(\bar x(t),\bar u(t))$, the deviation Jacobians are evaluated along that trajectory and generally vary with time, yielding a linear time-varying approximation. At an arbitrary point that is not an equilibrium or nominal solution, a nonzero residual term remains. This is a local approximation whose accuracy depends on neighborhood and neglected higher-order terms. Successful local linear prediction does not establish that the full system is globally linear.
+
+## Core notation
+
+- $A$: state-transition or dynamics matrix.
+- $B$: input matrix.
+- $C$: observation matrix.
+- $D$: direct input-to-output matrix.
+- $x,u,y$: state, input, and observation.
+- $e^{At}$: matrix exponential for the constant-$A$ homogeneous evolution.
+- $T$: invertible state-coordinate transformation.
+- $A' = TAT^{-1}$: similar dynamics matrix in transformed coordinates.
+- $c,d$: state and observation affine offsets, excluded from a strictly linear rule.
+
+## Prerequisites
+
+[State-Space Model](state-space-model.qmd) supplies the transition/observation roles. [Linear Subspace](linear-subspace.qmd) supplies the vector-space structure required for linear combinations.
+
+**Assumed background:** elementary matrices, integration, and matrix powers. Matrix-exponential proofs and spectral theory are deferred.
+
+## Relationship to adjacent concepts
+
+| Concept | Distinction |
+|---|---|
+| **Linear regression** | A static input-output relation; an LDS propagates state across time. |
+| **Linearization** | A local approximation to a nonlinear system, not proof that the full system is linear. |
+| **Low-dimensional model** | Linear systems may be high-dimensional; nonlinear models may be low-dimensional. |
+| **Affine dynamics** | Include a constant offset and are not strictly linear. Augmentation can create a linear representation only after changing coordinates/state representation. |
+| **Linear observation model** | A linear map from state to observation; it does not imply that the state evolution is linear. |
+| **Time-varying linear system** | Has matrices depending on time. It remains linear but does not use the constant-$A$ matrix-exponential formula unchanged. |
+| **Stochastic linear system** | Adds random variables or disturbances; linearity does not imply Gaussian distributions or independence. |
+
+## What this does NOT imply
+
+Linearity does not imply low dimension, stability, observability, controllability, identifiability, Gaussian noise, weak interactions, diagonalizable dynamics, orthogonal modes, or biological mechanism. Good prediction by an LDS or a local linearization does not establish that the underlying system is globally linear.
+
+## Minimal example
+
+For
+
+$$
+\dot x=-ax+bu(t),
+\qquad a>0,
+$$
+
+$$
+x(t)
+=
+e^{-a(t-t_0)}x_0
++
+b\int_{t_0}^{t}e^{-a(t-s)}u(s)\,ds.
+$$
+
+The first term decays from the initial condition, while the second accumulates input history. A constant input shifts the equilibrium but does not turn the input into a parameter by definition. The stability conclusion here follows from the specific scalar coefficient $-a$, not from linearity alone.
+
+In discrete time, $x_{k+1}=ax_k$ gives $x_k=a^{k-j}x_j$. The system is linear for every $a$, but its trajectories decay only when $|a|<1$.
+
+## Neuroscience / behavioral relevance
+
+Linear dynamical systems are important baselines for neural population trajectories and behavior. Nonlinear alternatives should demonstrate gains beyond a comparably evaluated LDS rather than rely on more expressive visualizations.
+
+## Relevance to LDG
+
+At L2, LDS supplies explicit propagation, input-response, and coordinate-similarity formulas as a baseline linking state-space models, vector fields, kernels, and recovery methods. It also makes clear which conclusions require stability, noise, inference, or observability assumptions beyond linearity.
+
+## Open questions
+
+- When is local linearization sufficient?
+- Which coordinate transformations preserve a useful linear interpretation?
+- How should nonlinear models be compared at matched complexity?
+
+## References
+
+- Åström and Murray provide the inspected discrete matrix form/multi-step solution, equilibrium linearization, and LTI superposition, matrix-exponential, similarity, and input/output-response formulations [@AstromMurray2021, secs. 3.2, 5.3, 6.1–6.4]. Section numbering was checked against the inspected 24 July 2020 electronic second-edition manuscript corresponding to the published edition.
+- Control, reachability, observability, estimation, spectral proofs, matrix-exponential derivations, and nonlinear error bounds are intentionally deferred.
+
+## Maturity checklist
+
+- [x] Defines continuous and discrete linear state-space forms.
+- [x] Separates linearity from dimension and stability.
+- [x] Identifies its role as a baseline.
+- [x] Types continuous and discrete linear state-space forms.
+- [x] Separates strict linearity, affine offsets, time variation, and local linearization.
+- [x] States superposition with the correct homogeneous and forced-response conditions.
+- [x] Gives continuous matrix-exponential and discrete multi-step solutions.
+- [x] States similarity transformations and coordinate non-uniqueness.
+- [x] Separates linearity from stability, Gaussianity, dimension, observability, and identifiability.
+- [x] Independent L2 scientific review completed; initial findings were corrected and focused re-review passed under the recorded review decision.

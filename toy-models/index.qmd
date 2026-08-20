@@ -1,0 +1,14 @@
+---
+title: "Toy Models"
+---
+
+Toy Models connect explicit questions and known generative structure to simulation, recovery, evaluation, and interpretation limits.
+
+- [Two-Dimensional Autonomous Dynamics: Generation and Recovery](two-dimensional-autonomous-dynamics.qmd) — an executable, known-ground-truth comparison of cubic vector-field recovery, an affine baseline, and a derivative-permutation control. *(L1, stable)*
+- [Linear-Gaussian Inference Ladder](linear-gaussian-inference-ladder.qmd) — a deterministic scalar LGSSM demonstration separating finite-grid parameter selection, online filtering, retrospective smoothing, direct batch conditioning, uncertainty, missing observations, misspecification, and sequence-boundary failure. *(L1, stable)*
+- [Static Linear Latent Recovery](static-linear-latent-recovery.qmd) — a known-ground-truth PCA, PPCA, and diagonal-FA comparison that separates principal-covariance and common-loading targets and tests residual misspecification, nuisance variance, outliers, and preprocessing leakage. *(L1, stable)*
+- [Label-Dependent Demixing](label-dependent-demixing.qmd) — a supervised time × stimulus × decision Toy Model comparing marginal means, PCA, marginal PCA, regularized dPCA, decoding, label shuffles, missing cells, pseudo-populations, and mean-versus-single-trial transfer. *(L1, stable)*
+- [Rotational Projection Controls](rotational-projection-controls.qmd) — a known block-skew positive generator and symmetric, latency, input, preprocessing, metric-dependence, random-plane, and covariance-matched controls for jPCA-style rotational projections. *(L1, stable)*
+- [Covariance-Prior Trajectories](covariance-prior-trajectories.qmd) — an exact Gaussian covariance-prior ladder comparing known and selected GPFA, static/two-stage FA and PCA, independent-channel/bin limits, recursive AR Kalman/RTS, masks, and covariance-family failures. *(L1, stable)*
+- [Bounded Nonlinear Reconstruction](bounded-nonlinear-reconstruction.qmd) — a deterministic mean/PCA/linear-AE/nonlinear-AE/frozen-encoder comparison on curved, full-dimensional, nuisance, few-sample, and shifted-range reconstruction conditions. *(L1, stable)*
+- [Graph Geometry Recovery Without Manifold Overclaim](graph-geometry-recovery.qmd) — a deterministic hairpin graph-distance/Isomap and finite-circle Diffusion Maps recovery study with held-out extensions, connectivity, shortcut, density, bandwidth, truncation, and metric controls. *(L1, stable)*

@@ -1,0 +1,504 @@
+---
+title: "Gaussian-Process Factor Analysis"
+object_type: method
+maturity: L2
+status: stable
+domain: [latent-modeling, temporal-modeling, neuroscience, statistics]
+tags: [gpfa, gaussian-process, factor-analysis, latent-trajectory]
+prerequisites:
+- knowledge/methods/factor-analysis.qmd
+- knowledge/concepts/latent-variable.qmd
+- knowledge/concepts/latent-trajectory.qmd
+- knowledge/concepts/observation-model.qmd
+- knowledge/concepts/observation-noise.qmd
+- knowledge/concepts/identifiability.qmd
+related:
+- knowledge/methods/linear-gaussian-state-space-model.qmd
+- knowledge/methods/kalman-smoothing.qmd
+created: 2026-08-19
+updated: 2026-08-19
+---
+
+# Gaussian-Process Factor Analysis
+
+## Problem
+
+Gaussian-process factor analysis (GPFA) infers smooth, low-dimensional latent trajectories from high-dimensional time series by combining a factor-analysis-style linear Gaussian observation model with Gaussian-process priors over latent coordinates. In its canonical neural application, the observations are transformed binned spike counts from simultaneously recorded units, and each trial receives a full-interval posterior distribution over its latent path [@YuEtAl2009].
+
+The bounded method solves a retrospective probabilistic smoothing and dimensionality-reduction problem:
+
+> Under a declared linear Gaussian observation model and declared covariance functions over within-trial time, what posterior distribution over latent trajectories is supported by the complete observed sequence?
+
+GPFA does not learn a state-transition equation. Its temporal structure is specified through covariance kernels that directly encode correlations among latent values at different times. Smooth posterior means are therefore partly consequences of the selected prior family, timescales, and observation model rather than direct observations of a uniquely existing path.
+
+**Assumed background:** Gaussian processes and symmetric positive-semidefinite covariance kernels. A Gaussian-process covariance kernel $k(t,t')$ specifies covariance between random function values and must generate positive-semidefinite Gram matrices on every finite time grid [@RasmussenWilliams2006]. The existing [Kernel Concept](../concepts/kernel.qmd) uses **kernel** for a temporal impulse-response/filter weighting function. It is not a prerequisite for, and must not be confused with, the positive-semidefinite covariance kernels used here.
+
+## Input
+
+For trial $n=1,\ldots,N$, let
+
+$$
+Y^{(n)}=
+\begin{bmatrix}
+y^{(n)}_1&\cdots&y^{(n)}_{T_n}
+\end{bmatrix}
+\in\mathbb R^{p\times T_n},
+$$
+
+where $p$ is the number of observed channels and $t^{(n)}_1,\ldots,t^{(n)}_{T_n}$ is that trial's declared time grid. In the canonical neural formulation, $y^{(n)}_t$ contains nonoverlapping binned spike counts after a square-root transformation; unlike a two-stage smoother followed by static dimensionality reduction, the transformed counts are not presmoothed before GPFA [@YuEtAl2009].
+
+A reproducible analysis must declare:
+
+- the experimental unit, recording population, simultaneous-versus-pseudo-population status, inclusion rules, and trial/sequence boundaries;
+- bin width, time grid, event alignment, analyzed interval, count transformation, and handling of unequal trial lengths;
+- whether an across-condition or trial-specific mean has been removed, represented in $d$, or modeled separately;
+- candidate latent dimension $q$ and its selection rule;
+- covariance-kernel family, signal variance convention, timescale constraints, and any latent nugget/noise term;
+- observation covariance structure and whether diagonal $R$ is scientifically defensible;
+- parameter initialization, optimization, restarts, convergence checks, and regularization;
+- missing-observation and censoring rules; and
+- training, validation, and test split units.
+
+The canonical multi-trial model treats trials as conditionally independent given shared parameters. It does not require equal $T_n$, but it does assume that all trials use the same loading matrix, observation offset, residual covariance, and kernel-hyperparameter family. Alignment resets within-trial time and does not create continuity between trial endpoints.
+
+## Output
+
+For a selected latent dimension $q$, fitted GPFA returns:
+
+- a loading matrix $C\in\mathbb R^{p\times q}$;
+- an observation offset $d\in\mathbb R^p$;
+- a diagonal observation-residual covariance $R\in\mathbb R^{p\times p}$;
+- one covariance kernel and fitted hyperparameters for each latent coordinate;
+- a marginal Gaussian distribution over every observed trial;
+- a joint Gaussian posterior over the complete latent path for each trial; and
+- posterior means, marginal covariances, cross-time covariances, samples, or posterior predictions derived from that path distribution.
+
+The posterior mean is one trajectory summary. It is not the latent trajectory random element itself, a measured state path, or a trajectory with parameter uncertainty integrated out. If parameters are estimated by maximum likelihood and then held fixed, reported posterior covariance is conditional on those plug-in parameters.
+
+## Core idea
+
+Static factor analysis applies the same low-rank-plus-diagonal Gaussian observation model independently to each observation vector. GPFA retains that observation layer but couples latent values across time using a GP prior. Nearby latent states can be strongly correlated when the covariance function has a long timescale, producing smooth posterior paths; a short timescale or large latent nugget permits faster or less smooth variation.
+
+Yu et al. describe GPFA as one factor analyzer per time point with shared observation parameters, linked in latent space by GP priors [@YuEtAl2009]. The complete finite-grid model is multivariate Gaussian, so the latent path can be integrated out to obtain an exact marginal likelihood and conditioned on the full trial to obtain an exact Gaussian posterior. Exactness is conditional on the Gaussian model and finite matrix computations; it is not evidence that transformed spike counts or neural activity truly follow that model.
+
+## Generative / modeling assumptions
+
+For time $t$ in one trial, the observation model is
+
+$$
+y_t=Cx_t+d+\epsilon_t,
+\qquad
+\epsilon_t\sim\mathcal N(0,R),
+$$
+
+where $x_t\in\mathbb R^q$ and
+
+$$
+R=\operatorname{diag}(r_1,\ldots,r_p),
+\qquad r_i>0.
+$$
+
+Observation residuals are independent across channels conditional on $x_t$ because $R$ is diagonal, and they are ordinarily assumed independent across time and trials. The latent functions are independent a priori across coordinates:
+
+$$
+x_j^{(n)}(\cdot)\sim\mathcal{GP}(0,k_j),
+\qquad j=1,\ldots,q,
+$$
+
+and independent across trials conditional on shared hyperparameters. Thus each trial draws a new latent path; no model constraint forces nominally similar trials to follow the same realization [@YuEtAl2009].
+
+The original paper used a squared-exponential covariance with a coordinate-specific timescale:
+
+$$
+k_j(t,t')
+=
+\alpha_j^2
+\exp\!\left[-\frac{(t-t')^2}{2\tau_j^2}\right]
++
+\nu_j^2\,\delta_{t,t'}.
+$$
+
+Here $\alpha_j^2$ is smooth latent signal variance, $\tau_j>0$ is a characteristic timescale, and $\nu_j^2\ge0$ is an optional **latent GP nugget/noise variance**. The nugget is independent variation in the latent coordinate at sampled times; it is not the observation noise $R$, process noise in a transition equation, or measurement error. Yu et al. fixed a small positive latent nugget in their main analyses and normalized $k_j(t,t)=1$, which sets $\alpha_j^2=1-\nu_j^2$ and fixes latent scale [@YuEtAl2009]. If $\nu_j^2=1$ under that convention, cross-time covariance vanishes and the temporal coupling reduces to a static FA-like model applied with shared parameters over time.
+
+These assumptions are substantive:
+
+- latent-to-observation dependence is linear;
+- transformed observations and residuals are Gaussian;
+- $R$ is diagonal in the declared observed coordinates;
+- latent coordinates are independent GPs in the fitted parameterization;
+- trials are independent replicates conditional on parameters;
+- the selected covariance family represents relevant temporal regularity; and
+- one shared observation subspace and set of timescales applies across the pooled sequences.
+
+## Mathematical formulation
+
+### Finite-grid GP prior
+
+For one trial with time grid $t_1,\ldots,t_T$, let
+
+$$
+X=
+\begin{bmatrix}
+x_1&\cdots&x_T
+\end{bmatrix}
+\in\mathbb R^{q\times T}.
+$$
+
+Use time-major stacking
+
+$$
+\mathbf x=
+\begin{bmatrix}
+x_1^\top&\cdots&x_T^\top
+\end{bmatrix}^\top
+\in\mathbb R^{qT}.
+$$
+
+The GP prior gives
+
+$$
+\mathbf x\sim\mathcal N(0,K),
+$$
+
+where the $(a,b)$ block of $K\in\mathbb R^{qT\times qT}$ is
+
+$$
+K_{ab}
+=
+\operatorname{diag}\!\left(
+ k_1(t_a,t_b),\ldots,k_q(t_a,t_b)
+\right).
+$$
+
+A valid covariance kernel produces a positive-semidefinite Gram matrix on every finite grid; a strictly positive nugget often makes the matrix positive definite and improves conditioning [@RasmussenWilliams2006]. Arbitrary symmetric similarity functions are not automatically valid GP covariances.
+
+Define
+
+$$
+\bar C=I_T\otimes C,
+\qquad
+\bar d=\mathbf 1_T\otimes d,
+\qquad
+\bar R=I_T\otimes R,
+$$
+
+and stack observations as
+
+$$
+\mathbf y=
+\begin{bmatrix}
+y_1^\top&\cdots&y_T^\top
+\end{bmatrix}^\top.
+$$
+
+Then
+
+$$
+\mathbf y\mid\mathbf x
+\sim
+\mathcal N(\bar C\mathbf x+\bar d,\bar R).
+$$
+
+### Marginal observation distribution
+
+Integrating out the latent trajectory gives
+
+$$
+\mathbf y
+\sim
+\mathcal N(\bar d,\Sigma_y),
+\qquad
+\Sigma_y=\bar C K\bar C^\top+\bar R.
+$$
+
+The trial log marginal likelihood is therefore
+
+$$
+\log p(\mathbf y\mid\theta)
+=-\frac12
+\left[
+(\mathbf y-\bar d)^\top\Sigma_y^{-1}(\mathbf y-\bar d)
++\log|\Sigma_y|
++pT\log(2\pi)
+\right],
+$$
+
+where $\theta$ denotes $C,d,R$ and the kernel hyperparameters. Independent trials contribute a sum of trial log likelihoods. The quadratic data-fit and log-determinant complexity terms are standard consequences of Gaussian-process marginalization [@RasmussenWilliams2006]. Stable implementations use Cholesky or other structured solves rather than explicit inverses or determinants.
+
+### Full-interval latent posterior
+
+Gaussian conditioning yields
+
+$$
+\mathbf x\mid\mathbf y
+\sim
+\mathcal N(\mu_{x\mid y},\Sigma_{x\mid y}),
+$$
+
+with
+
+$$
+\mu_{x\mid y}
+=K\bar C^\top\Sigma_y^{-1}(\mathbf y-\bar d),
+$$
+
+$$
+\Sigma_{x\mid y}
+=K-K\bar C^\top\Sigma_y^{-1}\bar C K.
+$$
+
+When $K$ and $\bar R$ are nonsingular, the equivalent precision form is
+
+$$
+\Sigma_{x\mid y}
+=
+\left(K^{-1}+\bar C^\top\bar R^{-1}\bar C\right)^{-1},
+$$
+
+$$
+\mu_{x\mid y}
+=
+\Sigma_{x\mid y}\bar C^\top\bar R^{-1}(\mathbf y-\bar d).
+$$
+
+These formulas define a full path posterior, including covariance between different latent coordinates and times after conditioning. Plotting $\mu_{x\mid y}$ alone suppresses this uncertainty and cross-time dependence. The same finite-grid Gaussian conditioning principles underlie ordinary GP posterior prediction [@RasmussenWilliams2006]; Yu et al. derive these stacked GPFA expressions explicitly [@YuEtAl2009].
+
+### Missing observations
+
+Let $H$ be a binary selection matrix retaining only observed channel--time entries. Then
+
+$$
+\mathbf y_O=H\mathbf y
+$$
+
+has
+
+$$
+\mathbf y_O\mid\mathbf x
+\sim
+\mathcal N(H\bar C\mathbf x+H\bar d, H\bar R H^\top).
+$$
+
+The marginal and posterior formulas apply after replacing $\bar C,\bar d,\bar R$ by their selected versions. This handles arbitrary missing channels or bins exactly under the model when missingness is ignorable. State-dependent dropout, spike censoring, saturation, event-triggered acquisition, or informative trial termination requires an explicit missingness/observation model rather than simple row deletion.
+
+### New times within an existing trial
+
+For a new time grid, covariance cross-blocks between new and observed times provide a joint Gaussian prior. Conditioning gives posterior interpolation or extrapolation of latent values. Interpolation uncertainty depends on sampling gaps and the kernel; extrapolation reverts toward the prior and can be highly uncertain. This is GP prediction, not propagation by a learned transition law.
+
+## What is learned?
+
+Maximum-likelihood fitting may learn $C,d,R$, kernel timescales, and any kernel variances or nugget terms not fixed by convention. Candidate latent dimension and covariance family may be selected by nested validation. These parameters determine the marginal distribution over observed sequences.
+
+After parameters are fixed, posterior inference computes $p(\mathbf x\mid\mathbf y,\widehat\theta)$ separately for each trial. The posterior mean, covariance, and samples are inferential outputs, not additional learned model parameters. Parameter learning and trajectory inference must not be described as the same operation.
+
+GPFA does not learn a transition matrix, ordinary differential equation, vector field, flow, state-dependent velocity, causal graph, or physical measurement mechanism. A fitted timescale describes prior covariance decay in one latent coordinate under the selected kernel family; it is not a discovered relaxation constant or causal interaction time without further evidence.
+
+## What is fixed?
+
+The analyst fixes the observation representation, binning and transform, trial boundaries and alignment, latent-dimension search, Gaussian linear observation family, diagonal-$R$ restriction, kernel family, stationarity choice, whether latent variance or nugget is fixed, parameter-sharing structure, optimization method, initialization/restart policy, missingness assumptions, split units, and evaluation target.
+
+In the original bounded formulation, latent marginal variance was fixed, a small latent nugget was fixed, and each coordinate's squared-exponential timescale was learned [@YuEtAl2009]. A model that learns arbitrary amplitudes, cross-latent covariance kernels, nonstationary kernels, nonlinear observations, or point-process likelihoods is a related extension and must state its enlarged identifiability and inference requirements.
+
+## Temporal assumptions
+
+Time enters as the index of each covariance kernel. GPFA can evaluate kernels on regular or irregular grids, but the original neural pipeline used nonoverlapping bins and trial-relative time. A stationary squared-exponential kernel assumes covariance depends only on $t-t'$ within a trial and implies very smooth latent sample paths. Other valid kernels encode different regularity, periodicity, roughness, or nonstationarity [@RasmussenWilliams2006].
+
+Different trials are independent draws under shared parameters; the canonical model includes no cross-trial covariance and no continuity across boundaries. Event alignment changes the time coordinates supplied to the covariance function. Incorrect alignment can blur real structure or encourage the model to explain timing jitter through short timescales, latent nuggets, or observation noise.
+
+The posterior uses observations from the entire trial. It is retrospective, like fixed-interval smoothing, and is not an online estimate available at earlier times. Extending, shortening, or re-aligning the trial changes the posterior. GPFA does not define one-step causal propagation or a forecast state transition, although its GP prior can conditionally predict unobserved times.
+
+## Geometry assumptions
+
+The observation layer is linear in the transformed observed coordinates. $C$ defines a loading subspace, while diagonal $R$ privileges the chosen channel coordinates. The GP kernels define temporal covariance and a prior distribution over functions; they do not define a sampled-data manifold or a Riemannian metric on a biological state space.
+
+Euclidean distances between posterior latent means depend on the latent-coordinate convention and scaling. Yu et al. post-process $C$ with an SVD to obtain orthonormalized visualization coordinates spanning the same loading space [@YuEtAl2009]. That display transformation can aid interpretation but does not make the displayed axes uniquely identified, preserve the independent-GP parameterization under every rotation, or convert the posterior mean into a directly observed geometric path.
+
+## Supervision
+
+The likelihood requires no external outcome label, so canonical fitting is unsupervised with respect to behavior or experimental class. Nevertheless, trial segmentation, event alignment, selected intervals, condition pooling, neuron inclusion, preprocessing, kernel choice, and latent-dimension search are design choices that can use task information.
+
+If labels or behavior select the model, hyperparameters, alignment, displayed dimensions, or time interval, those choices introduce supervision and must occur inside training/validation folds. Relating fixed, held-out latent summaries to behavior is a downstream analysis; predictive success does not prove that latent coordinates are causal or mechanistic variables.
+
+## Optimization / inference
+
+For fixed parameters, the Gaussian path posterior and marginal likelihood are exact finite-dimensional conditioning calculations. Parameter fitting is a separate generally nonconvex optimization problem.
+
+Yu et al. use expectation--maximization: the E-step computes posterior first and second moments of every trial's latent path; the M-step updates $C,d$, diagonal $R$, and kernel hyperparameters, with closed-form FA-like updates for the observation parameters and gradient optimization for timescales [@YuEtAl2009]. EM's monotone likelihood improvement does not ensure a unique global optimum. The original study found timescale estimates dependent on initialization even when likelihoods and displayed trajectories were similar, motivating multiple starts and explicit convergence checks.
+
+Direct marginal-likelihood optimization is also possible. Lengthscale, signal, nugget, and residual-noise objectives can contain ridges or local optima, and short records may provide weak information about them [@RasmussenWilliams2006]. Stable computation should use Cholesky factorizations, triangular solves, log-determinants from factors, and declared jitter only when it is recognized as a covariance-model modification.
+
+## Strengths
+
+- It combines temporal smoothing and factor analysis in one normalized probability model.
+- It returns full-interval posterior uncertainty and cross-time covariance, not only a filtered curve or deterministic projection.
+- Coordinate-specific timescales allow latent factors to vary at different temporal scales.
+- Irregular time grids and missing observed entries can be handled through covariance evaluation and Gaussian conditioning.
+- Marginal likelihood, predictive densities, leave-neuron-out prediction, and posterior checks provide evaluation criteria beyond visualization.
+- It supplies a non-Markov covariance-prior comparison to LGSSM/RTS smoothing and a temporally coupled comparison to static FA.
+
+## Failure modes
+
+- **Wrong observation law:** low binned counts remain discrete, bounded below, skewed, and often overdispersed; a Gaussian law on square-rooted counts is only an approximation.
+- **Diagonal residual failure:** synchronous artifacts, shared input, cross-talk, sorting errors, and unmodeled population structure can leave correlated residuals that are forced into latent factors.
+- **Kernel misspecification:** squared-exponential priors can suppress abrupt transitions, oscillatory roughness, changepoints, or nonstationary timescales.
+- **Prior-imposed smoothness:** posterior means can look smooth even when data are sparse or noisy because the covariance prior rewards smooth functions.
+- **Wrong trial boundaries:** treating continuous activity segments as independent resets or smoothing across genuine resets changes the model.
+- **Alignment and binning sensitivity:** event jitter, bin width, and transformed count scale alter estimated covariance, apparent dimensionality, and timescales.
+- **Short or sparse trials:** timescale, nugget, and residual variance can be weakly distinguished when few within-trial lags are observed.
+- **Latent-versus-observation noise tradeoff:** $R$, latent nugget, short-timescale signal, and extra factors can compensate for one another.
+- **Wrong latent dimension:** too few factors leave shared residual covariance; too many create weakly occupied, unstable, or redundant trajectories.
+- **Local optimization:** EM or direct likelihood methods can reach different local representatives or hyperparameter modes.
+- **Computational scaling:** exact dense covariance calculations grow cubically with latent dimension times trial length in a naive implementation; long sequences can require structured or approximate variants outside this bounded object.
+- **Missingness misspecification:** ignored informative dropout or censoring biases the posterior.
+- **Distribution shift:** shared $C,R$, and kernels may fail across sessions, subjects, conditions, or recording drift.
+- **Leakage:** choosing bins, dimensions, kernels, timescales, alignment, or displayed trajectories using test trials gives optimistic results.
+- **Visualization overreach:** a smooth low-dimensional posterior mean is mistaken for a manifold, intrinsic dimension, dynamical law, vector field, mechanism, or unique path.
+
+## Identifiability issues
+
+Several exact or conditional equivalences must be distinguished:
+
+- **Sign:** replacing latent coordinate $x_j$ by $-x_j$ and loading column $C_{:j}$ by $-C_{:j}$ preserves the observable law.
+- **Permutation:** permuting latent coordinates, loading columns, and their kernel hyperparameters together preserves the model.
+- **Scale:** if kernel marginal amplitudes are free, rescaling $x_j'=s_jx_j$, $C'_{:j}=C_{:j}/s_j$, and $k'_j=s_j^2k_j$ preserves the observable distribution. Fixing $k_j(t,t)=1$ removes this continuous scale ambiguity but not sign or permutation.
+- **Rotation:** an arbitrary orthogonal rotation preserves the independent-GP family only among latent coordinates with identical covariance matrices. When kernels or timescales differ, a general rotation introduces cross-latent covariance and falls outside the diagonal independent-GP parameterization. Equal or nearly equal kernels therefore create exact or practical rotational ambiguity in the corresponding subspace.
+- **Post-hoc visualization:** any invertible latent coordinate transform can represent the same fitted joint Gaussian if $C$ and the full latent covariance are transformed consistently, but the transformed model may no longer have independent coordinate-wise kernels. Choosing orthonormal display axes selects a representative rather than identifying biological coordinates.
+
+Hyperparameter identification can also be weak. Signal amplitude trades with loading scale unless normalized; latent nugget, short lengthscale, $R$, and added factors can explain overlapping high-frequency variation; very long lengthscales can resemble low-order trends or trial means. Finite windows constrain which lags are observed, so a maximum-likelihood timescale may be boundary-limited or initialization-sensitive.
+
+A selected factor count is model- and criterion-dependent. It is not model-free intrinsic dimension. Even a concentrated posterior under fitted parameters does not establish a unique latent trajectory across observationally equivalent or misspecified models.
+
+## Comparison with simpler methods
+
+- **Training mean plus diagonal Gaussian:** predicts no shared latent variation. GPFA should improve held-out sequence likelihood or leave-neuron-out prediction before shared temporal structure is credited.
+- **Static Factor Analysis:** uses the same linear Gaussian observation idea but treats time points independently. It is the required baseline for whether GP temporal coupling adds value.
+- **Two-stage smoothing plus PCA or FA:** first chooses a temporal smoother, then applies static dimensionality reduction. Yu et al. compared GPFA with cross-validated two-stage variants; the comparison tests whether jointly fitting smoothness and shared covariance improves prediction under the chosen observation scale [@YuEtAl2009].
+- **Per-channel GP or smoother:** models each observed channel independently and tests whether a shared low-dimensional loading is needed.
+- **LGSSM:** specifies a first-order Markov transition law, process noise, and a linear observation model. GPFA specifies temporal covariance directly and need not correspond to the bounded LGSSM parameterization. A better fit does not imply either model is mechanistically true.
+- **Fixed-interval Kalman smoothing:** is an inference algorithm for a fixed LGSSM. GPFA posterior inference is also retrospective Gaussian smoothing, but it conditions a different prior and does not literally require an RTS pass. Some GP covariance models admit state-space representations; that computational equivalence does not make generic GPFA a learned transition model.
+- **Two-sided moving average:** a transparent nonprobabilistic smoother that lacks shared latent factors and calibrated path covariance but can reveal whether apparent smoothness requires a complex model.
+- **Independent-bin posterior means:** remove cross-time covariance while keeping $C,d,R$, isolating the effect of the GP prior.
+
+## Evaluation criteria
+
+Evaluation must keep parameter selection, posterior inference, and final scoring separate:
+
+1. **Split whole dependence units:** partition trials, sessions, animals, or conditions before fitting. Do not scatter bins from one trial across train and test parameter-learning folds.
+2. **Training-only design choices:** choose binning, alignment, transformations, included channels, latent dimension, covariance family, initialization policy, and hyperparameters inside training/validation data.
+3. **Held-out trial likelihood:** report marginal log likelihood or log predictive density per time/channel on untouched trials, with static FA, diagonal, and temporal baselines fitted under the same preprocessing.
+4. **Leave-neuron-out prediction:** fit parameters on training trials, then in held-out trials mask one recorded channel, infer the latent path from the remaining channels, and score the masked channel's predictive distribution. Do not refit using the held-out values. Yu et al. used an analogous prediction-error criterion to compare GPFA and two-stage methods [@YuEtAl2009].
+5. **Masked-time prediction:** hide declared time blocks from both parameter fitting and posterior conditioning for that test trial, then score their conditional predictive density and interval coverage.
+6. **Residual diagnostics:** inspect means, marginal variances, cross-channel residual covariance, temporal residual autocorrelation, tails, count dependence, and condition/session drift.
+7. **Posterior calibration:** in simulations with retained truth, assess pointwise and simultaneous coverage, posterior Mahalanobis statistics, and path uncertainty—not only posterior-mean RMSE.
+8. **Invariant recovery targets:** compare loading subspaces, observable covariance, predictions, and latent paths only after allowed sign/permutation/scale or identical-kernel-subspace alignment.
+9. **Hyperparameter stability:** report multiple starts, likelihood modes, timescale/nugget boundaries, fold variation, and sensitivity to window length and bin width.
+10. **Prior sensitivity:** compare plausible covariance families and independent-bin/static limits. Smoothness that disappears under a reasonable prior change is not a robust empirical discovery.
+11. **Distribution-shift tests:** when claimed, hold out sessions, subjects, task conditions, or acquisition periods rather than relying only on random trial folds.
+12. **No assimilated-target scoring:** observed bins used to form a posterior cannot be reused as independent evidence of reconstruction quality without a conditional predictive or held-out protocol.
+
+Likelihood and leave-neuron-out metrics remain conditional on the transformed Gaussian observation model. Better predictive performance supports that model/task combination, not a neural mechanism or uniquely correct latent representation.
+
+## Minimal toy model
+
+A future non-executable analytic/generation contract should use $q=2$ independent latent GPs observed through $p=8$ channels over multiple independent trials. Let
+
+$$
+k_1(t,t')=\exp\!\left[-\frac{(t-t')^2}{2(0.08)^2}\right],
+\qquad
+k_2(t,t')=0.95\exp\!\left[-\frac{(t-t')^2}{2(0.30)^2}\right]+0.05\delta_{t,t'}.
+$$
+
+Choose a full-column-rank loading matrix $C$, offset $d$, and heterogeneous diagonal
+
+$$
+R=\operatorname{diag}(r_1,\ldots,r_8).
+$$
+
+For each trial, draw new GP latent values on a declared regular or irregular grid, generate Gaussian observations, and retain latent truth. Some test trials should contain masked channels and time blocks.
+
+Compare:
+
+- mean plus diagonal Gaussian;
+- static two-factor FA;
+- cross-validated two-stage smoothing plus FA;
+- correctly specified GPFA;
+- a GPFA model with one wrong common timescale; and
+- a two-state LGSSM fitted to the same sequences.
+
+Score held-out marginal likelihood, masked-channel/time predictive density, observable covariance, loading-subspace error, aligned posterior-mean error, posterior coverage, and timescale recovery. Required stress cases are:
+
+1. an abrupt changepoint that violates squared-exponential smoothness;
+2. correlated observation residuals violating diagonal $R$;
+3. low-rate Poisson counts analyzed with the Gaussian square-root approximation;
+4. one latent coordinate with nearly independent temporal values;
+5. two equal-timescale coordinates exposing rotational ambiguity;
+6. event-time jitter and incorrect trial alignment;
+7. informative missingness; and
+8. a condition-locked mean omitted from $d$, forcing latent factors to absorb deterministic trial structure.
+
+Recovery claims must respect sign, permutation, scale, and identical-kernel rotational equivalences. The toy contract would distinguish posterior inference under a known model from parameter learning and model selection. No code, data, figure, or result is produced in this Method Object.
+
+## Relevance to LDG
+
+GPFA is LDG's canonical covariance-prior latent-trajectory method. It connects static factor analysis, full-interval posterior inference, temporal regularization, and model-dependent uncertainty while providing a contrast with transition-based LGSSM smoothing.
+
+Its main methodological lesson is that a smooth latent trajectory can be an appropriate posterior summary without being discovered dynamics. The covariance prior states which paths are plausible before conditioning, the observation model states how latent paths relate to measurements, and the posterior combines both. None of these steps alone identifies a vector field or mechanism.
+
+::: {.callout-warning title="What this does NOT imply"}
+A smooth GPFA posterior mean does not establish a learned transition law, vector field, flow, dynamics, manifold, intrinsic dimension, biological mechanism, causal process, or uniquely identified latent trajectory. Smoothness is imposed by the covariance prior and fitted hyperparameters. The posterior is retrospective and conditional on the linear Gaussian observation model, diagonal residual assumption, trial boundaries, kernel family, preprocessing, and plug-in parameters.
+:::
+
+### Mouse trajectory
+
+No modality-specific empirical claim is retained. GPFA could summarize repeated multichannel movement measurements, but external task drive, trial alignment, discontinuities, and sensor correlations would need explicit treatment. Smooth latent curves would not establish autonomous behavioral dynamics.
+
+### Eye movement
+
+No modality-specific empirical claim is retained. Saccade discontinuities, pursuit inputs, event alignment, blinks, censoring, and angular coordinates can violate stationary smooth-GP and ignorable-missingness assumptions.
+
+### EEG
+
+No modality-specific empirical claim is retained. Rereferencing, volume conduction, filtering, artifacts, nonstationarity, and correlated sensor residuals directly challenge diagonal $R$ and independent-trial assumptions. GPFA factors are not automatically neural sources.
+
+### MEG / neural population data
+
+Yu et al. applied GPFA to square-root-transformed binned activity from 61 simultaneously recorded macaque premotor and motor cortical units during reach planning and execution. Under their cross-validated leave-neuron-out prediction-error criterion, GPFA improved on the tested two-stage methods, and the inferred single-trial trajectories were used to examine convergence during motor preparation [@YuEtAl2009]. These are source-specific empirical findings under one dataset and pipeline, not universal evidence for smooth neural dynamics or mechanism.
+
+Cunningham and Yu review GPFA as a single-trial latent-trajectory method with an explicit noise model and emphasize that extracted trajectories reflect the temporal structure encouraged by the fitted model [@CunninghamYu2014]. New neural claims therefore require independent predictive evaluation, prior sensitivity, residual checks, and modality-specific evidence.
+
+## Primary sources
+
+- Yu et al. introduce GPFA, specify the FA-style observation layer and independent latent GP priors, derive the finite-grid marginal and posterior, fit parameters with EM, define orthonormalized visualization, and report the original single-trial macaque motor-cortex application [@YuEtAl2009]. The published corrigendum was inspected; it corrects the color attribution in Figure A2 and does not alter the model equations used here.
+
+## Reviews / secondary sources
+
+- Rasmussen and Williams provide the inspected authoritative treatment of Gaussian processes, positive-semidefinite covariance functions, finite-grid joint Gaussian distributions, posterior conditioning, squared-exponential lengthscales, and marginal-likelihood learning [@RasmussenWilliams2006].
+- Cunningham and Yu review neural dimensionality-reduction methods, distinguish GPFA from two-stage and transition-based alternatives, discuss single-trial use and cross-validation, and caution that latent trajectories reflect model-imposed temporal structure [@CunninghamYu2014].
+
+## Open methodological questions
+
+- Which covariance families capture neural regularity without suppressing scientifically meaningful discontinuities or nonstationarity?
+- When can latent nugget, observation noise, short timescale, and additional factors be distinguished from available trial lengths and sampling rates?
+- How should parameter uncertainty be propagated into posterior path uncertainty at practical scale?
+- Which held-out target—trial likelihood, neuron prediction, masked-time prediction, behavior, or simulator state—best matches the scientific use?
+- How robust are inferred timescales and loading subspaces across sessions, subjects, conditions, bin widths, and observation transformations?
+- When is a transition-based state-space representation preferable for forecasting, interventions, or mechanistic questions?
+- How should point-process, correlated-residual, nonstationary, or cross-trial extensions be bounded and validated without treating flexibility as evidence?
+
+## Maturity checklist
+
+- [x] Complete Method schema at `L2/review`.
+- [x] Defines FA-style linear Gaussian observations with diagonal $R$ and independent latent GP priors across coordinates and trials.
+- [x] Declares Gaussian processes and positive-semidefinite covariance kernels as assumed background and excludes the temporal Kernel Concept as a prerequisite.
+- [x] Defines squared-exponential timescales and clearly separates optional latent GP nugget from observation noise and transition-process noise.
+- [x] Gives the finite-grid stacked joint Gaussian, marginal likelihood, posterior mean/covariance, and missing-observation selection formulation.
+- [x] Separates parameter learning, model selection, and posterior trajectory inference.
+- [x] States learned/fixed quantities, retrospective time handling, geometry, supervision, and spike-count Gaussian boundaries.
+- [x] Covers sign, permutation, scale, identical-kernel rotation, post-hoc-coordinate, and hyperparameter identifiability.
+- [x] Covers prior-imposed smoothness, kernel/observation/trial/alignment/binning/missingness failures and local optimization.
+- [x] Includes static FA, two-stage, independent-channel, LGSSM, Kalman smoothing, moving-average, and independent-bin baselines.
+- [x] Gives leakage-safe held-out evaluation and a non-executable positive/negative toy contract.
+- [x] Explicitly rejects learned-transition, vector-field, dynamics, manifold, intrinsic-dimension, mechanism, causal, and unique-trajectory claims.
+- [x] Three retained sources and the original-paper corrigendum were inspected; metadata and DOI or stable identifiers were verified.
+- [x] Independent mixed review returned PASS with no correction round required.
+- [x] Stable promotion authorized under the recorded review decision after object-specific PASS and validation.

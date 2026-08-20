@@ -1,0 +1,208 @@
+---
+title: "Latent Trajectory"
+object_type: concept
+maturity: L2
+status: stable
+domain: [latent-modeling, dynamics]
+tags: [latent-trajectory, latent-state, time-series, posterior-inference]
+prerequisites:
+- knowledge/concepts/trajectory.qmd
+- knowledge/concepts/latent-variable.qmd
+related:
+- knowledge/concepts/observation-model.qmd
+- knowledge/concepts/state-space-model.qmd
+- knowledge/concepts/identifiability.qmd
+- knowledge/concepts/vector-field.qmd
+- knowledge/concepts/flow.qmd
+created: 2026-08-18
+updated: 2026-08-18
+---
+
+# Latent Trajectory
+
+## One-sentence definition
+
+A **latent trajectory** is a time-indexed latent random element or one realized path of that element, distinguished from the observations and from any point summary used to estimate it.
+
+## Why this concept matters
+
+Latent-trajectory language is used for several different objects: a latent process specified by a model, its posterior distribution after observing data, a posterior draw, and a plotted point estimate. Keeping these objects separate prevents a smooth estimate from being mistaken for a uniquely recovered state evolution or for evidence of a dynamical mechanism.
+
+## Intuition
+
+An observation sequence can support many hidden paths. A model assigns relative probability to those paths, and inference updates that distribution using data. Plotting one posterior mean or one maximum-a-posteriori path suppresses this uncertainty and may also hide latent-coordinate symmetries.
+
+## Formal definition
+
+Let $(\mathcal Z,\Sigma_{\mathcal Z})$ be a latent space and let $I=\{0,\ldots,T\}$ in discrete time. A latent trajectory random element is a measurable map
+
+$$
+Z_{0:T}:\Omega\to\mathcal Z^{T+1}.
+$$
+
+One realization is a path $z_{0:T}=(z_0,\ldots,z_T)$. In continuous time, one must declare a path space $\mathcal P(I,\mathcal Z)$—for example, continuous or càdlàg paths with a specified measurable structure—and write $Z:\Omega\to\mathcal P(I,\mathcal Z)$. Temporal indexing does not by itself make $Z_t$ a sufficient dynamical state or specify a transition law.
+
+Assuming an appropriate regular conditional distribution exists, given observations $Y_{0:T}=y_{0:T}$ and a generative model, the inferential target is generally a conditional probability measure over complete paths,
+
+$$
+\Pi(A\mid y_{0:T})
+=
+\Pr(Z_{0:T}\in A\mid Y_{0:T}=y_{0:T}),
+\qquad A\in\Sigma_{\mathcal Z}^{\otimes(T+1)},
+$$
+
+or a conditional density $p(z_{0:T}\mid y_{0:T})$ when a suitable reference measure exists. This posterior law is not identical to any single plotted path.
+
+### Generative law and inference targets
+
+Under the first-order state-space assumptions declared in [State-Space Model](state-space-model.qmd), a path law may factor through an initial law and transition kernels,
+
+$$
+p(z_{0:T},y_{0:T})
+=
+p(z_0)
+\prod_{k=0}^{T-1}p(z_{k+1}\mid z_k)
+\prod_{k=0}^{T}p(y_k\mid z_k).
+$$
+
+The factorization is a model assumption, not a consequence of the term “latent trajectory.” Common inferential objects include:
+
+- **filtering distribution:** $p(z_k\mid y_{0:k})$, using observations available through time $k$;
+- **fixed-interval smoothing distribution:** $p(z_{0:T}\mid y_{0:T})$, or its marginal $p(z_k\mid y_{0:T})$, using later observations as well;
+- **posterior sample:** a random draw $\tilde z_{0:T}\sim p(z_{0:T}\mid y_{0:T})$;
+- **joint MAP path:** when a declared path density and maximizer exist, a value $\hat z^{\mathrm{MAP}}_{0:T}\in\arg\max p(z_{0:T}\mid y_{0:T})$;
+- **marginal MAP sequence:** independently selected maximizers of $p(z_k\mid y_{0:T})$, which need not equal a joint MAP path or form a supported transition sequence;
+- **posterior mean path:** $\hat z^{\mathrm{mean}}_k=\mathbb E[Z_k\mid y_{0:T}]$, when $\mathcal Z$ is represented in a vector space and the expectation exists.
+
+Kalman distinguishes filtering, smoothing, and prediction by whether the target time is equal to, earlier than, or later than the last observation time, and treats an estimate as a function of a conditional distribution and a loss [@Kalman1960]. Consequently, the posterior mean is tied to squared-error loss in declared coordinates; it is not a representation-free definition of “the recovered trajectory.” A MAP value based on a density can also depend on the reference measure and coordinate parameterization.
+
+Point summaries are not automatically admissible realized paths. Pointwise marginal means or modes can leave a discrete or nonlinear state space, violate hard path constraints, or combine features that never co-occur in a posterior draw. Even when a summary lies in the path space, it need not be typical under the posterior or satisfy an unforced deterministic evolution law. Exact posterior samples respect the modeled posterior support, but that only establishes compatibility with the fitted model.
+
+### Coordinate reparameterization
+
+Let $h:\mathcal Z\to\mathcal Z'$ be a bimeasurable bijection and define $Z'_k=h(Z_k)$. The transformed path law is the pushforward under the componentwise path map $h^{0:T}$. Preserving the same observable model requires every affected component to transform consistently:
+
+$$
+\mu'=h_\#\mu,
+$$
+
+$$
+Q'_k(z',A')
+=
+Q_k\!\left(h^{-1}(z'),h^{-1}(A')\right),
+$$
+
+$$
+G'_k(z',B)
+=
+G_k\!\left(h^{-1}(z'),B\right).
+$$
+
+For deterministic dynamics $z_{k+1}=f_k(z_k)$, this gives $f'_k=h\circ f_k\circ h^{-1}$. The posterior over transformed paths must likewise be the pushforward $(h^{0:T})_\#\Pi$. Transforming only the reported trajectory, without the latent law, transition model, and observation model, generally changes the generative specification rather than merely changing coordinates.
+
+Coordinate-wise trajectory errors such as Euclidean RMSE are therefore meaningful only after declaring coordinates, units, metric, time correspondence, and any permitted alignment. If a known group $G$ generates an observational symmetry, evaluation may instead target an orbit or equivalence class, for example
+
+$$
+\inf_{g\in G}
+\frac{1}{T+1}\sum_{k=0}^{T}
+d_{\mathcal Z}\!\left(z_k^\star,g\cdot\hat z_k\right)^2,
+$$
+
+with the group, metric, fitting data, and held-out use of the alignment stated. Observable predictions or other identifiable functions can also be compared when latent coordinates themselves are not identified. In PPCA, for example, the loading matrix and latent coordinate frame have an orthogonal-rotation ambiguity [@TippingBishop1999, sec. 3.2]. This exact symmetry does not license arbitrary nonlinear alignment for every latent model.
+
+### Uncertainty-aware evaluation with known ground truth
+
+::: {.callout-tip title="LDG Operational Synthesis"}
+The following protocol connects the posterior, identifiability, and state-space distinctions above into a bounded evaluation design. It is a proposed LDG practice, not a theorem attributed to the inspected sources.
+:::
+
+In simulations or other settings with declared latent ground truth $z_{0:T}^\star$, evaluation should report more than one visually aligned path:
+
+1. **state or trajectory error:** use a declared metric and, when necessary, a justified symmetry/alignment convention;
+2. **temporal generalization:** evaluate held-out times, trials, initial conditions, or parameter conditions rather than only the fitted sequence;
+3. **uncertainty coverage:** across repeated data sets, check whether marginal state regions or simultaneous path regions contain the appropriately aligned ground truth at their advertised rates, and do not conflate these two coverage targets;
+4. **calibration or scoring:** compare posterior or predictive distributions with proper scoring rules or repeated-simulation calibration, not only the width of one interval;
+5. **model comparison:** test against a simpler static or weak-dynamics baseline to determine whether a transition model improves held-out prediction or recovery.
+
+If alignment is estimated from the same ground truth used for scoring, that dependence and any resulting optimism must be reported. Coverage is a repeated-procedure property under a declared data-generating process; one visually plausible credible band is not a calibration result. Simulated ground truth establishes recovery only relative to the simulator and declared equivalence convention, not unique physical or biological truth.
+
+## Core notation
+
+- $Z_{0:T}$: latent trajectory random element.
+- $z_{0:T}$: one realized latent path.
+- $Y_{0:T}=y_{0:T}$: observation random variables and realized data.
+- $\Pi(\mathrm dz_{0:T}\mid y_{0:T})$: posterior probability measure over paths.
+- $p(z_k\mid y_{0:k})$: filtering distribution.
+- $p(z_{0:T}\mid y_{0:T})$: fixed-interval smoothing distribution.
+- $\tilde z_{0:T}$: posterior sample.
+- $\hat z^{\mathrm{MAP}}_{0:T}$, $\hat z^{\mathrm{mean}}_{0:T}$: declared point summaries.
+- $h$ and $h^{0:T}$: latent-coordinate and componentwise path reparameterizations.
+- $G$: a declared symmetry group when the scientific target is an orbit or equivalence class.
+
+## Prerequisites
+
+[Trajectory](trajectory.qmd) supplies typed time-indexed paths. [Latent Variable](latent-variable.qmd) supplies model-hidden quantities. [Observation Model](observation-model.qmd) and [State-Space Model](state-space-model.qmd) separate the forward measurement relation, transition law, and posterior inference task.
+
+## Relationship to adjacent concepts
+
+| Concept | Distinction |
+|---|---|
+| **Observed trajectory** | A path constructed directly from measured variables. It can be input to latent inference but is not the hidden path itself. |
+| **Deterministic embedding path** | A sequence $e(y_k)$ produced by a fixed transformation of data. It need not define a latent probability law, posterior uncertainty, or adequate dynamical state. |
+| **Latent state trajectory** | A stronger modeling role in which each latent value is treated as a state adequate for the specified evolution and system boundary. |
+| **Posterior distribution over trajectories** | A conditional probability law over possible paths; it is not one posterior mean, MAP path, or sample. |
+| **Vector field / transition law** | A rule assigning local change or transition distributions across supported states. One inferred path does not determine such a rule away from visited states. |
+| **Flow** | A compatible family of finite-time evolution maps over supported initial states. One latent trajectory is only one orbit/path under a flow, when such a flow exists. |
+| **Identifiability** | Determines whether latent paths, parameters, or only equivalence classes/functions are uniquely constrained by the observable law. |
+
+## What this does NOT imply
+
+A latent trajectory does not imply identifiable coordinates, low intrinsic dimension, smoothness, autonomous dynamics, manifold structure, Markov sufficiency, causal or mechanistic meaning, or a unique inverse from observations. Low reconstruction error or accurate decoding does not establish that the latent path is the true state. A smooth posterior mean does not establish smooth true dynamics.
+
+## Minimal example
+
+Let the latent state space be $\mathcal Z=\{-1,+1\}$ and suppose the posterior assigns probability $1/2$ to the constant path $(-1,\ldots,-1)$ and probability $1/2$ to $(+1,\ldots,+1)$. Both posterior samples are admissible paths, but the pointwise posterior mean is $(0,\ldots,0)$, which is not in $\mathcal Z^{T+1}$. This shows why a posterior mean can be a useful loss-optimal summary without being a possible latent realization.
+
+In a linear Gaussian state-space model,
+
+$$
+z_{k+1}=Az_k+w_k,
+\qquad
+y_k=Cz_k+v_k,
+$$
+
+filtering and smoothing return conditional distributions over states or paths, not only one line. Rotating latent coordinates while transforming $A$, $C$, the latent law, and the posterior consistently can preserve the same observable model under the relevant symmetry; rotating only a plotted estimate does not establish equivalence.
+
+## Neuroscience / behavioral relevance
+
+Cunningham and Yu describe HMM, GPFA, LDS, and nonlinear dynamical-system methods as returning low-dimensional latent neural trajectories, but explicitly caution that an extracted trajectory reflects a statistical tradeoff between noisy data and the fitted dynamics model [@CunninghamYu2014]. GPFA smoothness and LDS/NLDS dynamical motifs can therefore be encouraged by model assumptions rather than discovered independently in the data. Behavioral latent paths require the same separation among measurements, model-hidden variables, posterior summaries, and state claims.
+
+## Relevance to LDG
+
+At L2, Latent Trajectory joins path-space probability, state-space inference, coordinate symmetry, and known-ground-truth evaluation. It supplies the guardrails needed to compare generation-and-recovery methods without treating a visualization, posterior mean, or aligned reconstruction as mechanistic evidence.
+
+## Open questions
+
+- Which path-space topology and uncertainty representation are appropriate for irregularly sampled or discontinuous trajectories?
+- Which latent symmetries preserve the scientific claim in a given model?
+- How should alignment uncertainty be propagated into trajectory-error and coverage estimates?
+- When does a transition model improve held-out recovery over independent latent factors or smoothed observations?
+
+## References
+
+- Kalman provides an inspected primary distinction among smoothing, filtering, and prediction and relates conditional distributions, loss, estimates, and estimation-error covariance in a linear stochastic setting [@Kalman1960].
+- Cunningham and Yu provide inspected neural-population trajectory context and the warning that extracted smoothness or dynamical motifs can reflect the fitted model as well as noisy data [@CunninghamYu2014].
+- Tipping and Bishop provide an inspected probabilistic latent-variable observation model, a conditional latent distribution, conditional-mean summaries, and the PPCA orthogonal-rotation ambiguity [@TippingBishop1999, secs. 3.1--3.4].
+- General path-space measure theory, nonlinear filtering/smoothing algorithms, posterior-consistency theorems, and calibration theorems are intentionally deferred.
+
+## Maturity checklist
+
+- [x] Types a latent trajectory as a random element and distinguishes a realized path from its posterior law.
+- [x] Separates filtering, smoothing, posterior samples, joint MAP paths, and posterior means.
+- [x] Shows why point summaries need not be admissible or typical latent paths.
+- [x] Transforms latent law, transition model, observation model, and posterior consistently under coordinate changes.
+- [x] Separates coordinate-dependent error from declared symmetry/equivalence-class targets.
+- [x] Treats model-induced smoothness as an inference assumption rather than evidence of true dynamics.
+- [x] Specifies uncertainty-aware known-ground-truth evaluation and alignment cautions.
+- [x] Distinguishes observed paths, deterministic embeddings, latent states, vector fields, and flows.
+- [x] Independent L2 scientific review completed under the recorded review decision; the bounded review passed without substantive findings.

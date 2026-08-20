@@ -1,0 +1,96 @@
+---
+title: "Torus"
+object_type: concept
+maturity: L1
+status: stable
+domain: [topology, geometry]
+tags: [torus, product-space, periodic-coordinates]
+prerequisites:
+- knowledge/concepts/circle-s1.qmd
+- knowledge/concepts/topology.qmd
+related:
+- knowledge/concepts/manifold.qmd
+created: 2026-08-18
+updated: 2026-08-18
+---
+
+# Torus
+
+## One-sentence definition
+
+The two-dimensional **torus** $T^2$ is the product $S^1\times S^1$, equivalently a plane with two independent periodic directions.
+
+## Why this concept matters
+
+The torus models systems with two circular variables, such as two phases or two periodic coordinates. Its intrinsic topology is not tied to the familiar doughnut-shaped embedding in $\mathbb R^3$.
+
+## Intuition
+
+Take a square and identify its left edge with its right edge and its bottom edge with its top edge. Moving off one side returns from the opposite side.
+
+## Formal definition
+
+With the product topology and product smooth structure,
+
+$$
+T^2=S^1\times S^1
+\cong
+\mathbb R^2/\mathbb Z^2,
+$$
+
+where $\mathbb Z^2$ acts by coordinatewise integer translations. Quotient coordinates $(t_1,t_2)\pmod{\mathbb Z^2}$ are measured in turns; radian coordinates satisfy $\theta_i=2\pi t_i$.
+
+It is a compact two-dimensional smooth manifold. The quotient-square, product-of-circles, and embedded doughnut are representations of the same standard topological type under suitable maps.
+
+## Core notation
+
+- $T^2$: two-torus.
+- $(\theta_1,\theta_2)$: two periodic coordinates.
+- $\mathbb R^2/\mathbb Z^2$: quotient representation.
+
+## Prerequisites
+
+[Circle / S¹](circle-s1.qmd) supplies each periodic factor. [Topology](topology.qmd) supplies product and quotient constructions.
+
+## Relationship to adjacent concepts
+
+| Concept | Distinction |
+|---|---|
+| **Doughnut surface** | One embedding of a torus; the topology does not require that geometry. |
+| **Two-dimensional plane** | Locally similar but globally lacks the torus's periodic identifications. |
+| **Limit cycle** | One periodic orbit has circle topology; a torus can support two independent phases or quasiperiodic motion. |
+| **Product space** | The torus is a particular product of two circles. |
+
+## What this does NOT imply
+
+A toroidal latent claim does not imply a doughnut-shaped point cloud, a flat metric, two identifiable biological oscillators, dense sampling, quasiperiodic dynamics, or a unique embedding.
+
+## Minimal example
+
+Two independent clock phases $(\theta_1,\theta_2)$, each taken modulo $2\pi$, define a point on $T^2$. Equivalently, $(t_1,t_2)=(\theta_1/2\pi,\theta_2/2\pi)$ is taken modulo $\mathbb Z^2$. Returning either phase by one full turn leaves the torus point unchanged.
+
+## Neuroscience / behavioral relevance
+
+Joint head-direction and rhythmic-phase variables, or two coupled periodic task variables, may motivate toroidal models. Such topology must be compared with simpler circular, planar, and disconnected alternatives.
+
+## Relevance to LDG
+
+Torus extends the topology branch from one periodic coordinate to product topology and prepares careful discussion of multi-phase latent structure.
+
+## Open questions
+
+- What sampling is required to distinguish a torus from a curved sheet?
+- How robust are two-hole signatures to noise and missing states?
+- When does toroidal topology improve prediction?
+
+## References
+
+- Sutherland provides the inspected product and quotient topology constructions [@Sutherland2024].
+- Mrowka's manifold notes provide product and torus context [@Mrowka2004].
+
+## Maturity checklist
+
+- [x] Defines $T^2$ as a product and quotient.
+- [x] Separates intrinsic topology from a doughnut embedding.
+- [x] States empirical and dynamical non-implications.
+- [x] Independent bounded review completed; initial findings were corrected and focused re-review passed.

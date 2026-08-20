@@ -1,0 +1,575 @@
+---
+title: "Demixing and Rotational Projection Robustness Benchmark"
+object_type: benchmark
+maturity: L1
+status: stable
+domain: [dimensionality-reduction, supervised-learning, dynamical-systems, neuroscience]
+tags: [benchmark, dpca, jpca, demixing, rotation, negative-controls]
+prerequisites:
+- knowledge/methods/demixed-principal-component-analysis.qmd
+- knowledge/methods/jpca.qmd
+- toy-models/label-dependent-demixing.qmd
+- toy-models/rotational-projection-controls.qmd
+related:
+- knowledge/methods/principal-component-analysis.qmd
+- knowledge/concepts/identifiability.qmd
+- knowledge/concepts/latent-trajectory.qmd
+created: 2026-08-20
+updated: 2026-08-20
+---
+
+# Demixing and Rotational Projection Robustness Benchmark
+
+## Scientific question
+
+P4-U04 asks two separate synthetic questions.
+
+1. **Label-dependent demixing:** under known stimulus- and decision-dependent
+   linear effects, when do condition means, PCA, marginal PCA, bounded dPCA and
+   ridge decoding recover their own declared held-out targets, and how do those
+   targets respond to collinearity, cell imbalance, label permutation,
+   pseudo-populations, trial averaging and sample size?
+2. **Rotational projection:** under known rotational and non-rotational
+   trajectory families, when do PCA planes, unrestricted derivative regression,
+   skew-constrained jPCA-like fitting, symmetric fitting, input-aware fitting and
+   fixed/random/control planes recover held-out derivative, plane, angular-rate,
+   tangential-motion or covariance-control targets?
+
+The two tasks have separate generators, scenario grids, methods, applicability
+rules, metrics, summaries and figure panels. No cross-task normalization,
+aggregate score, rank or winner is computed. Marginal reconstruction, label
+decoding, marginal-subspace recovery, rotational-plane recovery, angular-rate
+recovery and derivative prediction are also never combined into one score.
+
+## Ground truth
+
+### Demixing task
+
+The demixing generator has eight observed features, 12 aligned time bins and a
+balanced binary stimulus $s\in\{-1,1\}$ and decision $d\in\{-1,1\}$ design in
+the reference scenario. A trial has clean signal
+
+$$
+y_{s,d}(t)
+= \mu(t)
++0.9\,s\,f_s(t)v_s
++0.75\,d\,f_d(t)v_d,
+$$
+
+plus independent Gaussian observation noise with standard deviation $0.42$.
+The reference $v_s$ and $v_d$ are orthonormal. The near-collinear scenario
+replaces the second direction by a normalized perturbation of the first. There
+is no interaction effect in this bounded generator. Trial shifts,
+feature-wise trial reassignment and label permutations are scenario operations,
+not hidden changes to the reference target.
+
+The known targets are the stimulus and decision condition-mean
+marginalizations and their generating one-dimensional feature directions.
+Labels are observed supervision for fitting; clean signals and generating
+directions are unavailable to fitting and enter only scoring or verification.
+
+### Rotational task
+
+The rotational generator has four latent coordinates, eight observed features,
+six conditions, 31 physical-time samples on $[0,1.2]$, and independent trials.
+The reference latent matrix contains a rate-four planar rotation and a second,
+slower damped rotational block. The primary plane/rate target is the first
+known observed-space plane and angular rate $4$. Other scenarios replace the
+latent family with symmetric decay, latency sequences or input-driven
+trajectories, or alter the observation metric and preprocessing.
+
+The observation map is an eight-by-four orthonormal embedding in ordinary
+scenarios and a declared nonorthogonal embedding in the metric stress. Gaussian
+latent and observation perturbations are added independently. Known latent
+states, embedding and generating matrices are scoring/verification truth only.
+They are not supplied to fitted projections.
+
+## Generation
+
+Generation is task-specific and precedes all fitting.
+
+- **Demixing:** each scenario-replicate independently generates train,
+  validation and test trials. Reference per-cell counts are 20/10/12, giving
+  actual split totals 80/40/48. The small-sample per-cell counts 5/4/12 give
+  totals 20/16/48; large-sample counts 45/18/18 give totals 180/72/72. The
+  missing-cell training matrix is `[[20,20],[20,0]]`, for total 60 and design
+  rank three; validation/test remain balanced with totals 40/48. The
+  unbalanced training matrix is `[[40,5],[6,20]]`, for total 71 and design rank
+  four; its validation/test totals are 40/48.
+- **Rotation:** each scenario-replicate independently generates 7/4/5 trials
+  per condition for train/validation/test. Across six conditions, the actual
+  totals are 42/24/30. Condition trajectories share the declared scenario
+  family but receive independent perturbations.
+
+Demixing condition means are arithmetic means within each observed cell. The
+complete-design marginalization then gives the four cells equal weight rather
+than weighting them by trial count. Rotational preprocessing first averages
+trials within each condition; when subtraction is enabled, it subtracts the
+across-condition mean separately at each time point.
+
+The executable is benchmark-local. It records SHA-256 digests of the stable
+Phase 3 demixing and rotational-control executables as scientific-design
+provenance, but it does not claim to call or executable-reuse their numerical
+routines.
+
+## Scenario grid
+
+### Demixing scenarios
+
+| Scenario | Declared manipulation | Primary boundary |
+|---|---|---|
+| `balanced_reference` | complete $2\times2$ design with orthogonal generating directions | bounded reference |
+| `near_collinear` | decision direction nearly aligned with stimulus direction | target overlap and unstable separation |
+| `missing_cell` | training counts `[[20,20],[20,0]]`; factorial design rank three of four | balanced marginal recovery is undefined |
+| `unbalanced_cells` | training counts `[[40,5],[6,20]]`, with complete rank-four support | equal-cell marginalization versus unequal precision |
+| `label_shuffle` | deterministic permutation of training labels before lawful fitting | supervision-destruction control |
+| `pseudo_population` | within each split and condition cell, each feature's complete trial trajectory is independently permuted | cell means are preserved while simultaneous trial covariance changes |
+| `averaging_mismatch` | independent trial-level shifts of $-1,0,+1$ bins with nearest-edge fill and no circular wrap | aligned condition means blur trial structure |
+| `small_sample` | 5/4 train/validation trials per cell | estimation stress |
+| `large_sample` | 45/18/18 trials per cell | higher-information comparison |
+
+The grid is core-plus-stress, not a factorial isolation of individual causes.
+The missing-cell training design has rank three rather than the required rank
+four. The benchmark therefore reports the design-rank diagnostic and retains
+held-out decoder scores, but labels every otherwise applicable balanced
+marginal-reconstruction and marginal-subspace row `invalid` with reason
+`incomplete_factorial_design_rank_3_of_4`. It does not use grand-mean filling to
+claim identified balanced marginal recovery.
+
+### Rotational scenarios
+
+| Scenario | Declared manipulation | Primary boundary |
+|---|---|---|
+| `clean_rotation` | reference rotational generator and standard preprocessing | bounded positive reference |
+| `symmetric_decay` | diagonal negative generator without a true rotational plane | structure-specific negative control |
+| `latency_sequence` | sequential transient bumps rather than an autonomous rotation | latency-induced apparent sequence |
+| `common_input` | input-driven state equation with known two-dimensional input | state-only versus input-aware prediction |
+| `short_arcs` | first 12 time points only | limited angular occupancy |
+| `time_jitter` | condition-dependent shifts $(-1,0,+1)$ applied to latent path and input with nearest-edge fill, never wrapping | alignment stress |
+| `smoothed` | three-point moving average fitted/applied before projection | preprocessing dependence |
+| `no_condition_subtraction` | omit across-condition time-mean subtraction | subtraction dependence |
+| `nonorthogonal_metric` | nonorthogonal observation map | Euclidean metric dependence |
+| `covariance_control` | select among admissible training-only feature-wise cyclic condition-shift proposals by covariance cosine; uniform global shifts are excluded | thresholded covariance-match control |
+
+Plane and angular-rate truth are reported only for declared rotational
+scenarios and are omitted for decay, latency, input and covariance-control
+families where that target is not defined.
+
+## Negative controls and stress cases
+
+Demixing controls include permuted labels, incomplete and unequal cells,
+within-cell pseudo-population reassignment and non-wrapping trial-alignment
+mismatch. The shuffled-dPCA control independently permutes both training and
+validation labels, reselects its own dPCA ridge parameter on the shuffled
+validation target, and then refits. Each shuffled decoder likewise independently
+reselects its own ridge parameter from shuffled training/validation labels.
+Thus shuffled controls do not inherit the lawful method's selected parameter.
+A label permutation is expected to change supervised fitted states; it is not
+another independent replicate.
+
+The pseudo-population operation permutes each feature's complete trajectory only
+among trials in the same split and condition cell. Labels and cell means are
+preserved to numerical precision across all replicates (maximum discrepancy
+$3.33\times10^{-16}$). Across the three replicates, the off-diagonal
+trial-noise covariance change ranges from 0.0523--0.0644 in train,
+0.0685--0.0766 in validation and 0.0690--0.0772 in test. It therefore isolates
+loss of simultaneous within-cell trial covariance rather than destroying
+condition means.
+
+Rotational controls include symmetric dynamics, latency sequences, common
+input, short arcs, non-wrapping timing jitter, smoothing and subtraction
+alternatives, nonorthogonal metric distortion, a deterministic seed-derived
+random plane and a selected covariance control. The latter attempts 24
+predeclared seed-derived proposals, each applying a cyclic condition shift
+separately to every PCA coordinate. A proposal is admissible only when at least
+two coordinate shifts are distinct and it materially changes cross-coordinate
+condition correspondence; a uniform all-coordinate shift is excluded as a
+global relabeling/no-op. Selection maximizes training covariance cosine
+similarity among admissible proposals only, with match threshold 0.97.
+Replicates 0/1/2 have 23/24/24 admissible proposals and select proposals
+0/19/4 with similarities 0.999995, 0.999990 and 0.999985. All selected controls
+use multiple distinct shifts, materially alter cross-coordinate correspondence,
+and are labelled `matched`. Selection and matching occur on training scores;
+the control does not preserve condition pairing or establish dynamics.
+
+No stress case is discarded because it weakens the preferred method, and no
+post-hoc scenario-specific parameter search is performed.
+
+## Replicates and deterministic seeds
+
+Each of the 19 scenarios has three independent replicates. PCG64 seeds are
+deterministically derived from master seed `20260820`, task, stable scenario
+hash, replicate, stage, split and, where needed, trial/control index. Methods
+within a replicate share the same generated data for paired comparison.
+
+The q10, median and q90 summaries therefore use three replicate-level values.
+They are descriptive finite-sample summaries, not confidence intervals or
+stable tail estimates. Trials, conditions, cells and time points are not
+promoted to independent replicates.
+
+## Split discipline
+
+Generation, fitting/selection, frozen recovery and scoring are separate stages.
+
+- Demixing fitting accepts only train/validation observations and labels.
+  dPCA regularization and ridge-decoder regularization are selected without test
+  data. Frozen recovery accepts fitted states and test observations/labels;
+  truth is joined only in scoring.
+- Rotational preprocessing, PCA and derivative models are fitted from training
+  observations and known training inputs where declared. Frozen recovery accepts
+  fitted states, test observations and test inputs. Test latent states and the
+  true embedding remain scoring-only.
+- Excluded test observations and truth cannot enter fitting by function
+  signature. Poison diagnostics report zero fitted-state discrepancy for test
+  exclusion and zero fixed-observation recovery discrepancy for truth poison.
+- Complete trials remain within one split. Adjacent time bins are never split
+  across train and test.
+
+The label- and condition-permutation controls are explicit alternate fitting
+paths, not leakage into the lawful path.
+
+## Methods and information sets
+
+### Demixing methods
+
+| Method | Role | Parameter source | Recorded information set |
+|---|---|---|---|
+| `condition_mean` | training condition-mean marginal reference | train labels | supervised train |
+| `pca` | rank-two global PCA projection of each marginal target | train fit | supervised train |
+| `marginal_pca` | rank-one PCA fitted separately to each training marginal | train labels | supervised train |
+| `selected_dpca` | ridge reduced-rank marginal map | train plus validation | supervised train, with `parameter_source=train_validation` |
+| `ridge_decoder` | separate stimulus and decision trial classifier | train plus validation | supervised train/validation |
+| `shuffled_dpca_control` | marginal map with independently selected ridge after deterministic train/validation-label permutations | permuted train/validation labels | permuted train/validation control |
+| `shuffled_decoder_control` | decoder with independently selected ridge after deterministic train/validation-label permutations | permuted train/validation labels | permuted train/validation control |
+| `factorial_design_diagnostic` | rank of the training design $[1,s,d,sd]$ | train labels | design diagnostic |
+
+Reconstruction/subspace methods are not assigned decoding scores. Decoders are
+not assigned marginal-reconstruction or marginal-subspace scores.
+
+### Rotational methods
+
+| Method | Role | Parameter source | Information set |
+|---|---|---|---|
+| `pca_plane` | first two coordinates of the training PCA representation | train fit | train-fitted projection |
+| `unrestricted_fit` | unrestricted linear derivative regression; plane extracted from its skew part | train fit | train-fitted projection |
+| `skew_fit` | skew-constrained derivative regression | train fit | train-fitted projection |
+| `symmetric_fit` | symmetric derivative regression control | train fit | train-fitted projection |
+| `input_aware_fit` | derivative regression on state and known input | train fit plus known input | train-fitted projection |
+| `fixed_plane` | predeclared PCA-coordinate axes 0 and 2 | predeclared | fixed reference |
+| `random_plane` | deterministic seed-derived rank-two plane | deterministic seed | train-fitted projection |
+| `covariance_shuffle_control` | plane/control from the highest-similarity admissible training-only condition-shift proposal; uniform global shifts excluded | selected permuted conditions | selected permutation control |
+
+The unrestricted, skew, symmetric and input-aware models share the same
+training PCA coordinate system. Their derivative predictions are evaluated on
+held-out central finite differences. `pca_plane` is coordinates `[0,1]`, whereas
+`fixed_plane` is the deliberately distinct coordinates `[0,2]`; they are not
+aliases. The verifier's maximum projector difference is 1.0, and their clean
+plane-angle medians are 0.5389° and 89.6500°, respectively. A retrospective
+condition-mean projection is not an online state estimator, and no online claim
+is made.
+
+## Parameter selection
+
+For `selected_dpca`, the ridge grid is
+
+$$
+\lambda\in\{10^{-4},10^{-2},10^{-1},1\}.
+$$
+
+Each candidate is fitted on training condition means and scored by the sum of
+validation stimulus- and decision-marginal mean-squared errors; ties use the
+smaller ordered $\lambda$. Each ridge decoder uses the same grid with
+validation classification error and the same deterministic tie rule. The
+lawful and shuffled dPCA/decoder paths each perform their own selection on their
+own labels before their states are frozen. In the reference replicate used by
+the verifier, lawful/shuffled dPCA both select 1.0; lawful stimulus/decision
+decoders select $10^{-4}/10^{-4}$, while shuffled decoders select
+$10^{-4}/1.0$. These values are diagnostics for that replicate, not universal
+hyperparameters.
+
+Rotational methods have no fitted hyperparameter search in this bounded
+implementation. Window, smoothing, subtraction, fixed/random planes and
+condition permutation are predeclared scenario or method choices, not selected
+from test performance.
+
+## Inference
+
+Demixing recovery rebuilds held-out condition means and marginalizations from
+complete test trials. Training condition means, global/marginal PCA projectors,
+selected dPCA maps and shuffled-control maps are then applied according to their
+fixed roles. Trial decoders use three predeclared temporal averages per feature.
+The clean trial signal and generating directions are never inputs to recovery.
+
+Rotational recovery applies training-fitted smoothing/subtraction statistics,
+feature mean and rank-four PCA basis to held-out condition means. Central
+finite differences define held-out derivative targets. Fitted derivative maps
+predict in the frozen PCA coordinate system. Plane methods project those same
+held-out scores. The input-aware model alone receives the declared held-out
+input sequence.
+
+## Scoring
+
+Every `results.csv` row has task, scenario, replicate, seed, metric-specific
+provenance/split/evaluation stage, method family, information set, parameter
+source, target, status/reason, per-cell count arrays and actual split totals.
+Where relevant it also records selected hyperparameter, design rank,
+covariance-control match status and proposal index. The artifact contains only
+the following metrics.
+
+### Demixing metrics
+
+| Metric | Target | Definition |
+|---|---|---|
+| `stimulus_marginal_nmse` | stimulus marginal reconstruction | held-out marginal reconstruction MSE divided by held-out stimulus-marginal mean square |
+| `decision_marginal_nmse` | decision marginal reconstruction | analogous held-out decision score |
+| `stimulus_subspace_angle_degrees` | stimulus marginal subspace | principal angle between the leading recovered stimulus-marginal direction and known $v_s$ |
+| `decision_subspace_angle_degrees` | decision marginal subspace | analogous angle to known $v_d$ |
+| `stimulus_decoding_accuracy` | stimulus label decoding | held-out complete-trial accuracy |
+| `decision_decoding_accuracy` | decision label decoding | held-out complete-trial accuracy |
+| `factorial_design_rank` | factorial-design identification | rank of the training design $[1,s,d,sd]$; it is a training diagnostic rather than a test score |
+
+Marginal NMSE, subspace angle and decoding accuracy answer different questions.
+A decoder can predict a label without reconstructing its condition-mean
+marginal, and low marginal error does not establish single-trial decoding.
+
+### Rotational metrics
+
+| Metric | Target | Definition |
+|---|---|---|
+| `plane_angle_degrees` | rotational plane | observed-space principal angle to the first known rotational plane; only in applicable rotational scenarios |
+| `angular_rate_abs_error` | angular rate | absolute error from the known first-plane rate $4$; only in applicable rotational scenarios |
+| `derivative_rmse` | held-out derivative prediction | RMSE between predicted and central-difference held-out derivatives in training-PCA coordinates |
+| `tangential_velocity_ratio` | plane tangential motion | norm of tangential projected velocity divided by total projected-velocity norm |
+| `covariance_similarity` | condition covariance control | Frobenius-cosine similarity of flattened score covariance before and after condition permutation |
+
+Derivative RMSE, plane angle, angular-rate error and tangential ratio are not
+interchangeable evidence. In particular, tangential motion in a selected plane
+can occur for transients or input-driven sequences.
+
+Each metric is first aggregated across its declared held-out cells/trials,
+conditions or derivative pairs into one scenario-replicate-method value.
+`diagnostics.json` then reports q10, median, q90, applicability rate and failure
+rate across the three replicates for each task $\times$ scenario $\times$
+method $\times$ metric group.
+
+## Failure and applicability labels
+
+The full Cartesian task-specific inventories are retained:
+
+- demixing: $9\times3\times8\times7=1{,}512$ rows;
+- rotation: $10\times3\times8\times5=1{,}200$ rows;
+- total: 2,712 unique canonical rows.
+
+Applicability is resolved before numerical failure. Every row has one status:
+
+- `ok`: applicable and finite;
+- `nonconvergence`: linear-algebra failure in an applicable path;
+- `invalid`: malformed, missing or non-finite applicable score;
+- `inapplicable`: the method/scenario does not define the metric target.
+
+Natural execution produced 1,041 `ok`, 1,617 `inapplicable`, 54 `invalid`
+and zero `nonconvergence` rows. By task, demixing has 567 `ok`, 891
+`inapplicable` and 54 `invalid`; rotation has 474 `ok` and 726 `inapplicable`.
+All 54 natural invalid rows are the three missing-cell replicates' otherwise
+applicable balanced marginal reconstruction/subspace combinations; the design
+rank is three of four. Every non-`ok` row has a machine-readable reason and no
+value. The absence of natural nonconvergence is not a robustness claim:
+real-path fault injection verifies both `invalid` and `nonconvergence`, while
+preserving `inapplicable` precedence.
+
+Examples of inapplicability are decoder methods on marginal reconstruction,
+reconstruction methods on decoding, symmetric/input-aware fits on plane or rate
+targets, and plane/rate truth in non-rotational scenarios.
+
+## Artifact contract
+
+`benchmarks/artifacts/demixing-rotational-robustness/` contains exactly:
+
+```text
+manifest.json
+results.csv
+diagnostics.json
+summary.png
+```
+
+The manifest freezes the two task inventories, three-replicate seed contract,
+stage/split/status vocabulary, canonical lexical row order, commands, runtime,
+Phase 3 provenance digests and artifact hashes. `results.csv` retains all raw
+replicate rows. `diagnostics.json` contains only task-specific summaries and
+verification diagnostics. `summary.png` uses four separate task/target panels
+and is a diagnostic view rather than acceptance evidence or a leaderboard.
+
+## Results
+
+The following values are q10/median/q90 across three replicates, recomputed from
+the authoritative `diagnostics.json`. They are scenario- and target-conditional.
+
+### Demixing results
+
+| Scenario and target | Method | q10 | Median | q90 |
+|---|---|---:|---:|---:|
+| Reference stimulus marginal NMSE | condition mean | 0.1808 | 0.1995 | 0.2691 |
+| Reference stimulus marginal NMSE | PCA | 0.1187 | 0.1251 | 0.1362 |
+| Reference stimulus marginal NMSE | marginal PCA | 0.1278 | 0.1368 | 0.1496 |
+| Reference stimulus marginal NMSE | selected dPCA | 0.1787 | 0.1789 | 0.1934 |
+| Reference stimulus marginal NMSE | independently selected shuffled-dPCA control | 0.7650 | 0.8885 | 1.0291 |
+| Reference decision marginal NMSE | selected dPCA | 0.0925 | 0.1045 | 0.1302 |
+| Reference stimulus subspace angle | selected dPCA | 5.0274° | 5.2335° | 7.9515° |
+| Reference decision subspace angle | selected dPCA | 1.5773° | 1.7486° | 1.8960° |
+| Reference stimulus decoding | ridge decoder | 1.0000 | 1.0000 | 1.0000 |
+| Reference stimulus decoding | independently selected shuffled-decoder control | 0.4625 | 0.4792 | 0.5792 |
+
+These rows do not define one method order: PCA's reference marginal NMSE,
+dPCA's supervised marginal map and the decoder's label accuracy are different
+targets. Under the `label_shuffle` scenario, selected-dPCA stimulus marginal
+NMSE has median 0.9821. The complete but unbalanced design has median 0.1739.
+The missing-cell design reports rank 3. Its 54 balanced marginal reconstruction
+and subspace rows are `invalid`, so no missing-cell marginal-recovery median is
+reported; its held-out decoder rows remain valid.
+
+The within-cell pseudo-population preserves condition means but changes
+simultaneous covariance. Consequently, its selected-dPCA stimulus marginal
+NMSE remains finite with median 0.1917 and its stimulus decoder median remains
+1.0000; those values do not show preservation of joint trial-level population
+information. The non-wrapping averaging-mismatch median is 0.1819. Small- and
+large-sample selected-dPCA stimulus NMSE medians are 0.2230 and 0.1679. These
+are bounded stress observations, not isolated causal effects.
+
+### Rotational results
+
+| Scenario and target | Method | q10 | Median | q90 |
+|---|---|---:|---:|---:|
+| Clean derivative RMSE | unrestricted fit | 0.6680 | 0.6844 | 0.6926 |
+| Clean derivative RMSE | skew fit | 0.6726 | 0.6872 | 0.6948 |
+| Clean derivative RMSE | symmetric fit | 2.5650 | 2.5741 | 2.5858 |
+| Clean derivative RMSE | input-aware fit | 0.6680 | 0.6844 | 0.6926 |
+| Clean plane angle | PCA plane `[0,1]` | 0.4619° | 0.5389° | 0.6176° |
+| Clean plane angle | fixed plane `[0,2]` | 89.5811° | 89.6500° | 89.9175° |
+| Clean plane angle | skew fit | 0.3565° | 0.4838° | 0.7605° |
+| Clean plane angle | random plane | 57.1430° | 72.6218° | 82.8646° |
+| Clean angular-rate error | skew fit | 0.0082 | 0.0083 | 0.0309 |
+| Clean tangential ratio | skew fit | 0.9556 | 0.9647 | 0.9677 |
+| Symmetric-decay derivative RMSE | symmetric fit | 0.6519 | 0.6738 | 0.6863 |
+| Common-input derivative RMSE | input-aware fit | 0.6861 | 0.6866 | 0.6933 |
+| Covariance-control similarity | selected admissible covariance control | 0.999986 | 0.999990 | 0.999994 |
+
+The matching state-only common-input derivative-RMSE median is 0.7001, a small
+scenario-specific difference rather than proof of autonomous or input-driven
+mechanism. Short-arc and non-wrapping jittered skew-plane median angles are
+1.0015° and 0.8561°. Smoothing lowers the skew derivative-RMSE median to 0.3413,
+showing preprocessing dependence rather than improved mechanistic truth. Under
+the nonorthogonal observation metric, skew-plane median angle is 12.2467° and
+skew derivative RMSE is 5.3649.
+
+For the covariance control, replicate 0 excludes proposal 17 because its
+shifts `[3,3,3,3]` are one global common relabeling; replicates 1 and 2 contain
+no uniform proposal. The selected admissible proposals in replicates 0/1/2 are
+0/19/4, with shifts `[5,5,3,3]`, `[3,3,5,5]` and `[1,4,2,2]`. Their covariance
+similarities are 0.999995, 0.999990 and 0.999985; all exceed the predeclared
+0.97 threshold and therefore have machine-readable status `matched`. The
+selected cross-coordinate correspondence-change fractions are 2/3, 2/3 and
+5/6, and selected score arrays change by nonzero amounts. These are selected
+near-matches from the admissible training proposal family, not preservation of
+condition identity or evidence for a rotational mechanism.
+
+![Separate demixing and rotational task summaries](artifacts/demixing-rotational-robustness/summary.png)
+
+The upper panels show only reference stimulus marginal NMSE and reference
+stimulus decoding. The lower panels show only clean held-out derivative RMSE
+and clean rotational-plane angle. `pca_plane` and `fixed_plane` are visibly and
+numerically distinct. No panel mixes the two tasks or treats one target as a
+proxy for another.
+
+## Interpretation limits
+
+This object establishes only behavior under the declared generators, splits,
+scenario grids, targets, metrics and fitted information sets.
+
+- **Demixing is label- and loss-dependent.** It does not establish statistical
+  independence, blind-source separation, unique latent causes, neural modules,
+  anatomy, mechanism or causality.
+- Decoding accuracy is not representation, marginal reconstruction or
+  demixing. A shuffled-label control is a supervision control, not a causal
+  intervention on the data-generating system.
+- Missing/unbalanced cells and pseudo-populations change the estimand and
+  available joint information. Finite output does not restore unidentified
+  factorial effects or simultaneous noise structure.
+- Trial averaging and aligned smooth condition means can hide trial-level
+  variability. They are not evidence for latent dynamics.
+- **A rotational projection is not an oscillator, autonomous dynamical system,
+  vector field or mechanism.** Skew-constrained derivative fit describes a
+  projection under declared preprocessing and metric.
+- A good plane angle does not imply good derivative prediction; high tangential
+  ratio does not imply a true rotational generator; good derivative prediction
+  does not imply autonomy or causality.
+- Latency sequences, common input, smoothing, subtraction, short windows,
+  timing jitter and nonorthogonal coordinates can create, remove or distort
+  rotational summaries.
+- No result establishes manifold structure, intrinsic dimension, biological
+  validity, real-data transfer or universal method superiority.
+
+## Reproducibility
+
+Use the recorded bundled runtime:
+
+```bash
+/Users/bytedance/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3 benchmarks/demixing-rotational-robustness.py --generate
+/Users/bytedance/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3 benchmarks/demixing-rotational-robustness.py --verify
+/Users/bytedance/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3 benchmarks/demixing-rotational-robustness.py --generate --resume
+```
+
+The verifier checks:
+
+- exact four-artifact inventory and SHA-256 hashes;
+- all 2,712 complete, unique, canonical raw rows and all 904 recomputed summaries;
+- byte-identical clean regeneration and reversed task/scenario traversal;
+- byte-identical valid partial resume and rejection of corrupted, duplicate,
+  unknown-key or incomplete resume rows;
+- capability exclusion of test/truth from fitting;
+- fixed-recovery invariance under truth poison;
+- deterministic replay and independent hyperparameter selection for shuffled
+  dPCA/decoder controls;
+- missing-cell rank/invalid routing, within-cell pseudo-population preservation,
+  non-wrapping shift replay and covariance-proposal argmax/threshold checks;
+- direct demixing-direction, rotation-embedding, generator and
+  analytic-derivative diagnostics; and
+- real-path non-finite and linear-algebra fault labels with applicability
+  precedence.
+
+The maximum clean-generator diagnostics are a stimulus/decision direction inner
+product of approximately $2.08\times10^{-17}$, an actual embedding-plane angle
+of approximately $1.21\times10^{-6}$ degrees, a direct generator-recovery
+error of approximately $2.35\times10^{-15}$, and a
+central-finite-difference versus analytic derivative discrepancy of
+approximately $2.04\times10^{-2}$. The last value is a finite-grid
+discretization diagnostic, not a performance score.
+
+## Review record
+
+Independent scientific and implementation reviewers were read-only and independent of the executors. Their initial
+reviews returned `REVISE` on missing-cell design-rank invalidity, within-cell pseudo-populations, independent shuffled-control selection, non-wrapping shifts, split metadata, distinct plane references, and nontrivial covariance-matched proposals. The bounded correction pass addressed only
+those findings; focused scientific and implementation re-reviews both returned
+`PASS` with no unresolved finding.
+
+The accepted validation record includes 61-object structural validation, 33 repository tests, the enhanced artifact verifier, target/index renders, workflow validation, and `git diff --check`. The recorded review decision then authorized the
+mechanical promotion to `L1/stable`. Stable status records bounded acceptance of
+this declared synthetic Benchmark Object; it does not expand its evidence,
+information-set, target, or interpretation boundaries.
+
+## Maturity checklist
+
+- [x] Demixing and rotational projection are separate tasks with separate grids,
+  methods, targets, metrics, summaries and panels.
+- [x] All 19 scenarios and three independent replicates are declared.
+- [x] Generation, fitting/selection, frozen recovery and scoring boundaries are
+  explicit.
+- [x] Label and condition permutations are explicit negative-control paths.
+- [x] Marginal reconstruction, decoding, subspace, plane, rate, derivative,
+  tangential and covariance targets remain distinct.
+- [x] Applicability precedes failure, and raw replicate rows are retained.
+- [x] Exactly four byte-verifiable artifacts and authoritative commands are
+  recorded.
+- [x] Bounded results and interpretation limits are reconciled to the artifacts.
+- [x] Final focused scientific re-review PASS is recorded.
+- [x] Final focused implementation re-review PASS is recorded.
+- [x] review-authorized mechanical promotion to `L1/stable` is complete.

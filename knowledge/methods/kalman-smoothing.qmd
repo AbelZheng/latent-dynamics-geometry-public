@@ -1,0 +1,470 @@
+---
+title: "Fixed-Interval Kalman Smoothing"
+object_type: method
+maturity: L2
+status: stable
+domain: [latent-modeling, temporal-modeling, state-estimation, statistics]
+tags: [kalman-smoother, rts-smoother, linear-gaussian, retrospective-inference]
+prerequisites:
+- knowledge/methods/kalman-filtering.qmd
+- knowledge/methods/linear-gaussian-state-space-model.qmd
+- knowledge/concepts/latent-trajectory.qmd
+- knowledge/concepts/observation-model.qmd
+related:
+- knowledge/concepts/identifiability.qmd
+- knowledge/methods/factor-analysis.qmd
+created: 2026-08-19
+updated: 2026-08-19
+---
+
+# Fixed-Interval Kalman Smoothing
+
+## Problem
+
+Fixed-interval Kalman smoothing retrospectively infers latent states over a completed finite interval after all observations in that interval are available. For $1\le t\le T$, its marginal target is
+
+$$
+p(z_t\mid x_{1:T},u_{1:T}),
+$$
+
+and its joint target is the full path posterior
+
+$$
+p(z_{1:T}\mid x_{1:T},u_{1:T}).
+$$
+
+When $t<T$, this distribution deliberately uses observations later than the state being estimated. It is therefore distinct from the filtering distribution $p(z_t\mid x_{1:t},u_{1:t})$ and is not an online or causal estimate. Rauch, Tung, and Striebel developed the foundational backward-smoothing recursion for linear dynamic systems; the modern Bayesian presentation gives a closed-form fixed-interval solution for the linear-Gaussian model [@RauchTungStriebel1965; @Sarkka2013, ch. 8].
+
+This Method fixes the LGSSM parameters and interval endpoint before inference. Model specification, parameter learning, filtering, smoothing, and forecasting remain separate tasks.
+
+## Input
+
+The smoother uses the same time-invariant input-driven LGSSM as the prerequisite filtering Method:
+
+$$
+z_1\sim\mathcal N(m_1,P_1),
+$$
+
+$$
+z_{t+1}=Az_t+Bu_t+w_t,
+\qquad
+w_t\sim\mathcal N(0,Q),
+$$
+
+$$
+x_t=Cz_t+Du_t+v_t,
+\qquad
+v_t\sim\mathcal N(0,R).
+$$
+
+The first required computation is a complete forward Kalman-filter pass over $t=1,\ldots,T$. For every backward step, retain or reproducibly recompute:
+
+- the filtering moments $m_{t\mid t},P_{t\mid t}$;
+- the one-step predicted moments $m_{t+1\mid t},P_{t+1\mid t}$;
+- the transition matrix and process covariance used for that step; and
+- the known input $u_t$ used in $m_{t+1\mid t}=Am_{t\mid t}+Bu_t$.
+
+A reproducible smoothing analysis must also declare:
+
+- the finite interval and why its endpoint $T$ is available at inference time;
+- sequence boundaries and whether intervals are independent or connected;
+- parameter provenance and whether the same parameters are used in filtering and smoothing;
+- state, observation, and input units and coordinate conventions;
+- initialization, missing-observation treatment, and input timing inherited from the forward pass;
+- stored versus recomputed forward quantities;
+- numerical precision, factorization, and singular-covariance policy; and
+- whether only marginal moments, adjacent-state moments, or a representation/sample of the full path posterior is required.
+
+Smoothing across a subject, trial, session, reset, or intervention boundary asserts that the transition model continues across that boundary. Independent intervals must be filtered and smoothed separately.
+
+## Output
+
+The standard Rauch--Tung--Striebel (RTS) recursion returns, for each $t$,
+
+$$
+p(z_t\mid x_{1:T},u_{1:T})
+=\mathcal N(m_{t\mid T},P_{t\mid T}).
+$$
+
+It can also provide the adjacent-state cross-covariance
+
+$$
+P_{t,t+1\mid T}
+=\operatorname{Cov}(z_t,z_{t+1}\mid x_{1:T},u_{1:T}),
+$$
+
+and the Gaussian backward conditionals needed to represent or sample the full path posterior. Marginal means alone do not specify path uncertainty; downstream use must retain the required covariances or conditional factors.
+
+The output is conditional on the fixed model, observed interval, selected missingness assumptions, and plug-in parameter values. It is not an observed trajectory and does not include parameter uncertainty unless that uncertainty is modeled separately.
+
+## Core idea
+
+The forward filter summarizes past evidence at each time. The backward pass asks how the full-data estimate of $z_{t+1}$ should revise the already filtered estimate of $z_t$. Under the Markov model, once $z_{t+1}$ is known, observations after $t$ carry no additional information about $z_t$ beyond their effect through $z_{t+1}$. This yields a backward Gaussian conditional and a linear correction to the filtered moments [@Sarkka2013, secs. 8.1--8.2].
+
+The smoother does not impose a second transition model. It reuses the same $A,Q$ and forward predictions. Consequently, an apparently smooth posterior path may principally reflect a small declared $Q$, strong transition coupling, or boundary conditions rather than a newly discovered dynamical law.
+
+## Generative / modeling assumptions
+
+Fixed-interval Kalman smoothing inherits all assumptions of the declared LGSSM and forward filter:
+
+- a Gaussian initial state;
+- linear transition and observation maps in the chosen coordinates;
+- Gaussian process and observation noises;
+- declared temporal independence and process/observation-noise independence;
+- fixed parameters throughout the interval;
+- a nonanticipating known input path with the timing used in the forward filter;
+- a valid first-order Markov state; and
+- non-informative missingness when absent observation rows are merely skipped.
+
+Under these assumptions and exact arithmetic, the posterior path is jointly Gaussian and the RTS recursion gives exact marginal smoothing moments. Exactness is conditional on the model. It does not show that linearity, Gaussianity, the selected state dimension, $A$, $Q$, $C$, $R$, or the interval boundaries are scientifically correct.
+
+## Mathematical formulation
+
+Let
+
+$$
+m_{t\mid t}=\mathbb E[z_t\mid x_{1:t},u_{1:t}],
+\qquad
+P_{t\mid t}=\operatorname{Cov}(z_t\mid x_{1:t},u_{1:t})
+$$
+
+be the forward filtering moments. The stored one-step prediction is
+
+$$
+m_{t+1\mid t}=A m_{t\mid t}+Bu_t,
+$$
+
+$$
+P_{t+1\mid t}=A P_{t\mid t}A^\top+Q.
+$$
+
+The smoother uses future observations relative to time $t$ through $m_{t+1\mid T}$ and $P_{t+1\mid T}$.
+
+### Backward conditional
+
+Given observations through $t$, the joint distribution of adjacent states is Gaussian:
+
+$$
+\begin{pmatrix}z_t\\z_{t+1}\end{pmatrix}
+\Bigm|x_{1:t},u_{1:t}
+\sim
+\mathcal N\!\left(
+\begin{pmatrix}m_{t\mid t}\\m_{t+1\mid t}\end{pmatrix},
+\begin{pmatrix}
+P_{t\mid t} & P_{t\mid t}A^\top\\
+AP_{t\mid t} & P_{t+1\mid t}
+\end{pmatrix}
+\right).
+$$
+
+When $P_{t+1\mid t}$ is nonsingular, define the RTS smoothing gain
+
+$$
+J_t=P_{t\mid t}A^\top P_{t+1\mid t}^{-1}.
+$$
+
+Then
+
+$$
+p(z_t\mid z_{t+1},x_{1:t},u_{1:t})
+=\mathcal N\!\left(
+m_{t\mid t}+J_t(z_{t+1}-m_{t+1\mid t}),
+P_{t\mid t}-J_tP_{t+1\mid t}J_t^\top
+\right).
+$$
+
+The input $Bu_t$ appears in the predicted mean. It does not appear in the covariance or gain because the input is treated as known rather than random.
+
+### Terminal condition
+
+At the completed interval endpoint, filtering and fixed-interval smoothing condition on the same observations, so
+
+$$
+m_{T\mid T}^{(s)}=m_{T\mid T},
+\qquad
+P_{T\mid T}^{(s)}=P_{T\mid T}.
+$$
+
+Below, write these terminal quantities simply as $m_{T\mid T}$ and $P_{T\mid T}$. There is no backward correction at $T$ because no later observation exists inside the declared interval.
+
+### RTS backward recursion
+
+For $t=T-1,T-2,\ldots,1$, compute
+
+$$
+J_t=P_{t\mid t}A^\top P_{t+1\mid t}^{-1},
+$$
+
+$$
+m_{t\mid T}
+=m_{t\mid t}
++J_t\left(m_{t+1\mid T}-m_{t+1\mid t}\right),
+$$
+
+$$
+P_{t\mid T}
+=P_{t\mid t}
++J_t\left(P_{t+1\mid T}-P_{t+1\mid t}\right)J_t^\top.
+$$
+
+These are the closed-form RTS marginal recursions [@Sarkka2013, theorem 8.2]. Under the exact regular model,
+
+$$
+P_{t\mid T}\preceq P_{t\mid t},
+$$
+
+because conditioning on additional observations cannot increase Gaussian conditional covariance. This covariance ordering is model-conditional; a numerically indefinite result is an implementation warning rather than negative uncertainty.
+
+### Adjacent-state covariance and full path posterior
+
+The adjacent-state smoothed covariance is
+
+$$
+P_{t,t+1\mid T}=J_tP_{t+1\mid T},
+$$
+
+with transpose $P_{t+1,t\mid T}=P_{t+1\mid T}J_t^\top$. This follows from the joint smoothed Gaussian construction in the RTS derivation [@Sarkka2013, sec. 8.2]. It permits moments such as
+
+$$
+\mathbb E[z_tz_{t+1}^\top\mid x_{1:T},u_{1:T}]
+=P_{t,t+1\mid T}+m_{t\mid T}m_{t+1\mid T}^\top.
+$$
+
+Such moments are needed by some parameter-learning procedures, including LGSSM EM E-steps [@GhahramaniHinton1996]. Their availability does not make smoothing itself a learning algorithm.
+
+The full path posterior admits the reverse factorization
+
+$$
+p(z_{1:T}\mid x_{1:T},u_{1:T})
+=p(z_T\mid x_{1:T},u_{1:T})
+\prod_{t=1}^{T-1}
+p(z_t\mid z_{t+1},x_{1:t},u_{1:t}).
+$$
+
+The terminal smoothing distribution and stored backward conditionals therefore define the joint Gaussian path posterior and can support backward path sampling. Returning only $m_{t\mid T}$ omits this joint dependence.
+
+### Missing observations
+
+Missing-channel handling occurs in the forward pass. At time $t$, the filter selects available observation rows or skips the update when no component is observed. The smoother then uses the resulting stored filtered and predicted moments without inventing an observation at the missing time.
+
+A later observed time can revise an earlier state across a missing block because the smoother is retrospective. This is exact only under the same non-informative missingness assumption as the filter. State-dependent dropout, censoring, saturation, event-triggered recording, or unknown sequence termination requires an explicit missingness/observation model.
+
+### Singular or ill-conditioned predicted covariance
+
+The textbook gain formula requires solving in $P_{t+1\mid t}$. If $P_{t+1\mid t}\succ0$, compute $J_t$ with a Cholesky or other stable linear solve; do not explicitly form the inverse. Reusing the same stored factorization that produced or checked the forward prediction can improve consistency.
+
+Because $P_{t\mid t}$ and $Q$ may be only positive semidefinite, $P_{t+1\mid t}$ can be singular. In that case the ordinary full-density inverse formula is not defined. Exact deterministic constraints require a support-aware degenerate-Gaussian conditional, a rank-revealing factorization/generalized inverse with compatibility checks, or a square-root/information-form smoother designed for that model. Adding arbitrary jitter changes $Q$ or the predicted law and must be reported as a model modification, not a neutral numerical repair.
+
+If the matrix is theoretically positive definite but ill-conditioned, inspect scaling, nearly deterministic state directions, weakly excited modes, and cancellation inherited from the forward covariances. Symmetrizing output may remove tiny antisymmetric round-off but cannot repair a substantively indefinite covariance. Factorized forward and backward algorithms are computational variants of the same posterior target; their detailed derivation is outside this bounded object.
+
+## What is learned?
+
+With model parameters fixed, the smoother learns no parameter. It computes conditional distributions and path moments after seeing the full interval.
+
+An EM algorithm may use smoothing means, covariances, and adjacent-state moments in its E-step, then update parameters in a separate M-step [@GhahramaniHinton1996]. Repeating those two operations is parameter learning; a single RTS pass is not. Treating smoothed means as error-free state observations in an ordinary regression discards posterior covariance and can bias uncertainty claims.
+
+## What is fixed?
+
+The analyst fixes the LGSSM structure and parameters, state dimension, input path and timing, interval endpoint, sequence boundaries, initialization, missingness assumptions, coordinate conventions, numerical representation, stored forward quantities, and requested posterior summaries.
+
+The endpoint $T$ is part of the inferential question. Extending the interval can change $m_{t\mid T}$ for earlier $t$. Selecting an endpoint after inspecting desired trajectory features is an analysis choice, not a property discovered by the smoother.
+
+## Temporal assumptions
+
+Fixed-interval smoothing is explicitly retrospective. For $t<T$, the estimate may depend on every later observation $x_{t+1:T}$. It must not be described as information available to an online controller, real-time decoder, or prospective decision at time $t$.
+
+Fixed-lag smoothing, fixed-point smoothing, online filtering, and out-of-sequence measurement updates solve different timing problems. Re-running an RTS smoother whenever new data arrive can produce a sequence of retrospective revisions, but it does not make the previously revised states causal estimates available in the past.
+
+Equal-step assumptions, time-varying transitions, and boundary resets are inherited from the LGSSM. Irregular gaps require the correct gap-dependent $A_t,Q_t$; missing observations do not by themselves change elapsed time.
+
+## Geometry assumptions
+
+The smoother operates in the same finite-dimensional state vector space as the LGSSM. Means, covariance ellipsoids, smoothing gains, and adjacent-state cross-covariances depend on the chosen state coordinates.
+
+Under an invertible state transformation $z'_t=Tz_t$, all model and posterior quantities must transform consistently:
+
+$$
+m'_{t\mid T}=Tm_{t\mid T},
+\qquad
+P'_{t\mid T}=TP_{t\mid T}T^\top,
+$$
+
+$$
+P'_{t,t+1\mid T}=TP_{t,t+1\mid T}T^\top.
+$$
+
+The same observable distribution can therefore admit different latent axes and visually different coordinate trajectories. A smooth posterior curve is not proof of a manifold, Riemannian metric, intrinsic dimension, or privileged biological coordinate system.
+
+## Supervision
+
+No external outcome label is required. Observations over the full interval condition the posterior; they are not labels in the ordinary supervised-learning sense. Known inputs remain conditioning variables under their declared timing.
+
+Labels or outcomes used to define intervals, choose state dimension, tune $Q/R$, select parameterizations, or choose which smoothed features to report introduce task dependence. Those decisions require leakage-safe training/validation separation when performance is evaluated.
+
+## Optimization / inference
+
+For fixed parameters and a regular covariance representation, RTS smoothing is a deterministic forward--backward Gaussian inference algorithm. It is not a nonconvex optimization procedure. The backward pass is linear in the number of time steps for fixed state dimension, but requires stored/recomputed forward moments and stable matrix solves.
+
+Implementation correctness should be checked against direct conditioning of the full joint Gaussian distribution on short sequences. Marginal means, covariances, adjacent cross-covariances, and backward samples should agree within declared numerical tolerances. A plausible smooth plot is not a numerical verification.
+
+## Strengths
+
+- Exact fixed-interval state marginals under the declared fixed linear-Gaussian model.
+- Uses all observations in a completed interval while propagating posterior uncertainty.
+- Reuses a standard forward Kalman filter and a bounded backward recursion.
+- Provides adjacent-state moments and backward conditionals for path uncertainty and EM E-steps.
+- Revises states across missing observations without deterministic interpolation, under the model.
+- Supplies a canonical retrospective baseline before nonlinear, non-Gaussian, or Gaussian-process trajectory methods.
+
+## Failure modes
+
+- **Future-data leakage:** reporting $m_{t\mid T}$ as though it were available at time $t$ invalidates online or prospective claims.
+- **Model misspecification:** nonlinear dynamics, non-Gaussian tails, colored noise, omitted inputs, time variation, or correlated process/observation noise produce a model-mismatched posterior.
+- **Over-smoothing from small $Q$:** the model can suppress genuine rapid changes and make the posterior look more regular than the process.
+- **Under-smoothing from large $Q$:** weak transition coupling can leave little retrospective revision.
+- **Wrong boundaries:** smoothing across resets or independent sequences invents continuity.
+- **Endpoint dependence:** later observations or a changed $T$ can materially revise earlier states.
+- **Initialization effects:** short intervals or weak observations may leave early smoothed states sensitive to the prior.
+- **Informative missingness:** skipped observations are invalid when absence itself depends on state or measurement value.
+- **Outliers:** a Gaussian observation model can propagate one atypical measurement backward through many states.
+- **Singular/ill-conditioned predictions:** unstable solves can corrupt gains and produce asymmetric or indefinite covariances.
+- **Parameter plug-in certainty:** posterior covariances conditional on estimated parameters can understate total uncertainty.
+- **Storage/recomputation mismatch:** using forward quantities from a different parameter set or numerical convention invalidates the backward pass.
+- **Interpretive overreach:** smooth posterior means can be mistaken for discovered dynamics, mechanism, causality, or a unique latent trajectory.
+
+## Identifiability issues
+
+Smoothing does not identify an LGSSM that was non-identifiable from observations. Observationally equivalent state-coordinate parameterizations can produce the same observation law while their smoothed coordinates, gains, transition entries, and posterior cross-covariances transform accordingly.
+
+Using future observations can reduce conditional uncertainty about a state under one fixed model. It does not select a unique model specification, prove observability under another design, or turn a coordinate convention into a scientific identity. Small $P_{t\mid T}$ means model-conditional concentration, not structural identification or mechanistic certainty.
+
+## Comparison with simpler methods
+
+- **Kalman filtering:** the required primary baseline. It uses only observations through $t$ and is appropriate for online use. Smoothing may reduce model-conditional state uncertainty by using later data, but the information sets are different.
+- **Open-loop propagation:** ignores all measurement updates and tests how much the posterior depends on observations.
+- **Measurement-only or linear interpolation:** simple retrospective baselines for directly observed coordinates or gaps; they generally lack the declared state-transition uncertainty model.
+- **Two-sided moving average:** uses future observations but does not represent a latent transition/observation model or calibrated state covariance.
+- **Static Factor Analysis:** infers each time point without a transition law and tests whether temporal coupling adds value.
+- **Direct batch Gaussian conditioning:** a short-sequence correctness oracle that computes the same posterior from one joint Gaussian system without the RTS factorization.
+
+A smoother should not be declared superior to a filter solely because it has access to more data. Comparisons must state whether the intended task is retrospective reconstruction or online inference.
+
+## Evaluation criteria
+
+1. **Batch-equivalence test:** on small problems, compare all smoothed means, marginal covariances, and adjacent cross-covariances with direct joint-Gaussian conditioning.
+2. **Known-state simulation:** report time-resolved state RMSE or Mahalanobis error and interval/path coverage when latent truth is genuinely available.
+3. **Filtering comparison:** compare filter and smoother under identical parameters while explicitly acknowledging their different information sets.
+4. **Masked-observation evaluation:** withhold declared observations from both the forward and backward passes, then score their conditional predictive distribution. Assimilated observations cannot serve as independent test targets.
+5. **Missing-block stress test:** vary gap length and location, including gaps near interval endpoints.
+6. **Boundary sensitivity:** vary initialization and scientifically plausible interval boundaries without crossing genuine resets.
+7. **Parameter-mismatch tests:** perturb $A,Q,C,R$ or inputs in controlled simulations and inspect bias, coverage, and retrospective propagation of errors.
+8. **Numerical checks:** monitor covariance symmetry, positive-semidefinite tolerances, factorization failures, scaling sensitivity, and agreement across covariance and factorized implementations.
+9. **Sequence-level splits:** estimate parameters on training sequences and evaluate held-out trials, sessions, subjects, or conditions when generalization is claimed.
+
+The observation-sequence likelihood is computed by the forward predictive densities; smoothing the same sequence does not create a better likelihood. Better state reconstruction under known simulator truth supports that model/task combination, not general model validity.
+
+## Minimal toy model
+
+Consider the scalar random walk
+
+$$
+z_1\sim\mathcal N(m_1,p_1),
+\qquad
+z_{t+1}=z_t+w_t,
+\quad w_t\sim\mathcal N(0,q),
+$$
+
+$$
+x_t=z_t+v_t,
+\quad v_t\sim\mathcal N(0,r),
+$$
+
+with $q\ge0$ and $r>0$. Suppose the forward filter has produced $m_{t\mid t},p_{t\mid t}$ and
+
+$$
+m_{t+1\mid t}=m_{t\mid t},
+\qquad
+p_{t+1\mid t}=p_{t\mid t}+q.
+$$
+
+The scalar smoothing gain and backward recursion are
+
+$$
+j_t=\frac{p_{t\mid t}}{p_{t\mid t}+q},
+$$
+
+$$
+m_{t\mid T}
+=m_{t\mid t}
++j_t\left(m_{t+1\mid T}-m_{t\mid t}\right),
+$$
+
+$$
+p_{t\mid T}
+=p_{t\mid t}
++j_t^2\left(p_{t+1\mid T}-p_{t\mid t}-q\right).
+$$
+
+The terminal state is unchanged from filtering. Earlier states can be revised by later observations, with the strength of revision controlled by the model-conditional uncertainty ratio. If $q$ is very small, later evidence propagates strongly backward; that behavior reflects the assumed near-constant process.
+
+A future non-executable toy contract should generate finite scalar sequences with retained latent truth and compare open-loop propagation, measurement-only, filtering, RTS smoothing, two-sided averaging, and direct batch conditioning. Required stress cases are a central missing block, wrong $q/r$, an outlier near $T$, a reset incorrectly treated as continuous, a wrong initial prior, and a deterministic or nearly deterministic state direction. Score state RMSE and coverage only against retained simulator truth, score masked observations only when they were not assimilated, and verify adjacent-state moments against batch conditioning. No code, data, figures, or results are created in this Method Object.
+
+## Relevance to LDG
+
+Fixed-interval Kalman smoothing is LDG's canonical retrospective latent-trajectory inference baseline. It clarifies how full-interval evidence changes state uncertainty while keeping model specification, filtering, smoothing, and parameter learning distinct. It also provides the appropriate comparison context before GPFA or other methods with explicit temporal smoothness priors.
+
+::: {.callout-warning title="What this does NOT imply"}
+A smooth posterior mean is not discovered dynamics, a vector field, a mechanism, a causal path, a manifold, or a uniquely identified latent trajectory. The shape and uncertainty of the smoothed path are consequences of the declared LGSSM, parameters, interval, missingness assumptions, and all observations through $T$. Fixed-interval smoothing is retrospective and must not be reported as an online estimate available at earlier times.
+:::
+
+### Mouse trajectory
+
+No modality-specific empirical claim is retained. Retrospective movement-state reconstruction depends on sampling, boundary, input, process-noise, and measurement assumptions and is not an online behavioral-state estimate.
+
+### Eye movement
+
+No modality-specific empirical claim is retained. Blinks, event-triggered intervals, saturation, and state-dependent missingness can invalidate ordinary skipped-row smoothing.
+
+### EEG
+
+No modality-specific empirical claim is retained. Rereferencing, sensor mixing, artifacts, nonstationarity, and temporal preprocessing must be represented or treated as model mismatch; smooth latent coordinates are not automatically neural sources.
+
+### MEG / neural population data
+
+No modality-specific empirical claim is retained. Trial boundaries, condition alignment, unit/channel missingness, observation-noise correlations, and parameter sharing define the posterior. Retrospective smoothness does not establish population dynamics or mechanism.
+
+## Primary sources
+
+- Rauch, Tung, and Striebel are retained for foundational historical attribution to the backward full-interval smoothing approach [@RauchTungStriebel1965]. This run inspected verified publication metadata and the abstract, not the full equation-level derivation; the displayed recursions are therefore supported by the fully inspected modern derivation below.
+- Ghahramani and Hinton give an inspected LGSSM parameter-estimation treatment in which forward filtering and backward smoothing supply posterior state and adjacent-state moments for a separate EM E-step [@GhahramaniHinton1996].
+
+## Reviews / secondary sources
+
+- Särkkä gives the inspected Bayesian fixed-interval smoothing equations, RTS gain, terminal condition, marginal covariance recursion, joint adjacent-state construction, and distinction from filtering [@Sarkka2013, ch. 8].
+
+## Open methodological questions
+
+- When should parameter uncertainty be integrated into path uncertainty rather than using plug-in LGSSM parameters?
+- Which factorized or constrained smoother is appropriate for singular process models and exact state constraints?
+- How should interval endpoints be selected without tuning retrospective trajectories to preferred features?
+- Which missingness mechanisms require joint state--missingness inference rather than a skipped-row forward pass?
+- How should smoothed trajectories be compared across observationally equivalent coordinate systems?
+- When does fixed-interval smoothing obscure scientifically meaningful discontinuities that a switching or robust model should represent?
+
+## Maturity checklist
+
+- [x] Uses the complete Method schema and the stable LGSSM/Kalman Filtering notation.
+- [x] Defines marginal and full-path fixed-interval posterior targets.
+- [x] Makes the retrospective future-data boundary explicit and rejects online interpretation.
+- [x] Requires a complete forward filter and states the terminal condition.
+- [x] Gives the RTS gain and backward mean/covariance recursions.
+- [x] Gives accurately sourced adjacent-state covariance and full-path backward factorization.
+- [x] Covers singular/ill-conditioned prediction covariance and factorized-solve boundaries.
+- [x] Inherits missing-observation handling from the forward pass and states informative-missingness limits.
+- [x] Separates smoothing inference from model specification, likelihood calculation, and EM learning.
+- [x] States learned/fixed quantities, time, geometry, supervision, and inherited identifiability.
+- [x] Includes failures, baselines, evaluation criteria, and an analytic/prose-only toy contract.
+- [x] Retains no modality-specific empirical claim.
+- [x] Foundational, authoritative Bayesian, and LGSSM-learning sources were inspected and verified.
+- [x] Independent mixed review completed after one bounded citation-scope correction; focused re-review returned PASS.
+- [x] Stable promotion authorized under the recorded review decision after object-specific PASS and validation.

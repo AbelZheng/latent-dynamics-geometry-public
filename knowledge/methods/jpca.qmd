@@ -1,0 +1,455 @@
+---
+title: "jPCA"
+object_type: method
+maturity: L2
+status: stable
+domain: [dimensionality-reduction, temporal-modeling, neuroscience]
+tags: [jpca, rotational-dynamics, linear-dynamics, neural-population]
+prerequisites:
+- knowledge/methods/principal-component-analysis.qmd
+- knowledge/concepts/linear-dynamical-system.qmd
+- knowledge/concepts/latent-trajectory.qmd
+related:
+- knowledge/methods/linear-gaussian-state-space-model.qmd
+- knowledge/concepts/vector-field.qmd
+- knowledge/concepts/identifiability.qmd
+created: 2026-08-19
+updated: 2026-08-19
+---
+
+# jPCA
+
+## Problem
+
+jPCA finds low-dimensional planes in a PCA-reduced, time-indexed data matrix where a fitted **skew-symmetric linear evolution** captures a strong rotational tendency. The canonical use is descriptive: align and average repeated neural-population responses by experimental condition, retain a variance-dominant PCA subspace, estimate derivatives, fit both unconstrained and skew-symmetric linear maps, and project the data onto invariant two-dimensional planes of the skew-symmetric fit [@ChurchlandEtAl2012].
+
+The method answers the bounded question:
+
+> Within this chosen representation, preprocessing window, and PCA subspace, which orthogonal planes make the fitted state-to-derivative relation look most like rotation?
+
+It does not by itself establish that the recorded system is autonomous, globally linear, oscillatory in a mechanistic sense, or governed by the fitted matrix outside the sampled condition--time region.
+
+## Input
+
+Let $p$ be the number of measured features or neurons, $C$ the number of experimental conditions, and $T_c$ the number of retained time samples for condition $c$. For each condition, begin with an aligned matrix
+
+$$
+Y^{(c)}=
+\begin{bmatrix}
+y^{(c)}(t_1)&\cdots&y^{(c)}(t_{T_c})
+\end{bmatrix}
+\in\mathbb R^{p\times T_c}.
+$$
+
+The original reaching analysis used trial-averaged firing rates, neuron-wise soft normalization, event alignment, smoothing, and subtraction of each neuron's across-condition mean at every time before PCA [@ChurchlandEtAl2012]. Those are consequential analysis choices, not universal requirements of the algebra. A reproducible jPCA analysis must declare:
+
+- the experimental unit, feature population, condition definitions, included trials, and whether neurons were simultaneous or assembled across recordings;
+- event alignment, time window, sampling interval, binning, smoothing, interpolation, and missing-sample handling;
+- whether trajectories are single-trial estimates or condition averages and how unequal trial counts are handled;
+- feature centering and scaling, including whether a time-varying across-condition mean is subtracted;
+- the PCA rank $k$ and how it is selected;
+- the derivative estimator and boundary rule;
+- which conditions, trials, subjects, sessions, and time regions are assigned to training, validation, and test sets; and
+- the rule for ranking, orienting, displaying, and evaluating jPCA planes.
+
+Stack the preprocessed matrices without creating transitions across condition boundaries:
+
+$$
+Y=\begin{bmatrix}Y^{(1)}&\cdots&Y^{(C)}\end{bmatrix}
+\in\mathbb R^{p\times N},
+\qquad
+N=\sum_c T_c.
+$$
+
+Alignment can reduce timing variability and reveal repeatable structure, but it can also impose a shared temporal origin. Condition averaging suppresses trial variability and can make heterogeneous latency sequences appear smooth. Lebedev et al. showed that the across-condition subtraction used by the canonical pipeline materially changes which rotations appear, illustrating that preprocessing is part of the estimand rather than a neutral display operation [@LebedevEtAl2019].
+
+## Output
+
+For a chosen even or odd PCA rank $k$, jPCA returns:
+
+- a PCA basis $W_k\in\mathbb R^{p\times k}$ and reduced trajectories $X^{(c)}=W_k^\top Y^{(c)}$;
+- an unconstrained least-squares state-to-derivative matrix $\widehat M\in\mathbb R^{k\times k}$;
+- a skew-symmetric constrained matrix $\widehat M_{\mathrm{skew}}=-\widehat M_{\mathrm{skew}}^\top$;
+- orthogonal two-dimensional invariant planes of $\widehat M_{\mathrm{skew}}$, conventionally ordered by rotational rate $|\omega_j|$;
+- projected condition trajectories in each selected plane; and
+- fit and descriptive diagnostics such as held-out derivative error, $R^2$, plane occupancy variance, and state--derivative angle distributions.
+
+These are deterministic summaries of the supplied, preprocessed trajectories. jPCA does not return a posterior distribution, observation-noise covariance, process-noise model, or latent-state uncertainty.
+
+## Core idea
+
+PCA first restricts attention to directions carrying strong variance in the selected data. Within that fixed subspace, jPCA asks whether derivatives can be predicted by a common linear map and how much of that relation can be represented by a skew-symmetric map. A real skew-symmetric matrix decomposes into orthogonal two-dimensional blocks that generate ideal rotations under the fitted continuous-time equation $\dot x=M_{\mathrm{skew}}x$. Projecting the empirical trajectories onto those planes makes the corresponding rotational tendency visible.
+
+Churchland et al. emphasized that the jPCs form an orthonormal basis spanning exactly the same retained space as the input PCs; jPCA rotates the basis within that PCA subspace rather than introducing patterns absent from it [@ChurchlandEtAl2012]. Cunningham and Yu consequently classify the displayed trajectories as orthogonal projections of processed population activity, distinct from posterior trajectories that trade off data against a probabilistic dynamics model [@CunninghamYu2014].
+
+## Generative / modeling assumptions
+
+Canonical jPCA is not a generative probability model. Its operative assumptions are:
+
+- selected condition--time trajectories can be compared in one feature coordinate system;
+- preprocessing, alignment, smoothing, and averaging preserve the structure relevant to the question;
+- the retained PCA subspace contains the rotational tendency of interest;
+- a common linear relation $\dot x\approx Mx$ is a useful local summary across the pooled conditions and sampled interval;
+- finite-difference or other derivative estimates are accurate enough for regression;
+- a skew-symmetric restriction is an informative definition of rotational structure; and
+- Euclidean orthogonality and squared derivative error in PCA coordinates are appropriate criteria.
+
+No Gaussian latent-state distribution, Markov transition density, process noise, observation noise, Kalman inference, likelihood, or stationarity assumption is inherited from the related linear-Gaussian state-space model. LGSSM is only an adjacent temporal-model comparison. jPCA fits a deterministic relation to processed trajectories and does not separate latent evolution from a measurement model.
+
+The equation $\dot x=Mx$ is also an **autonomous**, homogeneous linear approximation. If unmodeled inputs, time-varying drive, condition-dependent forcing, feedback, offsets, or nonlinearities contribute materially, the fitted $M$ can absorb their correlations with sampled states without identifying an autonomous law.
+
+## Mathematical formulation
+
+### PCA preprocessing
+
+After training-only centering and scaling, let $W_k$ contain the leading $k$ PCA directions. Define
+
+$$
+X^{(c)}=W_k^\top Y^{(c)}\in\mathbb R^{k\times T_c}.
+$$
+
+The retained states remain coordinates of observed or condition-averaged activity in a chosen linear projection. They are not automatically latent dynamical states.
+
+### Derivative estimation
+
+For equally spaced samples with interval $\Delta t$, a forward-difference version uses
+
+$$
+\dot x^{(c)}_j
+\approx
+\frac{x^{(c)}_{j+1}-x^{(c)}_j}{\Delta t},
+\qquad j=1,\ldots,T_c-1.
+$$
+
+Stack predictor and derivative columns condition by condition:
+
+$$
+X_-=
+\begin{bmatrix}
+x^{(1)}_1&\cdots&x^{(1)}_{T_1-1}&\cdots&x^{(C)}_{T_C-1}
+\end{bmatrix},
+$$
+
+$$
+D=
+\begin{bmatrix}
+\dot x^{(1)}_1&\cdots&\dot x^{(1)}_{T_1-1}&\cdots&\dot x^{(C)}_{T_C-1}
+\end{bmatrix}.
+$$
+
+The original implementation differenced adjacent samples within condition [@ChurchlandEtAl2012]. Central differences, local polynomial derivatives, or derivatives of a smoother change the regression target and must be declared. Derivative estimation amplifies high-frequency noise; smoothing and differentiation therefore cannot be treated as independent cosmetic choices.
+
+### Unconstrained linear fit
+
+The unrestricted least-squares fit is
+
+$$
+\widehat M
+\in
+\arg\min_{M\in\mathbb R^{k\times k}}
+\lVert D-MX_-\rVert_F^2.
+$$
+
+A minimum-norm solution is
+
+$$
+\widehat M=DX_-^\dagger,
+$$
+
+and, when $X_-X_-^\top$ is nonsingular,
+
+$$
+\widehat M
+=DX_-^\top(X_-X_-^\top)^{-1}.
+$$
+
+Rank deficiency or poor excitation makes the fit nonunique or unstable. Ridge regularization is a defensible variant only when the penalty and tuning protocol are declared; it is not the unregularized canonical estimator.
+
+### Skew-symmetric constrained fit
+
+The jPCA dynamics fit solves
+
+$$
+\widehat M_{\mathrm{skew}}
+\in
+\arg\min_{M^\top=-M}
+\lVert D-MX_-\rVert_F^2.
+$$
+
+Choose a fixed basis $B_1,\ldots,B_{k(k-1)/2}$ for real skew-symmetric matrices and write
+
+$$
+M=\sum_{\ell}\theta_\ell B_\ell.
+$$
+
+Then $\theta$ is obtained by ordinary linear least squares with design columns
+
+$$
+\operatorname{vec}(B_\ell X_-).
+$$
+
+This makes clear that the constraint does not add nonlinear inference. Simply replacing an arbitrary unrestricted fit by $(\widehat M-\widehat M^\top)/2$ is generally not the constrained least-squares solution unless the predictor weighting makes that Euclidean matrix projection equivalent, for example under an isotropic predictor Gram matrix.
+
+The comparison
+
+$$
+\lVert D-\widehat M_{\mathrm{skew}}X_-\rVert_F^2
+\geq
+\lVert D-\widehat M X_-\rVert_F^2
+$$
+
+holds because the skew-symmetric class is a subset of all matrices. A small gap says that the fitted **linear derivative relation** is mostly representable by a skew component under this loss; it does not show that the data-generating system is purely rotational or correctly specified.
+
+### Real rotational planes
+
+Every real skew-symmetric matrix admits an orthogonal real canonical, equivalently real-Schur, representation
+
+$$
+\widehat M_{\mathrm{skew}}
+=
+Q\,
+\operatorname{blockdiag}
+\left(
+J(\omega_1),\ldots,J(\omega_r),0
+\right)
+Q^\top,
+$$
+
+where
+
+$$
+J(\omega_j)=
+\begin{pmatrix}
+0&-\omega_j\\
+\omega_j&0
+\end{pmatrix},
+\qquad
+|\omega_1|\geq\cdots\geq|\omega_r|\geq0.
+$$
+
+The paired columns $Q_j=(q_{j,1},q_{j,2})$ span a real invariant plane. In exact fitted coordinates $z_j=Q_j^\top x$, the constrained model gives
+
+$$
+\dot z_j=J(\omega_j)z_j,
+$$
+
+whose ideal trajectories have constant radius and angular rate $|\omega_j|$. Churchland et al. construct the same real planes from complex-conjugate eigenvectors of $M_{\mathrm{skew}}$ and rank them by the magnitudes of the imaginary eigenvalues [@ChurchlandEtAl2012]. A real Schur implementation avoids displaying complex coordinates while representing the same invariant planes.
+
+The empirical projection is
+
+$$
+Z_j^{(c)}=Q_j^\top X^{(c)}.
+$$
+
+Because empirical data only approximately satisfy the constrained fit, these projections need not be circular, constant-radius, periodic, or closed. Ranking by $|\omega_j|$ prioritizes fitted angular rate, not data variance, held-out fit, biological importance, or statistical reliability. Report those quantities separately.
+
+## What is learned?
+
+From the training trajectories, jPCA learns the PCA subspace, the unconstrained and skew-constrained derivative maps, their invariant rotational planes, fitted angular-rate parameters, and representative coordinates within those planes. It also estimates descriptive fit statistics under the chosen derivative loss.
+
+It does not learn a unique neural state, a probabilistic latent trajectory, a causal transition law, exogenous input, observation map, noise decomposition, autonomous vector field over an unobserved state space, or a mechanism that generates behavior.
+
+## What is fixed?
+
+The analyst fixes the feature population, trial and condition definitions, alignment event, time window, bin width, smoother, normalization, across-condition subtraction policy, PCA rank-selection search, derivative estimator, regression loss and regularization, plane-ordering convention, sign/orientation convention, split unit, shuffle family, baseline set, and evaluation metrics.
+
+The original choice of six PCs and a 200-ms movement-related interval was application-specific, not part of a universal definition [@ChurchlandEtAl2012]. Searching many windows, ranks, alignments, smoothers, and control families after viewing the final test data converts exploratory flexibility into leakage.
+
+## Temporal assumptions
+
+Time is explicitly ordered through derivative estimation. Adjacent samples are paired only within the same condition or trial trajectory. Equal index spacing is not equal elapsed time unless the sampling grid is regular; irregular sampling requires gap-aware derivatives or a different continuous-time estimation procedure.
+
+The canonical fit pools condition trajectories under one time-invariant matrix. It assumes neither periodic boundary conditions nor repeated cycles. A short arc can score as rotational without completing an oscillation. Event alignment and averaging can synchronize transients, while smoothing can produce phase-shifted, visually coherent curves. Therefore rotational appearance can reflect latency structure or common input rather than autonomous recurrence.
+
+## Geometry assumptions
+
+jPCA uses Euclidean inner products after declared feature scaling and PCA projection. Orthogonality of jPC axes is coordinate- and metric-dependent. The jPC plane is a linear subspace within the retained PCA subspace; it is not a nonlinear manifold, a recovered phase space, or a global tangent plane to an unknown state space.
+
+A skew-symmetric matrix is rotational only with respect to the chosen Euclidean metric. Under a general invertible coordinate change, a skew-symmetric matrix need not remain skew-symmetric. Thus “rotation” is not invariant to arbitrary feature scaling or latent reparameterization, although orthogonal changes within the fixed whitened/Euclidean coordinates preserve the skew property.
+
+## Supervision
+
+The regression does not require an external behavioral target, but the canonical pipeline is not label-free. Condition identities determine which samples form trajectories; event labels determine alignment; across-condition subtraction uses the condition design; and window or plane selection may use task timing. These are forms of experimental supervision and design dependence.
+
+If behavior, condition identity, or outcome is used to tune rank, window, smoothing, plane, or display, that selection must be nested inside training and validation. A visually compelling post hoc plane is not an unsupervised discovery merely because no class label appears in the least-squares equation.
+
+## Optimization / inference
+
+PCA uses eigendecomposition or SVD. Both derivative regressions are linear least-squares problems, and the skew-symmetric plane extraction uses a complex eigendecomposition or real Schur decomposition. Numerical choices include rank tolerance, derivative boundary handling, regularization, ordering of nearly equal frequencies, and treatment of zero modes.
+
+There is no posterior inference. Projecting a new processed trajectory uses the training-fitted normalization, PCA basis, and jPCA plane. Recomputing PCA or $M_{\mathrm{skew}}$ after adding the test trajectory is transductive refitting, not held-out application.
+
+## Strengths
+
+- It provides an explicit, auditable definition of rotation within a variance-dominant linear subspace.
+- It separates an unrestricted linear derivative fit from the nested skew-symmetric restriction.
+- Its two-dimensional planes are invariant subspaces of a fitted operator rather than arbitrary hand-selected PC pairs.
+- It keeps displayed trajectories as linear projections of the data rather than model-smoothed posterior paths [@CunninghamYu2014].
+- It supports direct controls involving derivative prediction, plane occupancy, condition consistency, preprocessing sensitivity, and structured shuffles.
+- It can reveal phase-offset population patterns that are difficult to see neuron by neuron [@ChurchlandEtAl2012].
+
+## Failure modes
+
+- **Alignment artifacts:** locking trajectories to a common event can synchronize unrelated transients or hide condition-dependent timing.
+- **Condition averaging:** smooth mean trajectories can suppress trial variability and manufacture apparent reproducibility that is weak at single-trial level.
+- **Across-condition subtraction:** removing the time-varying condition mean changes the data and can create or remove displayed rotations [@LebedevEtAl2019].
+- **Derivative noise:** finite differences amplify sampling noise; smoothing can reduce noise while imposing phase and bandwidth structure.
+- **Latency sequences:** populations of delayed transient responses can trace rotations even without a recurrent oscillator or autonomous common vector field [@MichaelsEtAl2016; @LebedevEtAl2019].
+- **Wrong PCA rank:** too few PCs can omit structure; too many can expose noise and increase regression flexibility.
+- **Ill-conditioned predictors:** weakly occupied directions make $M$ and its planes unstable.
+- **Short arcs:** less than one cycle can look rotational without supporting periodicity or recurrence.
+- **Mixed timescales or regimes:** one common time-invariant matrix can average incompatible condition-specific or time-varying relations.
+- **Unmodeled inputs:** cue-, sensory-, feedback-, or movement-related drive can be absorbed into a state-only fit.
+- **Pseudo-populations:** sequentially recorded neurons do not provide trialwise population covariance and may combine incompatible session timing.
+- **Metric dependence:** normalization and feature units change PCA, skew symmetry, and plane ranking.
+- **Plane-selection multiplicity:** inspecting many ranks, windows, alignments, smoothers, and planes without nested selection inflates apparent structure.
+- **Shuffle mismatch:** a control that destroys covariance, smoothness, latency, or condition balance tests several properties at once and may be too easy to reject.
+- **Interpretive overreach:** rotational projection is mistaken for oscillation, mechanism, autonomy, causality, a global vector field, or a unique state space.
+
+Michaels et al. showed that latency-augmented representational simulations can produce rotations, while a covariance-matched condition permutation was more discriminating than an unconstrained shuffle in their reaching analyses [@MichaelsEtAl2016]. Lebedev et al. offered a stronger critical interpretation, arguing that temporal response order and preprocessing can account for visually rotational projections [@LebedevEtAl2019]. These sources do not settle every motor-cortex interpretation; together they show that rotations require controls matched to the specific alternative explanation.
+
+## Identifiability issues
+
+PCA contributes its usual sign and repeated-eigenspace ambiguities. Within a jPCA plane, any rotation of the two displayed axes represents the same oriented plane and the same $J(\omega)$ block. Simultaneously reflecting one axis changes the displayed handedness and the sign convention for $\omega$ without changing the unoriented plane. The original implementation selected counterclockwise net rotation and an axis emphasizing preparatory-state spread as display conventions [@ChurchlandEtAl2012].
+
+If two $|\omega_j|$ values are equal or nearly equal, individual two-dimensional planes can mix within the corresponding higher-dimensional invariant subspace; the combined subspace is more stable than named plane 1 versus plane 2. Zero or weak frequencies do not define a robust rotational plane. Sampling perturbations can also exchange plane order.
+
+The unrestricted map can be nonunique when $X_-$ is rank deficient. Even with a unique regression coefficient in the chosen coordinates, the fitted state-only equation is not structurally identified as a physical mechanism: unmodeled input, nonlinear dynamics, time variation, and observation mixing can yield the same sampled state--derivative relation. Coordinate conventions choose a representative; they do not supply biological uniqueness.
+
+## Comparison with simpler methods
+
+- **Raw condition traces and latency plots:** inspect neuron/feature responses, peak times, and condition consistency before projection. This tests whether jPCA is revealing more than a visible sequence of delayed responses.
+- **PCA alone:** plot fixed leading PC pairs and report the same held-out split. jPCA should show a more coherent rotational diagnostic than an arbitrary axis alignment, not merely a prettier plot.
+- **Unconstrained linear derivative regression:** compare held-out errors for $\widehat M$ and $\widehat M_{\mathrm{skew}}$. This is the required nested model comparison.
+- **Symmetric-versus-skew decomposition:** fit or score the symmetric expansion/contraction component under the same predictor weighting. A strong skew component should not hide equally important radial dynamics.
+- **Fixed or random planes:** within the same training PCA subspace, compare jPCA with prespecified or randomly sampled orthogonal planes using preregistered metrics.
+- **Latency-sequence simulator:** generate condition-dependent transient responses with controlled delays but no recurrent autonomous oscillator. This is a targeted negative control motivated by later analyses [@MichaelsEtAl2016; @LebedevEtAl2019].
+- **Condition-structure shuffles:** use a shuffle that preserves declared nuisance statistics, such as neuron-wise temporal smoothness and relevant covariance, while disrupting the condition relationship under test. The covariance-matched permutation of Michaels et al. is one source-specific example rather than a universal null [@MichaelsEtAl2016].
+- **Observation-space autoregression or input-aware regression:** test whether derivative prediction needs the PCA/jPCA representation and whether known task inputs explain structure attributed to autonomous evolution.
+- **LGSSM:** provides a probabilistic latent temporal model with process/observation noise and state uncertainty. It solves a different problem; jPCA must not borrow its Gaussian or inferential interpretation.
+
+## Evaluation criteria
+
+Evaluation should be predictive and control-based, not visual alone:
+
+1. **Split independent units:** hold out entire trials, sessions, animals, or conditions according to the intended generalization claim. Adjacent bins from one trajectory must not be randomly divided across folds.
+2. **Rebuild condition means inside folds:** when condition averages are the analysis unit, compute training and held-out averages from disjoint trials. Holding out conditions asks a separate across-condition generalization question.
+3. **Fit preprocessing on training data only:** normalization, across-condition subtraction, PCA, rank, smoothing hyperparameters, derivative settings, $M$, $M_{\mathrm{skew}}$, plane ranking, orientation, and any display window must not use test data.
+4. **Score held-out derivatives:** apply the training transform and report
+   $$
+   \lVert D_{\mathrm{test}}-\widehat M X_{-,\mathrm{test}}\rVert_F^2
+   \quad\text{and}\quad
+   \lVert D_{\mathrm{test}}-\widehat M_{\mathrm{skew}}X_{-,\mathrm{test}}\rVert_F^2,
+   $$
+   with an explicitly defined derivative-mean or persistence reference and a held-out $R^2$ whose denominator is fitted without test leakage.
+5. **Separate rate from occupancy:** report $|\omega_j|$, variance/energy occupying each plane, and derivative fit separately. A high fitted rate in a weakly occupied plane is not a dominant data feature.
+6. **Quantify rotation:** report state--derivative angle, tangential versus radial derivative energy, direction consistency across conditions, radius change, and whether trajectories complete enough arc to support the language used.
+7. **Assess stability:** compare PCA and jPCA subspaces across bootstrap samples or folds using principal angles after accounting for sign, orientation, ordering, and repeated-frequency ambiguity.
+8. **Stress preprocessing:** repeat predeclared analyses across plausible alignment, smoothing, normalization, time-window, rank, and across-condition-centering choices.
+9. **Use matched controls:** evaluate mechanistic, kinematic/representational, latency-sequence, and structured-shuffle alternatives under the same selection and test protocol.
+10. **Correct selection multiplicity:** hyperparameter and plane selection occur in training/validation; the untouched test set is used once for the final declared comparison.
+
+The original reaching study reported rotations in aligned trial-averaged macaque motor-cortex activity, compared $M_{\mathrm{skew}}$ with unrestricted $M$, and used simulated, EMG, and shuffle controls [@ChurchlandEtAl2012]. Those empirical findings support that dataset-specific result under the published pipeline; they do not establish universal motor-cortex dynamics or exempt new datasets from independent held-out and matched-null evaluation.
+
+## Minimal toy model
+
+A future non-executable generation/recovery contract should contain both recoverable rotation and deceptive non-rotational controls.
+
+### Positive generator
+
+Choose a six-dimensional continuous-time state with
+
+$$
+A=
+\operatorname{blockdiag}
+\left(
+J(2),J(0.7),\operatorname{diag}(-0.4,-0.9)
+\right).
+$$
+
+For multiple conditions, draw distinct initial states $x_0^{(c)}$ and generate
+
+$$
+x^{(c)}(t)=e^{At}x_0^{(c)}.
+$$
+
+Map states to $p>6$ observed features through a fixed **isometric embedding** $H$ with $H^\top H=I_6$ under the Euclidean metric used by PCA, add declared observation noise, and create repeated trials. Fit all preprocessing and jPCA components using training trials only. The positive recovery target is the image of each latent rotational plane under $H$, equivalently its representation inside the fitted training PCA coordinates. Evaluate those observed/PCA-space planes by principal angles, angular-rate error, and held-out derivative prediction. Compare with unrestricted regression, PCA pairs, and fixed random planes.
+
+A separate metric-dependence stress test should replace $H$ by a nonorthogonal full-column-rank mixing matrix. That case is not a nominal positive-recovery failure: it tests the stated fact that arbitrary coordinate changes need not preserve skew-symmetry under the fitted Euclidean metric.
+
+### Required negative controls
+
+1. **Symmetric decay/expansion:** replace $A$ by a real symmetric matrix with no skew part. jPCA should not receive credit merely for finding an arbitrary plane.
+2. **Latency sequence:** give each feature a smooth bell-shaped transient with a different peak delay and condition-dependent amplitude, but no shared autonomous state equation. This can produce phase-shifted loops and tests whether visual rotation is mistaken for mechanism.
+3. **Input-driven transient:** generate $\dot x=Ax+Bu^{(c)}(t)$ with condition-locked pulses, then fit the misspecified autonomous relation $\dot x=Mx$. This tests whether common input is absorbed as apparent rotation.
+4. **Alignment perturbation:** jitter the event time across trials before averaging and compare correct, incorrect, and data-selected alignment.
+5. **Condition shuffle:** disrupt condition structure while preserving predeclared smoothness and covariance as closely as practical; generate the null independently inside each training fold.
+
+The valid conclusion from successful positive recovery would be limited to recovery under the simulator, representation, loss, and controls. A circle in the latency or input-driven negative control would demonstrate why rotational appearance alone is insufficient. No data, code, figure, or benchmark result is produced in this Method Object.
+
+## Relevance to LDG
+
+jPCA is LDG's canonical example of a method that combines a static variance baseline, explicit temporal differencing, a constrained linear operator, and a coordinate projection. It is valuable precisely because it forces separation of several claims:
+
+- a trajectory is time-indexed;
+- derivatives are predictable from states in a selected representation;
+- the best fitted linear relation has a substantial skew component;
+- a projection displays rotational tendency; and
+- the biological system is an autonomous oscillator or mechanism.
+
+Only the first four are directly addressed by the bounded method, and each remains conditional on preprocessing and evaluation.
+
+::: {.callout-warning title="What this does NOT imply"}
+A jPCA plane does not prove oscillation, recurrence, a biological mechanism, a global vector field, autonomous dynamics, causal interaction, or a uniquely identified state space. It does not inherit Gaussian SSM assumptions or Kalman inference. Condition averaging, event alignment, smoothing, latency structure, and across-condition subtraction can create, remove, or exaggerate rotational projections.
+:::
+
+### Mouse trajectory
+
+No modality-specific empirical claim is retained. jPCA could be applied to repeated, aligned movement-feature trajectories, but alignment, condition definition, body-coordinate choice, and averaging would define the result. A rotational projection would not establish a locomotor oscillator or autonomous behavioral state dynamics.
+
+### Eye movement
+
+No modality-specific empirical claim is retained. Applying jPCA to aligned saccade or pursuit conditions would require explicit treatment of angular coordinates, event timing, trial dependence, and external visual drive. Input-locked loops would not identify an internal oculomotor mechanism.
+
+### EEG
+
+No modality-specific empirical claim is retained. Sensor scaling, rereferencing, volume conduction, filtering, phase distortion, trial alignment, and event averaging could dominate derivative relations. A sensor-space jPCA plane would not be a neural source or causal circuit mode.
+
+### MEG / neural population data
+
+Churchland et al. applied jPCA to trial-averaged, aligned macaque motor and premotor cortical population responses and reported brief condition-consistent rotational projections within the top six PCs [@ChurchlandEtAl2012]. The claim is source- and pipeline-specific. Later work showed that latency-augmented representational simulations can also yield rotations and proposed covariance-matched condition permutations [@MichaelsEtAl2016], while a critical reanalysis emphasized temporal response sequences and sensitivity to across-condition subtraction [@LebedevEtAl2019]. These studies motivate matched alternatives and preprocessing sensitivity analyses rather than a universal interpretation of neural rotations.
+
+## Primary sources
+
+- Churchland et al. introduce jPCA, define the PCA-reduced condition--time matrix, adjacent-sample derivative, unrestricted and skew-symmetric fits, complex-eigenvector plane construction, application-specific preprocessing, and the original macaque reaching results and controls [@ChurchlandEtAl2012].
+- Michaels, Dann, and Scherberger test latency-augmented representational and dynamical simulations and introduce a covariance-matched condition permutation for their motor-cortex comparison [@MichaelsEtAl2016].
+- Lebedev et al. reanalyze the Churchland data and code, demonstrate sensitivity to temporal response sequences and across-condition subtraction, and argue for more cautious mechanistic interpretation [@LebedevEtAl2019].
+
+## Reviews / secondary sources
+
+- Cunningham and Yu review neural dimensionality reduction and distinguish jPCA-style orthogonal projections from posterior trajectories produced by probabilistic temporal models; they also caution that extracted trajectories reflect the assumptions of the chosen method [@CunninghamYu2014].
+
+## Open methodological questions
+
+- Which derivative estimator best balances temporal resolution, phase distortion, and noise without tuning on the final test set?
+- Which null models preserve enough covariance, smoothness, condition structure, and latency statistics to isolate the scientific claim of interest?
+- When should rotational structure be scored by held-out derivative prediction, invariant-subspace stability, tangential energy, completed phase, or downstream prediction?
+- How should known external inputs and feedback be incorporated before interpreting a state-only fit as autonomous?
+- Which properties of a jPCA plane remain stable across feature scaling, recording subsets, animals, sessions, and alignment choices?
+- When are single-trial latent methods preferable to condition-averaged projection, and how should their different inferential targets be compared?
+
+## Maturity checklist
+
+- [x] Complete Method schema at `L2/review`.
+- [x] Declares condition--time input construction, alignment, averaging, normalization, PCA preprocessing, and derivative estimation.
+- [x] Defines unrestricted and skew-symmetric least-squares fits without incorrectly equating antisymmetrization with the constrained solution.
+- [x] Gives complex-eigenplane and real-Schur interpretations, plane ranking, projection, and occupancy/rate distinction.
+- [x] Separates learned and fixed quantities, temporal assumptions, Euclidean geometry, supervision, and computation.
+- [x] States sign, orientation, plane, repeated-frequency, PCA, rank-deficiency, and mechanistic non-identifiability boundaries.
+- [x] Covers alignment, averaging, smoothing, latency, input, conditioning, rank, metric, shuffle, and multiplicity failures.
+- [x] Includes PCA, raw latency, unrestricted dynamics, symmetric, random-plane, input-aware, LGSSM, and structured-null comparisons.
+- [x] Gives leakage-safe held-out evaluation and a non-executable positive/negative toy contract.
+- [x] Explicitly rejects inherited Gaussian-SSM assumptions and oscillation, mechanism, global-vector-field, autonomy, and causality overclaims.
+- [x] Four retained sources were inspected; bibliographic metadata and DOI or stable identifiers were verified.
+- [x] Independent mixed review returned PASS with no correction round required.
+- [x] Stable promotion authorized under the recorded review decision after object-specific PASS and validation.

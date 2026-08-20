@@ -1,0 +1,337 @@
+{
+  "aggregation": {
+    "across_replicates": "q10, median, and q90 across four independent replicate-level values",
+    "rates": "ok, failure=(invalid+nonconvergence), and applicability=(1-inapplicable) rates retain method and metric strata",
+    "within_replicate": "each metric pools the declared held-out test samples for one scenario replicate"
+  },
+  "artifact": "static-linear-latent-robustness",
+  "artifact_files": [
+    "manifest.json",
+    "results.csv",
+    "diagnostics.json",
+    "summary.png"
+  ],
+  "canonical_row_order": [
+    "scenario",
+    "replicate",
+    "provenance",
+    "method",
+    "metric"
+  ],
+  "capability_separation": {
+    "frozen_recovery": "recover_frozen_states receives frozen fitted/predeclared states and test observations only",
+    "invalid_control": "recover_invalid_leaked_control is a separately named negative control that intentionally pools train and test during preprocessing",
+    "lawful_fit": "fit_lawful_states receives train observations and validation observations only"
+  },
+  "commands": {
+    "generate": "/Users/bytedance/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3 benchmarks/static-linear-latent-robustness.py --generate",
+    "python_executable": "/Users/bytedance/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3",
+    "resume": "/Users/bytedance/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3 benchmarks/static-linear-latent-robustness.py --generate --resume",
+    "verify": "/Users/bytedance/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3 benchmarks/static-linear-latent-robustness.py --verify"
+  },
+  "date": "2026-08-20",
+  "failure_label_semantics": "method\u00d7metric\u00d7scenario applicability is resolved before convergence; inapplicable rows have no value; nonconvergence is assigned only to applicable selected-FA outputs, and optimizer_iterations retains the reached iteration count",
+  "files_sha256": {
+    "diagnostics.json": "527266ed8c3f09783132a3ee6dcba66b06b8e29199e5858366089f4fd8fb518d",
+    "results.csv": "ccf91db1332b9cda02db7264b136fe8fa65dfca46cf559ba6cbe221018e94a12",
+    "summary.png": "ece6e58ebb18b5209d148b2dfbb998d0fc46fd46fd782af0ce9204030f12b321"
+  },
+  "ground_truth": "x = mean + Lambda z + epsilon, z~N(0,I_2), with declared residual and contamination stresses",
+  "identification_rule": "loading-subspace and uniqueness recovery rows are applicable only for diagonal residual scenarios with a passing stable Phase 3 Anderson-Rubin-style sufficient row-deletion rank diagnostic",
+  "interpretation_boundary": "Scenario/target/metric conditional; not mechanism, causality, intrinsic dimension, real-data validity, or universal superiority.",
+  "master_seed": 20260820,
+  "maturity": "L1",
+  "methods": [
+    {
+      "family": "mean",
+      "id": "mean",
+      "information_set": "train_only",
+      "parameter_source": "train_fit",
+      "preprocessing": "center_train_only"
+    },
+    {
+      "family": "fixed_projection",
+      "id": "fixed_projection",
+      "information_set": "fixed_reference",
+      "parameter_source": "predeclared",
+      "preprocessing": "center_train_only"
+    },
+    {
+      "family": "random_projection",
+      "id": "random_projection",
+      "information_set": "fixed_reference",
+      "parameter_source": "deterministic_seed",
+      "preprocessing": "center_train_only"
+    },
+    {
+      "family": "pca",
+      "id": "pca",
+      "information_set": "train_only",
+      "parameter_source": "train_fit",
+      "preprocessing": "center_train_only"
+    },
+    {
+      "family": "ppca",
+      "id": "ppca",
+      "information_set": "train_only",
+      "parameter_source": "train_fit",
+      "preprocessing": "center_train_only"
+    },
+    {
+      "family": "diagonal_fa",
+      "id": "fa_selected",
+      "information_set": "train_validation",
+      "parameter_source": "selected_train_validation",
+      "preprocessing": "center_train_only"
+    },
+    {
+      "family": "true_parameter_gaussian",
+      "id": "true_gaussian_reference",
+      "information_set": "oracle_parameters",
+      "parameter_source": "known_true",
+      "preprocessing": "none"
+    },
+    {
+      "family": "preprocessing_control",
+      "id": "proper_scaled_pca",
+      "information_set": "train_only",
+      "parameter_source": "train_fit",
+      "preprocessing": "standardize_train_only"
+    },
+    {
+      "family": "preprocessing_control",
+      "id": "leaked_scaled_pca_control",
+      "information_set": "invalid_test_preprocessing",
+      "parameter_source": "train_test_pooled",
+      "preprocessing": "invalid_pooled_train_test"
+    }
+  ],
+  "metric_provenance": {
+    "covariance_relative_frobenius": "fit_diagnostic",
+    "heldout_gaussian_nll": "test",
+    "heldout_reconstruction_mse": "test",
+    "identification_applicable": "scenario_diagnostic",
+    "latent_signal_reconstruction_mse": "test",
+    "loading_subspace_angle_max_degrees": "fit_diagnostic",
+    "optimizer_iterations": "fit_diagnostic",
+    "preprocessing_test_poison_parameter_change": "leakage_diagnostic",
+    "principal_subspace_angle_max_degrees": "fit_diagnostic",
+    "selected_validation_nll": "validation",
+    "uniqueness_rmse": "fit_diagnostic"
+  },
+  "metrics": [
+    "heldout_reconstruction_mse",
+    "latent_signal_reconstruction_mse",
+    "heldout_gaussian_nll",
+    "covariance_relative_frobenius",
+    "principal_subspace_angle_max_degrees",
+    "loading_subspace_angle_max_degrees",
+    "uniqueness_rmse",
+    "selected_validation_nll",
+    "optimizer_iterations",
+    "identification_applicable",
+    "preprocessing_test_poison_parameter_change"
+  ],
+  "object_id": "P4-U02",
+  "phase3_reuse": "toy-models/static-linear-latent-recovery.py",
+  "phase3_sha256": "1dd673f733feb9d4f4f0fe752f7f9f1dc65639808ac692598c294cc5e2468bcd",
+  "provenance_vocabulary": [
+    "test",
+    "validation",
+    "fit_diagnostic",
+    "scenario_diagnostic",
+    "leakage_diagnostic"
+  ],
+  "replicates": 4,
+  "resume": "partial rows must match schema, key, metadata, status/value semantics, and freshly recomputed canonical bytes exactly; duplicate, unknown, stale, corrupted, or incomplete rows are rejected",
+  "row_key": [
+    "scenario",
+    "replicate",
+    "provenance",
+    "method",
+    "metric"
+  ],
+  "runtime": {
+    "numpy": "2.3.5",
+    "pillow": "12.3.0",
+    "platform": "macOS-26.5.1-arm64-arm-64bit",
+    "python": "3.12.13",
+    "python_executable": "/Users/bytedance/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3"
+  },
+  "scenarios": [
+    {
+      "class": "reference",
+      "id": "reference",
+      "n_test": 180,
+      "n_train": 240,
+      "n_validation": 120,
+      "residual": "heterogeneous_diagonal",
+      "strengths": [
+        2.0,
+        1.25
+      ]
+    },
+    {
+      "class": "sample_size",
+      "id": "small_sample",
+      "n_test": 180,
+      "n_train": 60,
+      "n_validation": 60,
+      "residual": "heterogeneous_diagonal",
+      "strengths": [
+        2.0,
+        1.25
+      ]
+    },
+    {
+      "class": "sample_size",
+      "id": "large_sample",
+      "n_test": 240,
+      "n_train": 600,
+      "n_validation": 200,
+      "residual": "heterogeneous_diagonal",
+      "strengths": [
+        2.0,
+        1.25
+      ]
+    },
+    {
+      "class": "signal_eigenvalue_separation",
+      "id": "weak_separation",
+      "n_test": 180,
+      "n_train": 240,
+      "n_validation": 120,
+      "residual": "homogeneous_diagonal",
+      "strengths": [
+        1.25,
+        0.95
+      ]
+    },
+    {
+      "class": "signal_eigenvalue_separation",
+      "id": "repeated_signal",
+      "n_test": 180,
+      "n_train": 240,
+      "n_validation": 120,
+      "residual": "homogeneous_diagonal",
+      "strengths": [
+        1.5,
+        1.5
+      ]
+    },
+    {
+      "class": "heterogeneous_uniqueness",
+      "id": "heterogeneous_uniqueness",
+      "n_test": 180,
+      "n_train": 240,
+      "n_validation": 120,
+      "residual": "heterogeneous_diagonal",
+      "strengths": [
+        2.0,
+        1.25
+      ]
+    },
+    {
+      "class": "near_zero_uniqueness",
+      "id": "near_zero_uniqueness",
+      "n_test": 180,
+      "n_train": 240,
+      "n_validation": 120,
+      "residual": "near_zero_diagonal",
+      "strengths": [
+        2.0,
+        1.25
+      ]
+    },
+    {
+      "class": "correlated_residuals",
+      "id": "correlated_residuals",
+      "n_test": 180,
+      "n_train": 240,
+      "n_validation": 120,
+      "residual": "correlated",
+      "strengths": [
+        2.0,
+        1.25
+      ]
+    },
+    {
+      "class": "high_nuisance",
+      "id": "high_nuisance",
+      "n_test": 180,
+      "n_train": 240,
+      "n_validation": 120,
+      "residual": "high_nuisance",
+      "strengths": [
+        2.0,
+        1.25
+      ]
+    },
+    {
+      "class": "outliers",
+      "id": "outliers",
+      "n_test": 180,
+      "n_train": 240,
+      "n_validation": 120,
+      "outlier_fraction": 0.025,
+      "outlier_scale": 9.0,
+      "residual": "heterogeneous_diagonal",
+      "strengths": [
+        2.0,
+        1.25
+      ]
+    },
+    {
+      "class": "preprocessing_leakage",
+      "id": "preprocessing_leakage",
+      "n_test": 180,
+      "n_train": 240,
+      "n_validation": 120,
+      "residual": "heterogeneous_diagonal",
+      "strengths": [
+        2.0,
+        1.25
+      ]
+    }
+  ],
+  "schema_version": 1,
+  "scientific_question": "Where are bounded static rank-two latent recovery methods applicable, robust, or brittle under declared synthetic scenarios and method-specific targets?",
+  "seed_mapping": "PCG64(SeedSequence(master_seed, sha256(scenario_id)[:4], replicate, stage, split_code))",
+  "selection": {
+    "candidate_floors": [
+      1e-05,
+      0.001
+    ],
+    "candidate_restarts": [
+      0,
+      1,
+      2
+    ],
+    "fit_data": "train observations only",
+    "latent_truth_allowed": false,
+    "max_iterations": 250,
+    "method": "bounded diagonal-noise FA EM imported from stable Phase 3",
+    "relative_nll_tolerance": 1e-08,
+    "selection_data": "validation observations only",
+    "test_inputs_allowed": false
+  },
+  "split_policy": "independent train, validation, and test samples per replicate; test latent/signal truth is scoring-only",
+  "stages": [
+    "generation",
+    "selection",
+    "inference",
+    "scoring"
+  ],
+  "status": "stable",
+  "status_vocabulary": [
+    "ok",
+    "nonconvergence",
+    "invalid",
+    "inapplicable"
+  ],
+  "tolerances": {
+    "oracle": 1e-10,
+    "ordering": 0.0,
+    "poison": 1e-12
+  }
+}

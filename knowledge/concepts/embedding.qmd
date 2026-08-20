@@ -1,0 +1,96 @@
+---
+title: "Embedding"
+object_type: concept
+maturity: L1
+status: stable
+domain: [geometry, representation]
+tags: [embedding, representation, structure-preserving-map]
+prerequisites:
+- knowledge/concepts/state-space.qmd
+- knowledge/concepts/ambient-dimension.qmd
+related:
+- knowledge/concepts/intrinsic-dimension.qmd
+created: 2026-08-18
+updated: 2026-08-18
+---
+
+# Embedding
+
+## One-sentence definition
+
+An **embedding** is an injective map that represents one space inside another while preserving the declared structure strongly enough that the original object can be recovered from its image.
+
+## Why this concept matters
+
+Embedding language distinguishes a faithful representation of an object from a projection or visualization that may collapse distinct points or distort relevant structure.
+
+## Intuition
+
+A circle can be placed in the plane without self-identifying points. Mapping the same circle onto a line with overlaps would not faithfully embed it.
+
+## Formal definition
+
+At the topological level, a map $e:X\to Y$ is an embedding when it is injective and gives a homeomorphism between $X$ and its image $e(X)$ with the subspace topology. Smooth embeddings add smoothness and an injective derivative.
+
+This L1 object uses only the representation principle; full topology and differential conditions belong to later objects. Whitney's classical work establishes broad smooth embedding results for differentiable manifolds [@Whitney1936].
+
+## Core notation
+
+- $X$: source space.
+- $Y$: ambient target space.
+- $e:X\hookrightarrow Y$: embedding.
+- $e(X)$: embedded image.
+
+## Prerequisites
+
+[State Space](state-space.qmd) supplies the source object whose states may be represented. [Ambient Dimension](ambient-dimension.qmd) supplies the target-space coordinate count.
+
+**Assumed background:** functions, injectivity, and elementary continuity.
+
+## Relationship to adjacent concepts
+
+| Concept | Distinction |
+|---|---|
+| **Projection** | May collapse distinct points and need not preserve the source structure. |
+| **Dimensionality reduction** | An algorithmic goal; its output is not automatically a mathematical embedding. |
+| **Feature map** | Any map to features; injectivity or structural preservation may be absent. |
+| **Manifold** | A type of space that may be embedded; an embedding does not prove the data form a manifold. |
+
+## What this does NOT imply
+
+An embedding does not imply isometry, low distortion under a chosen metric, unique coordinates, causal or mechanistic meaning, a manifold source, or successful recovery from finite noisy samples.
+
+## Minimal example
+
+The map
+
+$$
+e(\theta)=(\cos\theta,\sin\theta)
+$$
+
+represents the abstract circle in $\mathbb R^2$ when $\theta$ is understood modulo $2\pi$. The coordinate image has ambient dimension two but one intrinsic circular degree of freedom.
+
+## Neuroscience / behavioral relevance
+
+Learned low-dimensional coordinates are often called embeddings. LDG requires specifying whether “embedding” is only an algorithmic label or a supported claim of injective structural preservation.
+
+## Relevance to LDG
+
+Embedding prepares precise manifold and topology language while preventing nonlinear visualization from being treated as evidence by itself.
+
+## Open questions
+
+- Which structure should a scientific embedding preserve?
+- How can injectivity be assessed from finite samples?
+- What distortions matter for dynamics and behavior?
+
+## References
+
+- Whitney provides the inspected classical primary source for smooth manifold embedding results [@Whitney1936].
+
+## Maturity checklist
+
+- [x] Defines injective structure-preserving representation.
+- [x] Separates embedding from projection, features, and dimensionality reduction.
+- [x] States that embedding does not prove a manifold or mechanism.
+- [x] Independent bounded review completed; initial findings were corrected and focused re-review passed.

@@ -1,0 +1,463 @@
+---
+title: "Kalman Filtering"
+object_type: method
+maturity: L2
+status: stable
+domain: [latent-modeling, temporal-modeling, state-estimation, statistics]
+tags: [kalman-filter, linear-gaussian, sequential-inference, innovation]
+prerequisites:
+- knowledge/methods/linear-gaussian-state-space-model.qmd
+- knowledge/concepts/latent-trajectory.qmd
+- knowledge/concepts/observation-model.qmd
+- knowledge/concepts/process-noise.qmd
+- knowledge/concepts/observation-noise.qmd
+related:
+- knowledge/methods/factor-analysis.qmd
+- knowledge/concepts/identifiability.qmd
+created: 2026-08-19
+updated: 2026-08-19
+---
+
+# Kalman Filtering
+
+## Problem
+
+Kalman filtering sequentially computes the current latent-state distribution in a declared linear-Gaussian state-space model (LGSSM), using only observations available through the current time. Its target at time $t$ is
+
+$$
+p(z_t\mid x_{1:t},u_{1:t}),
+$$
+
+not a retrospective distribution that uses $x_{t+1:T}$. The recursion alternates between a **prediction** based on the previous filtering distribution and the transition model, and an **update** based on the current observation [@Kalman1960; @Sarkka2013, ch. 4].
+
+This object treats the model matrices and covariance parameters as fixed and known during filtering. Specifying or learning an LGSSM, filtering its state, forecasting future observations, and smoothing past states are distinct tasks. Fixed-interval Kalman smoothing is deferred to P2-U10.
+
+## Input
+
+Use the time-invariant, input-driven LGSSM defined in the prerequisite Method:
+
+$$
+z_1\sim\mathcal N(m_1,P_1),
+$$
+
+$$
+z_{t+1}=Az_t+Bu_t+w_t,
+\qquad
+w_t\sim\mathcal N(0,Q),
+$$
+
+$$
+x_t=Cz_t+Du_t+v_t,
+\qquad
+v_t\sim\mathcal N(0,R).
+$$
+
+Here $z_t\in\mathbb R^q$, $x_t\in\mathbb R^p$, and the optional known input is $u_t\in\mathbb R^r$. The canonical assumptions are $P_1,Q\succeq0$, $R\succ0$, mutual independence of the initial state and all process and observation noises, temporal independence of the noises, and a fixed or externally supplied open-loop input path.
+
+A reproducible filtering problem must declare:
+
+- the fixed parameter tuple $(m_1,P_1,A,B,C,D,Q,R)$ and its provenance;
+- state, observation, and input units and coordinate conventions;
+- sequence boundaries, sampling interval, and treatment of resets between sequences;
+- exactly when each input becomes available;
+- initialization at the first observation;
+- which observation components are available at each time and why;
+- numerical linear-algebra method, precision, and covariance representation; and
+- whether the goal is current-state inference, one-step predictive scoring, online monitoring, or an input to a separate learning procedure.
+
+For the transition from $t$ to $t+1$, $u_t$ must be known before that transition is evaluated. If $D\ne0$, the direct-feedthrough input $u_t$ used in the measurement mean must be available before $x_t$ is assimilated. A control constructed from $x_t$ itself creates a contemporaneous algebraic loop unless a separate within-step timing model is supplied. Future inputs that depend on future observations are not known conditioning variables.
+
+## Output
+
+At each time $t$, the filter returns or defines:
+
+- the predicted state distribution
+  $$
+  p(z_t\mid x_{1:t-1},u_{1:t})
+  =\mathcal N(m_{t\mid t-1},P_{t\mid t-1});
+  $$
+- the one-step predictive observation distribution
+  $$
+  p(x_t\mid x_{1:t-1},u_{1:t})
+  =\mathcal N(\widehat x_{t\mid t-1},S_t);
+  $$
+- the innovation $\nu_t=x_t-\widehat x_{t\mid t-1}$ and innovation covariance $S_t$; and
+- the filtering distribution
+  $$
+  p(z_t\mid x_{1:t},u_{1:t})
+  =\mathcal N(m_{t\mid t},P_{t\mid t}).
+  $$
+
+The filtering mean is a model-conditional posterior mean, not an observed state. Its covariance describes uncertainty under the fixed model and conditioning information; it does not include uncertainty about learned parameters unless that uncertainty is modeled separately.
+
+## Core idea
+
+The previous filtering distribution summarizes the information in past observations needed for the next recursive step. Linear propagation plus Gaussian process noise preserves Gaussianity. The current linear-Gaussian measurement then yields a Gaussian conditional distribution. Consequently, means and covariances are sufficient for exact finite-dimensional filtering under the declared model [@Sarkka2013, secs. 4.2--4.3].
+
+The innovation is the part of the current observation not predicted from prior observations and known inputs. Its covariance combines predicted state uncertainty projected into observation coordinates with observation noise. The Kalman gain maps this observation-space discrepancy into a state-space correction.
+
+## Generative / modeling assumptions
+
+The recursion inherits every assumption of the LGSSM. In particular:
+
+- state evolution and observation are linear in the chosen coordinates;
+- the prior and noises are Gaussian;
+- process and observation noises are white, mutually independent, and independent of the initial state;
+- the Markov state and conditional-observation structure is correctly specified;
+- matrices and covariance parameters used by the filter are fixed during the recursion;
+- the input path is nonanticipating under the declared within-step timing; and
+- any missing-observation pattern is treated as observed/fixed and non-informative unless a missingness model is added.
+
+Under these conditions and exact arithmetic, the recursion gives the exact Gaussian filtering distributions. Kalman's original state-space treatment derives optimal linear estimates through orthogonal projection and explicitly distinguishes filtering, prediction, and smoothing by the estimated time relative to the latest conditioning observation [@Kalman1960]. This object uses the narrower Bayesian linear-Gaussian interpretation: exactness is conditional on the stated probability model, not evidence that the model generated the scientific system.
+
+## Mathematical formulation
+
+Write $\mathcal I_t=\sigma(x_{1:t},u_{1:t})$ for the information available after assimilating $x_t$. Define
+
+$$
+m_{t\mid s}=\mathbb E[z_t\mid\mathcal I_s],
+\qquad
+P_{t\mid s}=\operatorname{Cov}(z_t\mid\mathcal I_s).
+$$
+
+No quantity below conditions on $x_{t+1}$ or any later observation.
+
+### Initialization
+
+Before the first observation,
+
+$$
+m_{1\mid0}=m_1,
+\qquad
+P_{1\mid0}=P_1.
+$$
+
+This prior is part of the model. An informative external initialization must be justified independently. Replacing an unknown initial distribution by an arbitrarily huge covariance is not automatically an exact diffuse initialization and can be numerically harmful; exact diffuse variants are outside this bounded Method.
+
+### Prediction
+
+For $t\ge2$, after filtering time $t-1$,
+
+$$
+m_{t\mid t-1}=A m_{t-1\mid t-1}+B u_{t-1},
+$$
+
+$$
+P_{t\mid t-1}=A P_{t-1\mid t-1}A^\top+Q.
+$$
+
+Thus
+
+$$
+p(z_t\mid x_{1:t-1},u_{1:t})
+=\mathcal N(m_{t\mid t-1},P_{t\mid t-1}).
+$$
+
+The transition input is $u_{t-1}$ because it drives $z_{t-1}\mapsto z_t$. The conditioning notation includes $u_t$ because the contemporaneous observation mean may use $D u_t$; $u_t$ does not retroactively drive the preceding transition.
+
+### Innovation and update
+
+The predicted observation mean, innovation, and innovation covariance are
+
+$$
+\widehat x_{t\mid t-1}=C m_{t\mid t-1}+D u_t,
+$$
+
+$$
+\nu_t=x_t-\widehat x_{t\mid t-1},
+$$
+
+$$
+S_t=C P_{t\mid t-1}C^\top+R.
+$$
+
+The predictive observation law is
+
+$$
+p(x_t\mid x_{1:t-1},u_{1:t})
+=\mathcal N(\widehat x_{t\mid t-1},S_t).
+$$
+
+The Kalman gain is
+
+$$
+K_t=P_{t\mid t-1}C^\top S_t^{-1},
+$$
+
+and the filtering moments are
+
+$$
+m_{t\mid t}=m_{t\mid t-1}+K_t\nu_t,
+$$
+
+$$
+P_{t\mid t}=P_{t\mid t-1}-K_tS_tK_t^\top.
+$$
+
+These are the closed-form Gaussian conditioning equations [@Sarkka2013, theorem 4.2]. Implementations should solve linear systems involving $S_t$ rather than explicitly forming $S_t^{-1}$.
+
+### Covariance-update forms and numerical boundary
+
+In exact arithmetic, the previous covariance update is equivalent to
+
+$$
+P_{t\mid t}=(I-K_tC)P_{t\mid t-1}.
+$$
+
+The short form can lose symmetry or positive-semidefinite structure through floating-point cancellation. The Joseph form
+
+$$
+P_{t\mid t}
+=(I-K_tC)P_{t\mid t-1}(I-K_tC)^\top
++K_t R K_t^\top
+$$
+
+is algebraically equivalent when $K_t$ is the Kalman gain and expresses the covariance as a sum of positive-semidefinite terms. Asada's inspected implementation notes specifically use this form to reduce asymmetric covariance caused by round-off and discuss factorized covariance representations as a further safeguard [@Asada2006Lecture8, sec. 4.10].
+
+The Joseph form is not a universal numerical cure. Stable implementations should also use symmetric factorizations and solves, monitor symmetry and definiteness, and avoid explicit matrix inverses. Square-root or factorized filters propagate covariance factors and can be preferable for severe scaling or conditioning problems; they are computational realizations of the same declared filtering target, not different scientific models [@Sarkka2013, sec. 4.3; @Asada2006Lecture8, sec. 4.10]. Detailed square-root algorithms are outside scope.
+
+### Partially missing observations
+
+Let $M_t$ be a row-selection matrix that retains only the components observed at time $t$. Define
+
+$$
+x_t^{(o)}=M_t x_t,
+\quad
+C_t=M_tC,
+\quad
+D_t=M_tD,
+\quad
+R_t=M_tRM_t^\top.
+$$
+
+Apply the ordinary update using $x_t^{(o)},C_t,D_t,R_t$. This preserves correlations among the retained measurement errors. If no component is observed, skip the measurement update:
+
+$$
+m_{t\mid t}=m_{t\mid t-1},
+\qquad
+P_{t\mid t}=P_{t\mid t-1}.
+$$
+
+This row-selection rule is exact only when the missingness indicator contributes no additional information about $z_t$ beyond the modeled observations and covariates. Informative dropout, threshold censoring, saturation, or state-dependent sensor failure requires an explicit observation/missingness model.
+
+### Singular or ill-conditioned innovation covariance
+
+Under the canonical assumptions $P_{t\mid t-1}\succeq0$ and $R\succ0$, the innovation covariance $S_t$ is positive definite. After row selection, $R_t\succ0$ for a nonempty set of distinct retained coordinates, so a Cholesky-based solve is available in exact arithmetic.
+
+A singular $S_t$ indicates that the implementation has left this regular model class—for example, by using zero-noise exact constraints, duplicated deterministic measurement rows, or a semidefinite $R$. The ordinary density and inverse formula then do not apply unchanged. Redundant rows may be removed, or a separately justified degenerate-Gaussian/constraint formulation may use support-aware generalized inverses. Adding arbitrary diagonal "jitter" changes the observation model and must not be presented as a neutral mathematical fix.
+
+If $S_t$ is theoretically positive definite but ill-conditioned, rescale variables, use Cholesky or another rank-revealing factorization, avoid explicit inversion, and inspect the model for nearly redundant sensors or extreme covariance scales. A failed factorization is a diagnostic, not permission to silently discard uncertainty.
+
+### Likelihood contribution
+
+For a complete $p$-dimensional observation and nonsingular $S_t$, the innovation gives the one-step log predictive density
+
+$$
+\ell_t
+=-\frac12\left[
+p\log(2\pi)+\log|S_t|+\nu_t^\top S_t^{-1}\nu_t
+\right].
+$$
+
+With partial observation, replace $p,\nu_t,S_t$ by the retained dimension and selected quantities. Summing $\ell_t$ gives the fixed-parameter marginal sequence log likelihood. Using this likelihood inside parameter estimation does not turn the filtering recursion itself into a parameter-learning algorithm.
+
+## What is learned?
+
+With parameters fixed, the filter learns no model parameter. It computes successive conditional distributions over $z_t$ and one-step predictive distributions over $x_t$ from incoming observations.
+
+The model parameters may have been set from physics, estimated on separate training sequences, or updated by a distinct algorithm. EM and likelihood optimization can call a filter internally, but the outer parameter-learning criterion and updates remain separate. Treating the filtered means as error-free observations for an unqualified second-stage fit discards posterior uncertainty and can create circular conclusions.
+
+## What is fixed?
+
+The analyst fixes the LGSSM structure, state dimension, parameter tuple, coordinate systems, sequence/reset policy, input timing, missingness assumptions, initialization, numerical precision, covariance representation, and any diagnostic thresholds. If parameters are estimated, the training split, estimator, constraints, and model-selection rule are fixed outside the filtering operation.
+
+The filter does not choose $Q$ and $R$ by deciding how much to trust dynamics versus measurements. Those covariances are model parameters whose values require external specification or a declared estimation procedure.
+
+## Temporal assumptions
+
+Filtering is causal with respect to the declared information order: $m_{t\mid t}$ and $P_{t\mid t}$ depend on $x_{1:t}$ but not $x_{t+1:T}$. Late-arriving or revised observations require a separately declared replay, out-of-sequence update, or smoothing procedure.
+
+The algorithm assumes the discrete sampling and sequence boundaries of the LGSSM. Unequal time gaps require gap-specific transitions and process covariances; incrementing the index as if every gap were equal changes the temporal model. Filtering does not by itself make the inferred mean trajectory dynamical evidence: its temporal structure is inherited from $A,Q$, the initialization, and the observations.
+
+## Geometry assumptions
+
+The state occupies a finite-dimensional vector space. Prediction and update use affine maps and covariance ellipsoids in declared coordinates. $P_{t\mid s}$ and $S_t$ define coordinate-dependent Mahalanobis geometries for uncertainty and innovations.
+
+Under an invertible state-coordinate change $z'_t=Tz_t$, the moments and model matrices must transform consistently, including
+
+$$
+m'_{t\mid s}=Tm_{t\mid s},
+\qquad
+P'_{t\mid s}=TP_{t\mid s}T^\top,
+\qquad
+C'=CT^{-1}.
+$$
+
+The observable predictive law can remain unchanged while latent axes and gain entries change. Euclidean distance between filtering means, visual smoothness, or covariance ellipsoids do not establish a manifold, Riemannian geometry, intrinsic dimension, or privileged biological coordinates.
+
+## Supervision
+
+No external outcome label is required. The current measurement is evidence in a probabilistic observation model, not a supervised target in the ordinary prediction-label sense. Known inputs condition the model; they do not become labels merely by being supplied.
+
+External labels or outcomes used to choose state dimension, matrices, covariance parameters, preprocessing, or diagnostic thresholds introduce task dependence. Such selection must occur within training/validation boundaries and be reported separately from online filtering.
+
+## Optimization / inference
+
+For fixed parameters, filtering is recursive Gaussian inference rather than nonconvex optimization. Each step uses matrix multiplication, addition, and a solve in the innovation covariance. Computational cost and conditioning depend on state and observed dimensions and on the selected factorization.
+
+There is no guarantee that an arbitrary software implementation reproduces the mathematical recursion. Tests should compare covariance forms, preserve symmetry, check positive-semidefinite tolerances, and verify small problems against direct joint-Gaussian conditioning. Computing a finite output without an exception is not evidence of numerical correctness.
+
+## Strengths
+
+- Exact finite-horizon filtering moments under the fixed linear-Gaussian model.
+- Sequential processing with a fixed-size state summary rather than repeated conditioning on the entire history.
+- Explicit propagation of process and observation uncertainty.
+- One-step predictive densities and innovations suitable for scoring and diagnostics.
+- Natural handling of irregularly absent measurement components through declared row selection.
+- A transparent baseline for later smoothing and for approximate nonlinear or non-Gaussian filters.
+
+## Failure modes
+
+- **Model misspecification:** nonlinear transitions, non-Gaussian tails, colored noise, correlated process/observation noise, time-varying parameters, or omitted inputs make the declared recursion model-mismatched.
+- **Wrong $Q/R$ balance:** underestimated process noise can make the filter overconfident in propagation; underestimated observation noise can make it chase measurements.
+- **Bad initialization:** a poorly chosen mean or covariance can dominate short sequences or interact with weak observability.
+- **Unobservable or weakly observed directions:** uncertainty can remain large or become practically ill-conditioned even when some observed coordinates fit well.
+- **Anticipating inputs:** controls or regressors containing contemporaneous/future observation information leak evidence into prediction.
+- **Sequence leakage:** carrying a posterior across independent subjects, sessions, or trials invents a transition unless continuity is part of the model.
+- **Missingness misspecification:** skipping state-dependent dropout as though it were uninformative can bias inference.
+- **Numerical loss of symmetry or definiteness:** subtraction updates, explicit inverses, poor scaling, and round-off can corrupt covariances [@Asada2006Lecture8, sec. 4.10].
+- **Singular innovation covariance:** deterministic or redundant measurements can invalidate the ordinary inverse-density update.
+- **Outliers:** a Gaussian likelihood can give atypical observations excessive influence; ad hoc clipping changes the method.
+- **Parameter plug-in certainty:** conditioning on estimated parameters as though known understates total uncertainty.
+- **Interpretive overreach:** a smooth or predictive filtered path can be mistaken for a validated mechanism or unique latent trajectory.
+
+## Identifiability issues
+
+Filtering does not repair non-identifiability of the LGSSM. If two parameter/state-coordinate specifications induce the same observable law, their filtering distributions transform within the corresponding equivalence while the observed predictive distribution can agree. Similarity transformations can change latent axes, transition entries, observation loadings, gains, and posterior means without selecting a unique scientific coordinate frame.
+
+Observability and identifiability are related but distinct. Weak observation of a state direction can make its current conditional uncertainty large under one fixed model. Structural identifiability asks whether different model specifications induce the same observable distribution. Neither property follows from a small filtering covariance computed under assumed parameters.
+
+## Comparison with simpler methods
+
+- **Open-loop prediction:** propagate $m$ and $P$ without measurement updates. Filtering should improve declared current-state or one-step predictive criteria when measurements contain model-consistent information.
+- **Measurement-only estimate:** where a state component is directly observed, use the current measurement or a calibrated static linear transform. This tests whether temporal propagation contributes beyond sensor smoothing.
+- **Persistence / last observation:** carry forward the most recent usable observation or state proxy. This is a minimal sequential baseline.
+- **Static Factor Analysis:** infer a latent factor independently at each time under a static observation model. It separates the contribution of the temporal transition from a probabilistic observation layer.
+- **Direct batch Gaussian conditioning:** for a short sequence, condition the full joint Gaussian distribution at once. Its current-time marginal should match the recursive filter and is an implementation oracle, not a cheaper deployment baseline.
+
+A fixed-gain or steady-state filter is not automatically a simpler version of the finite-horizon filter: it requires conditions under which covariance/gain convergence and the chosen initialization are appropriate.
+
+## Evaluation criteria
+
+Evaluation must match the intended use and separate model fit from implementation correctness:
+
+1. **One-step predictive log likelihood:** evaluate held-out sequences through innovation densities, with parameters and preprocessing fit only on training data.
+2. **Innovation calibration:** inspect mean, variance, cross-correlation, and temporal autocorrelation of standardized innovations. Apparent whiteness is a model check, not proof of correct latent states.
+3. **State error when truth exists:** in simulation or a genuinely observed-state benchmark, report time-resolved RMSE or Mahalanobis error and interval coverage. A proxy state must be labeled as a proxy.
+4. **Uncertainty calibration:** under repeated data from a known simulator, compare nominal posterior coverage with empirical coverage. Plug-in parameter uncertainty must be distinguished.
+5. **Baselines:** compare open-loop prediction, measurement-only, persistence, and static FA under identical splits and available information.
+6. **Missingness stress tests:** evaluate declared missing-channel patterns and distinguish random masking from state-dependent dropout.
+7. **Numerical checks:** compare recursive output with batch conditioning on small problems; monitor covariance symmetry, factorization failures, and sensitivity to scaling and precision.
+8. **Distribution shift:** separate held-out time within a sequence from held-out trials, subjects, sessions, conditions, or acquisition systems.
+
+Do not select parameters on the test sequences and then report the same innovations as out-of-sample evidence. Lower state RMSE or predictive loss under one simulator supports that declared criterion; it does not validate a biological mechanism.
+
+## Minimal toy model
+
+Consider the scalar random-walk model
+
+$$
+z_1\sim\mathcal N(m_1,p_1),
+\qquad
+z_{t+1}=z_t+w_t,
+\quad w_t\sim\mathcal N(0,q),
+$$
+
+$$
+x_t=z_t+v_t,
+\quad v_t\sim\mathcal N(0,r),
+$$
+
+with $q\ge0$ and $r>0$. At the first observation,
+
+$$
+s_1=p_1+r,
+\qquad
+k_1=\frac{p_1}{p_1+r},
+$$
+
+$$
+m_{1\mid1}=m_1+k_1(x_1-m_1),
+\qquad
+p_{1\mid1}=\frac{p_1r}{p_1+r}.
+$$
+
+The next prediction is
+
+$$
+m_{2\mid1}=m_{1\mid1},
+\qquad
+p_{2\mid1}=p_{1\mid1}+q.
+$$
+
+This example makes the uncertainty tradeoff explicit: $r\to\infty$ makes the update approach the prediction, whereas $r\to0$ makes a nondegenerate direct measurement dominate. These limits describe the model, not how $q$ or $r$ should be chosen from data.
+
+A future non-executable toy contract should generate independent scalar sequences with retained latent truth, compare Kalman filtering with open-loop, measurement-only, persistence, static FA where meaningful, and direct batch conditioning, and score held-out predictive density, state RMSE, and interval coverage. Required stress cases are every-third-step missing observations, misspecified $q/r$, a wrong initial prior, an outlier, and nearly duplicate measurement rows with very different scaling. The exercise should compare the short and Joseph covariance forms against a factorized implementation in finite precision, but no code, data, figures, or result claims are created here.
+
+## Relevance to LDG
+
+Kalman filtering is LDG's canonical online latent-state inference baseline for a discrete-time LGSSM. It operationalizes the distinction between a model, a current filtering distribution, a future prediction, and a later full-interval smoothing distribution.
+
+::: {.callout-warning title="What this does NOT imply"}
+Exact Kalman filtering under a declared LGSSM does not show that the model is correct, that the filtered mean is the true state, that latent coordinates are identifiable, that dynamics are mechanistic, or that future observations were legitimately available. Smoothness, low posterior variance, innovation fit, or predictive success alone do not establish a manifold, intrinsic dimension, causal structure, or biological mechanism.
+:::
+
+### Mouse trajectory
+
+No modality-specific empirical claim is retained. Filtering could be applied to a declared movement-state model, but inferred position, velocity, intention, and control variables require different observation and transition assumptions.
+
+### Eye movement
+
+No modality-specific empirical claim is retained. Missing samples, blinks, saturation, event segmentation, and irregular timing can violate simple row-selection and equal-step assumptions.
+
+### EEG
+
+No modality-specific empirical claim is retained. Sensor mixing, rereferencing, artifacts, spatial correlation, and nonstationarity must be represented or treated as model mismatch; a filtered latent coordinate is not automatically a neural source.
+
+### MEG / neural population data
+
+No modality-specific empirical claim is retained. Trial boundaries, unit/channel missingness, observation-noise correlations, parameter sharing, and input timing determine the filtering problem. A smooth posterior mean does not establish neural population dynamics or mechanism.
+
+## Primary sources
+
+- Kalman introduces the state-transition approach to linear filtering and prediction, defines filtering relative to observations through the current time, derives recursive state estimation and error-covariance equations, and treats model construction as a separate problem [@Kalman1960].
+
+## Reviews / secondary sources
+
+- Särkkä gives the inspected Bayesian prediction/update derivation, Gaussian filtering distributions, innovation covariance, Kalman gain, covariance recursion, and the boundary between filtering and later smoothing [@Sarkka2013, ch. 4].
+- Asada's inspected graduate implementation notes document round-off-driven covariance asymmetry, the Joseph stabilized covariance form, and factorized covariance representations as numerical safeguards [@Asada2006Lecture8, sec. 4.10].
+
+## Open methodological questions
+
+- How should uncertainty from parameter estimation be propagated into online state uncertainty without changing the bounded fixed-parameter target?
+- Which innovation diagnostics are most informative under dependent missingness or deliberate experimental inputs?
+- When should a factorized or square-root implementation be mandatory rather than optional?
+- How should filters be compared when state coordinates differ by observationally equivalent transformations?
+- Which sequence split best tests the intended use: future time, new trials, new sessions, new subjects, or new acquisition systems?
+- When do robust or constrained filters solve a scientifically different problem rather than merely a numerical one?
+
+## Maturity checklist
+
+- [x] Uses the complete Method schema and the existing discrete-time LGSSM notation.
+- [x] Distinguishes prior, prediction, innovation, update, and filtering distributions.
+- [x] Conditions only on observations available through the current time.
+- [x] States Kalman gain, innovation covariance, likelihood contribution, and Joseph covariance update.
+- [x] Declares initialization, input timing, partial-observation row selection, and missingness limits.
+- [x] Covers singular and ill-conditioned innovation covariance and factorized numerical boundaries.
+- [x] Separates fixed-parameter filtering from model specification, learning, forecasting, and smoothing.
+- [x] States learned/fixed quantities, temporal order, geometry, supervision, and inherited identifiability.
+- [x] Includes failure modes, baselines, evaluation criteria, and a non-executable analytic toy contract.
+- [x] Retains no modality-specific empirical claim.
+- [x] Foundational, authoritative Bayesian, and numerical-stability sources were inspected and verified.
+- [x] Independent mixed review returned PASS with no correction round required.
+- [x] Stable promotion authorized under the recorded review decision after object-specific PASS and validation.

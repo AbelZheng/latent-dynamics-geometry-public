@@ -1,0 +1,5 @@
+---
+title: "Papers"
+---
+
+Paper Objects integrate inspected evidence into LDG. They are not generic paper summaries and must separate claims from the evidence that supports them.

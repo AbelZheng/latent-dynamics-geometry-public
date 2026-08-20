@@ -1,0 +1,92 @@
+---
+title: "Topology"
+object_type: concept
+maturity: L1
+status: stable
+domain: [topology, foundations]
+tags: [topology, continuity, neighborhoods]
+prerequisites:
+- knowledge/concepts/state-space.qmd
+related:
+- knowledge/concepts/metric.qmd
+- knowledge/concepts/manifold.qmd
+created: 2026-08-18
+updated: 2026-08-18
+---
+
+# Topology
+
+## One-sentence definition
+
+A **topology** specifies which subsets of a set are open, thereby defining neighborhoods, continuity, convergence, and connectedness without first assigning numerical distances.
+
+## Why this concept matters
+
+Topology describes qualitative structure preserved under continuous deformation. It is weaker than metric or Riemannian geometry: spaces can share a topology while having different distances, angles, and curvature.
+
+## Intuition
+
+Topology records which points can be approached continuously and which regions are connected. It does not say how far apart points are.
+
+## Formal definition
+
+A topology $\mathcal T$ on a set $X$ is a family of subsets such that:
+
+1. $\varnothing,X\in\mathcal T$;
+2. arbitrary unions of members of $\mathcal T$ belong to $\mathcal T$;
+3. finite intersections of members of $\mathcal T$ belong to $\mathcal T$.
+
+The pair $(X,\mathcal T)$ is a topological space. A map is continuous when preimages of open sets are open. Sutherland gives these definitions and distinguishes topology induced by a metric [@Sutherland2024].
+
+## Core notation
+
+- $X$: underlying set.
+- $\mathcal T$: topology.
+- $U\in\mathcal T$: open set.
+- $f:X\to Y$: continuous map when open-set preimages are open.
+
+## Prerequisites
+
+[State Space](state-space.qmd) supplies the set of states to which neighborhood structure may be added.
+
+## Relationship to adjacent concepts
+
+| Concept | Distinction |
+|---|---|
+| **Metric** | Assigns numerical distances and induces a topology; different metrics can induce the same topology. |
+| **Geometry** | Adds quantitative length, angle, or curvature beyond topology. |
+| **Manifold** | A topological space with local Euclidean structure; a smooth manifold adds compatible smooth charts. |
+| **Graph connectivity** | A discrete combinatorial relation, not automatically the topology of an underlying state space. |
+
+## What this does NOT imply
+
+A topology does not imply a metric, smoothness, manifold structure, a unique embedding, low dimension, curvature, or dynamical law.
+
+## Minimal example
+
+The usual open intervals generate the standard topology on $\mathbb R$. The discrete topology instead declares every subset open. The same underlying set can therefore support different topologies.
+
+## Neuroscience / behavioral relevance
+
+Claims about loops, connected components, or holes in latent data are topological claims. They require sampling and noise analysis and are not established by one visualization or clustering result.
+
+## Relevance to LDG
+
+Topology supplies the precise layer beneath manifolds, circles, and tori while keeping topology distinct from metric geometry.
+
+## Open questions
+
+- Which topological features are stable across scales and noise?
+- How should sampling uncertainty affect claims about connectedness or holes?
+- Which null models are appropriate for topological summaries?
+
+## References
+
+- Sutherland provides the inspected definitions of topology, continuity, neighborhoods, and metric-induced topology [@Sutherland2024].
+
+## Maturity checklist
+
+- [x] States the topology axioms.
+- [x] Separates topology, metric, geometry, and manifold structure.
+- [x] States empirical non-implications.
+- [x] Independent bounded review completed; initial findings were corrected and focused re-review passed.

@@ -1,0 +1,203 @@
+---
+title: "Deconvolution"
+object_type: concept
+maturity: L2
+status: stable
+domain: [temporal-modeling, inverse-problems]
+tags: [deconvolution, inverse-problem, regularization]
+prerequisites:
+- knowledge/concepts/convolution.qmd
+- knowledge/concepts/observation-noise.qmd
+related:
+- knowledge/concepts/kernel.qmd
+- knowledge/concepts/identifiability.qmd
+- knowledge/concepts/observation-model.qmd
+created: 2026-08-18
+updated: 2026-08-18
+---
+
+# Deconvolution
+
+## One-sentence definition
+
+**Deconvolution** is the inverse problem of estimating an unknown input, source, or kernel from observations modeled as a convolution, usually in the presence of noise and incomplete information.
+
+## Why this concept matters
+
+Convolution can smooth or suppress components of a signal. Recovering what preceded that filtering is often unstable: small observation errors can produce large changes in a naive inverse.
+
+## Intuition
+
+If a sensor blurs a sharp event with a known response kernel, deconvolution tries to infer the event that could have produced the blurred measurement. Multiple sources may fit nearly equally well once noise is present.
+
+## Formal definition
+
+Let $\mathcal U$ be a source space, $\mathcal K$ a kernel space, and $\mathcal Y$ an observation space. For a fixed kernel $k$, define the convolution operator
+
+$$
+K_k:\mathcal U\to\mathcal Y,
+\qquad
+K_k u=k*u.
+$$
+
+The observed data follow a forward model such as
+
+$$
+y=K_k u+v,
+$$
+
+where $v$ is observation noise under a declared observation law. **Known-kernel deconvolution** estimates $u$ with $k$ fixed. **Blind deconvolution** estimates both $u$ and $k$ and therefore has additional scaling, shift, boundary, and factorization ambiguities. Blind recovery is not identifiable without constraints that restrict these equivalences.
+
+### Null spaces and ill-conditioning
+
+If $K_k u_1=K_k u_2$, then the data cannot distinguish $u_1$ and $u_2$. Equivalently, their difference lies in the null space,
+
+$$
+u_1-u_2\in\ker K_k.
+$$
+
+Even when the null space is trivial, small singular values or nearly suppressed frequency components can make the inverse ill-conditioned: small perturbations in $y$ produce large changes in a naive recovered source. Injectivity, stable inversion, and numerical conditioning are separate properties.
+
+### Fourier-domain division
+
+Under transform and boundary conditions for which convolution becomes multiplication,
+
+$$
+\widehat y(\omega)
+=
+\widehat k(\omega)\widehat u(\omega)
++
+\widehat v(\omega).
+$$
+
+The formal inverse
+
+$$
+\widehat u(\omega)
+=
+\frac{\widehat y(\omega)}{\widehat k(\omega)}
+$$
+
+is defined only where $\widehat k(\omega)\ne0$. If $|\widehat k(\omega)|$ is small, the noise term is amplified by $1/|\widehat k(\omega)|$. Zeros erase those components under the stated model. Finite windows, sampling, aliasing, padding, and circular-versus-linear convolution further change the implemented operator, so transform division is not a universal exact inverse.
+
+### Regularized and probabilistic formulations
+
+A common regularized estimator is
+
+$$
+\widehat u_\lambda
+\in
+\arg\min_{u\in\mathcal U}
+\left\{
+\mathcal D(K_k u,y)
++
+\lambda\mathcal R(u)
+\right\},
+$$
+
+where $\mathcal D$ is a data-fit or negative-log-likelihood term and $\mathcal R$ encodes assumptions such as smoothness, sparsity, nonnegativity, or bounded variation. Regularization can stabilize inversion but introduces bias toward the preferred solution class. Different penalties or priors can select different sources that fit the data similarly.
+
+A probabilistic formulation combines an observation likelihood and prior,
+
+$$
+p(u\mid y,k)
+\propto
+p(y\mid K_k u)\,p(u).
+$$
+
+A posterior or MAP estimate is conditional on those choices; it is not assumption-free recovery.
+
+For blind deconvolution one may optimize over $(u,k)$,
+
+$$
+\min_{u,k}
+\mathcal D(K_k u,y)
++
+\lambda_u\mathcal R_u(u)
++
+\lambda_k\mathcal R_k(k),
+$$
+
+but scale and shift conventions, kernel normalization/support, positivity, and other identifiability constraints must be declared.
+
+### Evaluation
+
+A small forward residual $\|K_k\widehat u-y\|$ checks consistency with the observation but does not prove source recovery. In a toy model with known ground truth, evaluation should separately report source error, event/support recovery, timing error, kernel error when estimated, and sensitivity to noise, sampling, boundaries, and regularization. Without ground truth, held-out forward prediction, calibration, interventions, or multiple observation channels provide indirect evidence only and cannot establish a unique source.
+
+Richardson's inspected paper supplies a primary convolutional image-restoration example, demonstrates sensitivity to noise and boundaries, and describes an iterative approximation without a general convergence proof [@Richardson1972]. The general inverse-operator and regularization framing above is established inverse-problem background, not attributed solely to that algorithm.
+
+## Core notation
+
+- $\mathcal U,\mathcal K,\mathcal Y$: source, kernel, and observation spaces.
+- $K_k:\mathcal U\to\mathcal Y$: convolution forward operator for kernel $k$.
+- $y$: observed convolved signal.
+- $u$: unknown source or input.
+- $k$: known or estimated kernel.
+- $v$: observation noise.
+- $\widehat u$: recovered source estimate.
+- $\ker K_k$: source perturbations invisible to the forward operator.
+- $\mathcal D$: data-fit or negative-log-likelihood term.
+- $\mathcal R$: regularizer or prior penalty.
+- $\lambda$: regularization strength.
+
+## Prerequisites
+
+[Convolution](convolution.qmd) supplies the forward operator. [Observation Noise](observation-noise.qmd) supplies the measurement uncertainty that makes inversion fragile.
+
+## Relationship to adjacent concepts
+
+| Concept | Distinction |
+|---|---|
+| **Inverse filtering** | A direct inverse construction; deconvolution is the broader inverse problem and may require regularization or probabilistic inference. |
+| **Blind deconvolution** | Both source and kernel are unknown, adding scale, shift, boundary, and factorization ambiguities that require explicit constraints. |
+| **Denoising** | Removes or models noise without necessarily undoing a convolution operator. |
+| **Source separation** | Separates multiple contributing sources; it is not automatically a convolution inverse. |
+| **Causal/mechanistic recovery** | Claims a physical generator or cause. Mathematical recovery under a forward model does not establish this interpretation. |
+| **System identification** | Estimates a system or kernel; deconvolution may instead assume the kernel and estimate the input. |
+
+## What this does NOT imply
+
+Deconvolution does not imply exact recovery, a unique or stable inverse, a correct known kernel, identifiable blind factors, separation of signal from structured noise, unbiased regularization, or recovery of a biological cause from a measurement trace. A low forward residual can coexist with large source error.
+
+## Minimal example
+
+Let the discrete kernel be $k=(1/2,1/2)$, so
+
+$$
+y_n=\frac{u_n+u_{n-1}}{2}+v_n.
+$$
+
+For the alternating component $u_n=(-1)^n$, the noiseless convolution is zero because adjacent values cancel. That component lies in the null space under an infinite/periodic idealization and cannot be recovered from $y$. Components near that alternating frequency are strongly attenuated, so division amplifies noise.
+
+A smoothness-regularized estimate can suppress the amplified component and improve stability, but it may also erase a true sharp event. Source error and forward fit must therefore be evaluated separately.
+
+## Neuroscience / behavioral relevance
+
+Examples include estimating neural events from calcium fluorescence or latent neural activity from a hemodynamic response. Recovery quality depends on kernel validity, sampling, noise, and prior assumptions.
+
+## Relevance to LDG
+
+At L2, Deconvolution provides a typed inverse-operator baseline with explicit identifiability, conditioning, regularization, and evaluation limits before recovered time courses are interpreted as latent states, dynamics, or mechanisms.
+
+## Open questions
+
+- Which regularizers reflect defensible scientific assumptions?
+- When must kernel uncertainty be modeled jointly?
+- How should recovery be evaluated against known ground truth?
+
+## References
+
+- Richardson gives an inspected primary convolutional degradation and iterative restoration example, including noise and boundary effects [@Richardson1972].
+- General inverse-operator, Fourier, regularization, posterior, and conditioning statements are established mathematical background; algorithmic convergence and broad inverse-problem theory are intentionally deferred.
+
+## Maturity checklist
+
+- [x] Defines the forward model and inverse target.
+- [x] Explains noise amplification and regularization need.
+- [x] Separates deconvolution, denoising, and system identification.
+- [x] Types the forward convolution operator and known-kernel/blind inverse targets.
+- [x] States null-space, singular-value, Fourier-zero, and noise-amplification limits.
+- [x] Defines regularized and probabilistic formulations with explicit bias/prior dependence.
+- [x] Separates deconvolution from denoising, system identification, source separation, and mechanistic recovery.
+- [x] Requires source-level evaluation beyond forward residual, preferably against known ground truth.
+- [x] Independent L2 scientific review completed with PASS under the recorded review decision.

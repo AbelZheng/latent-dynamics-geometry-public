@@ -1,0 +1,257 @@
+---
+title: "Principal Component Analysis"
+object_type: method
+maturity: L2
+status: stable
+domain: [dimensionality-reduction, linear-algebra, statistics]
+tags: [pca, linear-subspace, variance, low-rank-approximation]
+prerequisites:
+- knowledge/concepts/ambient-dimension.qmd
+- knowledge/concepts/linear-subspace.qmd
+related:
+- knowledge/concepts/intrinsic-dimension.qmd
+- knowledge/concepts/embedding.qmd
+- knowledge/concepts/latent-variable.qmd
+- knowledge/concepts/identifiability.qmd
+created: 2026-08-19
+updated: 2026-08-19
+---
+
+# Principal Component Analysis
+
+## Problem
+
+Principal component analysis (PCA) finds a low-dimensional linear subspace that summarizes variation in a declared data representation. In its ordinary centered, equal-sample-weight form, it solves two equivalent sample objectives: maximize variance retained by an orthogonal projection, or minimize squared Euclidean reconstruction error from that projection. The equivalence requires the same samples, centering, scaling, equal weighting, metric, rank, and orthogonal-projection constraint in both formulations [@Pearson1901; @JolliffeCadima2016; @EckartYoung1936].
+
+PCA is primarily a static representation and approximation method. It is a useful baseline for asking whether a more structured latent, nonlinear, geometric, or dynamical method improves on a linear Euclidean summary.
+
+## Input
+
+Let $X\in\mathbb R^{n\times p}$ contain $n$ selected observations as rows and $p$ selected features as columns. A reproducible PCA analysis must declare:
+
+- which observations enter the fit and whether rows are independent units, trials, condition--time pairs, or another sampling unit;
+- equal sample weighting, as used throughout this object; a nonuniformly weighted variant changes the fitted mean, covariance, and objective and is outside the present scope;
+- sample-mean centering with $\mu=n^{-1}\sum_i x_i$;
+- feature scaling, such as no rescaling, division by declared scale factors, or standardization to a correlation-matrix PCA;
+- exclusion rules and a complete analysis matrix; imputation or specialized missing-data PCA requires a separate method and validation argument; and
+- the target rank $k\leq\min(n-1,p)$ for centered data, or the rule by which $k$ will be selected.
+
+Write $D$ for a fixed nonsingular diagonal scaling matrix and let the transformed row vectors be $z_i=D^{-1}(x_i-\mu)$. The matrix $Z$ stacks the $z_i^\top$. Changing samples, weighting policy, or $D$ changes the problem being solved. This object always uses sample-mean centering; uncentered, origin-constrained PCA is a different variant outside its scope. In particular, covariance PCA is sensitive to feature units, whereas standardizing each feature produces correlation-matrix PCA [@JolliffeCadima2016].
+
+## Output
+
+For a chosen rank $k$, ordinary PCA returns:
+
+- a principal subspace $\mathcal S_k\subseteq\mathbb R^p$;
+- an orthonormal basis $V_k=[v_1,\ldots,v_k]$ for that subspace;
+- ordered eigenvalues $\lambda_1\geq\cdots\geq\lambda_p\geq0$ measuring sample variance along the principal directions;
+- scores $T=ZV_k$, which are coordinates of the transformed observations in the chosen basis; and
+- reconstructions $\widehat Z=TV_k^\top=ZV_kV_k^\top$, mapped back to the original feature units by $\widehat x_i=\mu+D\widehat z_i$.
+
+Terminology is not uniform. Here **principal directions**, **basis vectors**, and **loading vectors** refer to the columns of $V_k$. If “loadings” instead means variable--component correlations or the scaled vectors $v_j\sqrt{\lambda_j}$, that convention must be stated rather than silently mixed with $V_k$.
+
+## Core idea
+
+PCA rotates a centered and optionally scaled Euclidean coordinate system so that the first axis has the largest sample variance, each later axis has the largest remaining variance subject to orthogonality, and truncation keeps the first $k$ axes. Because orthogonal projection decomposes squared length into retained and residual parts, maximizing retained variance is the same as minimizing residual squared reconstruction error under the stated conditions. Pearson's original formulation minimizes the sum of squared perpendicular Euclidean distances from equally weighted points to a closest-fit line or plane through their centroid; it does not provide a modern SVD or probabilistic interpretation [@Pearson1901].
+
+## Generative / modeling assumptions
+
+Ordinary PCA does **not** specify a probability distribution, latent prior, observation-noise model, or data-generating mechanism. Its operative assumptions are instead approximation choices:
+
+- a single global affine subspace is an appropriate summary after the declared centering and scaling;
+- Euclidean squared distance in the transformed coordinates is scientifically meaningful;
+- directions with larger sample variance deserve priority; and
+- an orthogonal rank-$k$ projection is the permitted reconstruction class.
+
+These choices can be poor when variance is dominated by units, artifacts, outliers, heteroscedastic noise, nuisance conditions, or scientifically irrelevant directions. Statistical uncertainty statements require additional sampling assumptions or resampling procedures; they do not follow from the PCA optimization alone.
+
+## Mathematical formulation
+
+For the equal-weight sample, define the covariance matrix using divisor $n$ as
+
+$$
+S=\frac{1}{n}Z^\top Z.
+$$
+
+For $V\in\mathbb R^{p\times k}$ with $V^\top V=I_k$, the retained variance is
+
+$$
+\operatorname{tr}(V^\top SV)
+=\frac{1}{n}\sum_{i=1}^n\lVert V^\top z_i\rVert_2^2.
+$$
+
+The PCA basis solves
+
+$$
+V_k\in\arg\max_{V^\top V=I_k}\operatorname{tr}(V^\top SV),
+$$
+
+so its columns can be chosen as eigenvectors of $S$ associated with the $k$ largest eigenvalues. For the same $Z$, $V$, Euclidean norm, rank $k$, and orthogonal projection, the identity
+
+$$
+\frac{1}{n}\sum_i\lVert z_i-VV^\top z_i\rVert_2^2
+=\operatorname{tr}(S)-\operatorname{tr}(V^\top SV)
+$$
+
+shows that this also minimizes equal-weight least-squares reconstruction error. The more general truncated-SVD result gives a best rank-$k$ matrix approximation in Frobenius norm; the PCA reconstruction is its centered orthogonal-projection specialization [@EckartYoung1936]. The equivalence need not survive a different loss, a non-Euclidean metric, unequal sample or entrywise weights, constraints such as sparsity or nonnegativity, or inconsistent preprocessing between objectives.
+
+The covariance and SVD forms are linked by
+
+$$
+Z=U\Sigma V^\top,
+\qquad
+S=V\frac{\Sigma^2}{n}V^\top.
+$$
+
+Thus the right singular vectors are covariance eigenvectors, $\lambda_j=\sigma_j^2/n$, and the score matrix $T=ZV_k=U_k\Sigma_k$. With the common covariance divisor $n-1$ instead of $n$, all eigenvalues are multiplied by $n/(n-1)$ while eigenvectors and explained-variance ratios are unchanged. Jolliffe and Cadima give the centered-data eigenproblem and SVD relationship [@JolliffeCadima2016].
+
+## What is learned?
+
+From the declared fitted sample, PCA learns the ordered principal subspaces, a representative orthonormal basis, eigenvalues, observation scores, and corresponding rank-$k$ reconstructions. It does not learn a transition law, process noise, observation model, causal graph, or probabilistic posterior.
+
+When eigenvalues are distinct, ordering gives one-dimensional principal subspaces, although each displayed eigenvector still has arbitrary sign. When eigenvalues repeat, the repeated-eigenvalue eigenspace is learned but no particular orthonormal basis within it is preferred.
+
+## What is fixed?
+
+The analyst fixes the sample definition, feature representation, equal-weight policy, sample-mean-centering rule, scaling matrix, Euclidean metric, exclusion policy, and usually the rank-selection protocol. The orthonormality constraint and squared-error/variance criterion are part of ordinary PCA. If preprocessing parameters are estimated, they must be fitted using training data only during held-out evaluation.
+
+## Temporal assumptions
+
+Ordinary PCA is order-blind: permuting the rows leaves $S$ unchanged. If rows are time points, PCA uses their collection but not their succession, lag, derivative, or transition structure. Time can be encoded into features, lagged windows, or condition--time samples, but then PCA analyzes that engineered representation; it still does not by itself estimate dynamics.
+
+## Geometry assumptions
+
+PCA uses one global Euclidean inner product after declared scaling. Its reconstruction lies in an affine subspace $\mu+D\mathcal S_k$ in the original coordinates. This is a linear-geometric approximation, not evidence that observations lie on a manifold, that a Riemannian metric has been recovered, or that local topology is preserved.
+
+## Supervision
+
+Ordinary PCA is unsupervised with respect to labels and outcomes: its objective uses only the transformed feature matrix. Choosing features, trials, conditions, or time windows using labels can nevertheless introduce supervision or leakage at the analysis-design level.
+
+## Optimization / inference
+
+PCA is commonly computed by symmetric eigendecomposition of $S$ or by SVD of the centered and scaled data matrix. SVD avoids explicitly forming $S$ and directly exposes the best low-rank approximation. Iterative or randomized numerical algorithms may approximate leading components, but their approximation and convergence tolerances are additional computational choices, not changes to PCA's scientific interpretation.
+
+There is no latent posterior in ordinary PCA. Projection computes deterministic scores for a given fitted mean, scaling, and basis.
+
+## Strengths
+
+- It gives a transparent global linear baseline with a closed-form spectral solution.
+- Components are nested: the first $k$ directions solve the rank-$k$ variance objective for every $k$.
+- Scores, reconstruction, residual energy, and explained variance are easy to compute and audit.
+- The covariance-eigenvector and SVD views connect statistical variance summaries to low-rank matrix approximation [@JolliffeCadima2016; @EckartYoung1936].
+- It provides a demanding but interpretable baseline for methods claiming benefits from nonlinear geometry, probabilistic modeling, or temporal structure.
+
+## Failure modes
+
+- **Scale dependence:** high-variance units can dominate covariance PCA; standardization solves a different problem rather than revealing a uniquely correct scale.
+- **Outlier sensitivity:** the mean and covariance can be strongly altered by a few observations.
+- **Nuisance variance:** large variance may reflect artifacts, trial imbalance, baseline shifts, or irrelevant behavior.
+- **Global linearity:** curved, clustered, or condition-specific structure can be poorly represented by one subspace.
+- **Heterogeneous residuals:** squared Euclidean loss gives all transformed coordinates the declared metric and does not model feature-specific noise.
+- **Sampling instability:** small samples, dependent rows, distribution shift, and close eigenvalues can make estimated directions unstable.
+- **Leakage:** fitting centering, scaling, rank, or basis on evaluation data makes held-out performance optimistic.
+- **Interpretive overreach:** compact reconstruction can be mistaken for intrinsic dimension, a manifold, dynamics, mechanism, or a unique latent generator.
+
+## Identifiability issues
+
+For a simple eigenvalue, $v_j$ and $-v_j$ define the same axis; the corresponding score signs change together, leaving projection and reconstruction unchanged. For an eigenvalue of multiplicity greater than one, any orthonormal rotation within its eigenspace is equally valid. When $k<p$, if $\lambda_k=\lambda_{k+1}$, even the selected rank-$k$ subspace is not unique because the truncation cuts through a repeated eigenspace; if $\lambda_k>\lambda_{k+1}$, the rank-$k$ subspace is unique, although its basis retains sign ambiguity and rotations within repeated eigenvalue blocks wholly contained in the subspace [@EckartYoung1936; @JolliffeCadima2016]. When $k=p$ is permitted by the sample-rank bound, the selected subspace is the full ambient feature space, so no $\lambda_{p+1}$ boundary is defined; only the choice of basis remains ambiguous within repeated-eigenvalue blocks.
+
+These are mathematical ambiguities, not evidence for several biological mechanisms. More broadly, PCA scores are deterministic coordinates of a chosen projection, not uniquely identified latent causes.
+
+## Comparison with simpler methods
+
+- **Mean-only reference ($k=0$):** reconstruct every observation by the training mean. This is a nested algebraic sanity check, not discriminating evidence: for any centered observation, adding any nonzero orthogonal projection can only weakly reduce its reconstruction error in the same metric.
+- **Fixed projection:** use a prespecified scientifically meaningful orthonormal basis of the same rank. This tests whether data-adaptive variance ordering adds value.
+- **Random projection:** compare with one or a distribution of fixed random orthonormal rank-$k$ projections fitted without outcome information. This checks whether performance is specific to the learned PCA subspace rather than generic compression.
+
+Discriminating comparisons therefore use rank-matched fixed or random projections, nested rank selection, subspace stability across resamples or datasets, or separately declared scientific and predictive tests rather than mere improvement over $k=0$.
+
+PCA is not interchangeable with Factor Analysis (FA) or probabilistic PCA (PPCA). Ordinary PCA is a deterministic variance/reconstruction criterion with no observation-noise distribution. FA is a probabilistic latent-variable model commonly using a diagonal feature-specific residual covariance. PPCA is a particular Gaussian latent-variable model with isotropic residual covariance whose maximum-likelihood solution recovers the principal subspace, while retaining a noise parameter and likelihood [@TippingBishop1999]. A PCA score should therefore not be called a posterior latent state, and FA or PPCA assumptions should not be retroactively attributed to ordinary PCA.
+
+## Evaluation criteria
+
+For reconstruction, fit $\mu$, $D$, $V_k$, and any rank-selection rule on training observations, then reconstruct each held-out observation with the training preprocessing and report the transformed-coordinate loss
+
+$$
+\left\lVert D^{-1}(x-\widehat x)\right\rVert_2^2,
+$$
+
+equivalently the original-coordinate quadratic metric $(x-\widehat x)^\top D^{-\top}D^{-1}(x-\widehat x)$. Mean-only, fixed-projection, and random-projection references must use the same training-fitted centering, scaling, sample definition, and metric. Observation-level splits should hold out entire trials, conditions, subjects, sessions, trajectories, or time blocks as appropriate to the dependence structure. Holding out features, sensors, or recorded units is a different prediction problem requiring a separate observation-model or matrix-completion protocol.
+
+Training explained variance is
+
+$$
+\operatorname{EVR}_k=
+\frac{\sum_{j=1}^k\lambda_j}{\sum_{j=1}^p\lambda_j},
+$$
+
+but it is an in-sample descriptive ratio tied to the selected samples, features, scaling, equal-weight policy, and variance criterion. A held-out analogue can report projected energy relative to total held-out centered energy, but it is not a likelihood, can be unstable under distribution shift, and does not validate component interpretation. Reconstruction and variance metrics also favor the Euclidean loss PCA was designed to optimize; downstream prediction, stability, or scientific interpretability require separately declared tests. Explained-variance cutoffs are conventional and can be subjective rather than model-free discoveries [@JolliffeCadima2016].
+
+Neither a high explained-variance ratio nor an “elbow” supplies a model-free intrinsic dimension. Rank choice depends on tolerance, noise, sample size, task, preprocessing, and the comparison model.
+
+## Minimal toy model
+
+Consider centered observations in $\mathbb R^2$ with covariance
+
+$$
+S=\begin{pmatrix}9&0\\0&1\end{pmatrix}.
+$$
+
+Rank-one PCA selects the horizontal axis, retains $9/(9+1)=90\%$ of the declared sample variance, and reconstructs each point by dropping its vertical coordinate. The vertical residual variance is $1$, which is minimal among rank-one orthogonal projections.
+
+This example also exposes two boundaries. If the second feature is rescaled before fitting, the selected direction and variance ratio can change. If instead $S=I_2$, every unit direction is a valid first component: the repeated eigenvalue identifies the full two-dimensional eigenspace but no unique rank-one axis.
+
+## Relevance to LDG
+
+PCA is LDG's canonical static linear Euclidean baseline. It separates the modest claim “these transformed observations are well approximated by a rank-$k$ affine subspace under this metric” from stronger claims about latent variables, intrinsic dimension, nonlinear geometry, temporal evolution, or mechanism.
+
+::: {.callout-warning title="What this does NOT imply"}
+A low-rank PCA summary does not prove a manifold, discover dynamics, identify a mechanism, establish model-free intrinsic dimension, or recover a unique latent generator. Low reconstruction error and compelling visualization remain approximation results under declared preprocessing and loss.
+:::
+
+### Mouse trajectory
+
+PCA can summarize aligned trajectory samples after coordinates, subjects, trials, time normalization, centering, scaling, and row dependence are declared. A low-dimensional score plot does not establish a low-dimensional behavioral state space or a movement law. Evaluation should keep entire trajectories or animals together when splitting data if within-trajectory or within-animal dependence is present.
+
+### Eye movement
+
+For eye position, velocity, event, or engineered window features, PCA can provide a rank-matched linear compression baseline. Saccade alignment, binocular coordinate systems, angular units, sample exclusion, and temporal window construction determine the analyzed representation. Ordinary PCA does not infer oculomotor dynamics merely because successive samples trace a trajectory in score space.
+
+### EEG
+
+PCA can reduce sensor, time-window, spectral, or trial-feature matrices, but rereferencing, channel scaling, artifact rejection, subject pooling, and row definition must be explicit. Components are variance directions in the selected representation, not automatically neural sources; source separation and observation modeling require additional assumptions.
+
+### MEG / neural population data
+
+PCA can define a variance-dominant preprocessing subspace before a temporally structured analysis. In Churchland et al.'s reaching analysis, traditional PCA reduced a neuron-by-condition--time matrix to six dimensions before jPCA was applied to seek rotational structure; this supports PCA's role there as preprocessing for strongly represented population patterns, not a claim that PCA itself discovered dynamics [@ChurchlandEtAl2012]. For MEG or other population recordings, sensor/unit normalization, condition averaging, and trial dependence remain analysis-specific choices; observation-level evaluation may hold out trials, conditions, subjects, sessions, or time blocks, whereas feature, sensor, or unit holdout requires a separate observation-model or matrix-completion protocol.
+
+## Primary sources
+
+- Pearson formulates equal-weight perpendicular Euclidean least-squares closest-fit lines and planes through the sample centroid and notes degenerate non-uniqueness boundaries [@Pearson1901].
+- Eckart and Young formulate and solve the least-squares best lower-rank matrix approximation problem that underlies the truncated-SVD reconstruction view [@EckartYoung1936].
+- Tipping and Bishop define PPCA as a Gaussian latent-variable model, relate its maximum-likelihood solution to the principal subspace, and distinguish its isotropic noise model from ordinary factor analysis [@TippingBishop1999].
+- Churchland et al. provide a narrow empirical example in which PCA is used as preprocessing before a distinct dynamical projection method [@ChurchlandEtAl2012].
+
+## Reviews / secondary sources
+
+- Jolliffe and Cadima review ordinary PCA's variance criterion, covariance eigendecomposition, centered-data SVD formulation, covariance-versus-correlation choice, and explained-variance usage [@JolliffeCadima2016].
+
+## Open methodological questions
+
+- How stable is the fitted subspace across animals, sessions, conditions, and preprocessing choices?
+- Which sample-splitting unit gives an honest held-out reconstruction test when rows are temporally or hierarchically dependent?
+- Which metric or scaling expresses the scientific cost of errors rather than measurement units alone?
+- When do task-aware, probabilistic, nonlinear, or dynamical methods outperform rank-matched PCA without relying on an evaluation criterion that simply restates their training objective?
+- How should uncertainty be reported when leading eigenvalues are close or the sample covariance is poorly estimated?
+
+## Maturity checklist
+
+- [x] States the variance and least-squares objectives and the conditions for their equivalence.
+- [x] Connects covariance eigendecomposition to SVD with explicit normalization.
+- [x] Declares learned and fixed quantities, including centering, scale, equal weighting, samples, metric, and rank.
+- [x] States sign, repeated-eigenvalue, and truncation-boundary ambiguities.
+- [x] Separates ordinary PCA from FA, PPCA, nonlinear embedding, and temporal or dynamical methods.
+- [x] Includes mean-only and fixed/random projection baselines plus held-out evaluation limits.
+- [x] Restricts empirical claims to an inspected primary neural-population example.
+- [x] Independent mixed review completed after one bounded correction round and focused re-review PASS.
+- [x] Separate status authorization completed; promoted to `L2/stable`.

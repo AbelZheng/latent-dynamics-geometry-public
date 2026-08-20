@@ -1,0 +1,99 @@
+---
+title: "Circle / S¹"
+object_type: concept
+maturity: L1
+status: stable
+domain: [topology, geometry]
+tags: [circle, s1, periodic-coordinate]
+prerequisites:
+- knowledge/concepts/topology.qmd
+- knowledge/concepts/manifold.qmd
+related:
+- knowledge/concepts/limit-cycle.qmd
+created: 2026-08-18
+updated: 2026-08-18
+---
+
+# Circle / S¹
+
+## One-sentence definition
+
+The **circle** $S^1$ is the topological space of points at unit distance from the origin in $\mathbb R^2$, equivalently a periodic coordinate with endpoints identified.
+
+## Why this concept matters
+
+$S^1$ is the simplest compact space with a loop and is the basic model for phase, heading, and periodic latent variables. Its topology is not captured by treating angle as an ordinary interval with unrelated endpoints.
+
+## Intuition
+
+Moving continuously through angle $2\pi$ returns to angle $0$. There is no distinguished beginning or end.
+
+## Formal definition
+
+Two equivalent descriptions are
+
+$$
+S^1=\{(x,y)\in\mathbb R^2:x^2+y^2=1\}
+$$
+
+with the subspace topology, and the quotient $\mathbb R/\mathbb Z$ identifying values that differ by an integer turn. The quotient coordinate $t\pmod 1$ is measured in turns and maps to the embedded circle by
+
+$$
+[t]\longmapsto (\cos 2\pi t,\sin 2\pi t),
+\qquad \theta=2\pi t
+$$
+
+when $\theta$ is measured in radians. It is a one-dimensional smooth manifold and can be covered by local real-valued charts. Mrowka lists spheres as standard manifold examples [@Mrowka2004, sec. 1].
+
+## Core notation
+
+- $S^1$: circle.
+- $\theta\pmod{2\pi}$: angular coordinate.
+- $\mathbb R/\mathbb Z$: quotient description.
+
+## Prerequisites
+
+[Topology](topology.qmd) supplies quotient and continuity language. [Manifold](manifold.qmd) supplies its locally Euclidean interpretation.
+
+## Relationship to adjacent concepts
+
+| Concept | Distinction |
+|---|---|
+| **Interval** | Has boundary endpoints; a circle identifies the periodic endpoints. |
+| **Limit cycle** | A periodic orbit produced by dynamics; $S^1$ is a space and need not be a trajectory or attractor. |
+| **Circular coordinate** | A representation of values on $S^1$; its observed distribution need not cover the full circle. |
+| **Ellipse** | Topologically a circle but metrically and geometrically different under inherited coordinates. |
+
+## What this does NOT imply
+
+A circular topology does not imply uniform speed, sinusoidal observations, a limit cycle, Euclidean circular geometry in data space, attraction, or a unique phase coordinate.
+
+## Minimal example
+
+Time of day modulo 24 hours is circular: 23:59 is near 00:01 even though their scalar labels differ greatly.
+
+## Neuroscience / behavioral relevance
+
+Head direction, movement direction, and oscillatory phase may use circular variables. Evidence should distinguish circular state topology from periodic forcing or repeated observations.
+
+## Relevance to LDG
+
+$S^1$ provides the first explicit non-Euclidean topology for testing latent representations and periodic dynamics.
+
+## Open questions
+
+- How can circular topology be distinguished from a bent interval under noise?
+- Which phase coordinate is scientifically invariant?
+- How should incomplete traversal of $S^1$ be analyzed?
+
+## References
+
+- Mrowka provides the inspected sphere/manifold chart context [@Mrowka2004, sec. 1].
+- Sutherland provides the inspected quotient and subspace-topology background [@Sutherland2024].
+
+## Maturity checklist
+
+- [x] Gives embedded and quotient descriptions.
+- [x] Separates circle topology, coordinate, and limit cycle.
+- [x] Includes a periodic-variable example.
+- [x] Independent bounded review completed; initial findings were corrected and focused re-review passed.

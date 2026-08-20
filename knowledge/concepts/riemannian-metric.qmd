@@ -1,0 +1,202 @@
+---
+title: "Riemannian Metric"
+object_type: concept
+maturity: L2
+status: stable
+domain: [geometry]
+tags: [riemannian-metric, inner-product, tangent-space]
+prerequisites:
+- knowledge/concepts/metric.qmd
+- knowledge/concepts/tangent-space.qmd
+related:
+- knowledge/concepts/manifold.qmd
+- knowledge/concepts/geodesic.qmd
+created: 2026-08-18
+updated: 2026-08-18
+---
+
+# Riemannian Metric
+
+## One-sentence definition
+
+A **Riemannian metric** assigns a positive-definite inner product to every tangent space of a smooth manifold, varying smoothly from point to point.
+
+## Why this concept matters
+
+A smooth manifold supplies local coordinates but no canonical lengths or angles. A Riemannian metric adds the structure needed to measure tangent vectors, curve length, angle, volume, geodesic distance, and curvature.
+
+## Intuition
+
+At each point, place a smoothly changing ruler and protractor on the tangent space. The rulers may stretch different directions by different amounts.
+
+## Formal definition
+
+Let $M$ be a smooth $n$-manifold. A Riemannian metric is a smooth symmetric positive-definite covariant $2$-tensor field
+
+$$
+g\in\Gamma(S^2T^*M).
+$$
+
+Equivalently, each $p\in M$ receives an inner product
+
+$$
+g_p:T_pM\times T_pM\to\mathbb R
+$$
+
+such that $p\mapsto g_p(X_p,Y_p)$ is smooth for smooth vector fields $X,Y$. Symmetry and positive definiteness mean
+
+$$
+g_p(v,w)=g_p(w,v),
+\qquad
+g_p(v,v)>0\quad(v\ne0).
+$$
+
+Lee gives this definition and its elementary constructions [@Lee1997, ch. 3].
+
+### Coordinate representation
+
+In coordinates $x=(x^1,\ldots,x^n)$,
+
+$$
+g=g_{ij}(x)\,dx^i\otimes dx^j,
+$$
+
+where $[g_{ij}(x)]$ is a smooth symmetric positive-definite matrix. Under coordinates $y=y(x)$,
+
+$$
+g'_{ab}(y)
+=
+\frac{\partial x^i}{\partial y^a}
+\frac{\partial x^j}{\partial y^b}
+ g_{ij}(x(y)).
+$$
+
+Thus the component matrix changes by the tensor transformation law; the geometric metric does not equal one fixed matrix independent of coordinates.
+
+### Tangent norms and angles
+
+For $v,w\in T_pM$,
+
+$$
+\|v\|_{g,p}=\sqrt{g_p(v,v)},
+$$
+
+and for nonzero vectors
+
+$$
+\cos\angle_g(v,w)
+=
+\frac{g_p(v,w)}{\|v\|_{g,p}\|w\|_{g,p}}.
+$$
+
+Orthogonality means $g_p(v,w)=0$. These quantities compare vectors in the same tangent space; comparing vectors at different points requires additional transport or coordinates.
+
+### Curve length and induced distance
+
+For a piecewise smooth curve $\gamma:[a,b]\to M$,
+
+$$
+L_g(\gamma)
+=
+\int_a^b
+\sqrt{g_{\gamma(t)}(\dot\gamma(t),\dot\gamma(t))}
+\,dt.
+$$
+
+This length is invariant under orientation-preserving reparameterizations. On a connected component, the induced Riemannian distance is
+
+$$
+d_g(p,q)
+=
+\inf_{\gamma:p\to q}L_g(\gamma),
+$$
+
+where the infimum ranges over piecewise smooth curves joining $p$ and $q$. Lee shows that this is a metric on a connected Riemannian manifold [@Lee1997, ch. 6]. Points in distinct connected components have no joining curve; one either treats distance componentwise or uses an extended distance $+\infty$.
+
+The infimum need not initially be attained, and the existence or uniqueness of a minimizing geodesic requires additional conditions. The [Geodesic](geodesic.qmd) object records the local relationship without assuming global minimizers.
+
+### Pullback and induced metrics
+
+For a smooth map $F:M\to N$ and a Riemannian metric $h$ on $N$, the pullback tensor is
+
+$$
+(F^*h)_p(v,w)
+=
+h_{F(p)}(dF_pv,dF_pw).
+$$
+
+It is symmetric and nonnegative. It is positive definite—and hence a Riemannian metric on $M$—when $dF_p$ is injective for every $p$, for example when $F$ is an immersion. For an embedded submanifold, the inclusion pulls the ambient metric back to the standard induced metric [@Lee1997, ch. 3]. An arbitrary non-injective map can yield a degenerate pullback and does not automatically define a Riemannian metric.
+
+A diffeomorphism $F:(M,g)\to(N,h)$ is an isometry when $F^*h=g$. Isometric descriptions preserve the Riemannian lengths, angles, and induced distances even though coordinate matrices may differ.
+
+## Core notation
+
+- $g$: Riemannian metric.
+- $g_p(v,w)=\langle v,w\rangle_p$: inner product at $p$.
+- $\|v\|_p=\sqrt{g_p(v,v)}$: tangent-vector norm.
+- $L_g(\gamma)$: curve length induced by $g$.
+- $d_g(p,q)$: point distance obtained as an infimum of curve lengths.
+- $g_{ij}$: coordinate matrix of metric components.
+- $F^*h$: pullback metric/tensor.
+- $dF_p$: differential used to test pullback nondegeneracy.
+
+## Prerequisites
+
+[Metric](metric.qmd) supplies distance language. [Tangent Space](tangent-space.qmd) supplies the vector spaces receiving inner products.
+
+## Relationship to adjacent concepts
+
+| Concept | Distinction |
+|---|---|
+| **Metric-space metric** | Directly assigns point-to-point distance; a Riemannian metric first acts on tangent vectors and induces distance through path lengths. |
+| **Euclidean metric** | A constant special case in Euclidean coordinates. |
+| **Mahalanobis distance** | A fixed positive-definite quadratic metric on a vector space, corresponding to a constant Riemannian metric in those coordinates; semidefinite matrices yield only pseudodistance. |
+| **Pseudo-Riemannian metric** | Uses a nondegenerate but indefinite bilinear form and need not define ordinary positive distance. |
+| **Sub-Riemannian metric** | Defines inner products only on a selected tangent distribution; admissible path length and distance require additional bracket/accessibility structure. |
+| **Finsler metric** | Uses a smoothly varying norm that need not arise from a quadratic inner product. |
+| **Learned metric** | A fitted local or global distance/tensor model whose positivity, smoothness, identifiability, and generalization require validation. |
+
+## What this does NOT imply
+
+A Riemannian metric does not imply zero curvature, completeness, unique coordinates, a unique data-derived choice, global geodesic existence or uniqueness, an isometric embedding in a chosen ambient space, or biological meaning. Positive-definite fitted matrices at sampled points do not by themselves establish a smooth global metric field.
+
+## Minimal example
+
+On $\mathbb R^2$, the Euclidean metric is
+
+$$
+g=dx^2+dy^2.
+$$
+
+If $a(x,y)>0$ is smooth, the position-dependent metric $g=a(x,y)^2dx^2+dy^2$ assigns different local costs to motion in the $x$ direction.
+
+## Neuroscience / behavioral relevance
+
+A learned local metric can encode anisotropic variability or task sensitivity in latent space. It must be evaluated against simpler fixed metrics and should not be interpreted mechanistically from fit alone.
+
+## Relevance to LDG
+
+At L2, Riemannian Metric supplies typed coordinate transformations, tangent norms/angles, curve lengths, induced distance, pullback conditions, and isometry language needed for geodesics and curvature without conflating nonlinear embeddings with geometry.
+
+## Open questions
+
+- Which observations constrain a local metric?
+- How should metric uncertainty be represented?
+- When does a learned metric improve prediction beyond Euclidean or covariance baselines?
+
+## References
+
+- Lee provides the inspected definition, coordinate/induced/product constructions, tangent norms and angles, and curve-length/Riemannian-distance formulation [@Lee1997, chs. 3, 6].
+- Connection, volume, completion, geodesic-existence, embedding, and metric-learning proofs are intentionally deferred.
+
+## Maturity checklist
+
+- [x] Defines a smooth positive-definite inner-product field.
+- [x] Separates Riemannian and metric-space metrics.
+- [x] States data-derived and mechanistic non-implications.
+- [x] Defines a smooth symmetric positive-definite covariant tensor field.
+- [x] States coordinate matrices and their transformation law.
+- [x] Defines tangent norms, angles, curve length, and componentwise induced distance.
+- [x] States pullback positivity conditions and induced metrics for immersions/embeddings.
+- [x] Separates metric-space, pseudo-Riemannian, sub-Riemannian, Finsler, Mahalanobis, and learned metrics.
+- [x] Independent L2 scientific review completed with PASS under the recorded review decision.

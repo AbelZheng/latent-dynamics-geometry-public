@@ -1,0 +1,167 @@
+{
+  "benchmark": "cross-suite-robustness-synthesis",
+  "conditional_failure_rate_counts": {
+    "inapplicable_zero_denominator": 104,
+    "ok": 539
+  },
+  "dimension_counts": {
+    "applicability_rate": 643,
+    "applicable_target_family_inventory": 73,
+    "conditional_failure_rate": 643,
+    "information_set_count": 7,
+    "information_set_member": 27,
+    "method_count": 7,
+    "method_member": 60,
+    "metric_count": 7,
+    "metric_member": 60,
+    "provenance_count": 7,
+    "provenance_member": 19,
+    "raw_cartesian_failure_label_fraction": 643,
+    "replicate_count": 7,
+    "scenario_count": 7,
+    "source_row_count": 7,
+    "status_count": 28,
+    "target_count": 7,
+    "target_member": 56
+  },
+  "record_type_counts": {
+    "applicability_pattern": 643,
+    "failure_pattern": 1286,
+    "inventory": 306,
+    "scenario_target_coverage": 73
+  },
+  "row_count": 2308,
+  "schema_version": 1,
+  "source_count": 5,
+  "synthesis_limits": [
+    "No source metric value is copied, normalized, averaged, ranked, or pooled across tasks.",
+    "Applicability and failure rates retain explicit raw-row denominators and remain benchmark/task/scenario/method specific.",
+    "Scenario-target coverage records inventory declared scenario classes and applicable target families without direction or magnitude implications.",
+    "The synthesis does not establish mechanism, causality, biological validity, real-data transfer, or universal method superiority."
+  ],
+  "task_inventory": [
+    {
+      "benchmark": "demixing-rotational-robustness",
+      "method_count": 8,
+      "metric_count": 7,
+      "replicate_count": 3,
+      "scenario_count": 9,
+      "source_row_count": 1512,
+      "status_counts": {
+        "inapplicable": 891,
+        "invalid": 54,
+        "nonconvergence": 0,
+        "ok": 567
+      },
+      "target_count": 7,
+      "task": "demixing"
+    },
+    {
+      "benchmark": "demixing-rotational-robustness",
+      "method_count": 8,
+      "metric_count": 5,
+      "replicate_count": 3,
+      "scenario_count": 10,
+      "source_row_count": 1200,
+      "status_counts": {
+        "inapplicable": 726,
+        "invalid": 0,
+        "nonconvergence": 0,
+        "ok": 474
+      },
+      "target_count": 5,
+      "task": "rotation"
+    },
+    {
+      "benchmark": "linear-gaussian-robustness",
+      "method_count": 11,
+      "metric_count": 9,
+      "replicate_count": 5,
+      "scenario_count": 11,
+      "source_row_count": 5445,
+      "status_counts": {
+        "inapplicable": 3930,
+        "invalid": 0,
+        "nonconvergence": 0,
+        "ok": 1515
+      },
+      "target_count": 7,
+      "task": "linear_gaussian_inference"
+    },
+    {
+      "benchmark": "nonlinear-graph-robustness",
+      "method_count": 8,
+      "metric_count": 11,
+      "replicate_count": 3,
+      "scenario_count": 13,
+      "source_row_count": 3432,
+      "status_counts": {
+        "inapplicable": 3133,
+        "invalid": 0,
+        "nonconvergence": 0,
+        "ok": 299
+      },
+      "target_count": 11,
+      "task": "graph"
+    },
+    {
+      "benchmark": "nonlinear-graph-robustness",
+      "method_count": 5,
+      "metric_count": 7,
+      "replicate_count": 3,
+      "scenario_count": 7,
+      "source_row_count": 735,
+      "status_counts": {
+        "inapplicable": 45,
+        "invalid": 0,
+        "nonconvergence": 0,
+        "ok": 690
+      },
+      "target_count": 7,
+      "task": "reconstruction"
+    },
+    {
+      "benchmark": "static-linear-latent-robustness",
+      "method_count": 9,
+      "metric_count": 11,
+      "replicate_count": 4,
+      "scenario_count": 11,
+      "source_row_count": 4356,
+      "status_counts": {
+        "inapplicable": 3044,
+        "invalid": 0,
+        "nonconvergence": 52,
+        "ok": 1260
+      },
+      "target_count": 13,
+      "task": "static_linear_latent_recovery"
+    },
+    {
+      "benchmark": "temporal-covariance-inference",
+      "method_count": 11,
+      "metric_count": 10,
+      "replicate_count": 3,
+      "scenario_count": 12,
+      "source_row_count": 3960,
+      "status_counts": {
+        "inapplicable": 1911,
+        "invalid": 0,
+        "nonconvergence": 0,
+        "ok": 2049
+      },
+      "target_count": 6,
+      "task": "temporal_covariance_inference"
+    }
+  ],
+  "verification_checks": {
+    "canonical_unique_rows": true,
+    "no_rank_score_or_winner_fields": true,
+    "no_source_metric_values_imported": true,
+    "rates_have_explicit_denominators": true,
+    "source_digests_recorded": true,
+    "source_scientific_content_hashes_verified": true,
+    "stable_source_manifests_required": true,
+    "summary_png_integrity_only_not_scientific_input": true,
+    "task_specific_only": true
+  }
+}

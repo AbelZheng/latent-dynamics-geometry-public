@@ -1,0 +1,365 @@
+---
+title: "Discrete-Time Linear-Gaussian State-Space Model"
+object_type: method
+maturity: L2
+status: stable
+domain: [latent-modeling, temporal-modeling, state-space-models, statistics]
+tags: [linear-gaussian, state-space-model, latent-dynamics, discrete-time]
+prerequisites:
+- knowledge/methods/factor-analysis.qmd
+- knowledge/concepts/state-space-model.qmd
+- knowledge/concepts/linear-dynamical-system.qmd
+- knowledge/concepts/latent-trajectory.qmd
+- knowledge/concepts/observation-model.qmd
+- knowledge/concepts/process-noise.qmd
+- knowledge/concepts/observation-noise.qmd
+related:
+- knowledge/methods/principal-component-analysis.qmd
+- knowledge/concepts/latent-variable.qmd
+- knowledge/concepts/identifiability.qmd
+created: 2026-08-19
+updated: 2026-08-19
+---
+
+# Discrete-Time Linear-Gaussian State-Space Model
+
+## Problem
+
+A discrete-time linear-Gaussian state-space model (LGSSM) describes an ordered sequence of observations through an unobserved state that evolves linearly with Gaussian process noise and generates measurements linearly with Gaussian observation noise. It provides one joint probability model in which forecasting, state inference, sequence likelihood, and parameter learning can be defined without treating them as the same task [@GhahramaniHinton1996; @Sarkka2013].
+
+This object specifies the finite-dimensional, time-invariant, discrete-time model with a fixed or externally supplied **open-loop known input path**. It does not present the Kalman filtering or fixed-interval smoothing algorithms, which are later Method units. Time-varying, switching, nonlinear, non-Gaussian, continuous-time, unknown-input, feedback-policy, and control-design variants are outside the bounded core.
+
+## Input
+
+For one sequence of length $T$, let
+
+- $x_t\in\mathbb R^p$ be the observed vector;
+- $u_t\in\mathbb R^r$ be an optional known input or regressor; and
+- $z_t\in\mathbb R^q$ be the latent state.
+
+A reproducible analysis must declare:
+
+- the observational unit, sequence boundaries, sampling interval, ordering, and whether matrices are assumed common across sequences;
+- feature definitions, units, transformations, exclusions, and missing-data policy;
+- which inputs are fixed or externally supplied at fitting and prediction time, and when each value becomes available;
+- latent dimension $q$ and its selection protocol;
+- whether parameters are fixed from external knowledge or learned from training sequences; and
+- the exact target: forecasting, filtering, smoothing, marginal likelihood, parameter learning, or simulation.
+
+Sequences, subjects, sessions, or trials are not interchangeable replicates. Their dependence and parameter sharing must be stated.
+
+## Output
+
+The model specification is a parameter tuple
+
+$$
+\theta=(m_1,P_1,A,B,C,D,Q,R),
+$$
+
+with dimensions conforming to the state, input, and observation spaces. Conditional on $\theta$, it defines:
+
+- the joint Gaussian law $p_\theta(z_{1:T},x_{1:T}\mid u_{1:T})$;
+- predictive distributions for future states and observations;
+- filtering distributions conditioned only on observations available through the target time;
+- smoothing distributions conditioned on a complete declared observation interval;
+- the marginal sequence likelihood after integrating out $z_{1:T}$; and
+- model-conditional latent-state summaries with uncertainty.
+
+An implementation may additionally return fitted parameters, forecast means/covariances, filtered or smoothed state moments, innovations, and likelihood contributions. These outputs have different conditioning information and must be labeled accordingly.
+
+## Core idea
+
+The state carries the information needed for the next-step transition, while observations are noisy linear views of that state. The Markov factorization converts one high-dimensional trajectory distribution into an initial-state law, local transition laws, and local observation laws. Gaussian closure makes the relevant conditional and marginal distributions Gaussian, permitting exact finite-horizon inference when parameters are known [@Sarkka2013, chs. 4, 8].
+
+The method's value is not merely that its inferred mean trajectory looks smooth. It is that a declared stochastic temporal model yields testable predictive distributions and separates uncertainty introduced at the transition from uncertainty introduced at measurement.
+
+## Generative / modeling assumptions
+
+The canonical input-driven model is
+
+$$
+z_1\sim\mathcal N(m_1,P_1),
+$$
+
+$$
+z_{t+1}=Az_t+Bu_t+w_t,
+\qquad
+w_t\sim\mathcal N(0,Q),
+$$
+
+$$
+x_t=Cz_t+Du_t+v_t,
+\qquad
+v_t\sim\mathcal N(0,R).
+$$
+
+The no-input core is recovered by omitting $u_t$, $B$, and $D$. Unless explicitly generalized, the model assumes:
+
+- $P_1,Q\succeq0$ and $R\succ0$;
+- $z_1$, every $w_t$, and every $v_s$ are mutually independent;
+- process and observation noises are independent across time;
+- $A,B,C,D,Q,R$ are constant over the sequence;
+- the latent transition is first-order Markov;
+- observations are conditionally independent across time given the state path and inputs; and
+- inputs are fixed in advance or externally supplied without depending on contemporaneous or future observations, so they are valid conditioning variables rather than unexplained stochastic causes.
+
+Gaussianity is stronger than specifying only means and covariances. Correlated process and observation noise, colored noise, heteroscedasticity, time-varying matrices, or history-dependent measurements require an explicit modified model rather than an informal reinterpretation of $Q$ or $R$.
+
+## Mathematical formulation
+
+For a fixed open-loop input path, the joint law factorizes as
+
+$$
+p_\theta(z_{1:T},x_{1:T}\mid u_{1:T})
+=p_\theta(z_1)
+\prod_{t=1}^{T-1}p_\theta(z_{t+1}\mid z_t,u_t)
+\prod_{t=1}^{T}p_\theta(x_t\mid z_t,u_t),
+$$
+
+where
+
+$$
+p_\theta(z_{t+1}\mid z_t,u_t)
+=\mathcal N(Az_t+Bu_t,Q),
+$$
+
+$$
+p_\theta(x_t\mid z_t,u_t)
+=\mathcal N(Cz_t+Du_t,R).
+$$
+
+This factorization defines several different conditional targets. The future input values appearing below must be known scenario values rather than controls that encode future observations:
+
+$$
+\text{forecasting:}\quad
+p(z_{t+h},x_{t+h}\mid x_{1:t},u_{1:t+h}),
+$$
+
+$$
+\text{filtering:}\quad
+p(z_t\mid x_{1:t},u_{1:t}),
+$$
+
+$$
+\text{smoothing:}\quad
+p(z_t\mid x_{1:T},u_{1:T}),\quad T>t,
+$$
+
+or the full path posterior $p(z_{1:T}\mid x_{1:T},u_{1:T})$. Kalman explicitly distinguishes smoothing, filtering, and prediction by whether the estimated state time is earlier than, equal to, or later than the final conditioning observation [@Kalman1960]. The exact recursions are deliberately deferred to separate filtering and smoothing Method Objects.
+
+The marginal likelihood is
+
+$$
+p_\theta(x_{1:T}\mid u_{1:T})
+=\int p_\theta(z_{1:T},x_{1:T}\mid u_{1:T})\,dz_{1:T}.
+$$
+
+It can be factorized into one-step predictive densities,
+
+$$
+p_\theta(x_{1:T}\mid u_{1:T})
+=\prod_{t=1}^{T}
+p_\theta(x_t\mid x_{1:t-1},u_{1:t}),
+$$
+
+which separates sequence scoring from state-point estimation [@Sarkka2013, sec. 12.1].
+
+Feedback-controlled data require a separate timing and policy model. A valid control $u_t$ must be measurable from information available before the transition it drives and, when $D\ne0$, before the contemporaneous observation $x_t$; using $x_t$ itself in $u_t$ creates an algebraic loop. If future controls depend on future observations, conditioning on the realized $u_{1:T}$ can leak future information. Policy-aware likelihoods and forecasts must instead state the nonanticipating policy and integrate or simulate controls not yet known.
+
+## What is learned?
+
+Depending on the protocol, parameter learning may estimate some or all of $m_1,P_1,A,B,C,D,Q,R$ and select $q$. Given fitted parameters, state inference determines conditional distributions over latent states; it does not relearn the model parameters unless an explicitly joint or online-learning procedure is used.
+
+Maximum-likelihood learning targets the observable sequence distribution after integrating over latent states. EM instead alternates between model-conditional expectations of latent sufficient statistics and parameter updates that increase the same marginal likelihood under exact steps [@GhahramaniHinton1996]. The inferred state path is therefore an intermediate uncertain quantity, not observed training data.
+
+## What is fixed?
+
+The analyst fixes the state dimension or its selection search, sequence boundaries, time step, input definition, matrix structure and parameter sharing, Gaussian and independence assumptions, covariance constraints, initial-state treatment, missing-data mechanism, learning criterion, regularization or priors, and evaluation target.
+
+When some matrices come from physical modeling, the fixed-versus-estimated partition must be explicit. Calling $A$ “the dynamics” does not establish that it is a physical law if $C$, $Q$, $R$, state coordinates, or inputs are learned phenomenologically.
+
+## Temporal assumptions
+
+Time is discrete and ordered. Permuting observations generally changes the likelihood. The first-order Markov assumption states that, conditional on $z_t$ and the known input, $z_{t+1}$ does not depend on earlier states. It does not imply that the observed sequence is first-order Markov.
+
+**Stability and stationarity are distinct.** For the time-invariant no-input mean dynamics, $\rho(A)<1$ is the usual Schur-stability condition under which deterministic perturbations decay. With zero mean, constant $Q$, and suitable finite covariance, a stable $A$ supports a stationary state covariance $\Sigma$ satisfying
+
+$$
+\Sigma=A\Sigma A^\top+Q.
+$$
+
+The process is stationary only when its initialization and inputs are also compatible with the stationary law. A stable model initialized away from that law has a transient; a unit-root or unstable finite-horizon model can still define valid distributions without being stationary. Time-varying inputs can make means nonstationary even when $A$ is stable.
+
+Irregular sampling cannot be handled by silently treating every index gap as equal. It requires gap-dependent transitions, an underlying continuous-time model and discretization, or another explicit variant.
+
+## Geometry assumptions
+
+The latent state is represented in a finite-dimensional vector space. $A$ is linear in the chosen state coordinates, while $Q$ and $R$ define coordinate-dependent Mahalanobis uncertainty. Euclidean distances between posterior state means have no invariant scientific meaning unless a metric and coordinate convention are justified.
+
+The model does not posit a nonlinear manifold or Riemannian geometry. A low-dimensional linear latent state is a modeling choice, not proof of intrinsic dimension or a unique state space.
+
+## Supervision
+
+Likelihood-based fitting from observation sequences is unsupervised with respect to external labels. Fixed open-loop inputs condition the transition and observation laws; their presence is not automatically “supervision” in the prediction-label sense. Labels, outcomes, or interventions used to design states, constrain matrices, select hyperparameters, or score models introduce task dependence and must be declared.
+
+An observational input correlated with unmodeled disturbances is not automatically exogenous. Including $u_t$ does not identify the causal effect represented by $B$ or $D$. Feedback-dependent inputs require the policy-aware extension delimited above rather than the open-loop conditional factorization used here.
+
+## Optimization / inference
+
+For known parameters, finite-horizon linear-Gaussian forecasting, filtering, and smoothing are exact Gaussian conditioning problems. They differ only in target and information set, but require distinct computations. Filtering uses data through the current time; fixed-interval smoothing uses future observations within the declared interval [@Sarkka2013, chs. 4, 8].
+
+Parameter learning is a separate optimization or Bayesian inference problem. Direct maximum-likelihood optimization can use the predictive-density factorization. In EM, the E-step requires smoothed expectations such as $\mathbb E[z_t]$, $\mathbb E[z_tz_t^\top]$, and $\mathbb E[z_tz_{t-1}^\top]$ under the current parameters; the M-step updates model parameters from those expectations [@GhahramaniHinton1996]. Thus an EM implementation may internally call filtering and smoothing, but the learned model, filtering posterior, smoothing posterior, and optimizer are not interchangeable objects.
+
+The likelihood is generally nonconvex in a free latent parameterization. Initializations, covariance constraints, regularization, stopping criteria, multiple starts, and numerical factorizations must be reported. An increasing EM objective does not prove global optimality or scientific validity.
+
+## Strengths
+
+- It defines a coherent joint distribution over ordered latent and observed sequences.
+- Process and observation uncertainty are represented separately through $Q$ and $R$.
+- Exact Gaussian forecasts and state posteriors are available when parameters are fixed.
+- Marginal likelihood supports sequence-level predictive comparison and parameter learning.
+- Inputs can be incorporated without abandoning linear-Gaussian tractability.
+- It is a transparent temporal baseline before nonlinear or non-Gaussian latent models.
+
+## Failure modes
+
+- **Wrong latent dimension or structure:** omitted modes leave temporal residual structure; redundant modes create weakly identified or unused states.
+- **Noise tradeoff:** short, weakly observed sequences may not distinguish process variation from observation variation, so $Q$, $R$, $C$, and the state path can compensate for one another.
+- **Unmodeled dependence:** colored, correlated, heteroscedastic, or state-dependent noise invalidates the white independent Gaussian assumptions.
+- **Nonlinearity or regime changes:** one global $A$ and $C$ cannot represent switching, saturation, curved observation maps, or abrupt interventions.
+- **Instability or near-unit roots:** forecasts can diverge or become highly uncertain, and parameter estimates can be sensitive in short records.
+- **Unobservable modes:** latent directions that do not affect available observations cannot be recovered from those observations.
+- **Weak excitation:** inputs or process noise may fail to explore directions needed to estimate transition effects.
+- **Missingness or censoring:** treating informative missing observations as ignorable can bias learning and state inference.
+- **Boundary covariance estimates:** nearly singular $Q$, $R$, or $P_1$ can create numerical failure or degenerate likelihood behavior.
+- **Local optimization:** different initializations can converge to different representatives or local optima.
+- **Leakage:** smoothing future data into an online forecast, fitting preprocessing on test sequences, or splitting adjacent time points across train and test yields optimistic evaluation.
+- **Mechanistic overreach:** a predictive $A$ can summarize conditional evolution without identifying a biological mechanism or causal transition law.
+
+## Identifiability issues
+
+For any invertible $T\in\mathbb R^{q\times q}$, define $z'_t=Tz_t$. The transformed parameters
+
+$$
+A'=TAT^{-1},\quad B'=TB,\quad C'=CT^{-1},
+$$
+
+$$
+m'_1=Tm_1,\quad P'_1=TP_1T^\top,\quad Q'=TQT^\top
+$$
+
+with unchanged $D$ and $R$ generate the same observation distribution. Sign changes, permutations, rotations, and state-coordinate scalings are special cases. Therefore individual latent axes and matrix entries are not identified without a coordinate convention; invariant predictions, transfer behavior under declared inputs, or similarity classes may be the defensible targets.
+
+Similarity transformation is not always the only ambiguity. Nonminimal realizations can contain unobservable or unreachable states; unknown $C,Q,R,P_1$, restricted input coverage, singular covariances, or finite sequence length can create stronger structural or practical nonidentifiability. A good optimizer cannot recover a unique parameter outside what the observation design identifies.
+
+For deterministic pairs, observability of $(A,C)$ asks whether states can in principle be distinguished from an output history, while controllability of $(A,B)$ asks whether inputs can reach state directions. In stochastic estimation, excitation through $Q$ and detectability/stabilizability conditions introduce related but distinct boundaries. These properties are not automatic consequences of writing an LGSSM, and they do not by themselves prove causal or physical meaning.
+
+## Comparison with simpler methods
+
+- **Training mean or independent Gaussian:** ignores both latent structure and temporal dependence. The LGSSM should improve held-out predictive likelihood or calibrated forecasts before its temporal complexity is credited.
+- **PCA:** a deterministic, static, order-blind linear representation. It provides no process/observation noise split or temporal likelihood.
+- **Factor Analysis:** a static probabilistic low-rank observation model. With independent factors at each time and no state persistence, it tests whether the transition layer is needed. FA remains the canonical static probabilistic comparison.
+- **Observation-space autoregression or persistence:** predicts measurements directly without a separate latent observation map. It is often a stronger temporal baseline than a static method and tests whether latent states add value.
+- **Known-parameter model:** separates state-inference performance from errors introduced by parameter learning. Simulation studies should report both known-parameter and learned-parameter cases.
+
+## Evaluation criteria
+
+Evaluation must respect sequence order and the information set of the intended task:
+
+1. split entire subjects, sessions, trials, or trajectories when dependence crosses adjacent time points;
+2. fit preprocessing, dimension selection, parameters, and regularization on training sequences only;
+3. for forecasting, report one- and multi-step predictive log likelihood, error, and interval calibration using no future observations beyond the forecast origin;
+4. for filtering, evaluate $p(z_t\mid x_{1:t})$ or observation predictions using only online information;
+5. for smoothing, label the task retrospective and permit $x_{t+1:T}$ only within that separately evaluated target;
+6. report held-out marginal sequence likelihood and compare with static and observation-space temporal baselines;
+7. inspect innovation means, covariance, autocorrelation, temporal residual structure, and sensitivity to state dimension and covariance constraints; and
+8. under synthetic known truth, assess state and parameter recovery only after an allowed similarity alignment, while separately scoring invariant predictions and observable covariance.
+
+Random point-wise train/test splits are generally invalid for sequence forecasting. Comparing a smoother with an online filter on the same target without acknowledging future information is also invalid. High likelihood or low state error under the assumed model does not establish that the latent coordinates are unique or mechanistic.
+
+Missing observations can be handled by evaluating each observation update on the observed components—equivalently selecting the relevant rows and covariance submatrices—provided the missingness mechanism is ignorable under the declared analysis. Informative missingness, censoring, unknown inputs, or observation-time selection require their own model. These variants do not change the need to keep future information out of online evaluation.
+
+## Minimal toy model
+
+Consider the scalar no-input model
+
+$$
+z_{t+1}=az_t+w_t,
+\qquad
+x_t=z_t+v_t,
+$$
+
+with $w_t\sim\mathcal N(0,q)$ and $v_t\sim\mathcal N(0,r)$. If $|a|<1$ and
+
+$$
+z_1\sim\mathcal N\!\left(0,\frac{q}{1-a^2}\right),
+$$
+
+then the latent process is stationary with
+
+$$
+\operatorname{Var}(z_t)=\frac{q}{1-a^2},
+\qquad
+\operatorname{Cov}(x_t,x_{t+h})
+=a^h\frac{q}{1-a^2}\quad(h>0),
+$$
+
+and $\operatorname{Var}(x_t)=q/(1-a^2)+r$. This separates temporal persistence $a$, process variation $q$, and measurement variation $r$. Setting $a=0$ produces temporally independent latent variables; setting $a=1$ removes the stationary covariance formula even though a finite-horizon random-walk model remains well defined.
+
+A future non-executable toy contract would generate multiple independent sequences with known $a,q,r$; compare the training mean, static FA, observation-space AR(1), known-parameter LGSSM, and learned-parameter LGSSM; evaluate blocked predictive likelihood, multi-step calibration, innovation autocorrelation, filtered versus smoothed information sets, and similarity-aligned state recovery. Negative controls would include a unit root, correlated $w_t$ and $v_t$, informative missingness, and an unobservable augmented state. No data, code, fitted result, or benchmark is produced in this Method Object.
+
+## Relevance to LDG
+
+The discrete-time LGSSM is LDG's canonical probabilistic temporal latent baseline. It connects a factor-analysis-style observation layer to an explicit stochastic transition while preserving clear distinctions among model structure, state inference, forecasting, and parameter learning. It is the prerequisite model class for later Kalman filtering and smoothing Methods.
+
+::: {.callout-warning title="What this does NOT imply"}
+A well-predicting LGSSM does not prove that latent coordinates are unique, that $A$ is a biological mechanism or causal law, that inferred trajectories are directly observed, or that data lie on a manifold with a discovered intrinsic dimension. Stability is not stationarity, smooth posterior means can be model-imposed, and exact inference is exact only conditional on the declared linear-Gaussian model and fixed parameters.
+:::
+
+### Mouse trajectory
+
+An LGSSM can model ordered kinematic observations and known task inputs, but alignment, variable sampling intervals, animal-level dependence, nonlinear biomechanics, and interventions must be declared. No modality-specific empirical result is retained here.
+
+### Eye movement
+
+The model can separate a latent temporal state from measurement variability in declared gaze or oculomotor features. Saccades, censoring, event-dependent noise, and irregular samples can violate one global linear-Gaussian model. No modality-specific empirical result is retained here.
+
+### EEG
+
+Sensor sequences may be modeled through latent linear dynamics, but rereferencing, spatial mixing, artifacts, colored noise, and nonstationarity challenge $C$, $Q$, and $R$. Latent states are not automatically neural sources. No modality-specific empirical result is retained here.
+
+### MEG / neural population data
+
+The method provides a baseline for population recordings with ordered trials or time bins. Unit scaling, condition averaging, trial dependence, input definitions, and observation distributions must be explicit. No modality-specific empirical result is retained here.
+
+## Primary sources
+
+- Kalman develops the state-transition and random-excitation approach to linear filtering and prediction, and explicitly separates smoothing, filtering, and prediction by their conditioning time [@Kalman1960]. His inspected formulation is not used here as the sole source for the separate additive observation-noise equation.
+- Ghahramani and Hinton specify the discrete-time linear-Gaussian transition, observation, initial-state, $Q/R$ covariance model and derive EM parameter updates from smoothed latent sufficient statistics [@GhahramaniHinton1996].
+
+## Reviews / secondary sources
+
+- Särkkä gives an authoritative Bayesian treatment of probabilistic state-space models, linear-Gaussian filtering and smoothing targets, predictive-density likelihood factorization, and parameter estimation [@Sarkka2013].
+- Roweis and Ghahramani review factor analysis, PCA, and linear-Gaussian dynamic models in a common generative framework and distinguish static from ordered dynamic data [@RoweisGhahramani1999].
+
+## Open methodological questions
+
+- Which state-dimension and covariance constraints remain reliable for short, dependent, high-dimensional LDG sequences?
+- Which interventions or observation designs break scientifically important similarity and noise-allocation ambiguities?
+- When is an observation-space autoregression sufficient, making a latent state unnecessary?
+- How should irregular sampling, informative missingness, and correlated process/observation noise be introduced without obscuring the canonical baseline?
+
+## Maturity checklist
+
+- [x] Schema-complete Method Object at `L2/review`.
+- [x] Initial state, input-driven transition, observation law, Gaussian $Q/R$, and independence assumptions specified.
+- [x] Model specification, forecasting, filtering, smoothing, marginal likelihood, and parameter learning distinguished.
+- [x] Filtering and smoothing algorithms deferred to later units.
+- [x] Ordered discrete time, stability/stationarity, observability/controllability, missingness, and input boundaries stated.
+- [x] Similarity-transform ambiguity and stronger nonidentifiability stated.
+- [x] Learned/fixed, geometry, supervision, failure modes, baselines, leakage-safe evaluation, and analytic/prose toy contract included.
+- [x] No causal, mechanism, manifold, or model-free intrinsic-dimension claim made.
+- [x] Four retained sources inspected; metadata and DOI or stable identifiers verified; no empirical result retained.
+- [x] Independent mixed review completed after one bounded correction round;
+  focused re-review returned PASS.
+- [x] Stable promotion authorized by the human owner under the recorded review decision after published-site review.

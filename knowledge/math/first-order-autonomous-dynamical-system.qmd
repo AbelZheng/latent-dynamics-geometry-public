@@ -1,0 +1,743 @@
+---
+title: "First-Order Autonomous Dynamical System"
+object_type: math
+maturity: L2
+status: stable
+domain:
+- foundations
+- dynamics
+tags:
+- autonomous-ode
+- initial-value-problem
+- existence-uniqueness
+- local-flow
+prerequisites:
+- knowledge/concepts/state.qmd
+- knowledge/concepts/state-space.qmd
+- knowledge/concepts/trajectory.qmd
+- knowledge/concepts/initial-condition.qmd
+- knowledge/concepts/vector-field.qmd
+- knowledge/concepts/flow.qmd
+related: []
+created: 2026-08-17
+updated: 2026-08-19
+---
+
+# First-Order Autonomous Dynamical System
+
+## Why we need this
+
+The six Cycle 1 Concepts distinguish a [state](../concepts/state.qmd), its [state space](../concepts/state-space.qmd), a [trajectory](../concepts/trajectory.qmd), an [initial condition](../concepts/initial-condition.qmd), a [vector field](../concepts/vector-field.qmd), and a [flow](../concepts/flow.qmd). This Math Object connects those roles in one reusable continuous-time formulation:
+
+$$
+\frac{dx}{dt}=f(x),
+\qquad
+x(t_0)=x_0.
+$$
+
+The differential equation is not merely a compact description of a plotted curve. It is a constraint on an unknown differentiable state trajectory. Existence, uniqueness, continuation, and finite-time flow statements require separate hypotheses. Making those hypotheses explicit is necessary before later LDG work can use an autonomous ODE as a generative model or recovery target.
+
+The scope is deliberately narrow: $\mathcal{X}$ is an open subset of $\mathbb{R}^n$, time is continuous, and the rule is deterministic and autonomous. Discrete-time, stochastic, input-driven, explicitly time-dependent, and non-Euclidean systems are outside this object.
+
+## Prerequisites
+
+- [State](../concepts/state.qmd): the state value carried by the model at a time.
+- [State Space](../concepts/state-space.qmd): the admissible values of that state.
+- [Trajectory](../concepts/trajectory.qmd): one time-parameterized evolution.
+- [Initial Condition](../concepts/initial-condition.qmd): the assignment $x(t_0)=x_0$.
+- [Vector Field](../concepts/vector-field.qmd): the instantaneous state-change rule.
+- [Flow](../concepts/flow.qmd): finite-time evolution across supported initial states.
+
+**Assumed background:** elementary sets, functions, Euclidean vectors, single-variable differentiation and integration, the chain rule, and composition of functions.
+
+## Definitions
+
+### System and solution
+
+Let
+
+$$
+\mathcal{X}\subseteq\mathbb{R}^n
+$$
+
+be open, and let
+
+$$
+f:\mathcal{X}\rightarrow\mathbb{R}^n.
+$$
+
+The equation
+
+$$
+\dot{x}=f(x)
+$$
+
+is a **first-order autonomous ordinary differential equation**. It is first-order because the highest derivative is $\dot{x}$, and autonomous because the right-hand side depends on the current state $x$ but not explicitly on clock time $t$.
+
+A **solution** on an interval $I\subseteq\mathbb{R}$ is a differentiable curve
+
+$$
+x:I\rightarrow\mathcal{X}
+$$
+
+such that, for every $t\in I$,
+
+$$
+\dot{x}(t)=f\bigl(x(t)\bigr).
+$$
+
+Thus $x(t)$ is a state value in $\mathcal{X}$, while both $\dot{x}(t)$ and $f(x(t))$ are vectors in $\mathbb{R}^n$. The equation requires the trajectory to be tangent to the vector assigned by $f$ at every visited state.
+
+### Initial-value problem
+
+For a reference time $t_0$ and initial state $x_0\in\mathcal{X}$, the **initial-value problem** (IVP) is
+
+$$
+\dot{x}=f(x),
+\qquad
+x(t_0)=x_0.
+$$
+
+A solution of the IVP must satisfy both the differential equation and the initial condition. The rule $f$ describes possible instantaneous evolution across its domain; the initial condition selects the solution or set of solutions that pass through $x_0$ at $t_0$.
+
+### Local, maximal, and global solutions
+
+- A **local solution** is defined on an open interval $I$ containing $t_0$.
+- A solution is **maximal** if it cannot be extended to a strictly larger interval while remaining a solution in $\mathcal{X}$. If the IVP admits a unique local solution---that is, local solutions exist and any two compatible local solutions agree on their common domain---those local pieces assemble into one unique maximal solution on an open maximal interval
+
+  $$
+  I_{t_0,x_0}=(T_-(t_0,x_0),T_+(t_0,x_0)).
+  $$
+
+- A **global solution** in this object's all-time setting is defined for every $t\in\mathbb{R}$, so its maximal interval is $\mathbb{R}$.
+
+Local existence and uniqueness do not imply global existence. Under the same local solvability assumptions, if a maximal solution has a finite forward endpoint $T_+$, then as $t\uparrow T_+$ it eventually leaves every compact subset of $\mathcal{X}$. When $\mathcal{X}=\mathbb{R}^n$, this means $\|x(t)\|\to\infty$. On a proper open domain, the trajectory can instead remain bounded while approaching the complement of $\mathcal{X}$; it need not converge to one particular boundary point. The analogous statements hold at a finite backward endpoint. Teschl separates local solvability from maximal continuation and states this compact-set criterion explicitly [@Teschl2012, secs. 2.2, 2.6].
+
+### Finite-time evolution and local flow
+
+It is useful to measure time from the initial condition. Write
+
+$$
+\tau=t-t_0
+$$
+
+for **elapsed time**. For each $x\in\mathcal{X}$, suppose a unique maximal solution through $x$ at elapsed time $0$ is defined on an interval $I_x$ containing $0$. Define
+
+$$
+W=\{(\tau,x)\in\mathbb{R}\times\mathcal{X}:\tau\in I_x\}.
+$$
+
+The set $W$ records which elapsed-time/state pairs are supported. It need not equal $\mathbb{R}\times\mathcal{X}$: a state can support only a finite interval of forward or backward evolution. For fixed elapsed time $\tau$, the finite-time map has the typed domain
+
+$$
+\operatorname{dom}(\phi_\tau)
+=
+\{x\in\mathcal{X}:(\tau,x)\in W\}.
+$$
+
+#### Level 1: single-valued local finite-time evolution
+
+Under local existence and uniqueness, the maximal solutions define a single-valued map
+
+$$
+\Phi:W\rightarrow\mathcal{X},
+\qquad
+(\tau,x)\mapsto\Phi(\tau,x)=\phi_\tau(x).
+$$
+
+This local evolution family satisfies
+
+$$
+\phi_0(x)=x
+$$
+
+and, whenever the terms are defined,
+
+$$
+\phi_{\tau+s}(x)=\phi_\tau\bigl(\phi_s(x)\bigr).
+$$
+
+More explicitly, if $s\in I_x$ and $\tau\in I_{\phi_s(x)}$, then $s+\tau\in I_x$ and evolving first for $s$ and then for $\tau$ agrees with evolving for the combined elapsed time $s+\tau$. These algebraic properties follow from autonomy and uniqueness. They do not by themselves assert joint continuity or differentiability in $(\tau,x)$.
+
+When $f$ is locally Lipschitz, it is continuous, so each individual curve $\tau\mapsto\phi_\tau(x)$ is $C^1$ in elapsed time and satisfies
+
+$$
+\frac{d}{d\tau}\phi_\tau(x)
+=
+f\bigl(\phi_\tau(x)\bigr).
+$$
+
+In particular,
+
+$$
+\left.\frac{d}{d\tau}\phi_\tau(x)\right|_{\tau=0}
+=
+f(x).
+$$
+
+This is differentiability along one trajectory in $\tau$; it is not yet a claim of differentiability with respect to the initial state $x$.
+
+#### Level 2: the jointly $C^1$ local flow
+
+If $f\in C^1(\mathcal{X},\mathbb{R}^n)$, Teschl's smooth-dependence result gives that $W$ is open and the joint map
+
+$$
+\Phi:W\rightarrow\mathcal{X},
+\qquad
+(\tau,x)\mapsto\Phi(\tau,x)=\phi_\tau(x),
+$$
+
+is $C^1$ jointly in elapsed time and initial state. Under the adopted LDG convention, this jointly $C^1$ map, together with the identity and composition laws above, is the **local flow** generated by $f$. More generally, $f\in C^k$ with $k\geq1$ gives a joint $C^k$ local-flow map [@Teschl2012, sec. 6.2].
+
+## Notation
+
+| Symbol | Role |
+|---|---|
+| $\mathcal{X}\subseteq\mathbb{R}^n$ | Open Euclidean state-space domain. |
+| $x\in\mathcal{X}$ | One admissible state value. |
+| $x(t)$ | State value along one trajectory at clock time $t$. |
+| $t_0$ | Reference clock time for the IVP. |
+| $x_0$ | Initial state satisfying $x(t_0)=x_0$. |
+| $f:\mathcal{X}\to\mathbb{R}^n$ | Autonomous vector field. |
+| $\dot{x}(t)$ | Instantaneous derivative of the trajectory. |
+| $I_{t_0,x_0}$ | Maximal clock-time interval for the solution through $(t_0,x_0)$. |
+| $\tau=t-t_0$ | Elapsed time relative to the reference time. |
+| $I_x$ | Maximal elapsed-time interval for the solution through $x$ at $\tau=0$. |
+| $W$ | Supported elapsed-time/state pairs $(\tau,x)$. |
+| $\operatorname{dom}(\phi_\tau)$ | States $x$ for which $(\tau,x)\in W$. |
+| $\Phi(\tau,x)=\phi_\tau(x)$ | Single-valued local finite-time evolution; jointly $C^1$ when $f\in C^1$. |
+
+Clock time $t$ locates a state on a particular trajectory. Elapsed time $\tau$ indexes how far the autonomous rule advances an initial state. Autonomy is what permits the same one-parameter notation $\phi_\tau$ to be used independently of the numerical value of $t_0$.
+
+## Main result / formulation
+
+### A regularity ladder
+
+The formula $\dot{x}=f(x)$ alone does not settle whether solutions exist, are unique, or persist globally. For the open Euclidean domain above, the following sufficient conditions form a useful ladder.
+
+| Assumption on $f$ | Consequence used here | What is not obtained automatically |
+|---|---|---|
+| $f$ is an arbitrary map | The expression assigns a candidate instantaneous vector to each state. | Even local existence is not guaranteed. |
+| $f$ is continuous | For every $(t_0,x_0)$, at least one local solution exists by the autonomous form of Peano's theorem. Because $\dot{x}=f(x)$ is then continuous along a solution, each classical solution is $C^1$ [@Teschl2012, sec. 2.7]. | The solution need not be unique. |
+| $f$ is locally Lipschitz | Local Lipschitz continuity implies continuity. Picard--Lindelöf therefore gives local existence and uniqueness, and the compatible local pieces assemble into a unique maximal solution. The maximal solutions define single-valued local finite-time evolution with identity and composition where defined [@Teschl2012, secs. 2.2, 2.6]. | Global existence and joint differentiability with respect to the initial state are not implied. |
+| $f\in C^k(\mathcal{X},\mathbb{R}^n)$, $k\geq1$ | The unique solution curves are $C^{k+1}$ in time. The supported set $W$ is open, and the joint local-flow map $\Phi:W\to\mathcal{X}$ is $C^k$ in $(\tau,x)$ [@Teschl2012, secs. 2.2, 6.2]. | Even smoothness does not prevent finite-time blow-up or exit from a proper open domain. |
+
+Here **locally Lipschitz** means that every $x\in\mathcal{X}$ has a neighborhood $U\subseteq\mathcal{X}$ and a finite constant $L_U$ such that
+
+$$
+\|f(y)-f(z)\|\leq L_U\|y-z\|
+\qquad
+\text{for all }y,z\in U.
+$$
+
+This ladder gives sufficient, not logically necessary, conditions. Some continuous non-Lipschitz fields still have unique solutions, and some less regular settings admit other existence or uniqueness theorems. The scoped conclusion is only that continuity and local Lipschitz continuity cleanly separate basic existence from basic uniqueness.
+
+### Existence and uniqueness are distinct claims
+
+Existence asks:
+
+> Is there at least one differentiable curve through $(t_0,x_0)$ satisfying the equation?
+
+Uniqueness asks:
+
+> If two such curves pass through the same initial state at the same reference time, must they coincide on their common domain?
+
+A theorem can answer the first question without answering the second. This distinction matters for flow notation: $\phi_\tau(x_0)$ is a single state only when the evolution from $x_0$ is single-valued under the active assumptions or an additional selection rule has been declared.
+
+### Integral form in the continuous-field setting
+
+Now assume $f$ is continuous and $x:I\to\mathcal{X}$ is a classical solution of the IVP. Then $f\circ x$ is continuous, so $\dot{x}=f\circ x$ is continuous and $x\in C^1(I,\mathcal{X})$. The fundamental theorem of calculus therefore gives
+
+$$
+x(t)-x_0
+=
+\int_{t_0}^{t}\dot{x}(s)\,ds
+=
+\int_{t_0}^{t}f\bigl(x(s)\bigr)\,ds.
+$$
+
+Hence every solution satisfies
+
+$$
+x(t)=x_0+\int_{t_0}^{t}f\bigl(x(s)\bigr)\,ds.
+$$
+
+Conversely, let $f$ be continuous and let a continuous curve $x:I\to\mathcal{X}$ satisfy this integral equation for every $t\in I$. Then $s\mapsto f(x(s))$ is continuous. The integral on the right is therefore $C^1$, so $x$ is $C^1$ and differentiation gives $\dot{x}(t)=f(x(t))$; setting $t=t_0$ gives $x(t_0)=x_0$. Thus the differential and integral formulations are equivalent in this continuous-$f$ classical-solution setting. Picard iteration uses the integral equation as a fixed-point problem under the stronger local Lipschitz hypothesis [@Teschl2012, sec. 2.2].
+
+### From local existence and uniqueness to finite-time evolution
+
+Assume local existence and uniqueness. For an initial state $x_0$, let $x(\cdot;t_0,x_0)$ denote its maximal solution. Autonomy permits the finite-time map
+
+$$
+\phi_\tau(x_0)
+=
+x(t_0+\tau;t_0,x_0),
+$$
+
+whenever $t_0+\tau$ lies in the maximal interval. The result does not depend on the numerical choice of $t_0$: shifting clock time shifts an autonomous solution without changing the elapsed-time evolution rule.
+
+For one fixed $x_0$,
+
+$$
+t\mapsto x(t)=\phi_{t-t_0}(x_0)
+$$
+
+is one trajectory. By contrast, the flow varies both elapsed time and initial state:
+
+$$
+(\tau,x_0)\mapsto\phi_\tau(x_0).
+$$
+
+The identity relation follows because no elapsed time has passed. The composition relation follows from autonomy and uniqueness: as functions of a new elapsed-time variable, both continuations start at the intermediate state $\phi_s(x)$ and solve the same IVP, so they agree wherever both are defined. No differentiability with respect to $x_0$ is required for these identities.
+
+### Time differentiation, joint flow regularity, and the generator
+
+For locally Lipschitz $f$, the individual curve $\tau\mapsto\phi_\tau(x)$ is $C^1$ and its instantaneous generator is
+
+$$
+f(x)
+=
+\left.\frac{d}{d\tau}\phi_\tau(x)\right|_{\tau=0}.
+$$
+
+This derivative is only with respect to elapsed time. If $f\in C^1$, the stronger conclusion is that $\Phi(\tau,x)$ is jointly $C^1$ in both $\tau$ and $x$. Conversely, a jointly differentiable local flow satisfying identity and composition generates an autonomous vector field through the derivative-at-zero relation, and its flow curves satisfy the corresponding ODE [@Teschl2012, sec. 6.2, problem 6.5]. Thus instantaneous and finite-time descriptions are linked without conflating time differentiability of one trajectory with differentiable dependence on initial state.
+
+## Step-by-step derivation
+
+The central logical chain is:
+
+1. **Choose the admissible states.** Declare an open domain $\mathcal{X}\subseteq\mathbb{R}^n$.
+2. **Assign instantaneous change.** Specify $f:\mathcal{X}\to\mathbb{R}^n$.
+3. **Constrain a curve.** Require a differentiable $x:I\to\mathcal{X}$ to satisfy $\dot{x}(t)=f(x(t))$.
+4. **Anchor the curve.** Add $x(t_0)=x_0$ to form an IVP.
+5. **Invoke the relevant regularity result.** Continuity supplies at least one local solution; local Lipschitz continuity supplies local uniqueness as well.
+6. **Continue as far as possible.** Because local existence and uniqueness both hold at the locally Lipschitz rung, compatible local pieces combine into one unique maximal solution on $I_{t_0,x_0}$.
+7. **Re-index by elapsed time.** Set $\tau=t-t_0$ and define $\phi_\tau(x_0)=x(t_0+\tau;t_0,x_0)$ where supported.
+8. **Use uniqueness to compose.** Evolving from $x$ for $s$ reaches $\phi_s(x)$. Starting there and evolving for $\tau$ solves the same IVP as evolving from $x$ for $s+\tau$, so
+
+   $$
+   \phi_{\tau+s}(x)=\phi_\tau(\phi_s(x)).
+   $$
+
+9. **Differentiate at zero elapsed time.** Since locally Lipschitz $f$ is continuous, each solution curve is $C^1$ in $\tau$, and its local slope recovers the instantaneous rule:
+
+   $$
+   \left.\frac{d}{d\tau}\phi_\tau(x)\right|_{\tau=0}=f(x).
+   $$
+
+   This is a derivative along the elapsed-time coordinate. Joint $C^1$ dependence on $(\tau,x)$ is asserted only at the stronger $f\in C^1$ rung.
+
+No step in this chain turns local existence into global existence. For example, the smooth field $f(x)=x^2$ on $\mathbb{R}$ has the solution
+
+$$
+x(t)=\frac{x_0}{1-x_0(t-t_0)}
+$$
+
+for $x_0>0$. Its maximal interval is
+
+$$
+(-\infty,t_0+1/x_0),
+$$
+
+because the solution diverges as $t\uparrow t_0+1/x_0$. Smoothness gives local uniqueness and a smooth local flow, not a global flow on $\mathbb{R}\times\mathbb{R}$ [@Teschl2012, secs. 1.3, 6.2].
+
+## Geometric intuition
+
+At each $x\in\mathcal{X}$, the vector $f(x)$ is a local arrow with units of state per unit time. A compatible trajectory is tangent to the arrow at every state it visits:
+
+$$
+\text{trajectory tangent at }x(t)
+=
+\dot{x}(t)
+=
+f(x(t)).
+$$
+
+The flow asks a different question. Rather than showing only the arrow at one point, $\phi_\tau$ transports every supported initial point through a finite elapsed time $\tau$. Fixing the point gives one trajectory; fixing the elapsed time gives one state-to-state map.
+
+This picture is intuition, not evidence that measured data possess a vector field or flow. Arrows fitted to samples and curves displayed in a projection inherit the assumptions of the state definition, sampling process, and fitted model.
+
+## Worked example
+
+Consider the scalar IVP
+
+$$
+\frac{dx}{dt}=a x,
+\qquad
+x(t_0)=x_0,
+$$
+
+where $a\in\mathbb{R}$ is fixed.
+
+### Derive the trajectory
+
+Multiply the state by the integrating factor $e^{-a(t-t_0)}$. By the product rule,
+
+$$
+\begin{aligned}
+\frac{d}{dt}\left(e^{-a(t-t_0)}x(t)\right)
+&=
+-a e^{-a(t-t_0)}x(t)
++e^{-a(t-t_0)}\dot{x}(t)\\
+&=
+e^{-a(t-t_0)}\bigl(\dot{x}(t)-a x(t)\bigr)\\
+&=0.
+\end{aligned}
+$$
+
+Therefore $e^{-a(t-t_0)}x(t)$ is constant in $t$. Evaluating that constant at $t=t_0$ gives
+
+$$
+e^{-a(t_0-t_0)}x(t_0)=x_0.
+$$
+
+Hence
+
+$$
+x(t)=x_0e^{a(t-t_0)}.
+$$
+
+This derivation also covers $x_0=0$ without dividing by the state.
+
+### Verify the IVP
+
+Differentiate the proposed solution:
+
+$$
+\dot{x}(t)
+=
+a x_0e^{a(t-t_0)}
+=
+a x(t).
+$$
+
+At the reference time,
+
+$$
+x(t_0)=x_0e^0=x_0.
+$$
+
+It therefore satisfies both the ODE and the initial condition.
+
+### Identify the mathematical roles
+
+- **State space:** $\mathcal{X}=\mathbb{R}$.
+- **State value:** $x(t)\in\mathbb{R}$.
+- **Vector field:** $f(x)=ax$.
+- **Initial state:** $x_0$ at reference time $t_0$.
+- **Trajectory:** $t\mapsto x_0e^{a(t-t_0)}$ for the chosen $x_0$.
+- **Elapsed-time flow:**
+
+  $$
+  \phi_\tau(x)=xe^{a\tau}.
+  $$
+
+The field is globally Lipschitz because
+
+$$
+|f(x)-f(y)|=|a|\,|x-y|.
+$$
+
+The solution is finite for every real $t$, so this example has a global flow.
+
+### Verify the flow laws
+
+Identity:
+
+$$
+\phi_0(x)=xe^{a\cdot0}=x.
+$$
+
+Composition:
+
+$$
+\begin{aligned}
+\phi_\tau\bigl(\phi_s(x)\bigr)
+&=\phi_\tau(xe^{as})\\
+&=(xe^{as})e^{a\tau}\\
+&=xe^{a(\tau+s)}\\
+&=\phi_{\tau+s}(x).
+\end{aligned}
+$$
+
+Generator:
+
+$$
+\left.\frac{d}{d\tau}\phi_\tau(x)\right|_{\tau=0}
+=
+\left.a xe^{a\tau}\right|_{\tau=0}
+=
+ax
+=
+f(x).
+$$
+
+The example makes the three levels explicit: $f(x)=ax$ gives instantaneous change, $\phi_\tau(x)=xe^{a\tau}$ gives finite-time evolution across initial states, and choosing one $x_0$ yields one trajectory.
+
+### Worked two-dimensional rotation--dilation example
+
+For a bounded two-dimensional example, let the state be
+
+$$
+z(t)=
+\begin{pmatrix}
+x(t)\\
+y(t)
+\end{pmatrix}
+\in\mathbb{R}^2
+$$
+
+and fix parameters $a,\omega\in\mathbb{R}$. Consider the autonomous IVP
+
+$$
+\dot z=Az,
+\qquad
+A=
+\begin{pmatrix}
+a & -\omega\\
+\omega & a
+\end{pmatrix},
+\qquad
+z(t_0)=z_0.
+$$
+
+Define the planar rotation matrix
+
+$$
+R(\theta)
+=
+\begin{pmatrix}
+\cos\theta & -\sin\theta\\
+\sin\theta & \cos\theta
+\end{pmatrix}.
+$$
+
+With elapsed time $\tau=t-t_0$, propose
+
+$$
+z(t_0+\tau)
+=
+e^{a\tau}R(\omega\tau)z_0.
+$$
+
+When $\omega\neq0$, the rotation changes the angular position while the factor $e^{a\tau}$ changes the radius: $a<0$ gives inward spirals, $a=0$ gives constant-radius rotation, and $a>0$ gives outward spirals. These descriptions concern this declared system only; they do not infer spiral dynamics from a plotted trajectory.
+
+#### Verify the initial value and differential equation
+
+At zero elapsed time, $e^{a\cdot0}=1$ and $R(0)=I$, so
+
+$$
+z(t_0)=e^0R(0)z_0=z_0.
+$$
+
+Let
+
+$$
+J=
+\begin{pmatrix}
+0 & -1\\
+1 & 0
+\end{pmatrix},
+\qquad
+A=aI+\omega J.
+$$
+
+Direct differentiation of the sine and cosine entries gives
+
+$$
+\frac{d}{d\tau}R(\omega\tau)
+=
+\omega J R(\omega\tau).
+$$
+
+Because $d\tau/dt=1$, the product rule yields
+
+$$
+\begin{aligned}
+\dot z(t_0+\tau)
+&=
+e^{a\tau}
+\left[aI+\omega J\right]
+R(\omega\tau)z_0\\
+&=
+A\left[e^{a\tau}R(\omega\tau)z_0\right]\\
+&=Az(t_0+\tau).
+\end{aligned}
+$$
+
+The proposed curve therefore satisfies both the ODE and the initial condition.
+
+#### Identify the mathematical roles
+
+- **State space:** $\mathcal{X}=\mathbb{R}^2$.
+- **State value:** $z(t)=(x(t),y(t))^T\in\mathbb{R}^2$.
+- **Vector field:** $f(z)=Az$.
+- **Initial condition:** $z(t_0)=z_0$.
+- **Trajectory:** $t\mapsto e^{a(t-t_0)}R(\omega(t-t_0))z_0$ for the chosen $z_0$.
+- **Elapsed-time flow:**
+
+  $$
+  \phi_\tau(z)=e^{a\tau}R(\omega\tau)z.
+  $$
+
+#### Verify the flow laws and global domain
+
+The identity law follows immediately:
+
+$$
+\phi_0(z)=e^0R(0)z=z.
+$$
+
+Using $e^{a\tau}e^{as}=e^{a(\tau+s)}$ and the planar rotation law
+$R(\alpha)R(\beta)=R(\alpha+\beta)$ gives
+
+$$
+\begin{aligned}
+\phi_\tau\bigl(\phi_s(z)\bigr)
+&=
+e^{a\tau}R(\omega\tau)
+e^{as}R(\omega s)z\\
+&=
+e^{a(\tau+s)}R\bigl(\omega(\tau+s)\bigr)z\\
+&=
+\phi_{\tau+s}(z).
+\end{aligned}
+$$
+
+The field is globally Lipschitz on $\mathbb{R}^2$ because, for the Euclidean norm and its induced matrix norm,
+
+$$
+\|f(z)-f(w)\|
+=
+\|A(z-w)\|
+\leq
+\|A\|\,\|z-w\|.
+$$
+
+The explicit formula is finite for every $z\in\mathbb{R}^2$ and every finite $\tau\in\mathbb{R}$. Hence the supported domain is
+
+$$
+W=\mathbb{R}\times\mathbb{R}^2,
+$$
+
+so this system has a global two-sided flow. Each $\phi_\tau$ is a globally defined bijection with inverse $\phi_{-\tau}$. Outward growth when $a>0$ is unbounded as $\tau\to\infty$, but it does not cause finite-time blow-up.
+
+### Why the uniqueness assumption matters
+
+Now consider
+
+$$
+\dot{x}=\sqrt{|x|},
+\qquad
+x(0)=0,
+\qquad
+\mathcal{X}=\mathbb{R}.
+$$
+
+The vector field $f(x)=\sqrt{|x|}$ is continuous, so Peano's theorem guarantees at least one local solution through $(0,0)$. It is not locally Lipschitz at $0$, because for $x\neq0$,
+
+$$
+\frac{|f(x)-f(0)|}{|x-0|}
+=
+\frac{\sqrt{|x|}}{|x|}
+=
+\frac{1}{\sqrt{|x|}},
+$$
+
+which is unbounded as $x\to0$.
+
+One solution is
+
+$$
+x(t)=0.
+$$
+
+For every waiting time $c\geq0$, another solution is
+
+$$
+x_c(t)=
+\begin{cases}
+0, & t\leq c,\\
+\dfrac{(t-c)^2}{4}, & t\geq c.
+\end{cases}
+$$
+
+For $t<c$, both $\dot{x}_c(t)$ and $\sqrt{|x_c(t)|}$ are zero. For $t>c$,
+
+$$
+\dot{x}_c(t)=\frac{t-c}{2}
+=
+\sqrt{\frac{(t-c)^2}{4}}
+=
+\sqrt{|x_c(t)|}.
+$$
+
+At $t=c$, the left and right derivatives are both zero, so $x_c$ is differentiable there. Since $c\geq0$, every such curve also satisfies $x_c(0)=0$. The same IVP therefore has infinitely many solutions. This is the standard nonuniqueness mechanism illustrated by Teschl's square-root example [@Teschl2012, sec. 1.3].
+
+The lesson is precise: continuity supports existence here, but the failed local Lipschitz condition removes the basic uniqueness guarantee. Consequently, the ODE and initial state alone do not determine a unique value $\phi_\tau(0)$ after positive elapsed time and therefore do not induce one uniquely determined single-valued flow.
+
+## Common mistakes
+
+1. **Treating the equation as a curve rather than a constraint.** The expression $\dot{x}=f(x)$ specifies which differentiable curves qualify as solutions; it is not itself one trajectory.
+2. **Equating existence with uniqueness.** A continuous field can admit solutions without selecting exactly one solution from an initial state.
+3. **Equating local with global.** Local Lipschitz continuity gives local existence and uniqueness and hence a unique maximal continuation, not an all-time solution.
+4. **Ignoring the declared domain.** A solution must remain in $\mathcal{X}$. Reaching its boundary can end the maximal solution even when the coordinate values stay bounded.
+5. **Using $t$ and $\tau$ interchangeably.** Clock time labels a trajectory relative to $t_0$; elapsed time indexes autonomous evolution maps.
+6. **Calling one trajectory a flow.** One fixed $x_0$ gives one trajectory. A flow organizes evolution across multiple initial states and must satisfy identity and composition where defined.
+7. **Assuming every vector field has a global flow.** Even a smooth vector field can have finite-time blow-up.
+8. **Inferring a field from a display.** A plotted curve or fitted arrow field is not by itself evidence for a unique autonomous mechanism.
+
+This formalism also does **not** imply that:
+
+- every observed time series is a dynamical-system trajectory;
+- every time-varying latent representation admits a valid autonomous vector field;
+- one observed trajectory uniquely determines a vector field, either away from or along incompletely sampled states;
+- multiple similar trajectories prove one shared flow;
+- predictive success establishes mechanistic correctness;
+- an inferred latent state is the uniquely true physical state;
+- all systems are autonomous or continuous-time;
+- all scientifically relevant state spaces are Euclidean; or
+- all vector fields generate global flows.
+
+## Computational interpretation
+
+Given a declared $f$, $x_0$, and $t_0$, a numerical ODE solver approximates one solution trajectory over a requested time interval. Step size, error control, stiffness, domain boundaries, and finite-time divergence affect whether the computation is reliable. Numerical output does not replace the analytical questions addressed here: whether a solution exists, whether it is unique, and whether the requested interval lies inside its maximal domain.
+
+The flow viewpoint corresponds computationally to solving the same ODE for many initial states and elapsed times. A finite grid of simulations samples a proposed flow; it is not the complete map $\Phi:W\to\mathcal{X}$. Likewise, estimating $f$ from data is a separate Method problem involving sampling, observation, noise, identifiability, and baselines. It is not part of this mathematical definition.
+
+## Relationship to LDG
+
+This object formalizes, rather than replaces, the six Cycle 1 Concepts:
+
+| Concept | Formal role in the autonomous IVP |
+|---|---|
+| [State](../concepts/state.qmd) | $x(t)$ is the state value carried at clock time $t$. |
+| [State Space](../concepts/state-space.qmd) | $x(t)\in\mathcal{X}\subseteq\mathbb{R}^n$. |
+| [Initial Condition](../concepts/initial-condition.qmd) | $x(t_0)=x_0$ anchors the evolution at a reference time. |
+| [Vector Field](../concepts/vector-field.qmd) | $f:\mathcal{X}\to\mathbb{R}^n$ assigns instantaneous change. |
+| [Trajectory](../concepts/trajectory.qmd) | $t\mapsto x(t)$ is one solution selected by an initial condition when uniqueness holds. |
+| [Flow](../concepts/flow.qmd) | $(\tau,x_0)\mapsto\phi_\tau(x_0)$ organizes finite-time evolution across supported initial states. |
+
+For LDG, the main methodological boundary is that mathematical coherence inside a declared ODE model is not empirical evidence that measured neural, behavioral, or latent variables obey that model. A later toy model may use this object to specify known ground truth. Real-data claims would additionally require a justified state description, observation model, estimation procedure, simpler baselines, and tests that distinguish an autonomous shared rule from inputs, nonstationarity, omitted state, and measurement artifacts.
+
+## References
+
+- Existence, uniqueness, smoothness, integral form, and continuation of IVP solutions: [@Teschl2012, ch. 2].
+- Scalar autonomous examples demonstrating global evolution, finite-time blow-up, and nonuniqueness: [@Teschl2012, sec. 1.3].
+- Maximal integral curves, the supported domain $W$, local-flow composition, and the infinitesimal generator: [@Teschl2012, sec. 6.2].
+
+## Maturity checklist
+
+- [x] Uses the six stable Cycle 1 Concepts as canonical prerequisites.
+- [x] States the autonomous Euclidean IVP with well-typed domains and codomains.
+- [x] Separates continuity, local Lipschitz continuity, and stronger smoothness.
+- [x] Distinguishes existence from uniqueness and local from maximal and global solutions.
+- [x] Defines the supported local-flow domain and states identity and composition only where defined.
+- [x] Relates the differentiable local flow to its vector field through the derivative at zero.
+- [x] Includes and verifies the complete $\dot{x}=ax$ trajectory and flow derivation.
+- [x] Includes an analytically checked two-dimensional rotation--dilation trajectory and global flow.
+- [x] Includes a checked nonuniqueness example and a bounded finite-time blow-up boundary.
+- [x] States empirical and modeling non-implications without entering excluded downstream topics.
+- [x] Completed one internal mathematical consistency / Red-Team pass.
+- [x] Applied the bounded corrections from the independent L2 mathematical review.
+- [x] Independent focused re-review confirmed the revised statements; the owner approved `L2` / `stable` promotion on 2026-08-18.

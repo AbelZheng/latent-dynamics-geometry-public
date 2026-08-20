@@ -1,0 +1,136 @@
+---
+title: "Initial Condition"
+object_type: concept
+maturity: L1
+status: stable
+domain:
+- foundations
+- dynamics
+tags:
+- initial-condition
+- reference-time
+- state-evolution
+prerequisites:
+- knowledge/concepts/state.qmd
+- knowledge/concepts/state-space.qmd
+- knowledge/concepts/trajectory.qmd
+related: []
+created: 2026-08-17
+updated: 2026-08-17
+---
+
+# Initial Condition
+
+## One-sentence definition
+
+An **initial condition** assigns a specified state value to a specified reference time for the evolution being considered.
+
+## Why this concept matters
+
+An evolution rule does not by itself say which realized evolution is under discussion. An initial condition supplies the state value from which the description is started, anchored at a reference time. It therefore connects a general state description to a particular trajectory or set of possible trajectories.
+
+“Initial” is relative to the problem, not necessarily to the physical beginning of the system. A researcher may choose the start of a trial, stimulus onset, movement onset, or any other declared reference time. The same state value can serve as an initial condition for one analysis and as an intermediate state in another.
+
+## Intuition
+
+Suppose a pendulum model is ready to describe how angle and angular velocity change. To continue the model from time $t_0$, one must specify the pendulum's state there. Saying “the angle is zero” is generally insufficient because different angular velocities lead to different subsequent motions. Saying “at $t_0$, angle is zero and angular velocity is one” assigns a complete state value and therefore supplies an initial condition for that state description.
+
+The initial condition is not an extra kind of physical quantity. It is a state value placed in a particular role: the value used to anchor an evolution problem at a reference time.
+
+## Formal definition
+
+Let $\mathcal{X}$ be the state space and let $t_0$ be the chosen reference time. An initial condition has the form
+
+$$
+x(t_0)=x_0,\qquad x_0\in\mathcal{X}.
+$$
+
+Here $x_0$ is an admissible state value. The equation is a condition imposed on a trajectory $x(t)$: any trajectory considered for the problem must pass through $x_0$ at $t_0$. Teschl uses this standard form when defining an initial value problem [@Teschl2012, sec. 2.2].
+
+The condition constrains a trajectory only together with a specified evolution rule, parameters, and any required future input values or prescription after $t_0$. At L1, no universal existence or uniqueness claim is made: depending on the description and assumptions, a condition and rule may admit one trajectory, several, or none over the requested time interval.
+
+## Core notation
+
+- $t_0$: the reference time selected for the problem.
+- $\mathcal{X}$: the state space.
+- $x_0\in\mathcal{X}$: the assigned initial state value.
+- $x(t_0)=x_0$: the initial-condition statement.
+- $x(t)$: a trajectory satisfying the condition when such a trajectory is defined.
+
+The subscript zero marks the reference role; it does not require the clock time to be numerically zero.
+
+## Prerequisites
+
+- [State](state.qmd): distinguishes state values from observations and parameters.
+- [State Space](state-space.qmd): supplies the admissible values from which $x_0$ is chosen.
+- [Trajectory](trajectory.qmd): supplies the time-indexed object constrained at $t_0$.
+
+**Assumed background:** elementary function notation.
+
+## Relationship to adjacent concepts
+
+| Concept | Distinction from initial condition |
+|---|---|
+| **State value** | Any realized condition of the system at a time. It becomes an initial condition when assigned to the chosen reference time for an evolution problem. |
+| **Trajectory** | A time-parameterized admissible evolution of states. The initial condition constrains its value at one reference time but is not the entire trajectory. |
+| **Parameter** | A parameter indexes or specifies the evolution rule and is held fixed under the declared description. The initial state is initialized and propagated by that rule. A constant unknown can be moved into an augmented state only by explicitly changing the model's role assignments. |
+| **Observation at the reference time** | A measurement $y(t_0)$ may be noisy, partial, or indirect. It is evidence about $x_0$, not automatically the initial condition itself. |
+| **First recorded sample** | The first available datum may occur after the modeled interval begins, may omit state variables, or may be an observation. It is not automatically a complete initial condition. |
+| **External input** | A future input may influence the subsequent trajectory but is not generally contained in $x_0$. The model must separately specify any input information it requires. |
+| **Boundary condition** | A boundary condition is a broader constraint that may be imposed at another time or location. An initial condition specifically assigns state information at a chosen reference time. |
+| **Reset or trial onset** | An experimental event can define $t_0$, but it does not guarantee that the system's state is known, identical across trials, or independent of earlier history. |
+
+## What this does NOT imply
+
+Calling $x(t_0)=x_0$ an initial condition does **not** by itself imply that:
+
+- $t_0$ is the time when the physical system began to exist;
+- $x_0$ was directly or exactly measured;
+- the first data row is a complete state value;
+- the same nominal experimental condition produces the same $x_0$ on every trial;
+- the evolution rule and parameters are known;
+- a trajectory exists for all later times or is unique;
+- changing $x_0$ while changing parameters or inputs isolates an initial-condition effect; or
+- differences in later behavior are caused solely by differences in the initial condition.
+
+## Minimal example
+
+For the pendulum state $x=(\text{angle},\text{angular velocity})$, choose a reference time $t_0$ and assign
+
+$$
+x(t_0)=(0,1).
+$$
+
+This says that at $t_0$ the pendulum is at zero angle with angular velocity one in the chosen units. The pair is the initial state value; $t_0$ is part of the condition. Pendulum length and damping remain parameters of the declared model, while applied torque after $t_0$ is an external input if the model includes one.
+
+A camera measurement reporting angle near zero is not sufficient to establish this initial condition because angular velocity is missing and the measured angle is uncertain. Estimating the full state at $t_0$ produces an **estimated initial condition**, which should not be silently treated as exact.
+
+## Neuroscience / behavioral relevance
+
+In neural dynamics, a population activity vector at a declared event time may be modeled as an initial condition for subsequent population evolution. Cunningham and Yu summarize motor-cortical work in which preparatory population activity is interpreted as setting the initial state for movement-period dynamics [@CunninghamYu2014]. This is a model interpretation of recorded activity, not proof that the vector is the complete physical neural state or that later differences are caused only by that initial value.
+
+For behavior, position alone at trial onset may not be an adequate initial condition when velocity, posture, context, or internal task state affects subsequent behavior. LDG should distinguish the experimental alignment event, the measurements available there, and the state value actually assigned to the model.
+
+## Relevance to LDG
+
+Many LDG questions compare time courses across trials, conditions, subjects, or modalities. Initial-condition language makes those comparisons more precise: are trajectories different because they begin from different proposed states, because the evolution rule or inputs differ, or because the state is incompletely observed? The concept does not answer that empirical question, but it prevents the alternatives from being collapsed.
+
+## Open questions
+
+- How should uncertainty in an estimated $x_0$ be propagated into claims about later trajectories?
+- Which event should define $t_0$ for a particular neural or behavioral analysis?
+- What evidence can distinguish initial-state variation from changes in parameters, inputs, or unmeasured state variables?
+
+## References
+
+- Initial-value notation and role: [@Teschl2012, sec. 2.2].
+- Neuroscience-specific initial-state interpretation: [@CunninghamYu2014].
+
+## Maturity checklist
+
+- [x] Defines an initial condition as a state assignment at a reference time.
+- [x] Distinguishes initial state, observation, first sample, parameter, and input.
+- [x] Makes the role of $t_0$ explicit without entering existence or uniqueness theory.
+- [x] Includes explicit non-implications and an estimated-initial-condition caveat.
+- [x] Uses only existing canonical prerequisites.
+- [x] Has received lightweight conceptual review and incorporated the required L1 corrections.
