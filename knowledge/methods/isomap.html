@@ -1,0 +1,1414 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.10.18">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Isomap – Latent Dynamics &amp; Geometry</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-445b8638c3d06994fee0907d791121c4.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-chtml.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">Latent Dynamics &amp; Geometry</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../index.html"> 
+<span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../knowledge/concepts/index.html"> 
+<span class="menu-text">Concepts</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../knowledge/methods/index.html"> 
+<span class="menu-text">Methods</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../knowledge/math/index.html"> 
+<span class="menu-text">Math</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../knowledge/papers/index.html"> 
+<span class="menu-text">Papers</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../toy-models/index.html"> 
+<span class="menu-text">Toy Models</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../research-questions/index.html"> 
+<span class="menu-text">Research Questions</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../benchmarks/index.html"> 
+<span class="menu-text">Benchmarks</span></a>
+  </li>  
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/AbelZheng/latent-dynamics-geometry-public"> <i class="bi bi-github" role="img" aria-label="GitHub repository">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="https://github.com/AbelZheng/latent-dynamics-geometry-public/discussions"> 
+<span class="menu-text">Discussions</span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#isomap" id="toc-isomap" class="nav-link active" data-scroll-target="#isomap">Isomap</a>
+  <ul class="collapse">
+  <li><a href="#problem" id="toc-problem" class="nav-link" data-scroll-target="#problem">Problem</a></li>
+  <li><a href="#input" id="toc-input" class="nav-link" data-scroll-target="#input">Input</a></li>
+  <li><a href="#output" id="toc-output" class="nav-link" data-scroll-target="#output">Output</a></li>
+  <li><a href="#core-idea" id="toc-core-idea" class="nav-link" data-scroll-target="#core-idea">Core idea</a></li>
+  <li><a href="#generative-modeling-assumptions" id="toc-generative-modeling-assumptions" class="nav-link" data-scroll-target="#generative-modeling-assumptions">Generative / modeling assumptions</a></li>
+  <li><a href="#mathematical-formulation" id="toc-mathematical-formulation" class="nav-link" data-scroll-target="#mathematical-formulation">Mathematical formulation</a>
+  <ul class="collapse">
+  <li><a href="#neighborhood-graph" id="toc-neighborhood-graph" class="nav-link" data-scroll-target="#neighborhood-graph">1. Neighborhood graph</a></li>
+  <li><a href="#shortest-path-graph-distance" id="toc-shortest-path-graph-distance" class="nav-link" data-scroll-target="#shortest-path-graph-distance">2. Shortest-path graph distance</a></li>
+  <li><a href="#classical-mds" id="toc-classical-mds" class="nav-link" data-scroll-target="#classical-mds">3. Classical MDS</a></li>
+  </ul></li>
+  <li><a href="#what-is-learned" id="toc-what-is-learned" class="nav-link" data-scroll-target="#what-is-learned">What is learned?</a></li>
+  <li><a href="#what-is-fixed" id="toc-what-is-fixed" class="nav-link" data-scroll-target="#what-is-fixed">What is fixed?</a></li>
+  <li><a href="#temporal-assumptions" id="toc-temporal-assumptions" class="nav-link" data-scroll-target="#temporal-assumptions">Temporal assumptions</a></li>
+  <li><a href="#geometry-assumptions" id="toc-geometry-assumptions" class="nav-link" data-scroll-target="#geometry-assumptions">Geometry assumptions</a></li>
+  <li><a href="#supervision" id="toc-supervision" class="nav-link" data-scroll-target="#supervision">Supervision</a></li>
+  <li><a href="#optimization-inference" id="toc-optimization-inference" class="nav-link" data-scroll-target="#optimization-inference">Optimization / inference</a></li>
+  <li><a href="#strengths" id="toc-strengths" class="nav-link" data-scroll-target="#strengths">Strengths</a></li>
+  <li><a href="#failure-modes" id="toc-failure-modes" class="nav-link" data-scroll-target="#failure-modes">Failure modes</a></li>
+  <li><a href="#identifiability-issues" id="toc-identifiability-issues" class="nav-link" data-scroll-target="#identifiability-issues">Identifiability issues</a></li>
+  <li><a href="#comparison-with-simpler-methods" id="toc-comparison-with-simpler-methods" class="nav-link" data-scroll-target="#comparison-with-simpler-methods">Comparison with simpler methods</a></li>
+  <li><a href="#evaluation-criteria" id="toc-evaluation-criteria" class="nav-link" data-scroll-target="#evaluation-criteria">Evaluation criteria</a></li>
+  <li><a href="#minimal-toy-model" id="toc-minimal-toy-model" class="nav-link" data-scroll-target="#minimal-toy-model">Minimal toy model</a></li>
+  <li><a href="#relevance-to-ldg" id="toc-relevance-to-ldg" class="nav-link" data-scroll-target="#relevance-to-ldg">Relevance to LDG</a>
+  <ul class="collapse">
+  <li><a href="#mouse-trajectory" id="toc-mouse-trajectory" class="nav-link" data-scroll-target="#mouse-trajectory">Mouse trajectory</a></li>
+  <li><a href="#eye-movement" id="toc-eye-movement" class="nav-link" data-scroll-target="#eye-movement">Eye movement</a></li>
+  <li><a href="#eeg" id="toc-eeg" class="nav-link" data-scroll-target="#eeg">EEG</a></li>
+  <li><a href="#meg-neural-population-data" id="toc-meg-neural-population-data" class="nav-link" data-scroll-target="#meg-neural-population-data">MEG / neural population data</a></li>
+  </ul></li>
+  <li><a href="#primary-sources" id="toc-primary-sources" class="nav-link" data-scroll-target="#primary-sources">Primary sources</a></li>
+  <li><a href="#reviews-secondary-sources" id="toc-reviews-secondary-sources" class="nav-link" data-scroll-target="#reviews-secondary-sources">Reviews / secondary sources</a></li>
+  <li><a href="#open-methodological-questions" id="toc-open-methodological-questions" class="nav-link" data-scroll-target="#open-methodological-questions">Open methodological questions</a></li>
+  <li><a href="#maturity-checklist" id="toc-maturity-checklist" class="nav-link" data-scroll-target="#maturity-checklist">Maturity checklist</a></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<div class="quarto-title-block"><div><h1 class="title">Isomap</h1><button type="button" class="btn code-tools-button" id="quarto-code-tools-source"><i class="bi"></i> Code</button></div></div>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="isomap" class="level1">
+<h1>Isomap</h1>
+<section id="problem" class="level2">
+<h2 class="anchored" data-anchor-id="problem">Problem</h2>
+<p>Isomap constructs low-dimensional Euclidean coordinates intended to preserve shortest-path distances in a neighborhood graph built from high-dimensional observations. It addresses a narrower problem than generic nonlinear dimensionality reduction: when ambient distances are locally meaningful and the samples adequately trace a structure whose path metric is approximately Euclidean in some global coordinate system, graph paths can provide a better global distance surrogate than straight ambient chords <span class="citation" data-cites="TenenbaumDeSilvaLangford2000 BernsteinEtAl2000">(<a href="#ref-TenenbaumDeSilvaLangford2000" role="doc-biblioref">Tenenbaum et al. 2000</a>; <a href="#ref-BernsteinEtAl2000" role="doc-biblioref">Bernstein et al. 2000</a>)</span>.</p>
+<p>The output is an embedding of the fitted observations, not proof that the observations arose from a manifold. Isomap separates three operations that must not be conflated: constructing an ambient-distance neighborhood graph, computing shortest-path distances on that finite graph, and applying classical multidimensional scaling (MDS) to those graph distances.</p>
+</section>
+<section id="input" class="level2">
+<h2 class="anchored" data-anchor-id="input">Input</h2>
+<p>Let <span class="math inline">\(x_1,\ldots,x_n\in\mathbb R^p\)</span> be the fitted observations after a declared feature construction and preprocessing pipeline. A reproducible analysis must specify:</p>
+<ul>
+<li>the observational unit represented by each row and any dependence among rows;</li>
+<li>centering, feature scaling, exclusion, missing-data and duplicate-point policies;</li>
+<li>the ambient dissimilarity <span class="math inline">\(\delta(x_i,x_j)\)</span> used both to choose neighbors and, unless explicitly separated, to weight graph edges;</li>
+<li>either a <span class="math inline">\(k\)</span>-nearest-neighbor rule or an <span class="math inline">\(\varepsilon\)</span>-radius rule;</li>
+<li>directed versus symmetrized <span class="math inline">\(k\)</span>-nearest-neighbor construction, including whether mutual or union symmetrization is used;</li>
+<li>tie breaking, zero-distance and duplicate handling;</li>
+<li>the treatment of disconnected components;</li>
+<li>the target coordinate dimension <span class="math inline">\(d\)</span> or the training-only rule used to choose it; and</li>
+<li>whether new observations will require an explicitly declared out-of-sample extension.</li>
+</ul>
+<p>Ordinary Isomap commonly uses Euclidean distance after preprocessing, but that choice is not automatic. Feature scaling can alter neighbor identities, edge lengths, graph connectivity, shortest paths and the final embedding.</p>
+</section>
+<section id="output" class="level2">
+<h2 class="anchored" data-anchor-id="output">Output</h2>
+<p>For the fitted observations, Isomap returns:</p>
+<ul>
+<li>a neighborhood graph <span class="math inline">\(G=(V,E)\)</span> whose vertices correspond to observations;</li>
+<li>weighted shortest-path distances <span class="math inline">\(d_G(i,j)\)</span> within the analyzed connected component or components;</li>
+<li>a double-centered matrix derived from squared graph distances;</li>
+<li>eigenvalues diagnosing how nearly those graph distances admit the requested Euclidean representation; and</li>
+<li>centered coordinates <span class="math inline">\(y_i\in\mathbb R^d\)</span> for the fitted observations.</li>
+</ul>
+<p>Standard Isomap does not return a generative distribution, a posterior over coordinates, a unique inverse map from coordinates to observations, or automatically valid coordinates for observations not included in the fitted graph.</p>
+</section>
+<section id="core-idea" class="level2">
+<h2 class="anchored" data-anchor-id="core-idea">Core idea</h2>
+<p>Isomap has three distinct stages <span class="citation" data-cites="TenenbaumDeSilvaLangford2000">(<a href="#ref-TenenbaumDeSilvaLangford2000" role="doc-biblioref">Tenenbaum et al. 2000</a>)</span>:</p>
+<ol type="1">
+<li><strong>Neighbor graph:</strong> connect observations judged locally close by a fixed <span class="math inline">\(k\)</span> or <span class="math inline">\(\varepsilon\)</span> rule, and weight each retained edge by its declared ambient dissimilarity.</li>
+<li><strong>Graph distance:</strong> approximate long-range path distance by the length of the shortest sequence of local edges between each pair of vertices.</li>
+<li><strong>Classical MDS:</strong> convert squared graph distances to a centered inner-product matrix and approximate that matrix by a rank-<span class="math inline">\(d\)</span> positive-semidefinite Gram matrix.</li>
+</ol>
+<p>The first stage proposes which ambient chords are local enough to stand in for short path segments. The second stage produces a finite graph metric. The third asks whether that metric can be represented, exactly or approximately, by Euclidean coordinates of the requested dimension. A visually smooth final plot cannot retroactively validate either the graph or the manifold assumptions.</p>
+</section>
+<section id="generative-modeling-assumptions" class="level2">
+<h2 class="anchored" data-anchor-id="generative-modeling-assumptions">Generative / modeling assumptions</h2>
+<p>Isomap is not a probabilistic generative model. Its interpretation nevertheless relies on strong approximation assumptions:</p>
+<ul>
+<li>nearby ambient observations are close along the candidate structure rather than merely close because two distant branches approach each other;</li>
+<li>sampling is dense enough that graph paths can follow relevant paths without large gaps;</li>
+<li>neighborhood scale is large enough for connectivity but small enough to avoid shortcut edges;</li>
+<li>observation noise and outliers do not substantially corrupt neighbor identities;</li>
+<li>the relevant connected region is represented by the fitted sample; and</li>
+<li>the resulting path metric is sufficiently close to a Euclidean distance matrix for classical MDS to represent it at dimension <span class="math inline">\(d\)</span>.</li>
+</ul>
+<p>Bernstein et al.&nbsp;prove graph-distance approximation under sufficient conditions that include geodesic convexity (so the relevant minimizing geodesics exist), fine enough sample coverage, and edge scales controlled relative to curvature radius and separation between distinct branches. These are conditional theorem hypotheses, not tests that a finite dataset satisfies the assumptions <span class="citation" data-cites="BernsteinEtAl2000">(<a href="#ref-BernsteinEtAl2000" role="doc-biblioref">Bernstein et al. 2000</a>)</span>. The original Isomap result additionally emphasizes a favorable case in which intrinsic geometry is isometric to a convex region of Euclidean space; curved spaces or non-Euclidean path metrics need not flatten globally without distortion <span class="citation" data-cites="TenenbaumDeSilvaLangford2000">(<a href="#ref-TenenbaumDeSilvaLangford2000" role="doc-biblioref">Tenenbaum et al. 2000</a>)</span>.</p>
+</section>
+<section id="mathematical-formulation" class="level2">
+<h2 class="anchored" data-anchor-id="mathematical-formulation">Mathematical formulation</h2>
+<section id="neighborhood-graph" class="level3">
+<h3 class="anchored" data-anchor-id="neighborhood-graph">1. Neighborhood graph</h3>
+<p>For a symmetric graph, let</p>
+<p><span class="math display">\[
+(i,j)\in E
+\]</span></p>
+<p>when the declared <span class="math inline">\(k\)</span>-nearest-neighbor or <span class="math inline">\(\varepsilon\)</span>-radius relation, followed by its declared symmetrization, retains the pair. Assign edge weight</p>
+<p><span class="math display">\[
+w_{ij}=\delta(x_i,x_j).
+\]</span></p>
+<p>A <span class="math inline">\(k\)</span>-nearest-neighbor rule fixes a neighbor count but can create very long edges in sparse regions. An <span class="math inline">\(\varepsilon\)</span> rule fixes an ambient scale but can isolate low-density regions. Mutual and union symmetrization generally produce different graphs.</p>
+</section>
+<section id="shortest-path-graph-distance" class="level3">
+<h3 class="anchored" data-anchor-id="shortest-path-graph-distance">2. Shortest-path graph distance</h3>
+<p>For vertices in the same connected component, define</p>
+<p><span class="math display">\[
+d_G(i,j)
+=
+\min_{i=v_0,\ldots,v_m=j}
+\sum_{r=0}^{m-1}w_{v_rv_{r+1}},
+\]</span></p>
+<p>where the minimum ranges over graph paths. If <span class="math inline">\(i\)</span> and <span class="math inline">\(j\)</span> are disconnected, the graph distance is infinite rather than a missing finite geodesic estimate. Deleting small components, analyzing components separately, adding bridging edges, or increasing the neighborhood are scientifically different decisions.</p>
+<p>Dense sampling alone is not sufficient if the neighborhood graph contains edges between nearby ambient points on distant branches. Such an edge can make <span class="math inline">\(d_G\)</span> much smaller than the intended path distance for many pairs. Conversely, gaps or overly small neighborhoods can make graph routes much longer than the intended path or disconnect them <span class="citation" data-cites="TenenbaumDeSilvaLangford2000 BernsteinEtAl2000 VanDerMaatenEtAl2009">(<a href="#ref-TenenbaumDeSilvaLangford2000" role="doc-biblioref">Tenenbaum et al. 2000</a>; <a href="#ref-BernsteinEtAl2000" role="doc-biblioref">Bernstein et al. 2000</a>; <a href="#ref-VanDerMaatenEtAl2009" role="doc-biblioref">Maaten et al. 2009</a>)</span>.</p>
+</section>
+<section id="classical-mds" class="level3">
+<h3 class="anchored" data-anchor-id="classical-mds">3. Classical MDS</h3>
+<p>Let <span class="math inline">\(D_G^{(2)}\)</span> denote the matrix with entries <span class="math inline">\(d_G(i,j)^2\)</span> for one finite connected component, and let</p>
+<p><span class="math display">\[
+H=I_n-\frac{1}{n}\mathbf 1\mathbf 1^\top.
+\]</span></p>
+<p>Classical MDS forms</p>
+<p><span class="math display">\[
+B=-\frac{1}{2}H D_G^{(2)}H.
+\]</span></p>
+<p>If</p>
+<p><span class="math display">\[
+B=Q\Lambda Q^\top
+\]</span></p>
+<p>has ordered eigenvalues <span class="math inline">\(\lambda_1\geq\cdots\geq\lambda_n\)</span>, the usual <span class="math inline">\(d\)</span>-dimensional coordinates retain the largest positive eigenvalues,</p>
+<p><span class="math display">\[
+Y_d=Q_d\Lambda_d^{1/2}.
+\]</span></p>
+<p>This spectral construction minimizes squared error between <span class="math inline">\(B\)</span> and a rank-<span class="math inline">\(d\)</span> positive-semidefinite Gram matrix; it is a <strong>strain</strong> criterion on double-centered squared distances, not direct minimization of raw distance stress <span class="citation" data-cites="TenenbaumDeSilvaLangford2000 BengioEtAl2003">(<a href="#ref-TenenbaumDeSilvaLangford2000" role="doc-biblioref">Tenenbaum et al. 2000</a>; <a href="#ref-BengioEtAl2003" role="doc-biblioref">Bengio et al. 2003</a>)</span>. Substantial negative eigenvalues show that the supplied graph distances are not exactly Euclidean. They do not identify whether the cause is non-Euclidean intrinsic geometry, sampling, shortcuts, disconnected-component handling, noise, or another misspecification.</p>
+<p>For ordinary Euclidean input distances, centered classical MDS recovers the same coordinate subspaces as PCA up to rigid coordinate conventions. Isomap differs by supplying graph shortest-path distances to the MDS stage <span class="citation" data-cites="TenenbaumDeSilvaLangford2000">(<a href="#ref-TenenbaumDeSilvaLangford2000" role="doc-biblioref">Tenenbaum et al. 2000</a>)</span>.</p>
+</section>
+</section>
+<section id="what-is-learned" class="level2">
+<h2 class="anchored" data-anchor-id="what-is-learned">What is learned?</h2>
+<p>Given all analyst-fixed choices, Isomap learns the sample neighborhood graph, its weighted all-pairs shortest-path distances, the double-centered matrix <span class="math inline">\(B\)</span>, its spectrum, and one representative rank-<span class="math inline">\(d\)</span> Euclidean coordinate system for the fitted observations.</p>
+<p>The algorithm does not learn a smooth manifold atlas, a Riemannian metric tensor, topology, transition law, observation model, noise distribution, intrinsic dimension, or causal mechanism. The graph and its metric are data-dependent estimates, not directly observed properties of an underlying space.</p>
+</section>
+<section id="what-is-fixed" class="level2">
+<h2 class="anchored" data-anchor-id="what-is-fixed">What is fixed?</h2>
+<p>The analyst fixes the observations and features, preprocessing, ambient dissimilarity, neighbor rule, neighborhood scale, graph direction/symmetrization, tie handling, edge weights, component policy, target dimension or selection procedure, positive-eigenvalue policy, and any out-of-sample method. Evaluation splits and all tuning ranges are also fixed by the analysis design.</p>
+<p>These choices interact. Selecting <span class="math inline">\(k\)</span> or <span class="math inline">\(\varepsilon\)</span> after inspecting the desired visualization is outcome-dependent tuning unless the selection criterion and validation protocol are independently declared.</p>
+</section>
+<section id="temporal-assumptions" class="level2">
+<h2 class="anchored" data-anchor-id="temporal-assumptions">Temporal assumptions</h2>
+<p>Ordinary Isomap is order-blind: permuting observation rows only relabels graph vertices and embedded points. If observations are time samples, the method does not use succession, direction, lag, velocity or transition probability unless those quantities are inserted into features, distances or graph constraints. A temporal-adjacency graph is a modified method and must not be interpreted as ordinary Isomap discovering dynamics.</p>
+<p>A trajectory-like ordering visible in Isomap coordinates can result from static similarity structure. It is not evidence for physical time, a vector field, an evolution equation or a latent dynamical system.</p>
+</section>
+<section id="geometry-assumptions" class="level2">
+<h2 class="anchored" data-anchor-id="geometry-assumptions">Geometry assumptions</h2>
+<p>Isomap uses the declared ambient metric locally, graph path length globally, and Euclidean geometry in the output. The graph shortest-path metric is a combinatorial metric on sampled vertices. Calling it an estimate of manifold geodesic distance requires external assumptions about a candidate embedded manifold, existence of the relevant minimizing geodesics, local metric fidelity, sampling density, curvature and branch separation <span class="citation" data-cites="BernsteinEtAl2000">(<a href="#ref-BernsteinEtAl2000" role="doc-biblioref">Bernstein et al. 2000</a>)</span>.</p>
+<p>Classical MDS then asks for Euclidean coordinates preserving this graph metric. If the candidate space has non-Euclidean global path geometry, holes, strong curvature or incompatible topology, no low-dimensional Euclidean coordinate system may preserve all graph distances. Isomap does not estimate a Riemannian metric tensor or certify an isometry.</p>
+</section>
+<section id="supervision" class="level2">
+<h2 class="anchored" data-anchor-id="supervision">Supervision</h2>
+<p>Standard Isomap is unsupervised with respect to labels and outcomes: graph construction and MDS use only the declared observations and distances. Labels can still leak into the result through feature selection, preprocessing, sample exclusion, hyperparameter choice or visual selection. Tuning the neighborhood or dimension to maximize downstream labeled performance creates a supervised model-selection layer that must be evaluated with nested or otherwise leakage-safe splits.</p>
+</section>
+<section id="optimization-inference" class="level2">
+<h2 class="anchored" data-anchor-id="optimization-inference">Optimization / inference</h2>
+<p>Exact Isomap performs neighborhood search, all-pairs shortest paths on the resulting weighted graph, and a symmetric eigendecomposition of <span class="math inline">\(B\)</span>. The MDS step has a spectral global solution for its stated strain objective, but this does not make the preceding graph construction statistically optimal or scientifically validated.</p>
+<p>The fitted coordinates are transductive. Adding a new point can add graph edges and change shortest paths between existing points, so recomputing Isomap can move the entire embedding. Nyström/eigenfunction and landmark constructions provide explicit approximate out-of-sample extensions, but they introduce additional assumptions and generally need not equal a full refit <span class="citation" data-cites="BengioEtAl2003">(<a href="#ref-BengioEtAl2003" role="doc-biblioref">Bengio et al. 2003</a>)</span>. Any claimed deployment rule must state how a new point is connected, how distances to training points are obtained, and how its coordinates are aligned with the training embedding.</p>
+</section>
+<section id="strengths" class="level2">
+<h2 class="anchored" data-anchor-id="strengths">Strengths</h2>
+<ul>
+<li>It makes the proposed local-to-global geometry explicit through an inspectable graph.</li>
+<li>It can represent globally curved but approximately intrinsically Euclidean structures that one affine PCA subspace cannot flatten.</li>
+<li>Its three stages have clear diagnostics: graph connectivity and edge structure, graph-distance stability, and MDS spectral distortion.</li>
+<li>The MDS stage has a transparent spectral solution.</li>
+<li>It supplies a useful stress test for whether nonlinear graph-geodesic assumptions add value beyond PCA and ambient-distance MDS.</li>
+</ul>
+</section>
+<section id="failure-modes" class="level2">
+<h2 class="anchored" data-anchor-id="failure-modes">Failure modes</h2>
+<ul>
+<li><strong>Neighborhood too small:</strong> sparse regions disconnect or graph routes detour, inflating distances.</li>
+<li><strong>Neighborhood too large:</strong> edges bridge separate arms or folds, creating short circuits that can corrupt many all-pairs distances.</li>
+<li><strong>Nonuniform sampling:</strong> one global <span class="math inline">\(k\)</span> or <span class="math inline">\(\varepsilon\)</span> can be simultaneously too large in dense regions and too small in sparse regions.</li>
+<li><strong>Noise and outliers:</strong> ambient perturbations alter nearest neighbors; an outlier can create a bridge or isolated component.</li>
+<li><strong>High-dimensional distance concentration:</strong> unreliable ambient neighborhoods make every downstream stage unreliable.</li>
+<li><strong>Disconnected supports:</strong> infinite graph distances cannot be passed to ordinary classical MDS without a declared component or imputation policy.</li>
+<li><strong>Non-Euclidean graph metric:</strong> negative eigenvalues and residual strain remain even with a correctly computed graph.</li>
+<li><strong>Boundary and holes:</strong> finite graph paths and global Euclidean flattening can distort structures with nonconvex intrinsic domains or nontrivial topology.</li>
+<li><strong>Hyperparameter instability:</strong> modest changes in preprocessing, <span class="math inline">\(k\)</span>, <span class="math inline">\(\varepsilon\)</span>, symmetrization or target dimension can rotate, fold, split or reconnect the output.</li>
+<li><strong>No native inverse:</strong> low-dimensional coordinates do not by themselves reconstruct observations.</li>
+<li><strong>No native out-of-sample map:</strong> extensions are extra algorithms, not an automatic property of the fitted embedding.</li>
+<li><strong>Visualization overreach:</strong> a convincing two-dimensional layout can conceal large graph-distance errors or discarded negative eigendirections.</li>
+</ul>
+<p>The comparative review by van der Maaten et al.&nbsp;emphasizes short-circuit sensitivity, neighborhood-graph dependence, disconnected-component restrictions and weaker performance on more complex natural data than on favorable synthetic examples <span class="citation" data-cites="VanDerMaatenEtAl2009">(<a href="#ref-VanDerMaatenEtAl2009" role="doc-biblioref">Maaten et al. 2009</a>)</span>.</p>
+</section>
+<section id="identifiability-issues" class="level2">
+<h2 class="anchored" data-anchor-id="identifiability-issues">Identifiability issues</h2>
+<p>For a fixed connected graph-distance matrix and a fixed retained positive eigenspace, classical MDS coordinates are centered and are non-unique under orthogonal transformations, including rotations and reflections. Individual axes have arbitrary signs. Repeated retained eigenvalues permit arbitrary rotations within their eigenspaces. If the truncation boundary crosses a repeated eigenvalue, the selected <span class="math inline">\(d\)</span>-dimensional coordinate subspace is itself non-unique.</p>
+<p>These spectral equivalences do not exhaust practical ambiguity. Different neighborhood graphs can yield different graph metrics and embeddings from the same observations. A plotting alignment or Procrustes transformation chooses a coordinate representative; it does not identify scientifically privileged latent axes. When negative eigenvalues are discarded, even the full positive-coordinate representation is only an approximation to the supplied graph distances.</p>
+</section>
+<section id="comparison-with-simpler-methods" class="level2">
+<h2 class="anchored" data-anchor-id="comparison-with-simpler-methods">Comparison with simpler methods</h2>
+<ul>
+<li><strong>PCA:</strong> the required rank-matched linear Euclidean baseline. It tests whether graph-geodesic construction improves the declared criterion beyond one global affine subspace.</li>
+<li><strong>Ambient-distance classical MDS:</strong> applies the same final spectral stage directly to pairwise ambient distances. With Euclidean distances it is closely linked to PCA, and it isolates the contribution of replacing ambient distances by graph paths.</li>
+<li><strong>Graph-distance diagnostic without embedding:</strong> inspect connectivity, edge lengths, shortest paths and stability across neighborhoods before attributing any value to the MDS visualization.</li>
+<li><strong>Synthetic oracle comparison:</strong> only in a future generated toy setting, compare graph distances with known curve or manifold path distances. This is unavailable for ordinary empirical data without independently known geometry.</li>
+</ul>
+<p>A method should not be judged superior merely because its own in-sample graph-distance objective is smaller. Comparisons must use matched dimension, training-only tuning and criteria tied to the intended scientific or predictive use.</p>
+</section>
+<section id="evaluation-criteria" class="level2">
+<h2 class="anchored" data-anchor-id="evaluation-criteria">Evaluation criteria</h2>
+<p>Evaluation should report several layers rather than one plot:</p>
+<ol type="1">
+<li><strong>Graph diagnostics:</strong> connected-component sizes, degree and edge-length distributions, sensitivity to tie handling and symmetrization, and the appearance or disappearance of long bridging edges.</li>
+<li><strong>Neighborhood stability:</strong> repeat the analysis across a prespecified, scientifically plausible range of <span class="math inline">\(k\)</span> or <span class="math inline">\(\varepsilon\)</span> and across resampled independent units.</li>
+<li><strong>Distance fidelity:</strong> report classical-MDS strain or a declared stress/correlation measure between <span class="math inline">\(d_G\)</span> and embedded Euclidean distances. State whether negative eigenvalues were omitted.</li>
+<li><strong>Local fidelity:</strong> when relevant, report declared neighborhood-preservation measures rather than inferring local correctness from global distance fit.</li>
+<li><strong>Baseline comparison:</strong> compare rank-matched PCA and ambient-distance classical MDS using the same fitted observations and preprocessing.</li>
+<li><strong>Held-out behavior:</strong> fit preprocessing, graph hyperparameters and dimension on training data; use a predeclared extension for held-out observations and evaluate distances or downstream performance without refitting on the test set.</li>
+<li><strong>Scientific stability:</strong> assess whether conclusions survive plausible preprocessing, sampling-unit, subject/session and neighborhood choices.</li>
+</ol>
+<p>The original residual-variance curve is an in-sample summary of distance preservation and can assist dimension comparison, but an elbow is not a model-free intrinsic-dimension estimate <span class="citation" data-cites="TenenbaumDeSilvaLangford2000">(<a href="#ref-TenenbaumDeSilvaLangford2000" role="doc-biblioref">Tenenbaum et al. 2000</a>)</span>. Isomap has no native observation-space reconstruction, so “reconstruction error” is undefined unless a separate inverse or decoder is introduced and evaluated as an additional method.</p>
+<p>For dependent observations, splits must keep whole trajectories, subjects, sessions or other dependence units together as appropriate. Randomly splitting adjacent time samples can make neighborhood and out-of-sample performance optimistic.</p>
+</section>
+<section id="minimal-toy-model" class="level2">
+<h2 class="anchored" data-anchor-id="minimal-toy-model">Minimal toy model</h2>
+<p>A future non-executable toy model should sample points along a known planar hairpin curve with two long, nearly parallel arms. The generation record should preserve the curve parameter and exact arc-length distance as ground truth, while the fitting algorithm receives only noisy ambient coordinates.</p>
+<p>The planned comparisons are:</p>
+<ul>
+<li>rank-one and rank-two PCA;</li>
+<li>classical MDS on ambient Euclidean distances;</li>
+<li>Isomap over a prespecified neighborhood range; and</li>
+<li>an oracle MDS embedding using the known arc-length distances, used only as a generation-side reference.</li>
+</ul>
+<p>At an adequate local neighborhood scale, graph paths should follow the hairpin and approximate arc length. With too few samples or too small a neighborhood, the graph should disconnect or detour. With too large a neighborhood, an edge should bridge the two arms and sharply underestimate many path distances. A negative control should remove samples from one bend to create a gap. Evaluation should compare graph distances with known arc length, inspect connected components and shortcuts, and align coordinate outputs only for comparison. This contract belongs to a later executable study; no data, code or results are created here.</p>
+</section>
+<section id="relevance-to-ldg" class="level2">
+<h2 class="anchored" data-anchor-id="relevance-to-ldg">Relevance to LDG</h2>
+<p>Isomap is LDG’s canonical example of a method that turns local metric assumptions into a global graph-distance representation and then into Euclidean coordinates. It is useful precisely because each interpretive leap can be audited separately: local ambient proximity, finite graph paths, Euclidean MDS representation, and any later scientific interpretation.</p>
+<div class="callout callout-style-default callout-warning callout-titled" title="What this does NOT imply">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Warning</span>What this does NOT imply
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>A successful Isomap visualization does not prove that a manifold exists, recover the topology of an underlying space, estimate a Riemannian metric tensor, establish intrinsic dimension, discover physical dynamics, identify a mechanism, or recover unique latent coordinates. Graph connectivity is not topology recovery; graph shortest paths are not automatically manifold geodesics; low strain is not model validation.</p>
+</div>
+</div>
+<section id="mouse-trajectory" class="level3">
+<h3 class="anchored" data-anchor-id="mouse-trajectory">Mouse trajectory</h3>
+<p>No modality-specific empirical claim is retained. Applying Isomap to mouse trajectories would require an independently justified representation, distance, temporal-alignment policy, sampling unit and held-out extension; a curved embedding would not establish a behavioral state manifold or movement dynamics.</p>
+</section>
+<section id="eye-movement" class="level3">
+<h3 class="anchored" data-anchor-id="eye-movement">Eye movement</h3>
+<p>No modality-specific empirical claim is retained. Eye-position samples, event summaries and temporal windows define different metric spaces, and ordinary Isomap does not convert their static proximity graph into evidence for oculomotor dynamics.</p>
+</section>
+<section id="eeg" class="level3">
+<h3 class="anchored" data-anchor-id="eeg">EEG</h3>
+<p>No modality-specific empirical claim is retained. Sensor scaling, rereferencing, artifact handling and subject/session pooling would determine the neighborhood graph; embedded axes would not automatically represent neural sources or cortical geometry.</p>
+</section>
+<section id="meg-neural-population-data" class="level3">
+<h3 class="anchored" data-anchor-id="meg-neural-population-data">MEG / neural population data</h3>
+<p>No modality-specific empirical claim is retained. Unit normalization, trial averaging and sampling dependence would need to be fixed before graph construction, and a low-dimensional layout would remain a graph-geometric approximation rather than evidence for a neural manifold, mechanism or dynamical law.</p>
+</section>
+</section>
+<section id="primary-sources" class="level2">
+<h2 class="anchored" data-anchor-id="primary-sources">Primary sources</h2>
+<ul>
+<li>Tenenbaum, de Silva and Langford introduce Isomap, explicitly separate neighborhood construction, shortest-path graph distances and classical MDS, and state the favorable intrinsically Euclidean setting and finite-sample graph limitations <span class="citation" data-cites="TenenbaumDeSilvaLangford2000">(<a href="#ref-TenenbaumDeSilvaLangford2000" role="doc-biblioref">Tenenbaum et al. 2000</a>)</span>.</li>
+<li>Bernstein, de Silva, Langford and Tenenbaum analyze sufficient conditions—including geodesic convexity/minimizing-geodesic existence, sampling coverage, curvature and branch separation—under which graph distances approximate path distances on an embedded manifold <span class="citation" data-cites="BernsteinEtAl2000">(<a href="#ref-BernsteinEtAl2000" role="doc-biblioref">Bernstein et al. 2000</a>)</span>.</li>
+<li>Bengio et al.&nbsp;give a technical double-centering/eigendecomposition formulation and derive explicit out-of-sample extensions for Isomap, MDS and related spectral methods <span class="citation" data-cites="BengioEtAl2003">(<a href="#ref-BengioEtAl2003" role="doc-biblioref">Bengio et al. 2003</a>)</span>.</li>
+</ul>
+</section>
+<section id="reviews-secondary-sources" class="level2">
+<h2 class="anchored" data-anchor-id="reviews-secondary-sources">Reviews / secondary sources</h2>
+<ul>
+<li>Van der Maaten, Postma and van den Herik provide an inspected comparative review of nonlinear dimensionality-reduction methods and identify Isomap’s neighborhood, disconnection, short-circuit and generalization limitations <span class="citation" data-cites="VanDerMaatenEtAl2009">(<a href="#ref-VanDerMaatenEtAl2009" role="doc-biblioref">Maaten et al. 2009</a>)</span>.</li>
+</ul>
+</section>
+<section id="open-methodological-questions" class="level2">
+<h2 class="anchored" data-anchor-id="open-methodological-questions">Open methodological questions</h2>
+<ul>
+<li>How should neighborhood scale be selected without optimizing a preferred visualization?</li>
+<li>Which diagnostics distinguish true local metric fidelity from distance concentration or preprocessing artifacts?</li>
+<li>How should uncertainty in graph edges and shortest paths propagate to coordinates?</li>
+<li>When should disconnected components be modeled separately rather than forced into one embedding?</li>
+<li>Which out-of-sample extension is appropriate when adding a point would materially change the fitted graph?</li>
+<li>Which scientific claims are invariant under rigid coordinate transformations and neighborhood perturbations?</li>
+</ul>
+</section>
+<section id="maturity-checklist" class="level2">
+<h2 class="anchored" data-anchor-id="maturity-checklist">Maturity checklist</h2>
+<ul class="task-list">
+<li><label><input type="checkbox" checked="">Uses the complete Method schema and states the bounded problem.</label></li>
+<li><label><input type="checkbox" checked="">Separates neighbor construction, graph shortest paths and classical MDS.</label></li>
+<li><label><input type="checkbox" checked="">States geodesic-existence, sampling, connectivity, curvature, branch-separation and shortcut assumptions.</label></li>
+<li><label><input type="checkbox" checked="">Declares learned and fixed quantities, temporal handling, geometry and supervision.</label></li>
+<li><label><input type="checkbox" checked="">States spectral and graph-construction ambiguities.</label></li>
+<li><label><input type="checkbox" checked="">Includes PCA, ambient-MDS and graph-diagnostic baselines.</label></li>
+<li><label><input type="checkbox" checked="">Defines evaluation and out-of-sample limits without claiming native reconstruction.</label></li>
+<li><label><input type="checkbox" checked="">Includes a prose-only future toy-model contract with failure and negative-control cases.</label></li>
+<li><label><input type="checkbox" checked="">Avoids unsupported modality-specific empirical claims.</label></li>
+<li><label><input type="checkbox" checked="">Includes explicit manifold, topology, geometry, dimension, dynamics and mechanism non-implications.</label></li>
+<li><label><input type="checkbox" checked="">Foundational, technical and review sources were inspected and bibliographic metadata verified.</label></li>
+<li><label><input type="checkbox" checked="">Independent mixed review completed after one bounded correction round; focused re-review returned PASS.</label></li>
+<li><label><input type="checkbox" checked="">Stable promotion authorized by the human owner under the recorded review decision after published-site review.</label></li>
+</ul>
+
+
+<!-- -->
+
+
+</section>
+</section>
+
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography" id="quarto-bibliography"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body hanging-indent" role="list">
+<div id="ref-BengioEtAl2003" class="csl-entry" role="listitem">
+Bengio, Yoshua, Jean-François Paiement, Pascal Vincent, Olivier Delalleau, Nicolas Roux, and Marie Ouimet. 2003. <span>“Out-of-Sample Extensions for <span>LLE</span>, <span>Isomap</span>, <span>MDS</span>, Eigenmaps, and Spectral Clustering.”</span> In <em>Advances in Neural Information Processing Systems</em>, edited by Sebastian Thrun, Lawrence K. Saul, and Bernhard Schölkopf, vol. 16. MIT Press. <a href="https://proceedings.neurips.cc/paper/2003/hash/cf05968255451bdefe3c5bc64d550517-Abstract.html">https://proceedings.neurips.cc/paper/2003/hash/cf05968255451bdefe3c5bc64d550517-Abstract.html</a>.
+</div>
+<div id="ref-BernsteinEtAl2000" class="csl-entry" role="listitem">
+Bernstein, Mira, Vin de Silva, John C. Langford, and Joshua B. Tenenbaum. 2000. <em>Graph Approximations to Geodesics on Embedded Manifolds</em>. Stanford University. <a href="https://www.cs.cmu.edu/~jcl/research/isofocs/isoproof.tex">https://www.cs.cmu.edu/~jcl/research/isofocs/isoproof.tex</a>.
+</div>
+<div id="ref-VanDerMaatenEtAl2009" class="csl-entry" role="listitem">
+Maaten, Laurens van der, Eric Postma, and Jaap van den Herik. 2009. <em>Dimensionality Reduction: A Comparative Review</em>. TiCC-TR 2009-005. Tilburg Centre for Creative Computing, Tilburg University. <a href="https://lvdmaaten.github.io/publications/papers/TR_Dimensionality_Reduction_Review_2009.pdf">https://lvdmaaten.github.io/publications/papers/TR_Dimensionality_Reduction_Review_2009.pdf</a>.
+</div>
+<div id="ref-TenenbaumDeSilvaLangford2000" class="csl-entry" role="listitem">
+Tenenbaum, Joshua B., Vin de Silva, and John C. Langford. 2000. <span>“A Global Geometric Framework for Nonlinear Dimensionality Reduction.”</span> <em>Science</em> 290 (5500): 2319–23. <a href="https://doi.org/10.1126/science.290.5500.2319">https://doi.org/10.1126/science.290.5500.2319</a>.
+</div>
+</div></section></div></main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+    const viewSource = window.document.getElementById('quarto-view-source') ||
+                       window.document.getElementById('quarto-code-tools-source');
+    if (viewSource) {
+      const sourceUrl = viewSource.getAttribute("data-quarto-source-url");
+      viewSource.addEventListener("click", function(e) {
+        if (sourceUrl) {
+          // rstudio viewer pane
+          if (/\bcapabilities=\b/.test(window.location)) {
+            window.open(sourceUrl);
+          } else {
+            window.location.href = sourceUrl;
+          }
+        } else {
+          const modal = new bootstrap.Modal(document.getElementById('quarto-embedded-source-code-modal'));
+          modal.show();
+        }
+        return false;
+      });
+    }
+    function toggleCodeHandler(show) {
+      return function(e) {
+        const cellDetails = window.document.querySelectorAll(".cell details.code-fold");
+        for (let i=0; i<cellDetails.length; i++) {
+          const details = cellDetails[i];
+          if (show) {
+            details.open = true;
+          } else {
+            details.removeAttribute("open");
+          }
+        }
+        const cellCodeDivs = window.document.querySelectorAll(".cell div.sourceCode.cell-code");
+        const fromCls = show ? "hidden" : "unhidden";
+        const toCls = show ? "unhidden" : "hidden";
+        for (let i=0; i<cellCodeDivs.length; i++) {
+          const codeDiv = cellCodeDivs[i];
+          if (codeDiv.classList.contains(fromCls)) {
+            codeDiv.classList.remove(fromCls);
+            codeDiv.classList.add(toCls);
+          } 
+        }
+        return false;
+      }
+    }
+    const hideAllCode = window.document.getElementById("quarto-hide-all-code");
+    if (hideAllCode) {
+      hideAllCode.addEventListener("click", toggleCodeHandler(false));
+    }
+    const showAllCode = window.document.getElementById("quarto-show-all-code");
+    if (showAllCode) {
+      showAllCode.addEventListener("click", toggleCodeHandler(true));
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/abelzheng\.github\.io\/latent-dynamics-geometry-public\/");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+            // target, if specified
+            link.setAttribute("target", "_blank");
+            if (link.getAttribute("rel") === null) {
+              link.setAttribute("rel", "noopener");
+            }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<input type="hidden" id="giscus-base-theme" value="preferred_color_scheme">
+<input type="hidden" id="giscus-alt-theme" value="preferred_color_scheme">
+<script>
+  function loadGiscus() {
+    // Function to get the theme based on body class
+    const getTheme = () => {
+      let baseTheme = document.getElementById('giscus-base-theme').value;
+      let altTheme = document.getElementById('giscus-alt-theme').value;
+      return document.body.classList.contains('quarto-dark') ? altTheme : baseTheme;
+    };
+    const script = document.createElement("script");
+    script.src = "https://giscus.app/client.js";
+    script.async = true;
+    script.dataset.repo = "AbelZheng/latent-dynamics-geometry-public";
+    script.dataset.repoId = "R_kgDOT-VBkw";
+    script.dataset.category = "Announcements";
+    script.dataset.categoryId = "DIC_kwDOT-VBk84DDyEz";
+    script.dataset.mapping = "pathname";
+    script.dataset.reactionsEnabled = "1";
+    script.dataset.emitMetadata = "0";
+    script.dataset.inputPosition = "bottom";
+    script.dataset.theme = getTheme();
+    script.dataset.lang = "en";
+    script.crossOrigin = "anonymous";
+    // Append the script to the desired div instead of at the end of the body
+    document.getElementById("quarto-content").appendChild(script);
+  }
+  loadGiscus();
+</script><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">Source Code</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1" data-shortcodes="false"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="an">title:</span><span class="co"> "Isomap"</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="an">object_type:</span><span class="co"> method</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="an">maturity:</span><span class="co"> L2</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="an">status:</span><span class="co"> stable</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="an">domain:</span><span class="co"> [dimensionality-reduction, geometry, graph-methods]</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="an">tags:</span><span class="co"> [isomap, nonlinear-embedding, shortest-path, classical-mds]</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="an">prerequisites:</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="co">- knowledge/methods/principal-component-analysis.qmd</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="co">- knowledge/concepts/embedding.qmd</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="co">- knowledge/concepts/metric.qmd</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="co">- knowledge/concepts/geodesic.qmd</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="co">- knowledge/concepts/manifold.qmd</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="an">related:</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="co">- knowledge/concepts/intrinsic-dimension.qmd</span></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="co">- knowledge/concepts/topology.qmd</span></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="co">- knowledge/concepts/identifiability.qmd</span></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a><span class="an">created:</span><span class="co"> 2026-08-19</span></span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a><span class="an">updated:</span><span class="co"> 2026-08-19</span></span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a><span class="fu"># Isomap</span></span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a><span class="fu">## Problem</span></span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>Isomap constructs low-dimensional Euclidean coordinates intended to preserve shortest-path distances in a neighborhood graph built from high-dimensional observations. It addresses a narrower problem than generic nonlinear dimensionality reduction: when ambient distances are locally meaningful and the samples adequately trace a structure whose path metric is approximately Euclidean in some global coordinate system, graph paths can provide a better global distance surrogate than straight ambient chords <span class="co">[</span><span class="ot">@TenenbaumDeSilvaLangford2000; @BernsteinEtAl2000</span><span class="co">]</span>.</span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>The output is an embedding of the fitted observations, not proof that the observations arose from a manifold. Isomap separates three operations that must not be conflated: constructing an ambient-distance neighborhood graph, computing shortest-path distances on that finite graph, and applying classical multidimensional scaling (MDS) to those graph distances.</span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a><span class="fu">## Input</span></span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>Let $x_1,\ldots,x_n\in\mathbb R^p$ be the fitted observations after a declared feature construction and preprocessing pipeline. A reproducible analysis must specify:</span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>the observational unit represented by each row and any dependence among rows;</span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>centering, feature scaling, exclusion, missing-data and duplicate-point policies;</span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>the ambient dissimilarity $\delta(x_i,x_j)$ used both to choose neighbors and, unless explicitly separated, to weight graph edges;</span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>either a $k$-nearest-neighbor rule or an $\varepsilon$-radius rule;</span>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>directed versus symmetrized $k$-nearest-neighbor construction, including whether mutual or union symmetrization is used;</span>
+<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>tie breaking, zero-distance and duplicate handling;</span>
+<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>the treatment of disconnected components;</span>
+<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>the target coordinate dimension $d$ or the training-only rule used to choose it; and</span>
+<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>whether new observations will require an explicitly declared out-of-sample extension.</span>
+<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a>Ordinary Isomap commonly uses Euclidean distance after preprocessing, but that choice is not automatic. Feature scaling can alter neighbor identities, edge lengths, graph connectivity, shortest paths and the final embedding.</span>
+<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a><span class="fu">## Output</span></span>
+<span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-48"><a href="#cb1-48" aria-hidden="true" tabindex="-1"></a>For the fitted observations, Isomap returns:</span>
+<span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-50"><a href="#cb1-50" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>a neighborhood graph $G=(V,E)$ whose vertices correspond to observations;</span>
+<span id="cb1-51"><a href="#cb1-51" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>weighted shortest-path distances $d_G(i,j)$ within the analyzed connected component or components;</span>
+<span id="cb1-52"><a href="#cb1-52" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>a double-centered matrix derived from squared graph distances;</span>
+<span id="cb1-53"><a href="#cb1-53" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>eigenvalues diagnosing how nearly those graph distances admit the requested Euclidean representation; and</span>
+<span id="cb1-54"><a href="#cb1-54" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>centered coordinates $y_i\in\mathbb R^d$ for the fitted observations.</span>
+<span id="cb1-55"><a href="#cb1-55" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-56"><a href="#cb1-56" aria-hidden="true" tabindex="-1"></a>Standard Isomap does not return a generative distribution, a posterior over coordinates, a unique inverse map from coordinates to observations, or automatically valid coordinates for observations not included in the fitted graph.</span>
+<span id="cb1-57"><a href="#cb1-57" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-58"><a href="#cb1-58" aria-hidden="true" tabindex="-1"></a><span class="fu">## Core idea</span></span>
+<span id="cb1-59"><a href="#cb1-59" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-60"><a href="#cb1-60" aria-hidden="true" tabindex="-1"></a>Isomap has three distinct stages <span class="co">[</span><span class="ot">@TenenbaumDeSilvaLangford2000</span><span class="co">]</span>:</span>
+<span id="cb1-61"><a href="#cb1-61" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-62"><a href="#cb1-62" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>**Neighbor graph:** connect observations judged locally close by a fixed $k$ or $\varepsilon$ rule, and weight each retained edge by its declared ambient dissimilarity.</span>
+<span id="cb1-63"><a href="#cb1-63" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>**Graph distance:** approximate long-range path distance by the length of the shortest sequence of local edges between each pair of vertices.</span>
+<span id="cb1-64"><a href="#cb1-64" aria-hidden="true" tabindex="-1"></a><span class="ss">3. </span>**Classical MDS:** convert squared graph distances to a centered inner-product matrix and approximate that matrix by a rank-$d$ positive-semidefinite Gram matrix.</span>
+<span id="cb1-65"><a href="#cb1-65" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-66"><a href="#cb1-66" aria-hidden="true" tabindex="-1"></a>The first stage proposes which ambient chords are local enough to stand in for short path segments. The second stage produces a finite graph metric. The third asks whether that metric can be represented, exactly or approximately, by Euclidean coordinates of the requested dimension. A visually smooth final plot cannot retroactively validate either the graph or the manifold assumptions.</span>
+<span id="cb1-67"><a href="#cb1-67" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-68"><a href="#cb1-68" aria-hidden="true" tabindex="-1"></a><span class="fu">## Generative / modeling assumptions</span></span>
+<span id="cb1-69"><a href="#cb1-69" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-70"><a href="#cb1-70" aria-hidden="true" tabindex="-1"></a>Isomap is not a probabilistic generative model. Its interpretation nevertheless relies on strong approximation assumptions:</span>
+<span id="cb1-71"><a href="#cb1-71" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-72"><a href="#cb1-72" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>nearby ambient observations are close along the candidate structure rather than merely close because two distant branches approach each other;</span>
+<span id="cb1-73"><a href="#cb1-73" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>sampling is dense enough that graph paths can follow relevant paths without large gaps;</span>
+<span id="cb1-74"><a href="#cb1-74" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>neighborhood scale is large enough for connectivity but small enough to avoid shortcut edges;</span>
+<span id="cb1-75"><a href="#cb1-75" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>observation noise and outliers do not substantially corrupt neighbor identities;</span>
+<span id="cb1-76"><a href="#cb1-76" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>the relevant connected region is represented by the fitted sample; and</span>
+<span id="cb1-77"><a href="#cb1-77" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>the resulting path metric is sufficiently close to a Euclidean distance matrix for classical MDS to represent it at dimension $d$.</span>
+<span id="cb1-78"><a href="#cb1-78" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-79"><a href="#cb1-79" aria-hidden="true" tabindex="-1"></a>Bernstein et al. prove graph-distance approximation under sufficient conditions</span>
+<span id="cb1-80"><a href="#cb1-80" aria-hidden="true" tabindex="-1"></a>that include geodesic convexity (so the relevant minimizing geodesics exist),</span>
+<span id="cb1-81"><a href="#cb1-81" aria-hidden="true" tabindex="-1"></a>fine enough sample coverage, and edge scales controlled relative to curvature</span>
+<span id="cb1-82"><a href="#cb1-82" aria-hidden="true" tabindex="-1"></a>radius and separation between distinct branches. These are conditional theorem</span>
+<span id="cb1-83"><a href="#cb1-83" aria-hidden="true" tabindex="-1"></a>hypotheses, not tests that a finite dataset satisfies the assumptions</span>
+<span id="cb1-84"><a href="#cb1-84" aria-hidden="true" tabindex="-1"></a><span class="co">[</span><span class="ot">@BernsteinEtAl2000</span><span class="co">]</span>. The original Isomap result additionally emphasizes a</span>
+<span id="cb1-85"><a href="#cb1-85" aria-hidden="true" tabindex="-1"></a>favorable case in which intrinsic geometry is isometric to a convex region of</span>
+<span id="cb1-86"><a href="#cb1-86" aria-hidden="true" tabindex="-1"></a>Euclidean space; curved spaces or non-Euclidean path metrics need not flatten</span>
+<span id="cb1-87"><a href="#cb1-87" aria-hidden="true" tabindex="-1"></a>globally without distortion <span class="co">[</span><span class="ot">@TenenbaumDeSilvaLangford2000</span><span class="co">]</span>.</span>
+<span id="cb1-88"><a href="#cb1-88" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-89"><a href="#cb1-89" aria-hidden="true" tabindex="-1"></a><span class="fu">## Mathematical formulation</span></span>
+<span id="cb1-90"><a href="#cb1-90" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-91"><a href="#cb1-91" aria-hidden="true" tabindex="-1"></a><span class="fu">### 1. Neighborhood graph</span></span>
+<span id="cb1-92"><a href="#cb1-92" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-93"><a href="#cb1-93" aria-hidden="true" tabindex="-1"></a>For a symmetric graph, let</span>
+<span id="cb1-94"><a href="#cb1-94" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-95"><a href="#cb1-95" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-96"><a href="#cb1-96" aria-hidden="true" tabindex="-1"></a>(i,j)\in E</span>
+<span id="cb1-97"><a href="#cb1-97" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-98"><a href="#cb1-98" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-99"><a href="#cb1-99" aria-hidden="true" tabindex="-1"></a>when the declared $k$-nearest-neighbor or $\varepsilon$-radius relation, followed by its declared symmetrization, retains the pair. Assign edge weight</span>
+<span id="cb1-100"><a href="#cb1-100" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-101"><a href="#cb1-101" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-102"><a href="#cb1-102" aria-hidden="true" tabindex="-1"></a>w_{ij}=\delta(x_i,x_j).</span>
+<span id="cb1-103"><a href="#cb1-103" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-104"><a href="#cb1-104" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-105"><a href="#cb1-105" aria-hidden="true" tabindex="-1"></a>A $k$-nearest-neighbor rule fixes a neighbor count but can create very long edges in sparse regions. An $\varepsilon$ rule fixes an ambient scale but can isolate low-density regions. Mutual and union symmetrization generally produce different graphs.</span>
+<span id="cb1-106"><a href="#cb1-106" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-107"><a href="#cb1-107" aria-hidden="true" tabindex="-1"></a><span class="fu">### 2. Shortest-path graph distance</span></span>
+<span id="cb1-108"><a href="#cb1-108" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-109"><a href="#cb1-109" aria-hidden="true" tabindex="-1"></a>For vertices in the same connected component, define</span>
+<span id="cb1-110"><a href="#cb1-110" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-111"><a href="#cb1-111" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-112"><a href="#cb1-112" aria-hidden="true" tabindex="-1"></a>d_G(i,j)</span>
+<span id="cb1-113"><a href="#cb1-113" aria-hidden="true" tabindex="-1"></a>=</span>
+<span id="cb1-114"><a href="#cb1-114" aria-hidden="true" tabindex="-1"></a>\min_{i=v_0,\ldots,v_m=j}</span>
+<span id="cb1-115"><a href="#cb1-115" aria-hidden="true" tabindex="-1"></a>\sum_{r=0}^{m-1}w_{v_rv_{r+1}},</span>
+<span id="cb1-116"><a href="#cb1-116" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-117"><a href="#cb1-117" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-118"><a href="#cb1-118" aria-hidden="true" tabindex="-1"></a>where the minimum ranges over graph paths. If $i$ and $j$ are disconnected, the graph distance is infinite rather than a missing finite geodesic estimate. Deleting small components, analyzing components separately, adding bridging edges, or increasing the neighborhood are scientifically different decisions.</span>
+<span id="cb1-119"><a href="#cb1-119" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-120"><a href="#cb1-120" aria-hidden="true" tabindex="-1"></a>Dense sampling alone is not sufficient if the neighborhood graph contains edges between nearby ambient points on distant branches. Such an edge can make $d_G$ much smaller than the intended path distance for many pairs. Conversely, gaps or overly small neighborhoods can make graph routes much longer than the intended path or disconnect them <span class="co">[</span><span class="ot">@TenenbaumDeSilvaLangford2000; @BernsteinEtAl2000; @VanDerMaatenEtAl2009</span><span class="co">]</span>.</span>
+<span id="cb1-121"><a href="#cb1-121" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-122"><a href="#cb1-122" aria-hidden="true" tabindex="-1"></a><span class="fu">### 3. Classical MDS</span></span>
+<span id="cb1-123"><a href="#cb1-123" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-124"><a href="#cb1-124" aria-hidden="true" tabindex="-1"></a>Let $D_G^{(2)}$ denote the matrix with entries $d_G(i,j)^2$ for one finite connected component, and let</span>
+<span id="cb1-125"><a href="#cb1-125" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-126"><a href="#cb1-126" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-127"><a href="#cb1-127" aria-hidden="true" tabindex="-1"></a>H=I_n-\frac{1}{n}\mathbf 1\mathbf 1^\top.</span>
+<span id="cb1-128"><a href="#cb1-128" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-129"><a href="#cb1-129" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-130"><a href="#cb1-130" aria-hidden="true" tabindex="-1"></a>Classical MDS forms</span>
+<span id="cb1-131"><a href="#cb1-131" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-132"><a href="#cb1-132" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-133"><a href="#cb1-133" aria-hidden="true" tabindex="-1"></a>B=-\frac{1}{2}H D_G^{(2)}H.</span>
+<span id="cb1-134"><a href="#cb1-134" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-135"><a href="#cb1-135" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-136"><a href="#cb1-136" aria-hidden="true" tabindex="-1"></a>If</span>
+<span id="cb1-137"><a href="#cb1-137" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-138"><a href="#cb1-138" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-139"><a href="#cb1-139" aria-hidden="true" tabindex="-1"></a>B=Q\Lambda Q^\top</span>
+<span id="cb1-140"><a href="#cb1-140" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-141"><a href="#cb1-141" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-142"><a href="#cb1-142" aria-hidden="true" tabindex="-1"></a>has ordered eigenvalues $\lambda_1\geq\cdots\geq\lambda_n$, the usual $d$-dimensional coordinates retain the largest positive eigenvalues,</span>
+<span id="cb1-143"><a href="#cb1-143" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-144"><a href="#cb1-144" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-145"><a href="#cb1-145" aria-hidden="true" tabindex="-1"></a>Y_d=Q_d\Lambda_d^{1/2}.</span>
+<span id="cb1-146"><a href="#cb1-146" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-147"><a href="#cb1-147" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-148"><a href="#cb1-148" aria-hidden="true" tabindex="-1"></a>This spectral construction minimizes squared error between $B$ and a rank-$d$ positive-semidefinite Gram matrix; it is a **strain** criterion on double-centered squared distances, not direct minimization of raw distance stress <span class="co">[</span><span class="ot">@TenenbaumDeSilvaLangford2000; @BengioEtAl2003</span><span class="co">]</span>. Substantial negative eigenvalues show that the supplied graph distances are not exactly Euclidean. They do not identify whether the cause is non-Euclidean intrinsic geometry, sampling, shortcuts, disconnected-component handling, noise, or another misspecification.</span>
+<span id="cb1-149"><a href="#cb1-149" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-150"><a href="#cb1-150" aria-hidden="true" tabindex="-1"></a>For ordinary Euclidean input distances, centered classical MDS recovers the same coordinate subspaces as PCA up to rigid coordinate conventions. Isomap differs by supplying graph shortest-path distances to the MDS stage <span class="co">[</span><span class="ot">@TenenbaumDeSilvaLangford2000</span><span class="co">]</span>.</span>
+<span id="cb1-151"><a href="#cb1-151" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-152"><a href="#cb1-152" aria-hidden="true" tabindex="-1"></a><span class="fu">## What is learned?</span></span>
+<span id="cb1-153"><a href="#cb1-153" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-154"><a href="#cb1-154" aria-hidden="true" tabindex="-1"></a>Given all analyst-fixed choices, Isomap learns the sample neighborhood graph, its weighted all-pairs shortest-path distances, the double-centered matrix $B$, its spectrum, and one representative rank-$d$ Euclidean coordinate system for the fitted observations.</span>
+<span id="cb1-155"><a href="#cb1-155" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-156"><a href="#cb1-156" aria-hidden="true" tabindex="-1"></a>The algorithm does not learn a smooth manifold atlas, a Riemannian metric tensor, topology, transition law, observation model, noise distribution, intrinsic dimension, or causal mechanism. The graph and its metric are data-dependent estimates, not directly observed properties of an underlying space.</span>
+<span id="cb1-157"><a href="#cb1-157" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-158"><a href="#cb1-158" aria-hidden="true" tabindex="-1"></a><span class="fu">## What is fixed?</span></span>
+<span id="cb1-159"><a href="#cb1-159" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-160"><a href="#cb1-160" aria-hidden="true" tabindex="-1"></a>The analyst fixes the observations and features, preprocessing, ambient dissimilarity, neighbor rule, neighborhood scale, graph direction/symmetrization, tie handling, edge weights, component policy, target dimension or selection procedure, positive-eigenvalue policy, and any out-of-sample method. Evaluation splits and all tuning ranges are also fixed by the analysis design.</span>
+<span id="cb1-161"><a href="#cb1-161" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-162"><a href="#cb1-162" aria-hidden="true" tabindex="-1"></a>These choices interact. Selecting $k$ or $\varepsilon$ after inspecting the desired visualization is outcome-dependent tuning unless the selection criterion and validation protocol are independently declared.</span>
+<span id="cb1-163"><a href="#cb1-163" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-164"><a href="#cb1-164" aria-hidden="true" tabindex="-1"></a><span class="fu">## Temporal assumptions</span></span>
+<span id="cb1-165"><a href="#cb1-165" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-166"><a href="#cb1-166" aria-hidden="true" tabindex="-1"></a>Ordinary Isomap is order-blind: permuting observation rows only relabels graph vertices and embedded points. If observations are time samples, the method does not use succession, direction, lag, velocity or transition probability unless those quantities are inserted into features, distances or graph constraints. A temporal-adjacency graph is a modified method and must not be interpreted as ordinary Isomap discovering dynamics.</span>
+<span id="cb1-167"><a href="#cb1-167" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-168"><a href="#cb1-168" aria-hidden="true" tabindex="-1"></a>A trajectory-like ordering visible in Isomap coordinates can result from static similarity structure. It is not evidence for physical time, a vector field, an evolution equation or a latent dynamical system.</span>
+<span id="cb1-169"><a href="#cb1-169" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-170"><a href="#cb1-170" aria-hidden="true" tabindex="-1"></a><span class="fu">## Geometry assumptions</span></span>
+<span id="cb1-171"><a href="#cb1-171" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-172"><a href="#cb1-172" aria-hidden="true" tabindex="-1"></a>Isomap uses the declared ambient metric locally, graph path length globally,</span>
+<span id="cb1-173"><a href="#cb1-173" aria-hidden="true" tabindex="-1"></a>and Euclidean geometry in the output. The graph shortest-path metric is a</span>
+<span id="cb1-174"><a href="#cb1-174" aria-hidden="true" tabindex="-1"></a>combinatorial metric on sampled vertices. Calling it an estimate of manifold</span>
+<span id="cb1-175"><a href="#cb1-175" aria-hidden="true" tabindex="-1"></a>geodesic distance requires external assumptions about a candidate embedded</span>
+<span id="cb1-176"><a href="#cb1-176" aria-hidden="true" tabindex="-1"></a>manifold, existence of the relevant minimizing geodesics, local metric</span>
+<span id="cb1-177"><a href="#cb1-177" aria-hidden="true" tabindex="-1"></a>fidelity, sampling density, curvature and branch separation</span>
+<span id="cb1-178"><a href="#cb1-178" aria-hidden="true" tabindex="-1"></a><span class="co">[</span><span class="ot">@BernsteinEtAl2000</span><span class="co">]</span>.</span>
+<span id="cb1-179"><a href="#cb1-179" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-180"><a href="#cb1-180" aria-hidden="true" tabindex="-1"></a>Classical MDS then asks for Euclidean coordinates preserving this graph metric. If the candidate space has non-Euclidean global path geometry, holes, strong curvature or incompatible topology, no low-dimensional Euclidean coordinate system may preserve all graph distances. Isomap does not estimate a Riemannian metric tensor or certify an isometry.</span>
+<span id="cb1-181"><a href="#cb1-181" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-182"><a href="#cb1-182" aria-hidden="true" tabindex="-1"></a><span class="fu">## Supervision</span></span>
+<span id="cb1-183"><a href="#cb1-183" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-184"><a href="#cb1-184" aria-hidden="true" tabindex="-1"></a>Standard Isomap is unsupervised with respect to labels and outcomes: graph construction and MDS use only the declared observations and distances. Labels can still leak into the result through feature selection, preprocessing, sample exclusion, hyperparameter choice or visual selection. Tuning the neighborhood or dimension to maximize downstream labeled performance creates a supervised model-selection layer that must be evaluated with nested or otherwise leakage-safe splits.</span>
+<span id="cb1-185"><a href="#cb1-185" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-186"><a href="#cb1-186" aria-hidden="true" tabindex="-1"></a><span class="fu">## Optimization / inference</span></span>
+<span id="cb1-187"><a href="#cb1-187" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-188"><a href="#cb1-188" aria-hidden="true" tabindex="-1"></a>Exact Isomap performs neighborhood search, all-pairs shortest paths on the resulting weighted graph, and a symmetric eigendecomposition of $B$. The MDS step has a spectral global solution for its stated strain objective, but this does not make the preceding graph construction statistically optimal or scientifically validated.</span>
+<span id="cb1-189"><a href="#cb1-189" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-190"><a href="#cb1-190" aria-hidden="true" tabindex="-1"></a>The fitted coordinates are transductive. Adding a new point can add graph edges and change shortest paths between existing points, so recomputing Isomap can move the entire embedding. Nyström/eigenfunction and landmark constructions provide explicit approximate out-of-sample extensions, but they introduce additional assumptions and generally need not equal a full refit <span class="co">[</span><span class="ot">@BengioEtAl2003</span><span class="co">]</span>. Any claimed deployment rule must state how a new point is connected, how distances to training points are obtained, and how its coordinates are aligned with the training embedding.</span>
+<span id="cb1-191"><a href="#cb1-191" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-192"><a href="#cb1-192" aria-hidden="true" tabindex="-1"></a><span class="fu">## Strengths</span></span>
+<span id="cb1-193"><a href="#cb1-193" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-194"><a href="#cb1-194" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>It makes the proposed local-to-global geometry explicit through an inspectable graph.</span>
+<span id="cb1-195"><a href="#cb1-195" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>It can represent globally curved but approximately intrinsically Euclidean structures that one affine PCA subspace cannot flatten.</span>
+<span id="cb1-196"><a href="#cb1-196" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Its three stages have clear diagnostics: graph connectivity and edge structure, graph-distance stability, and MDS spectral distortion.</span>
+<span id="cb1-197"><a href="#cb1-197" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>The MDS stage has a transparent spectral solution.</span>
+<span id="cb1-198"><a href="#cb1-198" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>It supplies a useful stress test for whether nonlinear graph-geodesic assumptions add value beyond PCA and ambient-distance MDS.</span>
+<span id="cb1-199"><a href="#cb1-199" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-200"><a href="#cb1-200" aria-hidden="true" tabindex="-1"></a><span class="fu">## Failure modes</span></span>
+<span id="cb1-201"><a href="#cb1-201" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-202"><a href="#cb1-202" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Neighborhood too small:** sparse regions disconnect or graph routes detour, inflating distances.</span>
+<span id="cb1-203"><a href="#cb1-203" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Neighborhood too large:** edges bridge separate arms or folds, creating short circuits that can corrupt many all-pairs distances.</span>
+<span id="cb1-204"><a href="#cb1-204" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Nonuniform sampling:** one global $k$ or $\varepsilon$ can be simultaneously too large in dense regions and too small in sparse regions.</span>
+<span id="cb1-205"><a href="#cb1-205" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Noise and outliers:** ambient perturbations alter nearest neighbors; an outlier can create a bridge or isolated component.</span>
+<span id="cb1-206"><a href="#cb1-206" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**High-dimensional distance concentration:** unreliable ambient neighborhoods make every downstream stage unreliable.</span>
+<span id="cb1-207"><a href="#cb1-207" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Disconnected supports:** infinite graph distances cannot be passed to ordinary classical MDS without a declared component or imputation policy.</span>
+<span id="cb1-208"><a href="#cb1-208" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Non-Euclidean graph metric:** negative eigenvalues and residual strain remain even with a correctly computed graph.</span>
+<span id="cb1-209"><a href="#cb1-209" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Boundary and holes:** finite graph paths and global Euclidean flattening can distort structures with nonconvex intrinsic domains or nontrivial topology.</span>
+<span id="cb1-210"><a href="#cb1-210" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Hyperparameter instability:** modest changes in preprocessing, $k$, $\varepsilon$, symmetrization or target dimension can rotate, fold, split or reconnect the output.</span>
+<span id="cb1-211"><a href="#cb1-211" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**No native inverse:** low-dimensional coordinates do not by themselves reconstruct observations.</span>
+<span id="cb1-212"><a href="#cb1-212" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**No native out-of-sample map:** extensions are extra algorithms, not an automatic property of the fitted embedding.</span>
+<span id="cb1-213"><a href="#cb1-213" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Visualization overreach:** a convincing two-dimensional layout can conceal large graph-distance errors or discarded negative eigendirections.</span>
+<span id="cb1-214"><a href="#cb1-214" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-215"><a href="#cb1-215" aria-hidden="true" tabindex="-1"></a>The comparative review by van der Maaten et al. emphasizes short-circuit sensitivity, neighborhood-graph dependence, disconnected-component restrictions and weaker performance on more complex natural data than on favorable synthetic examples <span class="co">[</span><span class="ot">@VanDerMaatenEtAl2009</span><span class="co">]</span>.</span>
+<span id="cb1-216"><a href="#cb1-216" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-217"><a href="#cb1-217" aria-hidden="true" tabindex="-1"></a><span class="fu">## Identifiability issues</span></span>
+<span id="cb1-218"><a href="#cb1-218" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-219"><a href="#cb1-219" aria-hidden="true" tabindex="-1"></a>For a fixed connected graph-distance matrix and a fixed retained positive eigenspace, classical MDS coordinates are centered and are non-unique under orthogonal transformations, including rotations and reflections. Individual axes have arbitrary signs. Repeated retained eigenvalues permit arbitrary rotations within their eigenspaces. If the truncation boundary crosses a repeated eigenvalue, the selected $d$-dimensional coordinate subspace is itself non-unique.</span>
+<span id="cb1-220"><a href="#cb1-220" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-221"><a href="#cb1-221" aria-hidden="true" tabindex="-1"></a>These spectral equivalences do not exhaust practical ambiguity. Different neighborhood graphs can yield different graph metrics and embeddings from the same observations. A plotting alignment or Procrustes transformation chooses a coordinate representative; it does not identify scientifically privileged latent axes. When negative eigenvalues are discarded, even the full positive-coordinate representation is only an approximation to the supplied graph distances.</span>
+<span id="cb1-222"><a href="#cb1-222" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-223"><a href="#cb1-223" aria-hidden="true" tabindex="-1"></a><span class="fu">## Comparison with simpler methods</span></span>
+<span id="cb1-224"><a href="#cb1-224" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-225"><a href="#cb1-225" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**PCA:** the required rank-matched linear Euclidean baseline. It tests whether graph-geodesic construction improves the declared criterion beyond one global affine subspace.</span>
+<span id="cb1-226"><a href="#cb1-226" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Ambient-distance classical MDS:** applies the same final spectral stage directly to pairwise ambient distances. With Euclidean distances it is closely linked to PCA, and it isolates the contribution of replacing ambient distances by graph paths.</span>
+<span id="cb1-227"><a href="#cb1-227" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Graph-distance diagnostic without embedding:** inspect connectivity, edge lengths, shortest paths and stability across neighborhoods before attributing any value to the MDS visualization.</span>
+<span id="cb1-228"><a href="#cb1-228" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Synthetic oracle comparison:** only in a future generated toy setting, compare graph distances with known curve or manifold path distances. This is unavailable for ordinary empirical data without independently known geometry.</span>
+<span id="cb1-229"><a href="#cb1-229" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-230"><a href="#cb1-230" aria-hidden="true" tabindex="-1"></a>A method should not be judged superior merely because its own in-sample graph-distance objective is smaller. Comparisons must use matched dimension, training-only tuning and criteria tied to the intended scientific or predictive use.</span>
+<span id="cb1-231"><a href="#cb1-231" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-232"><a href="#cb1-232" aria-hidden="true" tabindex="-1"></a><span class="fu">## Evaluation criteria</span></span>
+<span id="cb1-233"><a href="#cb1-233" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-234"><a href="#cb1-234" aria-hidden="true" tabindex="-1"></a>Evaluation should report several layers rather than one plot:</span>
+<span id="cb1-235"><a href="#cb1-235" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-236"><a href="#cb1-236" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>**Graph diagnostics:** connected-component sizes, degree and edge-length distributions, sensitivity to tie handling and symmetrization, and the appearance or disappearance of long bridging edges.</span>
+<span id="cb1-237"><a href="#cb1-237" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>**Neighborhood stability:** repeat the analysis across a prespecified, scientifically plausible range of $k$ or $\varepsilon$ and across resampled independent units.</span>
+<span id="cb1-238"><a href="#cb1-238" aria-hidden="true" tabindex="-1"></a><span class="ss">3. </span>**Distance fidelity:** report classical-MDS strain or a declared stress/correlation measure between $d_G$ and embedded Euclidean distances. State whether negative eigenvalues were omitted.</span>
+<span id="cb1-239"><a href="#cb1-239" aria-hidden="true" tabindex="-1"></a><span class="ss">4. </span>**Local fidelity:** when relevant, report declared neighborhood-preservation measures rather than inferring local correctness from global distance fit.</span>
+<span id="cb1-240"><a href="#cb1-240" aria-hidden="true" tabindex="-1"></a><span class="ss">5. </span>**Baseline comparison:** compare rank-matched PCA and ambient-distance classical MDS using the same fitted observations and preprocessing.</span>
+<span id="cb1-241"><a href="#cb1-241" aria-hidden="true" tabindex="-1"></a><span class="ss">6. </span>**Held-out behavior:** fit preprocessing, graph hyperparameters and dimension on training data; use a predeclared extension for held-out observations and evaluate distances or downstream performance without refitting on the test set.</span>
+<span id="cb1-242"><a href="#cb1-242" aria-hidden="true" tabindex="-1"></a><span class="ss">7. </span>**Scientific stability:** assess whether conclusions survive plausible preprocessing, sampling-unit, subject/session and neighborhood choices.</span>
+<span id="cb1-243"><a href="#cb1-243" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-244"><a href="#cb1-244" aria-hidden="true" tabindex="-1"></a>The original residual-variance curve is an in-sample summary of distance preservation and can assist dimension comparison, but an elbow is not a model-free intrinsic-dimension estimate <span class="co">[</span><span class="ot">@TenenbaumDeSilvaLangford2000</span><span class="co">]</span>. Isomap has no native observation-space reconstruction, so “reconstruction error” is undefined unless a separate inverse or decoder is introduced and evaluated as an additional method.</span>
+<span id="cb1-245"><a href="#cb1-245" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-246"><a href="#cb1-246" aria-hidden="true" tabindex="-1"></a>For dependent observations, splits must keep whole trajectories, subjects, sessions or other dependence units together as appropriate. Randomly splitting adjacent time samples can make neighborhood and out-of-sample performance optimistic.</span>
+<span id="cb1-247"><a href="#cb1-247" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-248"><a href="#cb1-248" aria-hidden="true" tabindex="-1"></a><span class="fu">## Minimal toy model</span></span>
+<span id="cb1-249"><a href="#cb1-249" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-250"><a href="#cb1-250" aria-hidden="true" tabindex="-1"></a>A future non-executable toy model should sample points along a known planar hairpin curve with two long, nearly parallel arms. The generation record should preserve the curve parameter and exact arc-length distance as ground truth, while the fitting algorithm receives only noisy ambient coordinates.</span>
+<span id="cb1-251"><a href="#cb1-251" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-252"><a href="#cb1-252" aria-hidden="true" tabindex="-1"></a>The planned comparisons are:</span>
+<span id="cb1-253"><a href="#cb1-253" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-254"><a href="#cb1-254" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>rank-one and rank-two PCA;</span>
+<span id="cb1-255"><a href="#cb1-255" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>classical MDS on ambient Euclidean distances;</span>
+<span id="cb1-256"><a href="#cb1-256" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Isomap over a prespecified neighborhood range; and</span>
+<span id="cb1-257"><a href="#cb1-257" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>an oracle MDS embedding using the known arc-length distances, used only as a generation-side reference.</span>
+<span id="cb1-258"><a href="#cb1-258" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-259"><a href="#cb1-259" aria-hidden="true" tabindex="-1"></a>At an adequate local neighborhood scale, graph paths should follow the hairpin and approximate arc length. With too few samples or too small a neighborhood, the graph should disconnect or detour. With too large a neighborhood, an edge should bridge the two arms and sharply underestimate many path distances. A negative control should remove samples from one bend to create a gap. Evaluation should compare graph distances with known arc length, inspect connected components and shortcuts, and align coordinate outputs only for comparison. This contract belongs to a later executable study; no data, code or results are created here.</span>
+<span id="cb1-260"><a href="#cb1-260" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-261"><a href="#cb1-261" aria-hidden="true" tabindex="-1"></a><span class="fu">## Relevance to LDG</span></span>
+<span id="cb1-262"><a href="#cb1-262" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-263"><a href="#cb1-263" aria-hidden="true" tabindex="-1"></a>Isomap is LDG's canonical example of a method that turns local metric assumptions into a global graph-distance representation and then into Euclidean coordinates. It is useful precisely because each interpretive leap can be audited separately: local ambient proximity, finite graph paths, Euclidean MDS representation, and any later scientific interpretation.</span>
+<span id="cb1-264"><a href="#cb1-264" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-265"><a href="#cb1-265" aria-hidden="true" tabindex="-1"></a>::: {.callout-warning title="What this does NOT imply"}</span>
+<span id="cb1-266"><a href="#cb1-266" aria-hidden="true" tabindex="-1"></a>A successful Isomap visualization does not prove that a manifold exists, recover the topology of an underlying space, estimate a Riemannian metric tensor, establish intrinsic dimension, discover physical dynamics, identify a mechanism, or recover unique latent coordinates. Graph connectivity is not topology recovery; graph shortest paths are not automatically manifold geodesics; low strain is not model validation.</span>
+<span id="cb1-267"><a href="#cb1-267" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb1-268"><a href="#cb1-268" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-269"><a href="#cb1-269" aria-hidden="true" tabindex="-1"></a><span class="fu">### Mouse trajectory</span></span>
+<span id="cb1-270"><a href="#cb1-270" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-271"><a href="#cb1-271" aria-hidden="true" tabindex="-1"></a>No modality-specific empirical claim is retained. Applying Isomap to mouse trajectories would require an independently justified representation, distance, temporal-alignment policy, sampling unit and held-out extension; a curved embedding would not establish a behavioral state manifold or movement dynamics.</span>
+<span id="cb1-272"><a href="#cb1-272" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-273"><a href="#cb1-273" aria-hidden="true" tabindex="-1"></a><span class="fu">### Eye movement</span></span>
+<span id="cb1-274"><a href="#cb1-274" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-275"><a href="#cb1-275" aria-hidden="true" tabindex="-1"></a>No modality-specific empirical claim is retained. Eye-position samples, event summaries and temporal windows define different metric spaces, and ordinary Isomap does not convert their static proximity graph into evidence for oculomotor dynamics.</span>
+<span id="cb1-276"><a href="#cb1-276" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-277"><a href="#cb1-277" aria-hidden="true" tabindex="-1"></a><span class="fu">### EEG</span></span>
+<span id="cb1-278"><a href="#cb1-278" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-279"><a href="#cb1-279" aria-hidden="true" tabindex="-1"></a>No modality-specific empirical claim is retained. Sensor scaling, rereferencing, artifact handling and subject/session pooling would determine the neighborhood graph; embedded axes would not automatically represent neural sources or cortical geometry.</span>
+<span id="cb1-280"><a href="#cb1-280" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-281"><a href="#cb1-281" aria-hidden="true" tabindex="-1"></a><span class="fu">### MEG / neural population data</span></span>
+<span id="cb1-282"><a href="#cb1-282" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-283"><a href="#cb1-283" aria-hidden="true" tabindex="-1"></a>No modality-specific empirical claim is retained. Unit normalization, trial averaging and sampling dependence would need to be fixed before graph construction, and a low-dimensional layout would remain a graph-geometric approximation rather than evidence for a neural manifold, mechanism or dynamical law.</span>
+<span id="cb1-284"><a href="#cb1-284" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-285"><a href="#cb1-285" aria-hidden="true" tabindex="-1"></a><span class="fu">## Primary sources</span></span>
+<span id="cb1-286"><a href="#cb1-286" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-287"><a href="#cb1-287" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Tenenbaum, de Silva and Langford introduce Isomap, explicitly separate neighborhood construction, shortest-path graph distances and classical MDS, and state the favorable intrinsically Euclidean setting and finite-sample graph limitations <span class="co">[</span><span class="ot">@TenenbaumDeSilvaLangford2000</span><span class="co">]</span>.</span>
+<span id="cb1-288"><a href="#cb1-288" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Bernstein, de Silva, Langford and Tenenbaum analyze sufficient conditions—including geodesic convexity/minimizing-geodesic existence, sampling coverage, curvature and branch separation—under which graph distances approximate path distances on an embedded manifold <span class="co">[</span><span class="ot">@BernsteinEtAl2000</span><span class="co">]</span>.</span>
+<span id="cb1-289"><a href="#cb1-289" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Bengio et al. give a technical double-centering/eigendecomposition formulation and derive explicit out-of-sample extensions for Isomap, MDS and related spectral methods <span class="co">[</span><span class="ot">@BengioEtAl2003</span><span class="co">]</span>.</span>
+<span id="cb1-290"><a href="#cb1-290" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-291"><a href="#cb1-291" aria-hidden="true" tabindex="-1"></a><span class="fu">## Reviews / secondary sources</span></span>
+<span id="cb1-292"><a href="#cb1-292" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-293"><a href="#cb1-293" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Van der Maaten, Postma and van den Herik provide an inspected comparative review of nonlinear dimensionality-reduction methods and identify Isomap's neighborhood, disconnection, short-circuit and generalization limitations <span class="co">[</span><span class="ot">@VanDerMaatenEtAl2009</span><span class="co">]</span>.</span>
+<span id="cb1-294"><a href="#cb1-294" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-295"><a href="#cb1-295" aria-hidden="true" tabindex="-1"></a><span class="fu">## Open methodological questions</span></span>
+<span id="cb1-296"><a href="#cb1-296" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-297"><a href="#cb1-297" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>How should neighborhood scale be selected without optimizing a preferred visualization?</span>
+<span id="cb1-298"><a href="#cb1-298" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Which diagnostics distinguish true local metric fidelity from distance concentration or preprocessing artifacts?</span>
+<span id="cb1-299"><a href="#cb1-299" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>How should uncertainty in graph edges and shortest paths propagate to coordinates?</span>
+<span id="cb1-300"><a href="#cb1-300" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>When should disconnected components be modeled separately rather than forced into one embedding?</span>
+<span id="cb1-301"><a href="#cb1-301" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Which out-of-sample extension is appropriate when adding a point would materially change the fitted graph?</span>
+<span id="cb1-302"><a href="#cb1-302" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Which scientific claims are invariant under rigid coordinate transformations and neighborhood perturbations?</span>
+<span id="cb1-303"><a href="#cb1-303" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-304"><a href="#cb1-304" aria-hidden="true" tabindex="-1"></a><span class="fu">## Maturity checklist</span></span>
+<span id="cb1-305"><a href="#cb1-305" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-306"><a href="#cb1-306" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> Uses the complete Method schema and states the bounded problem.</span>
+<span id="cb1-307"><a href="#cb1-307" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> Separates neighbor construction, graph shortest paths and classical MDS.</span>
+<span id="cb1-308"><a href="#cb1-308" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> States geodesic-existence, sampling, connectivity, curvature,</span>
+<span id="cb1-309"><a href="#cb1-309" aria-hidden="true" tabindex="-1"></a>  branch-separation and shortcut assumptions.</span>
+<span id="cb1-310"><a href="#cb1-310" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> Declares learned and fixed quantities, temporal handling, geometry and supervision.</span>
+<span id="cb1-311"><a href="#cb1-311" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> States spectral and graph-construction ambiguities.</span>
+<span id="cb1-312"><a href="#cb1-312" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> Includes PCA, ambient-MDS and graph-diagnostic baselines.</span>
+<span id="cb1-313"><a href="#cb1-313" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> Defines evaluation and out-of-sample limits without claiming native reconstruction.</span>
+<span id="cb1-314"><a href="#cb1-314" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> Includes a prose-only future toy-model contract with failure and negative-control cases.</span>
+<span id="cb1-315"><a href="#cb1-315" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> Avoids unsupported modality-specific empirical claims.</span>
+<span id="cb1-316"><a href="#cb1-316" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> Includes explicit manifold, topology, geometry, dimension, dynamics and mechanism non-implications.</span>
+<span id="cb1-317"><a href="#cb1-317" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> Foundational, technical and review sources were inspected and bibliographic metadata verified.</span>
+<span id="cb1-318"><a href="#cb1-318" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> Independent mixed review completed after one bounded correction round;</span>
+<span id="cb1-319"><a href="#cb1-319" aria-hidden="true" tabindex="-1"></a>  focused re-review returned PASS.</span>
+<span id="cb1-320"><a href="#cb1-320" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> Stable promotion authorized by the human owner under the recorded review decision after published-site review.</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></div>
+</div></div></div></div></div>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

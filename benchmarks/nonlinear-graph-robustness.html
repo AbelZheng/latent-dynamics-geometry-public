@@ -1,0 +1,2276 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.10.18">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Nonlinear Reconstruction and Graph Geometry Robustness Benchmark – Latent Dynamics &amp; Geometry</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-445b8638c3d06994fee0907d791121c4.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-chtml.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../index.html">
+    <span class="navbar-title">Latent Dynamics &amp; Geometry</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../index.html"> 
+<span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../knowledge/concepts/index.html"> 
+<span class="menu-text">Concepts</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../knowledge/methods/index.html"> 
+<span class="menu-text">Methods</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../knowledge/math/index.html"> 
+<span class="menu-text">Math</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../knowledge/papers/index.html"> 
+<span class="menu-text">Papers</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../toy-models/index.html"> 
+<span class="menu-text">Toy Models</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../research-questions/index.html"> 
+<span class="menu-text">Research Questions</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../benchmarks/index.html"> 
+<span class="menu-text">Benchmarks</span></a>
+  </li>  
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/AbelZheng/latent-dynamics-geometry-public"> <i class="bi bi-github" role="img" aria-label="GitHub repository">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="https://github.com/AbelZheng/latent-dynamics-geometry-public/discussions"> 
+<span class="menu-text">Discussions</span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#nonlinear-reconstruction-and-graph-geometry-robustness-benchmark" id="toc-nonlinear-reconstruction-and-graph-geometry-robustness-benchmark" class="nav-link active" data-scroll-target="#nonlinear-reconstruction-and-graph-geometry-robustness-benchmark">Nonlinear Reconstruction and Graph Geometry Robustness Benchmark</a>
+  <ul class="collapse">
+  <li><a href="#scientific-question" id="toc-scientific-question" class="nav-link" data-scroll-target="#scientific-question">Scientific question</a></li>
+  <li><a href="#ground-truth" id="toc-ground-truth" class="nav-link" data-scroll-target="#ground-truth">Ground truth</a>
+  <ul class="collapse">
+  <li><a href="#reconstruction-task" id="toc-reconstruction-task" class="nav-link" data-scroll-target="#reconstruction-task">Reconstruction task</a></li>
+  <li><a href="#graph-geometry-task" id="toc-graph-geometry-task" class="nav-link" data-scroll-target="#graph-geometry-task">Graph-geometry task</a></li>
+  </ul></li>
+  <li><a href="#generation" id="toc-generation" class="nav-link" data-scroll-target="#generation">Generation</a></li>
+  <li><a href="#scenario-grid" id="toc-scenario-grid" class="nav-link" data-scroll-target="#scenario-grid">Scenario grid</a>
+  <ul class="collapse">
+  <li><a href="#reconstruction-scenarios" id="toc-reconstruction-scenarios" class="nav-link" data-scroll-target="#reconstruction-scenarios">Reconstruction scenarios</a></li>
+  <li><a href="#graph-scenarios" id="toc-graph-scenarios" class="nav-link" data-scroll-target="#graph-scenarios">Graph scenarios</a></li>
+  </ul></li>
+  <li><a href="#negative-controls-and-stress-cases" id="toc-negative-controls-and-stress-cases" class="nav-link" data-scroll-target="#negative-controls-and-stress-cases">Negative controls and stress cases</a></li>
+  <li><a href="#replicates-and-deterministic-seeds" id="toc-replicates-and-deterministic-seeds" class="nav-link" data-scroll-target="#replicates-and-deterministic-seeds">Replicates and deterministic seeds</a></li>
+  <li><a href="#split-discipline" id="toc-split-discipline" class="nav-link" data-scroll-target="#split-discipline">Split discipline</a>
+  <ul class="collapse">
+  <li><a href="#reconstruction" id="toc-reconstruction" class="nav-link" data-scroll-target="#reconstruction">Reconstruction</a></li>
+  <li><a href="#graph-geometry" id="toc-graph-geometry" class="nav-link" data-scroll-target="#graph-geometry">Graph geometry</a></li>
+  </ul></li>
+  <li><a href="#methods-and-information-sets" id="toc-methods-and-information-sets" class="nav-link" data-scroll-target="#methods-and-information-sets">Methods and information sets</a>
+  <ul class="collapse">
+  <li><a href="#reconstruction-methods" id="toc-reconstruction-methods" class="nav-link" data-scroll-target="#reconstruction-methods">Reconstruction methods</a></li>
+  <li><a href="#graph-methods" id="toc-graph-methods" class="nav-link" data-scroll-target="#graph-methods">Graph methods</a></li>
+  </ul></li>
+  <li><a href="#parameter-selection" id="toc-parameter-selection" class="nav-link" data-scroll-target="#parameter-selection">Parameter selection</a></li>
+  <li><a href="#inference" id="toc-inference" class="nav-link" data-scroll-target="#inference">Inference</a></li>
+  <li><a href="#scoring" id="toc-scoring" class="nav-link" data-scroll-target="#scoring">Scoring</a>
+  <ul class="collapse">
+  <li><a href="#reconstruction-metrics" id="toc-reconstruction-metrics" class="nav-link" data-scroll-target="#reconstruction-metrics">Reconstruction metrics</a></li>
+  <li><a href="#graph-metrics" id="toc-graph-metrics" class="nav-link" data-scroll-target="#graph-metrics">Graph metrics</a></li>
+  </ul></li>
+  <li><a href="#failure-and-applicability-labels" id="toc-failure-and-applicability-labels" class="nav-link" data-scroll-target="#failure-and-applicability-labels">Failure and applicability labels</a></li>
+  <li><a href="#artifact-contract" id="toc-artifact-contract" class="nav-link" data-scroll-target="#artifact-contract">Artifact contract</a></li>
+  <li><a href="#results" id="toc-results" class="nav-link" data-scroll-target="#results">Results</a>
+  <ul class="collapse">
+  <li><a href="#reconstruction-results" id="toc-reconstruction-results" class="nav-link" data-scroll-target="#reconstruction-results">Reconstruction results</a></li>
+  <li><a href="#graph-geometry-results" id="toc-graph-geometry-results" class="nav-link" data-scroll-target="#graph-geometry-results">Graph-geometry results</a></li>
+  </ul></li>
+  <li><a href="#interpretation-limits" id="toc-interpretation-limits" class="nav-link" data-scroll-target="#interpretation-limits">Interpretation limits</a></li>
+  <li><a href="#reproducibility" id="toc-reproducibility" class="nav-link" data-scroll-target="#reproducibility">Reproducibility</a></li>
+  <li><a href="#review-record" id="toc-review-record" class="nav-link" data-scroll-target="#review-record">Review record</a></li>
+  <li><a href="#maturity-checklist" id="toc-maturity-checklist" class="nav-link" data-scroll-target="#maturity-checklist">Maturity checklist</a></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<div class="quarto-title-block"><div><h1 class="title">Nonlinear Reconstruction and Graph Geometry Robustness Benchmark</h1><button type="button" class="btn code-tools-button" id="quarto-code-tools-source"><i class="bi"></i> Code</button></div></div>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="nonlinear-reconstruction-and-graph-geometry-robustness-benchmark" class="level1">
+<h1>Nonlinear Reconstruction and Graph Geometry Robustness Benchmark</h1>
+<section id="scientific-question" class="level2">
+<h2 class="anchored" data-anchor-id="scientific-question">Scientific question</h2>
+<p>P4-U05 asks two separate synthetic questions.</p>
+<ol type="1">
+<li><strong>Nonlinear reconstruction:</strong> under a declared curved generator and bounded controls, when do a training mean, rank-one PCA/linear autoencoder, a small nonlinear autoencoder and a frozen-random-encoder control reconstruct held-out observations or noiseless signal, and how do their codes respond to curvature, a moment-matched full-dimensional Gaussian, sample/capacity stress, nuisance variance and support shift?</li>
+<li><strong>Graph geometry:</strong> for a known hairpin or circle simulator, how do ambient linear references, classical MDS, Isomap, direct graph diagnostics, Diffusion Maps and frozen out-of-sample extensions respond to sampling gaps, shortcuts, nonuniform density, graph connectivity, neighborhood size, bandwidth, spectral truncation and feature-metric scaling?</li>
+</ol>
+<p>The tasks have separate generators, methods, information sets, applicability rules, metrics, summaries and figure panels. No cross-task normalization, aggregate score, ranking or universal winner is computed. Reconstruction loss, code diagnostics, graph-path error, operator eigenspace error and held-out extension error are not interchangeable targets.</p>
+</section>
+<section id="ground-truth" class="level2">
+<h2 class="anchored" data-anchor-id="ground-truth">Ground truth</h2>
+<section id="reconstruction-task" class="level3">
+<h3 class="anchored" data-anchor-id="reconstruction-task">Reconstruction task</h3>
+<p>The ordinary reconstruction scenarios use a scalar scoring variable <span class="math inline">\(s\in[-1.5,1.5]\)</span> and the six-dimensional noiseless map</p>
+<p><span class="math display">\[
+f_c(s)=\left[
+s,
+cs^2,
+0.35c\sin(2s),
+0.2cs^3,
+c\left(\cos s-\frac{\sin(1.5)}{1.5}\right),
+0.4c\sin(3s)
+\right],
+\]</span></p>
+<p>where <span class="math inline">\(c\)</span> is the declared curvature. Independent Gaussian observation noise with standard deviation <span class="math inline">\(0.06\)</span> is then added. The high-variance nuisance scenario adds independent standard-deviation-<span class="math inline">\(2.4\)</span> noise to the last two observed coordinates. The known <span class="math inline">\(s\)</span> and <span class="math inline">\(f_c(s)\)</span> are scoring-only truth; they are not supplied to preprocessing, fitting, selection or reconstruction.</p>
+<p>The moment-matched Gaussian scenario instead samples a full-dimensional Gaussian with the population mean and covariance of the reference curved signal plus observation noise. It has no scalar generator parameter or noiseless one-dimensional signal target, so those rows are explicitly inapplicable.</p>
+<p>The one-dimensional bottleneck width is fixed by the analyst. It is not a model-free estimate of intrinsic dimension, and the generated curve is not used as evidence that arbitrary observations lie on a manifold.</p>
+</section>
+<section id="graph-geometry-task" class="level3">
+<h3 class="anchored" data-anchor-id="graph-geometry-task">Graph-geometry task</h3>
+<p>The hairpin generator uses the stable Phase 3 unit-speed planar hairpin, embedded isometrically in three observed dimensions and perturbed by Gaussian noise of standard deviation <code>0.01</code>. Its scoring truth is analytic arc-length coordinate <span class="math inline">\(\ell\)</span>. The ordinary radius is inherited from the stable Phase 3 implementation; the shortcut stress uses radius <code>0.06</code>. Graph construction receives observed coordinates only. Arc length enters after fitting for graph or extension scoring.</p>
+<p>The circle generator uses the stable Phase 3 three-dimensional isometric embedding of <span class="math inline">\((\cos\theta,\sin\theta)\)</span>. The finite target is the declared training affinity/Markov operator and its cosine–sine two-mode subspace, full finite-operator diffusion distances and frozen Nyström extension. These are finite graph/operator targets, not inferred topology or a recovered Riemannian metric.</p>
+</section>
+</section>
+<section id="generation" class="level2">
+<h2 class="anchored" data-anchor-id="generation">Generation</h2>
+<p>Generation precedes fitting and is split-specific.</p>
+<ul>
+<li>Reconstruction train/validation/test sizes are <code>120/60/90</code>, except the sample/capacity stress (<code>28/42/90</code>). Ordinary <span class="math inline">\(s\)</span> values are independently uniform on <span class="math inline">\([-1.5,1.5]\)</span> within each split. In <code>support_shift</code>, train and validation are exactly the reference bundles, while test magnitudes are sampled in <span class="math inline">\([1.5,2.35]\)</span> with random sign.</li>
+<li>Hairpin train/validation/test sizes are <code>108/42/54</code>. Sampling is uniform in arc length unless the scenario declares a training gap or nonuniform density. Metric-scaling scenarios reuse the reference random draws before applying <code>diag(1,1,3)</code>.</li>
+<li>Circle train/validation/test sizes are <code>64/32/64</code>. Uniform training points form a phase-shifted regular grid; nonuniform training angles use a fixed power transform of uniform draws. In every circle scenario and replicate, each test angle is the exact circular midpoint between two consecutive sorted training angles, including the wrap-around interval. Validation is an independent reserved grid and is not used for fitting or selection. Metric scaling applies <code>diag(1,1,3)</code> to the same reference train/test angles.</li>
+</ul>
+<p>The two Phase 3 source roles are deliberately distinct. The stable nonlinear reconstruction executable is <strong>hash-only design provenance</strong>: it is not loaded at runtime and there are no <code>P3_NL</code> numerical calls. The stable graph-geometry executable is loaded and <strong>actually reused</strong> for hairpin geometry, graph fitting, shortest paths/MDS, extension, Diffusion Maps, Nyström and operator diagnostics. The manifest and verification diagnostics record these roles separately; neither stable Phase 3 source is modified.</p>
+</section>
+<section id="scenario-grid" class="level2">
+<h2 class="anchored" data-anchor-id="scenario-grid">Scenario grid</h2>
+<p>Both grids are bounded core-plus-stress designs, not complete factorial experiments. Differences between named scenarios are conditional observations, not isolated causal effects of a single factor.</p>
+<section id="reconstruction-scenarios" class="level3">
+<h3 class="anchored" data-anchor-id="reconstruction-scenarios">Reconstruction scenarios</h3>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Scenario</th>
+<th>Declared manipulation</th>
+<th>Main boundary</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>reference_curved</code></td>
+<td>curvature <span class="math inline">\(c=1\)</span>, sizes <code>120/60/90</code></td>
+<td>in-support nonlinear reconstruction</td>
+</tr>
+<tr class="even">
+<td><code>low_curvature</code></td>
+<td><span class="math inline">\(c=0.25\)</span></td>
+<td>weak nonlinearity versus rank-one linear references</td>
+</tr>
+<tr class="odd">
+<td><code>high_curvature</code></td>
+<td><span class="math inline">\(c=1.65\)</span></td>
+<td>stronger curvature</td>
+</tr>
+<tr class="even">
+<td><code>moment_matched_gaussian</code></td>
+<td>full-dimensional Gaussian with reference population mean/covariance</td>
+<td>compression without one-dimensional generator truth</td>
+</tr>
+<tr class="odd">
+<td><code>small_sample_high_capacity</code></td>
+<td>sizes <code>28/42/90</code>, hidden width 18</td>
+<td>finite-sample/capacity sensitivity</td>
+</tr>
+<tr class="even">
+<td><code>high_variance_nuisance</code></td>
+<td>standard deviation 2.4 in the last two coordinates</td>
+<td>aggregate reconstruction dominated by nuisance variance</td>
+</tr>
+<tr class="odd">
+<td><code>support_shift</code></td>
+<td>reference train/validation; test outside training support</td>
+<td>frozen-model extrapolation</td>
+</tr>
+</tbody>
+</table>
+<p>All scenarios other than <code>small_sample_high_capacity</code> use hidden width 8 for the nonlinear and frozen-encoder networks.</p>
+</section>
+<section id="graph-scenarios" class="level3">
+<h3 class="anchored" data-anchor-id="graph-scenarios">Graph scenarios</h3>
+<section id="hairpin" class="level4">
+<h4 class="anchored" data-anchor-id="hairpin">Hairpin</h4>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Scenario</th>
+<th>Declared manipulation</th>
+<th>Main boundary</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>hairpin_reference</code></td>
+<td>union-<span class="math inline">\(k\)</span>NN, <span class="math inline">\(k=6\)</span></td>
+<td>nominal finite graph and extension behavior</td>
+</tr>
+<tr class="even">
+<td><code>hairpin_sparse_gap</code></td>
+<td>training gap, <span class="math inline">\(k=6\)</span></td>
+<td>disconnected support and failed extension applicability</td>
+</tr>
+<tr class="odd">
+<td><code>hairpin_shortcuts</code></td>
+<td>branch radius <code>0.06</code>, <span class="math inline">\(k=6\)</span></td>
+<td>cross-branch shortcuts</td>
+</tr>
+<tr class="even">
+<td><code>hairpin_nonuniform</code></td>
+<td>nonuniform arc-length sampling, <span class="math inline">\(k=6\)</span></td>
+<td>density/connectivity sensitivity</td>
+</tr>
+<tr class="odd">
+<td><code>hairpin_disconnected</code></td>
+<td><span class="math inline">\(k=1\)</span></td>
+<td>explicit disconnection</td>
+</tr>
+<tr class="even">
+<td><code>hairpin_large_k</code></td>
+<td><span class="math inline">\(k=16\)</span></td>
+<td>overly broad neighborhoods</td>
+</tr>
+<tr class="odd">
+<td><code>hairpin_nearly_complete</code></td>
+<td><span class="math inline">\(k=100\)</span></td>
+<td>near-complete graph and chord shortcuts</td>
+</tr>
+<tr class="even">
+<td><code>hairpin_metric_scaling</code></td>
+<td>observed transform <code>diag(1,1,3)</code>, <span class="math inline">\(k=6\)</span></td>
+<td>feature-metric dependence</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="circle" class="level4">
+<h4 class="anchored" data-anchor-id="circle">Circle</h4>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Scenario</th>
+<th>Declared manipulation</th>
+<th>Main boundary</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>circle_reference</code></td>
+<td>uniform grid, <span class="math inline">\(\varepsilon=0.18\)</span></td>
+<td>finite operator/eigenspace and extension reference</td>
+</tr>
+<tr class="even">
+<td><code>circle_nonuniform</code></td>
+<td>nonuniform training density, <span class="math inline">\(\varepsilon=0.18\)</span></td>
+<td>density sensitivity</td>
+</tr>
+<tr class="odd">
+<td><code>circle_bandwidth_small</code></td>
+<td><span class="math inline">\(\varepsilon=0.008\)</span></td>
+<td>narrow affinity bandwidth and spectral truncation</td>
+</tr>
+<tr class="even">
+<td><code>circle_bandwidth_large</code></td>
+<td><span class="math inline">\(\varepsilon=4.0\)</span></td>
+<td>broad affinity bandwidth</td>
+</tr>
+<tr class="odd">
+<td><code>circle_metric_scaling</code></td>
+<td>transform <code>diag(1,1,3)</code>, <span class="math inline">\(\varepsilon=0.18\)</span></td>
+<td>observed-metric dependence</td>
+</tr>
+</tbody>
+</table>
+<p>Neighborhood sizes and bandwidths are predeclared scenario values; they are not selected from test truth or test score.</p>
+</section>
+</section>
+</section>
+<section id="negative-controls-and-stress-cases" class="level2">
+<h2 class="anchored" data-anchor-id="negative-controls-and-stress-cases">Negative controls and stress cases</h2>
+<ul>
+<li>The moment-matched Gaussian controls first and second moments while removing the declared scalar/noiseless reconstruction target.</li>
+<li>The frozen random encoder fixes its encoder and trains only its decoder, separating useful random nonlinear features from a learned encoder.</li>
+<li>High-capacity/small-sample and nuisance scenarios expose architecture and loss-composition sensitivity without forcing a particular failure story.</li>
+<li><code>support_shift</code> uses the exact reference train/validation observations and an exactly identical fitted state; only the exterior-support test bundle differs.</li>
+<li>Hairpin gaps and <span class="math inline">\(k=1\)</span> retain disconnected graphs and infinite shortest-path pairs rather than silently repairing connectivity.</li>
+<li>Reduced branch separation, large/nearly-complete neighborhoods and feature scaling expose shortcut and metric dependence.</li>
+<li>Circle density, bandwidth and metric-scaling scenarios stress the finite Markov operator, spectral truncation and frozen Nyström extension.</li>
+</ul>
+<p>Failures and inapplicability remain in the raw Cartesian result inventories and are not tuned away after inspection.</p>
+</section>
+<section id="replicates-and-deterministic-seeds" class="level2">
+<h2 class="anchored" data-anchor-id="replicates-and-deterministic-seeds">Replicates and deterministic seeds</h2>
+<p>Every scenario uses three independent deterministic replicates under master seed <code>20260820</code>. Seed words include task, a stable SHA-256-derived scenario code, replicate, stage, split and candidate where relevant. Methods within a scenario-replicate share generated data for paired descriptive comparison.</p>
+<p>Three replicates support only bounded descriptive q10/median/q90 summaries. They do not provide confidence intervals or stable tail estimates.</p>
+</section>
+<section id="split-discipline" class="level2">
+<h2 class="anchored" data-anchor-id="split-discipline">Split discipline</h2>
+<section id="reconstruction" class="level3">
+<h3 class="anchored" data-anchor-id="reconstruction">Reconstruction</h3>
+<ul>
+<li>Training observations fit the standardizer, mean and PCA/analytic linear autoencoder.</li>
+<li>Training and validation observations fit two deterministic candidate seeds for the nonlinear autoencoder and frozen-encoder control; validation MSE selects one candidate with deterministic index tie breaking.</li>
+<li>Test observations are passed only to frozen reconstruction.</li>
+<li>Test <span class="math inline">\(s\)</span> and noiseless signal are added only in scoring.</li>
+<li>The support-shift scenario reuses the exact reference train/validation observations and fitted state. The verifier records zero fitted-state difference.</li>
+</ul>
+</section>
+<section id="graph-geometry" class="level3">
+<h3 class="anchored" data-anchor-id="graph-geometry">Graph geometry</h3>
+<ul>
+<li>The training observations alone construct the hairpin graph or circle operator. The generated validation split is reserved but is not used for hyperparameter selection in this bounded implementation.</li>
+<li>A training-truth affine map is fitted solely as a scoring alignment for hairpin one-dimensional coordinates; it does not change the graph, embedding or raw extension.</li>
+<li>Test points are extended against the frozen training graph/operator. They are never inserted into a transductive refit. For circles, the test set is the exact set of circular midpoints of the realized training angles; the maximum midpoint-construction error over all 15 scenario-replicate records is <code>0.0</code>.</li>
+<li>Test arc length, circle angle and cosine–sine truth enter only after raw extension.</li>
+</ul>
+<p>The verifier’s restricted signatures, test/truth poison checks and support reuse checks all pass with maximum differences <code>0.0</code> in the protected fitted states or raw recoveries.</p>
+</section>
+</section>
+<section id="methods-and-information-sets" class="level2">
+<h2 class="anchored" data-anchor-id="methods-and-information-sets">Methods and information sets</h2>
+<section id="reconstruction-methods" class="level3">
+<h3 class="anchored" data-anchor-id="reconstruction-methods">Reconstruction methods</h3>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Method</th>
+<th>Fit/parameter source</th>
+<th>Information set</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>mean</code></td>
+<td>training mean after train-only standardization</td>
+<td>train fit, frozen test reconstruction</td>
+</tr>
+<tr class="even">
+<td><code>pca</code></td>
+<td>rank-one training PCA</td>
+<td>train fit, frozen test projection/reconstruction</td>
+</tr>
+<tr class="odd">
+<td><code>linear_autoencoder</code></td>
+<td>analytic PCA-equivalent rank-one linear map</td>
+<td>train fit, frozen test projection/reconstruction</td>
+</tr>
+<tr class="even">
+<td><code>nonlinear_autoencoder</code></td>
+<td>hidden width 8 or 18; two seed candidates selected by validation MSE</td>
+<td>train/validation fit, frozen test encoding/decoding</td>
+</tr>
+<tr class="odd">
+<td><code>frozen_encoder</code></td>
+<td>random fixed encoder; decoder trained; two candidates selected by validation MSE</td>
+<td>train/validation fit, frozen test encoding/decoding</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="graph-methods" class="level3">
+<h3 class="anchored" data-anchor-id="graph-methods">Graph methods</h3>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Method</th>
+<th>Domain and role</th>
+<th>Information set</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>mean</code></td>
+<td>hairpin arc-coordinate scoring reference</td>
+<td>training scoring mean, frozen test prediction</td>
+</tr>
+<tr class="even">
+<td><code>pca</code></td>
+<td>hairpin rank-one PCA plus frozen linear extension</td>
+<td>training fit, test observations only</td>
+</tr>
+<tr class="odd">
+<td><code>ambient_mds</code></td>
+<td>classical MDS of ambient pairwise distances plus Gower extension</td>
+<td>training distance fit, frozen test extension</td>
+</tr>
+<tr class="even">
+<td><code>isomap</code></td>
+<td>union-<span class="math inline">\(k\)</span>NN shortest paths, classical MDS and graph-distance Gower extension</td>
+<td>training graph fit, frozen test attachment/extension</td>
+</tr>
+<tr class="odd">
+<td><code>graph_diagnostics</code></td>
+<td>connectivity, shortcut and path-distance diagnostics</td>
+<td>training graph/operator diagnostic only</td>
+</tr>
+<tr class="even">
+<td><code>diffusion_maps</code></td>
+<td>circle finite Markov operator and retained two-mode diagnostics</td>
+<td>training operator only</td>
+</tr>
+<tr class="odd">
+<td><code>direct_operator</code></td>
+<td>direct finite-operator numerical references</td>
+<td>training operator only</td>
+</tr>
+<tr class="even">
+<td><code>nystrom_extension</code></td>
+<td>normalized extension of the frozen circle operator</td>
+<td>frozen training fit, held-out test observations</td>
+</tr>
+</tbody>
+</table>
+<p>Isomap coordinate and MDS diagnostics are inapplicable when the training graph is disconnected. A connected one-dimensional display is not forced.</p>
+</section>
+</section>
+<section id="parameter-selection" class="level2">
+<h2 class="anchored" data-anchor-id="parameter-selection">Parameter selection</h2>
+<p>The reconstruction networks use a fixed architecture per scenario and two predeclared initialization candidates for each method–scenario–replicate. The selected candidate minimizes validation transformed-coordinate MSE; ties use lower candidate index. <code>diagnostics.json</code> contains all <strong>42 network-selection records</strong> (seven scenarios <span class="math inline">\(\times\)</span> three replicates <span class="math inline">\(\times\)</span> two network methods) and all <strong>84 candidate runs</strong>. Each record stores candidate index, full deterministic PCG64 seed ID, validation loss, best epoch, epochs run, epoch cap, stop reason, selected candidate/seed/loss/epoch and the tie rule. The <code>selected_validation_mse</code> and <code>parameter_count</code> result rows are validation and architecture diagnostics, not held-out reconstruction scores.</p>
+<p>Across the 84 candidate runs, 49 stop at the epoch budget and 35 stop after the fixed patience rule; among the 42 selected candidates, the counts are 26 and 16. Hidden-width-8 runs have a 260-epoch cap, while the hidden-width-18 small-sample stress has a 340-epoch cap. Reaching <code>epoch_budget</code> means only that no patience stop occurred before the declared cap. A finite selected model at the epoch cap is <strong>not automatically labelled <code>nonconvergence</code></strong>. The benchmark reserves <code>nonconvergence</code> for an applicable path that raises a numerical linear-algebra failure; natural execution produced none.</p>
+<p>For the reference scenario, the selected nonlinear candidates for replicates 0/1/2 are <code>0/0/1</code>, with validation losses <code>0.147593/0.0432484/0.0671336</code>; all have selected best epoch 260 and stop reason <code>epoch_budget</code>. The selected frozen-encoder candidates are <code>1/0/0</code>, with losses <code>0.408717/0.513976/0.652788</code>, selected best epochs <code>260/260/259</code>, and the same selected stop reason. The complete seed IDs and both candidates’ losses, epochs and stop reasons remain machine-readable in the diagnostics rather than being abbreviated in the result CSV.</p>
+<p>PCA, the analytic linear autoencoder, mean, <span class="math inline">\(k\)</span>, <span class="math inline">\(\varepsilon\)</span>, retained circle modes and extension rules have no data-driven search in this implementation. Graph scenario parameters are frozen before generation and never selected from held-out truth.</p>
+</section>
+<section id="inference" class="level2">
+<h2 class="anchored" data-anchor-id="inference">Inference</h2>
+<p>Reconstruction recovery applies the frozen training standardizer and frozen method state to test observations, returns a six-dimensional reconstruction in original units and a one-dimensional code. The frozen encoder remains fixed at test time.</p>
+<p>Hairpin recovery applies frozen PCA or Gower extension. Isomap test points attach to their <span class="math inline">\(k\)</span> nearest training vertices without rebuilding the training graph; resulting graph distances feed the frozen MDS extension. Circle recovery uses normalized Nyström extension against the frozen training operator.</p>
+<p>Graph fitting, shortest paths, eigendecomposition and extension are distinct from scoring alignment and truth-based diagnostics.</p>
+</section>
+<section id="scoring" class="level2">
+<h2 class="anchored" data-anchor-id="scoring">Scoring</h2>
+<p>Each raw row identifies task, scenario, replicate, seed, split/evaluation stage, method family, information set, parameter source, target, metric, status/reason, split sizes, selected hyperparameter and domain. Only the metrics below occur in the artifacts.</p>
+<section id="reconstruction-metrics" class="level3">
+<h3 class="anchored" data-anchor-id="reconstruction-metrics">Reconstruction metrics</h3>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Metric</th>
+<th>Provenance/target</th>
+<th>Definition</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>observed_reconstruction_mse</code></td>
+<td>test; observed test reconstruction</td>
+<td>mean squared error to observed test vectors in original units</td>
+</tr>
+<tr class="even">
+<td><code>noiseless_signal_mse</code></td>
+<td>test; known noiseless test signal</td>
+<td>mean squared error to <span class="math inline">\(f_c(s)\)</span>; inapplicable to the full-dimensional Gaussian</td>
+</tr>
+<tr class="odd">
+<td><code>code_variance</code></td>
+<td>test; deterministic test code activity</td>
+<td>variance of the one-dimensional test code</td>
+</tr>
+<tr class="even">
+<td><code>code_abs_spearman_truth</code></td>
+<td>test; scoring-only generator parameter</td>
+<td>absolute Spearman correlation between code and known <span class="math inline">\(s\)</span>; inapplicable to the Gaussian</td>
+</tr>
+<tr class="odd">
+<td><code>code_collision_rate</code></td>
+<td>test; scoring-only generator collision diagnostic</td>
+<td>among code-close test pairs, fraction with <span class="math inline">\(|\Delta s|&gt;0.5\)</span> using the fixed 5%-of-code-range threshold; inapplicable to the Gaussian</td>
+</tr>
+<tr class="even">
+<td><code>selected_validation_mse</code></td>
+<td>validation</td>
+<td>selected or deterministic validation reconstruction MSE in transformed coordinates</td>
+</tr>
+<tr class="odd">
+<td><code>parameter_count</code></td>
+<td>architecture diagnostic</td>
+<td>declared fitted architecture/model parameter count</td>
+</tr>
+</tbody>
+</table>
+<p>Code correlation and collision are simulator diagnostics. They do not prove injectivity, semantic coordinates, representation or intrinsic dimension.</p>
+</section>
+<section id="graph-metrics" class="level3">
+<h3 class="anchored" data-anchor-id="graph-metrics">Graph metrics</h3>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Metric</th>
+<th>Provenance/target</th>
+<th>Definition</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>heldout_coordinate_rmse</code></td>
+<td>test extension; aligned known hairpin arc length</td>
+<td>held-out RMSE after one training-fitted affine scoring alignment</td>
+</tr>
+<tr class="even">
+<td><code>graph_distance_relative_rmse</code></td>
+<td>training diagnostic; known pairwise arc separation</td>
+<td>RMS shortest-path error divided by RMS analytic arc separation over finite pairs</td>
+</tr>
+<tr class="odd">
+<td><code>component_count</code></td>
+<td>training graph diagnostic</td>
+<td>number of finite connected components</td>
+</tr>
+<tr class="even">
+<td><code>material_shortcut_rate</code></td>
+<td>training graph diagnostic</td>
+<td>fraction of graph edges whose arc separation exceeds edge length by the stable Phase 3 material threshold</td>
+</tr>
+<tr class="odd">
+<td><code>infinite_pair_rate</code></td>
+<td>training graph diagnostic</td>
+<td>fraction of unordered training pairs with infinite shortest-path distance</td>
+</tr>
+<tr class="even">
+<td><code>mds_negative_eigenmass</code></td>
+<td>training MDS diagnostic</td>
+<td>total absolute negative eigenvalue mass of classical MDS</td>
+</tr>
+<tr class="odd">
+<td><code>diffusion_eigenspace_angle_max_degrees</code></td>
+<td>training finite-operator diagnostic</td>
+<td>maximum <span class="math inline">\(L^2(\pi)\)</span> principal angle between the first two nonconstant right-eigenfunction modes and cosine–sine truth</td>
+</tr>
+<tr class="even">
+<td><code>diffusion_truncation_relative_rmse</code></td>
+<td>training finite-operator diagnostic</td>
+<td>relative pairwise RMSE between full finite-operator diffusion distance and its two-mode truncation</td>
+</tr>
+<tr class="odd">
+<td><code>direct_spectral_distance_max_abs</code></td>
+<td>training numerical oracle</td>
+<td>maximum discrepancy between spectral and direct finite-operator diffusion distances</td>
+</tr>
+<tr class="even">
+<td><code>heldout_extension_rmse</code></td>
+<td>test extension</td>
+<td>RMSE of frozen Nyström cosine–sine extension after training alignment</td>
+</tr>
+<tr class="odd">
+<td><code>operator_row_sum_max_abs</code></td>
+<td>training numerical oracle</td>
+<td>maximum absolute Markov row-sum error from one</td>
+</tr>
+</tbody>
+</table>
+<p>For every task <span class="math inline">\(\times\)</span> scenario <span class="math inline">\(\times\)</span> method <span class="math inline">\(\times\)</span> metric group, <code>diagnostics.json</code> reports q10, median, q90, <code>ok_rate</code>, applicability rate and failure rate across the three replicate rows. No metric is normalized against or averaged with a metric from the other task.</p>
+</section>
+</section>
+<section id="failure-and-applicability-labels" class="level2">
+<h2 class="anchored" data-anchor-id="failure-and-applicability-labels">Failure and applicability labels</h2>
+<p>The full task-specific Cartesian inventories are retained:</p>
+<ul>
+<li>reconstruction: <span class="math inline">\(7\times3\times5\times7=735\)</span> rows;</li>
+<li>graph geometry: <span class="math inline">\(13\times3\times8\times11=3{,}432\)</span> rows;</li>
+<li>total: <strong>4,167</strong> unique canonical rows and <strong>1,389</strong> summary groups.</li>
+</ul>
+<p>Natural execution produced:</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Task</th>
+<th style="text-align: right;"><code>ok</code></th>
+<th style="text-align: right;"><code>inapplicable</code></th>
+<th style="text-align: right;"><code>invalid</code></th>
+<th style="text-align: right;"><code>nonconvergence</code></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Reconstruction</td>
+<td style="text-align: right;">690</td>
+<td style="text-align: right;">45</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr class="even">
+<td>Graph geometry</td>
+<td style="text-align: right;">299</td>
+<td style="text-align: right;">3,133</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr class="odd">
+<td><strong>Total</strong></td>
+<td style="text-align: right;"><strong>989</strong></td>
+<td style="text-align: right;"><strong>3,178</strong></td>
+<td style="text-align: right;"><strong>0</strong></td>
+<td style="text-align: right;"><strong>0</strong></td>
+</tr>
+</tbody>
+</table>
+<p>Applicability is resolved before numerical failure. <code>ok</code> requires an applicable finite value; <code>inapplicable</code> retains method–metric or truth-target mismatches; <code>invalid</code> represents malformed/non-finite applicable scoring; and <code>nonconvergence</code> represents linear-algebra failure in an applicable path. Every non-<code>ok</code> row has a machine-readable reason and no numeric value.</p>
+<p>The natural absence of <code>invalid</code> and <code>nonconvergence</code> is not a global robustness claim. Real-path fault injection verifies both labels while preserving inapplicability precedence. In disconnected hairpin replicates, Isomap coordinate/MDS rows remain <code>inapplicable</code> rather than receiving fabricated coordinates.</p>
+</section>
+<section id="artifact-contract" class="level2">
+<h2 class="anchored" data-anchor-id="artifact-contract">Artifact contract</h2>
+<p><code>benchmarks/artifacts/nonlinear-graph-robustness/</code> contains exactly:</p>
+<pre class="text"><code>manifest.json
+results.csv
+diagnostics.json
+summary.png</code></pre>
+<p>The manifest freezes scenario/method/metric inventories, stage and status vocabularies, three-replicate seed contract, canonical lexicographic row order, runtime, source digests, exact commands and SHA-256 hashes. <code>results.csv</code> retains all replicate-level rows. <code>diagnostics.json</code> stores target-specific summaries and verification checks. <code>summary.png</code> is a separated diagnostic view, not acceptance evidence or a leaderboard. Each plotted value carries an explicit <code>n=ok/total</code> applicability label; an inapplicable group is labelled <code>NA</code> rather than plotted as a zero-valued result.</p>
+</section>
+<section id="results" class="level2">
+<h2 class="anchored" data-anchor-id="results">Results</h2>
+<p>The following q10/median/q90 values are read from the authoritative artifact tree. They are conditional on the declared simulator, split, method, metric and information set.</p>
+<section id="reconstruction-results" class="level3">
+<h3 class="anchored" data-anchor-id="reconstruction-results">Reconstruction results</h3>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 16%">
+<col style="width: 16%">
+<col style="width: 22%">
+<col style="width: 22%">
+<col style="width: 22%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Scenario and target</th>
+<th>Method</th>
+<th style="text-align: right;">q10</th>
+<th style="text-align: right;">Median</th>
+<th style="text-align: right;">q90</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Reference observed reconstruction MSE</td>
+<td>mean</td>
+<td style="text-align: right;">0.2234</td>
+<td style="text-align: right;">0.2423</td>
+<td style="text-align: right;">0.2552</td>
+</tr>
+<tr class="even">
+<td>Reference observed reconstruction MSE</td>
+<td>PCA</td>
+<td style="text-align: right;">0.0943</td>
+<td style="text-align: right;">0.1166</td>
+<td style="text-align: right;">0.1298</td>
+</tr>
+<tr class="odd">
+<td>Reference observed reconstruction MSE</td>
+<td>analytic linear AE</td>
+<td style="text-align: right;">0.0943</td>
+<td style="text-align: right;">0.1166</td>
+<td style="text-align: right;">0.1298</td>
+</tr>
+<tr class="even">
+<td>Reference observed reconstruction MSE</td>
+<td>nonlinear AE</td>
+<td style="text-align: right;">0.0059</td>
+<td style="text-align: right;">0.0091</td>
+<td style="text-align: right;">0.0295</td>
+</tr>
+<tr class="odd">
+<td>Reference observed reconstruction MSE</td>
+<td>frozen encoder</td>
+<td style="text-align: right;">0.0770</td>
+<td style="text-align: right;">0.1333</td>
+<td style="text-align: right;">0.1405</td>
+</tr>
+<tr class="even">
+<td>Moment-matched Gaussian observed MSE</td>
+<td>PCA</td>
+<td style="text-align: right;">0.0948</td>
+<td style="text-align: right;">0.1196</td>
+<td style="text-align: right;">0.1312</td>
+</tr>
+<tr class="odd">
+<td>Moment-matched Gaussian observed MSE</td>
+<td>nonlinear AE</td>
+<td style="text-align: right;">0.1045</td>
+<td style="text-align: right;">0.1157</td>
+<td style="text-align: right;">0.1752</td>
+</tr>
+<tr class="even">
+<td>High-curvature observed MSE</td>
+<td>PCA</td>
+<td style="text-align: right;">0.2629</td>
+<td style="text-align: right;">0.2702</td>
+<td style="text-align: right;">0.3324</td>
+</tr>
+<tr class="odd">
+<td>High-curvature observed MSE</td>
+<td>nonlinear AE</td>
+<td style="text-align: right;">0.0085</td>
+<td style="text-align: right;">0.0091</td>
+<td style="text-align: right;">0.0100</td>
+</tr>
+<tr class="even">
+<td>High-nuisance observed MSE</td>
+<td>nonlinear AE</td>
+<td style="text-align: right;">1.6526</td>
+<td style="text-align: right;">1.7647</td>
+<td style="text-align: right;">2.1852</td>
+</tr>
+<tr class="odd">
+<td>High-nuisance observed MSE</td>
+<td>frozen encoder</td>
+<td style="text-align: right;">1.3691</td>
+<td style="text-align: right;">1.4110</td>
+<td style="text-align: right;">1.9084</td>
+</tr>
+<tr class="even">
+<td>Support-shift observed MSE</td>
+<td>PCA</td>
+<td style="text-align: right;">2.0082</td>
+<td style="text-align: right;">2.2370</td>
+<td style="text-align: right;">2.3075</td>
+</tr>
+<tr class="odd">
+<td>Support-shift observed MSE</td>
+<td>nonlinear AE</td>
+<td style="text-align: right;">1.0416</td>
+<td style="text-align: right;">1.2731</td>
+<td style="text-align: right;">1.5169</td>
+</tr>
+<tr class="even">
+<td>Support-shift observed MSE</td>
+<td>frozen encoder</td>
+<td style="text-align: right;">1.7829</td>
+<td style="text-align: right;">1.7922</td>
+<td style="text-align: right;">1.8110</td>
+</tr>
+</tbody>
+</table>
+<p>On the reference curved generator, the nonlinear code’s absolute Spearman correlation with scoring-only <span class="math inline">\(s\)</span> has median <code>0.9975</code>, and its collision-rate median is <code>0.00217</code>. Under support shift those medians become <code>0.6451</code> and <code>0.1505</code>. This deterioration is an extrapolation diagnostic only. The small-sample/high-capacity nonlinear observed-MSE median is <code>0.00744</code>; the predeclared validation procedure did not force a dramatic failure in these three replicates.</p>
+<p>The moment-matched Gaussian result shows that nonlinear reconstruction behavior can be discussed without a scalar-manifold target. High nuisance variance also shows that aggregate observed-space MSE can favor a different method from the curved-signal question. These rows do not establish a universal reconstruction order.</p>
+</section>
+<section id="graph-geometry-results" class="level3">
+<h3 class="anchored" data-anchor-id="graph-geometry-results">Graph-geometry results</h3>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 16%">
+<col style="width: 16%">
+<col style="width: 22%">
+<col style="width: 22%">
+<col style="width: 22%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Scenario and target</th>
+<th>Method</th>
+<th style="text-align: right;">q10</th>
+<th style="text-align: right;">Median</th>
+<th style="text-align: right;">q90</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Hairpin reference held-out coordinate RMSE</td>
+<td>mean</td>
+<td style="text-align: right;">2.0374</td>
+<td style="text-align: right;">2.0554</td>
+<td style="text-align: right;">2.0647</td>
+</tr>
+<tr class="even">
+<td>Hairpin reference held-out coordinate RMSE</td>
+<td>PCA</td>
+<td style="text-align: right;">2.0371</td>
+<td style="text-align: right;">2.0548</td>
+<td style="text-align: right;">2.1343</td>
+</tr>
+<tr class="odd">
+<td>Hairpin reference held-out coordinate RMSE</td>
+<td>ambient MDS</td>
+<td style="text-align: right;">2.0371</td>
+<td style="text-align: right;">2.0548</td>
+<td style="text-align: right;">2.1343</td>
+</tr>
+<tr class="even">
+<td>Hairpin reference held-out coordinate RMSE</td>
+<td>Isomap</td>
+<td style="text-align: right;">1.9997</td>
+<td style="text-align: right;">2.0484</td>
+<td style="text-align: right;">2.1207</td>
+</tr>
+<tr class="odd">
+<td>Hairpin reference graph-distance relative RMSE</td>
+<td>graph diagnostic</td>
+<td style="text-align: right;">0.4936</td>
+<td style="text-align: right;">0.5813</td>
+<td style="text-align: right;">0.6294</td>
+</tr>
+<tr class="even">
+<td>Hairpin reference component count</td>
+<td>graph diagnostic</td>
+<td style="text-align: right;">1.0</td>
+<td style="text-align: right;">1.0</td>
+<td style="text-align: right;">1.0</td>
+</tr>
+<tr class="odd">
+<td>Hairpin reference infinite-pair rate</td>
+<td>graph diagnostic</td>
+<td style="text-align: right;">0.0</td>
+<td style="text-align: right;">0.0</td>
+<td style="text-align: right;">0.0</td>
+</tr>
+<tr class="even">
+<td>Sparse-gap infinite-pair rate</td>
+<td>graph diagnostic</td>
+<td style="text-align: right;">0.0942</td>
+<td style="text-align: right;">0.4708</td>
+<td style="text-align: right;">0.4890</td>
+</tr>
+<tr class="odd">
+<td>Reduced-separation material-shortcut rate</td>
+<td>graph diagnostic</td>
+<td style="text-align: right;">0.2588</td>
+<td style="text-align: right;">0.2687</td>
+<td style="text-align: right;">0.2853</td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(k=1\)</span> component count</td>
+<td>graph diagnostic</td>
+<td style="text-align: right;">35.0</td>
+<td style="text-align: right;">35.0</td>
+<td style="text-align: right;">35.8</td>
+</tr>
+<tr class="odd">
+<td>Nearly-complete material-shortcut rate</td>
+<td>graph diagnostic</td>
+<td style="text-align: right;">0.3754</td>
+<td style="text-align: right;">0.4128</td>
+<td style="text-align: right;">0.4518</td>
+</tr>
+<tr class="even">
+<td>Circle reference eigenspace max angle</td>
+<td>Diffusion Maps</td>
+<td style="text-align: right;"><span class="math inline">\(1.71\times10^{-7}\)</span>°</td>
+<td style="text-align: right;"><span class="math inline">\(8.54\times10^{-7}\)</span>°</td>
+<td style="text-align: right;"><span class="math inline">\(1.35\times10^{-6}\)</span>°</td>
+</tr>
+<tr class="odd">
+<td>Circle reference two-mode truncation relative RMSE</td>
+<td>Diffusion Maps</td>
+<td style="text-align: right;">0.4417</td>
+<td style="text-align: right;">0.4417</td>
+<td style="text-align: right;">0.4417</td>
+</tr>
+<tr class="even">
+<td>Circle reference exact-midpoint extension RMSE</td>
+<td>Nyström</td>
+<td style="text-align: right;"><span class="math inline">\(2.40\times10^{-15}\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(2.82\times10^{-15}\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(5.42\times10^{-15}\)</span></td>
+</tr>
+<tr class="odd">
+<td>Circle nonuniform eigenspace max angle</td>
+<td>Diffusion Maps</td>
+<td style="text-align: right;">15.19°</td>
+<td style="text-align: right;">20.13°</td>
+<td style="text-align: right;">26.01°</td>
+</tr>
+<tr class="even">
+<td>Circle nonuniform exact-midpoint extension RMSE</td>
+<td>Nyström</td>
+<td style="text-align: right;">0.1342</td>
+<td style="text-align: right;">0.1718</td>
+<td style="text-align: right;">0.2133</td>
+</tr>
+<tr class="odd">
+<td>Small-bandwidth truncation relative RMSE</td>
+<td>Diffusion Maps</td>
+<td style="text-align: right;">0.7631</td>
+<td style="text-align: right;">0.7631</td>
+<td style="text-align: right;">0.7631</td>
+</tr>
+<tr class="even">
+<td>Metric-scaled circle eigenspace max angle</td>
+<td>Diffusion Maps</td>
+<td style="text-align: right;">5.8798°</td>
+<td style="text-align: right;">5.8798°</td>
+<td style="text-align: right;">5.8798°</td>
+</tr>
+<tr class="odd">
+<td>Metric-scaled circle exact-midpoint extension RMSE</td>
+<td>Nyström</td>
+<td style="text-align: right;">0.06285</td>
+<td style="text-align: right;">0.06285</td>
+<td style="text-align: right;">0.06285</td>
+</tr>
+</tbody>
+</table>
+<p>With the authoritative nominal <span class="math inline">\(k=6\)</span>, all three reference hairpin graphs are connected: component count is exactly one, infinite-pair rate is zero, and Isomap held-out-coordinate rows are applicable in all three replicates (<code>n=3/3</code>). The Isomap median <code>2.0484</code> is nevertheless close to the mean, PCA and ambient-MDS coordinate errors, while the graph-distance relative-RMSE median is <code>0.5813</code>. Connectivity and applicability therefore do not imply accurate recovery. Sparse gaps, nonuniform sampling, <span class="math inline">\(k=1\)</span> and metric scaling expose stronger connectivity boundaries; large/nearly-complete neighborhoods restore connectivity but retain path-error or shortcut failures.</p>
+<p>For every circle scenario and replicate, the held-out extension target is the exact circular midpoint set derived from that realized training grid. The integrity diagnostic reports maximum angular construction error <code>0.0</code>. Thus the Nyström rows evaluate one precise frozen midpoint-extension contract; they do not establish general out-of-support extension.</p>
+<p>The circle direct/spectral distance discrepancy is at most about <code>7.55e-15</code> in the verifier, and Markov row-sum error is about <code>2.22e-16</code>. Those are implementation checks. Accurate reference eigenspaces or Nyström extension do not establish topology, a manifold, geodesic recovery or a Riemannian metric.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="artifacts/nonlinear-graph-robustness/summary.png" class="img-fluid figure-img"></p>
+<figcaption>P4-U05 separated diagnostic summary</figcaption>
+</figure>
+</div>
+</section>
+</section>
+<section id="interpretation-limits" class="level2">
+<h2 class="anchored" data-anchor-id="interpretation-limits">Interpretation limits</h2>
+<ul>
+<li>Low held-out reconstruction error does <strong>not</strong> prove a manifold, low or intrinsic dimension, injective chart, representation, dynamics, mechanism or causality.</li>
+<li>A one-dimensional bottleneck is an analyst choice, not an intrinsic-dimension estimate. Code correlation or low collision rate on known simulation truth does not create a unique coordinate.</li>
+<li>A nonlinear method outperforming a linear reconstruction baseline on one curved simulator does not imply universal superiority or real-data validity.</li>
+<li>A visually ordered Isomap coordinate, finite graph-path accuracy or low MDS strain does <strong>not</strong> prove topology, geodesics or Riemannian geometry.</li>
+<li>A Diffusion Maps eigenspace is a finite operator output. It does not recover circle topology, a manifold Laplacian, intrinsic dimension, physical time or dynamics without additional assumptions and evidence.</li>
+<li>Connectivity is a property of the constructed finite graph, not evidence that the unknown latent support is topologically connected.</li>
+<li>Frozen extension is not transductive refitting and need not agree with it.</li>
+<li>Three replicates and bounded scenarios do not support significance, confidence, causal-factor isolation or a universal leaderboard.</li>
+</ul>
+</section>
+<section id="reproducibility" class="level2">
+<h2 class="anchored" data-anchor-id="reproducibility">Reproducibility</h2>
+<p>Run from the repository root with the manifest-recorded runtime:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">/Users/bytedance/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3</span> benchmarks/nonlinear-graph-robustness.py <span class="at">--generate</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="ex">/Users/bytedance/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3</span> benchmarks/nonlinear-graph-robustness.py <span class="at">--generate</span> <span class="at">--resume</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="ex">/Users/bytedance/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3</span> benchmarks/nonlinear-graph-robustness.py <span class="at">--verify</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>The verifier checks the exact four-artifact inventory and hashes; 4,167 unique complete canonical rows; summary recomputation; byte-identical clean, reverse-order and valid-resume generation; rejection of corrupted, stale, duplicate, unknown and incomplete resume rows; restricted fitting/recovery capabilities; truth/test poison behavior; exact support-shift fitted-state reuse; graph symmetry, shortest paths, MDS/Gower, Nyström, spectral/direct and relabeling oracles; exact circle-midpoint integrity; the complete network candidate/seed/loss/epoch/stop records; distinct Phase 3 provenance roles; metric-scaling sensitivity; finite values; and real-path <code>invalid</code>/<code>nonconvergence</code> fault labels with applicability precedence.</p>
+<p>The current verification diagnostics include:</p>
+<ul>
+<li>support-shift train, validation and fitted-state differences: <code>0.0</code>;</li>
+<li>metric-scaling hairpin undirected edge symmetric difference: <code>61</code>;</li>
+<li>ambient-MDS training extension replay maximum error: <code>2.44e-15</code>;</li>
+<li>Isomap training extension replay maximum error: <code>2.22e-15</code>;</li>
+<li>diffusion training Nyström replay maximum error: <code>2.44e-15</code>;</li>
+<li>direct/spectral diffusion-distance maximum error: <code>7.55e-15</code>;</li>
+<li>graph-distance relabeling maximum error: <code>8.88e-16</code>;</li>
+<li>exact circle midpoint construction maximum error: <code>0.0</code>;</li>
+<li>network selection records: <code>42/42</code>, containing <code>84</code> candidate runs;</li>
+<li>Phase 3 roles: nonlinear <code>hash_only_design_provenance</code>, graph <code>actual_executable_routine_reuse</code>.</li>
+</ul>
+</section>
+<section id="review-record" class="level2">
+<h2 class="anchored" data-anchor-id="review-record">Review record</h2>
+<p>Independent scientific and implementation reviewers were read-only and independent of the executors. Their initial reviews returned <code>REVISE</code> on the nominal hairpin neighborhood contract, exact circle midpoint extension, auditable network selection/epoch records, applicability-aware visualization, and distinct Phase 3 provenance roles. The bounded correction pass addressed only those findings; focused scientific and implementation re-reviews both returned <code>PASS</code> with no unresolved finding.</p>
+<p>The accepted validation record includes 62-object structural validation, 33 repository tests, the enhanced artifact verifier, target/index renders, workflow validation, and <code>git diff --check</code>. The recorded review decision then authorized the mechanical promotion to <code>L1/stable</code>. Stable status records bounded acceptance of this declared synthetic Benchmark Object; it does not expand its evidence, information-set, target, or interpretation boundaries.</p>
+</section>
+<section id="maturity-checklist" class="level2">
+<h2 class="anchored" data-anchor-id="maturity-checklist">Maturity checklist</h2>
+<ul class="task-list">
+<li><label><input type="checkbox" checked="">Reconstruction and graph-geometry tasks are separate with no pooled score.</label></li>
+<li><label><input type="checkbox" checked="">Ground truth, generation, scenarios, replicates and deterministic seeds are declared.</label></li>
+<li><label><input type="checkbox" checked="">Train/validation/test, fitting, frozen recovery, scoring and extension boundaries are documented.</label></li>
+<li><label><input type="checkbox" checked="">Reconstruction capacity, nuisance, Gaussian and support-shift controls are retained.</label></li>
+<li><label><input type="checkbox" checked="">Graph gap, shortcut, density, connectivity, neighborhood, bandwidth, truncation, metric-scaling and held-out-extension boundaries are retained.</label></li>
+<li><label><input type="checkbox" checked="">All raw metrics, targets, provenance and applicability/failure labels match the artifacts.</label></li>
+<li><label><input type="checkbox" checked="">Exactly four byte-verifiable artifacts and exact commands are recorded.</label></li>
+<li><label><input type="checkbox" checked="">Reconstruction is not interpreted as manifold or intrinsic-dimension evidence.</label></li>
+<li><label><input type="checkbox" checked="">Graph embedding/operator output is not interpreted as topology or Riemannian geometry.</label></li>
+<li><label><input type="checkbox" checked="">Focused scientific re-review passes.</label></li>
+<li><label><input type="checkbox" checked="">Focused implementation re-review passes.</label></li>
+<li><label><input type="checkbox" checked="">Mechanical stable promotion completed under the recorded review decision after both focused verdicts passed.</label></li>
+</ul>
+
+
+<!-- -->
+
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+    const viewSource = window.document.getElementById('quarto-view-source') ||
+                       window.document.getElementById('quarto-code-tools-source');
+    if (viewSource) {
+      const sourceUrl = viewSource.getAttribute("data-quarto-source-url");
+      viewSource.addEventListener("click", function(e) {
+        if (sourceUrl) {
+          // rstudio viewer pane
+          if (/\bcapabilities=\b/.test(window.location)) {
+            window.open(sourceUrl);
+          } else {
+            window.location.href = sourceUrl;
+          }
+        } else {
+          const modal = new bootstrap.Modal(document.getElementById('quarto-embedded-source-code-modal'));
+          modal.show();
+        }
+        return false;
+      });
+    }
+    function toggleCodeHandler(show) {
+      return function(e) {
+        const cellDetails = window.document.querySelectorAll(".cell details.code-fold");
+        for (let i=0; i<cellDetails.length; i++) {
+          const details = cellDetails[i];
+          if (show) {
+            details.open = true;
+          } else {
+            details.removeAttribute("open");
+          }
+        }
+        const cellCodeDivs = window.document.querySelectorAll(".cell div.sourceCode.cell-code");
+        const fromCls = show ? "hidden" : "unhidden";
+        const toCls = show ? "unhidden" : "hidden";
+        for (let i=0; i<cellCodeDivs.length; i++) {
+          const codeDiv = cellCodeDivs[i];
+          if (codeDiv.classList.contains(fromCls)) {
+            codeDiv.classList.remove(fromCls);
+            codeDiv.classList.add(toCls);
+          } 
+        }
+        return false;
+      }
+    }
+    const hideAllCode = window.document.getElementById("quarto-hide-all-code");
+    if (hideAllCode) {
+      hideAllCode.addEventListener("click", toggleCodeHandler(false));
+    }
+    const showAllCode = window.document.getElementById("quarto-show-all-code");
+    if (showAllCode) {
+      showAllCode.addEventListener("click", toggleCodeHandler(true));
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/abelzheng\.github\.io\/latent-dynamics-geometry-public\/");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+            // target, if specified
+            link.setAttribute("target", "_blank");
+            if (link.getAttribute("rel") === null) {
+              link.setAttribute("rel", "noopener");
+            }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<input type="hidden" id="giscus-base-theme" value="preferred_color_scheme">
+<input type="hidden" id="giscus-alt-theme" value="preferred_color_scheme">
+<script>
+  function loadGiscus() {
+    // Function to get the theme based on body class
+    const getTheme = () => {
+      let baseTheme = document.getElementById('giscus-base-theme').value;
+      let altTheme = document.getElementById('giscus-alt-theme').value;
+      return document.body.classList.contains('quarto-dark') ? altTheme : baseTheme;
+    };
+    const script = document.createElement("script");
+    script.src = "https://giscus.app/client.js";
+    script.async = true;
+    script.dataset.repo = "AbelZheng/latent-dynamics-geometry-public";
+    script.dataset.repoId = "R_kgDOT-VBkw";
+    script.dataset.category = "Announcements";
+    script.dataset.categoryId = "DIC_kwDOT-VBk84DDyEz";
+    script.dataset.mapping = "pathname";
+    script.dataset.reactionsEnabled = "1";
+    script.dataset.emitMetadata = "0";
+    script.dataset.inputPosition = "bottom";
+    script.dataset.theme = getTheme();
+    script.dataset.lang = "en";
+    script.crossOrigin = "anonymous";
+    // Append the script to the desired div instead of at the end of the body
+    document.getElementById("quarto-content").appendChild(script);
+  }
+  loadGiscus();
+</script><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">Source Code</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3" data-shortcodes="false"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="an">title:</span><span class="co"> "Nonlinear Reconstruction and Graph Geometry Robustness Benchmark"</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="an">object_type:</span><span class="co"> benchmark</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="an">maturity:</span><span class="co"> L1</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="an">status:</span><span class="co"> stable</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="an">domain:</span><span class="co"> [dimensionality-reduction, neural-networks, graph-methods, geometry]</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="an">tags:</span><span class="co"> [benchmark, autoencoder, isomap, diffusion-maps, support-shift, graph-controls]</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="an">prerequisites:</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="co">- knowledge/methods/autoencoder-baseline.qmd</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="co">- knowledge/methods/isomap.qmd</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a><span class="co">- knowledge/methods/diffusion-maps.qmd</span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a><span class="co">- toy-models/bounded-nonlinear-reconstruction.qmd</span></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a><span class="co">- toy-models/graph-geometry-recovery.qmd</span></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a><span class="an">related:</span></span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a><span class="co">- knowledge/methods/principal-component-analysis.qmd</span></span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a><span class="co">- knowledge/concepts/manifold.qmd</span></span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a><span class="co">- knowledge/concepts/topology.qmd</span></span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a><span class="co">- knowledge/concepts/intrinsic-dimension.qmd</span></span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a><span class="an">created:</span><span class="co"> 2026-08-20</span></span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a><span class="an">updated:</span><span class="co"> 2026-08-20</span></span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a><span class="fu"># Nonlinear Reconstruction and Graph Geometry Robustness Benchmark</span></span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a><span class="fu">## Scientific question</span></span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a>P4-U05 asks two separate synthetic questions.</span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>**Nonlinear reconstruction:** under a declared curved generator and bounded</span>
+<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a>   controls, when do a training mean, rank-one PCA/linear autoencoder, a small</span>
+<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a>   nonlinear autoencoder and a frozen-random-encoder control reconstruct</span>
+<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a>   held-out observations or noiseless signal, and how do their codes respond to</span>
+<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a>   curvature, a moment-matched full-dimensional Gaussian, sample/capacity</span>
+<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a>   stress, nuisance variance and support shift?</span>
+<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>**Graph geometry:** for a known hairpin or circle simulator, how do ambient</span>
+<span id="cb3-36"><a href="#cb3-36" aria-hidden="true" tabindex="-1"></a>   linear references, classical MDS, Isomap, direct graph diagnostics,</span>
+<span id="cb3-37"><a href="#cb3-37" aria-hidden="true" tabindex="-1"></a>   Diffusion Maps and frozen out-of-sample extensions respond to sampling gaps,</span>
+<span id="cb3-38"><a href="#cb3-38" aria-hidden="true" tabindex="-1"></a>   shortcuts, nonuniform density, graph connectivity, neighborhood size,</span>
+<span id="cb3-39"><a href="#cb3-39" aria-hidden="true" tabindex="-1"></a>   bandwidth, spectral truncation and feature-metric scaling?</span>
+<span id="cb3-40"><a href="#cb3-40" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-41"><a href="#cb3-41" aria-hidden="true" tabindex="-1"></a>The tasks have separate generators, methods, information sets, applicability</span>
+<span id="cb3-42"><a href="#cb3-42" aria-hidden="true" tabindex="-1"></a>rules, metrics, summaries and figure panels. No cross-task normalization,</span>
+<span id="cb3-43"><a href="#cb3-43" aria-hidden="true" tabindex="-1"></a>aggregate score, ranking or universal winner is computed. Reconstruction loss,</span>
+<span id="cb3-44"><a href="#cb3-44" aria-hidden="true" tabindex="-1"></a>code diagnostics, graph-path error, operator eigenspace error and held-out</span>
+<span id="cb3-45"><a href="#cb3-45" aria-hidden="true" tabindex="-1"></a>extension error are not interchangeable targets.</span>
+<span id="cb3-46"><a href="#cb3-46" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-47"><a href="#cb3-47" aria-hidden="true" tabindex="-1"></a><span class="fu">## Ground truth</span></span>
+<span id="cb3-48"><a href="#cb3-48" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-49"><a href="#cb3-49" aria-hidden="true" tabindex="-1"></a><span class="fu">### Reconstruction task</span></span>
+<span id="cb3-50"><a href="#cb3-50" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-51"><a href="#cb3-51" aria-hidden="true" tabindex="-1"></a>The ordinary reconstruction scenarios use a scalar scoring variable</span>
+<span id="cb3-52"><a href="#cb3-52" aria-hidden="true" tabindex="-1"></a>$s\in<span class="co">[</span><span class="ot">-1.5,1.5</span><span class="co">]</span>$ and the six-dimensional noiseless map</span>
+<span id="cb3-53"><a href="#cb3-53" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-54"><a href="#cb3-54" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb3-55"><a href="#cb3-55" aria-hidden="true" tabindex="-1"></a>f_c(s)=\left[</span>
+<span id="cb3-56"><a href="#cb3-56" aria-hidden="true" tabindex="-1"></a> s,</span>
+<span id="cb3-57"><a href="#cb3-57" aria-hidden="true" tabindex="-1"></a> cs^2,</span>
+<span id="cb3-58"><a href="#cb3-58" aria-hidden="true" tabindex="-1"></a> 0.35c\sin(2s),</span>
+<span id="cb3-59"><a href="#cb3-59" aria-hidden="true" tabindex="-1"></a> 0.2cs^3,</span>
+<span id="cb3-60"><a href="#cb3-60" aria-hidden="true" tabindex="-1"></a> c\left(\cos s-\frac{\sin(1.5)}{1.5}\right),</span>
+<span id="cb3-61"><a href="#cb3-61" aria-hidden="true" tabindex="-1"></a> 0.4c\sin(3s)</span>
+<span id="cb3-62"><a href="#cb3-62" aria-hidden="true" tabindex="-1"></a>\right],</span>
+<span id="cb3-63"><a href="#cb3-63" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb3-64"><a href="#cb3-64" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-65"><a href="#cb3-65" aria-hidden="true" tabindex="-1"></a>where $c$ is the declared curvature. Independent Gaussian observation noise</span>
+<span id="cb3-66"><a href="#cb3-66" aria-hidden="true" tabindex="-1"></a>with standard deviation $0.06$ is then added. The high-variance nuisance</span>
+<span id="cb3-67"><a href="#cb3-67" aria-hidden="true" tabindex="-1"></a>scenario adds independent standard-deviation-$2.4$ noise to the last two</span>
+<span id="cb3-68"><a href="#cb3-68" aria-hidden="true" tabindex="-1"></a>observed coordinates. The known $s$ and $f_c(s)$ are scoring-only truth; they</span>
+<span id="cb3-69"><a href="#cb3-69" aria-hidden="true" tabindex="-1"></a>are not supplied to preprocessing, fitting, selection or reconstruction.</span>
+<span id="cb3-70"><a href="#cb3-70" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-71"><a href="#cb3-71" aria-hidden="true" tabindex="-1"></a>The moment-matched Gaussian scenario instead samples a full-dimensional</span>
+<span id="cb3-72"><a href="#cb3-72" aria-hidden="true" tabindex="-1"></a>Gaussian with the population mean and covariance of the reference curved</span>
+<span id="cb3-73"><a href="#cb3-73" aria-hidden="true" tabindex="-1"></a>signal plus observation noise. It has no scalar generator parameter or</span>
+<span id="cb3-74"><a href="#cb3-74" aria-hidden="true" tabindex="-1"></a>noiseless one-dimensional signal target, so those rows are explicitly</span>
+<span id="cb3-75"><a href="#cb3-75" aria-hidden="true" tabindex="-1"></a>inapplicable.</span>
+<span id="cb3-76"><a href="#cb3-76" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-77"><a href="#cb3-77" aria-hidden="true" tabindex="-1"></a>The one-dimensional bottleneck width is fixed by the analyst. It is not a</span>
+<span id="cb3-78"><a href="#cb3-78" aria-hidden="true" tabindex="-1"></a>model-free estimate of intrinsic dimension, and the generated curve is not</span>
+<span id="cb3-79"><a href="#cb3-79" aria-hidden="true" tabindex="-1"></a>used as evidence that arbitrary observations lie on a manifold.</span>
+<span id="cb3-80"><a href="#cb3-80" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-81"><a href="#cb3-81" aria-hidden="true" tabindex="-1"></a><span class="fu">### Graph-geometry task</span></span>
+<span id="cb3-82"><a href="#cb3-82" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-83"><a href="#cb3-83" aria-hidden="true" tabindex="-1"></a>The hairpin generator uses the stable Phase 3 unit-speed planar hairpin,</span>
+<span id="cb3-84"><a href="#cb3-84" aria-hidden="true" tabindex="-1"></a>embedded isometrically in three observed dimensions and perturbed by Gaussian</span>
+<span id="cb3-85"><a href="#cb3-85" aria-hidden="true" tabindex="-1"></a>noise of standard deviation <span class="in">`0.01`</span>. Its scoring truth is analytic arc-length</span>
+<span id="cb3-86"><a href="#cb3-86" aria-hidden="true" tabindex="-1"></a>coordinate $\ell$. The ordinary radius is inherited from the stable Phase 3</span>
+<span id="cb3-87"><a href="#cb3-87" aria-hidden="true" tabindex="-1"></a>implementation; the shortcut stress uses radius <span class="in">`0.06`</span>. Graph construction</span>
+<span id="cb3-88"><a href="#cb3-88" aria-hidden="true" tabindex="-1"></a>receives observed coordinates only. Arc length enters after fitting for graph</span>
+<span id="cb3-89"><a href="#cb3-89" aria-hidden="true" tabindex="-1"></a>or extension scoring.</span>
+<span id="cb3-90"><a href="#cb3-90" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-91"><a href="#cb3-91" aria-hidden="true" tabindex="-1"></a>The circle generator uses the stable Phase 3 three-dimensional isometric</span>
+<span id="cb3-92"><a href="#cb3-92" aria-hidden="true" tabindex="-1"></a>embedding of $(\cos\theta,\sin\theta)$. The finite target is the declared</span>
+<span id="cb3-93"><a href="#cb3-93" aria-hidden="true" tabindex="-1"></a>training affinity/Markov operator and its cosine--sine two-mode subspace, full</span>
+<span id="cb3-94"><a href="#cb3-94" aria-hidden="true" tabindex="-1"></a>finite-operator diffusion distances and frozen Nyström extension. These are</span>
+<span id="cb3-95"><a href="#cb3-95" aria-hidden="true" tabindex="-1"></a>finite graph/operator targets, not inferred topology or a recovered</span>
+<span id="cb3-96"><a href="#cb3-96" aria-hidden="true" tabindex="-1"></a>Riemannian metric.</span>
+<span id="cb3-97"><a href="#cb3-97" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-98"><a href="#cb3-98" aria-hidden="true" tabindex="-1"></a><span class="fu">## Generation</span></span>
+<span id="cb3-99"><a href="#cb3-99" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-100"><a href="#cb3-100" aria-hidden="true" tabindex="-1"></a>Generation precedes fitting and is split-specific.</span>
+<span id="cb3-101"><a href="#cb3-101" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-102"><a href="#cb3-102" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Reconstruction train/validation/test sizes are <span class="in">`120/60/90`</span>, except the</span>
+<span id="cb3-103"><a href="#cb3-103" aria-hidden="true" tabindex="-1"></a>  sample/capacity stress (<span class="in">`28/42/90`</span>). Ordinary $s$ values are independently</span>
+<span id="cb3-104"><a href="#cb3-104" aria-hidden="true" tabindex="-1"></a>  uniform on $<span class="co">[</span><span class="ot">-1.5,1.5</span><span class="co">]</span>$ within each split. In <span class="in">`support_shift`</span>, train and</span>
+<span id="cb3-105"><a href="#cb3-105" aria-hidden="true" tabindex="-1"></a>  validation are exactly the reference bundles, while test magnitudes are</span>
+<span id="cb3-106"><a href="#cb3-106" aria-hidden="true" tabindex="-1"></a>  sampled in $<span class="co">[</span><span class="ot">1.5,2.35</span><span class="co">]</span>$ with random sign.</span>
+<span id="cb3-107"><a href="#cb3-107" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Hairpin train/validation/test sizes are <span class="in">`108/42/54`</span>. Sampling is uniform in</span>
+<span id="cb3-108"><a href="#cb3-108" aria-hidden="true" tabindex="-1"></a>  arc length unless the scenario declares a training gap or nonuniform</span>
+<span id="cb3-109"><a href="#cb3-109" aria-hidden="true" tabindex="-1"></a>  density. Metric-scaling scenarios reuse the reference random draws before</span>
+<span id="cb3-110"><a href="#cb3-110" aria-hidden="true" tabindex="-1"></a>  applying <span class="in">`diag(1,1,3)`</span>.</span>
+<span id="cb3-111"><a href="#cb3-111" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Circle train/validation/test sizes are <span class="in">`64/32/64`</span>. Uniform training points</span>
+<span id="cb3-112"><a href="#cb3-112" aria-hidden="true" tabindex="-1"></a>  form a phase-shifted regular grid; nonuniform training angles use a fixed</span>
+<span id="cb3-113"><a href="#cb3-113" aria-hidden="true" tabindex="-1"></a>  power transform of uniform draws. In every circle scenario and replicate,</span>
+<span id="cb3-114"><a href="#cb3-114" aria-hidden="true" tabindex="-1"></a>  each test angle is the exact circular midpoint between two consecutive</span>
+<span id="cb3-115"><a href="#cb3-115" aria-hidden="true" tabindex="-1"></a>  sorted training angles, including the wrap-around interval. Validation is an</span>
+<span id="cb3-116"><a href="#cb3-116" aria-hidden="true" tabindex="-1"></a>  independent reserved grid and is not used for fitting or selection. Metric</span>
+<span id="cb3-117"><a href="#cb3-117" aria-hidden="true" tabindex="-1"></a>  scaling applies <span class="in">`diag(1,1,3)`</span> to the same reference train/test angles.</span>
+<span id="cb3-118"><a href="#cb3-118" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-119"><a href="#cb3-119" aria-hidden="true" tabindex="-1"></a>The two Phase 3 source roles are deliberately distinct. The stable nonlinear</span>
+<span id="cb3-120"><a href="#cb3-120" aria-hidden="true" tabindex="-1"></a>reconstruction executable is **hash-only design provenance**: it is not loaded</span>
+<span id="cb3-121"><a href="#cb3-121" aria-hidden="true" tabindex="-1"></a>at runtime and there are no <span class="in">`P3_NL`</span> numerical calls. The stable graph-geometry</span>
+<span id="cb3-122"><a href="#cb3-122" aria-hidden="true" tabindex="-1"></a>executable is loaded and **actually reused** for hairpin geometry, graph</span>
+<span id="cb3-123"><a href="#cb3-123" aria-hidden="true" tabindex="-1"></a>fitting, shortest paths/MDS, extension, Diffusion Maps, Nyström and operator</span>
+<span id="cb3-124"><a href="#cb3-124" aria-hidden="true" tabindex="-1"></a>diagnostics. The manifest and verification diagnostics record these roles</span>
+<span id="cb3-125"><a href="#cb3-125" aria-hidden="true" tabindex="-1"></a>separately; neither stable Phase 3 source is modified.</span>
+<span id="cb3-126"><a href="#cb3-126" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-127"><a href="#cb3-127" aria-hidden="true" tabindex="-1"></a><span class="fu">## Scenario grid</span></span>
+<span id="cb3-128"><a href="#cb3-128" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-129"><a href="#cb3-129" aria-hidden="true" tabindex="-1"></a>Both grids are bounded core-plus-stress designs, not complete factorial</span>
+<span id="cb3-130"><a href="#cb3-130" aria-hidden="true" tabindex="-1"></a>experiments. Differences between named scenarios are conditional observations,</span>
+<span id="cb3-131"><a href="#cb3-131" aria-hidden="true" tabindex="-1"></a>not isolated causal effects of a single factor.</span>
+<span id="cb3-132"><a href="#cb3-132" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-133"><a href="#cb3-133" aria-hidden="true" tabindex="-1"></a><span class="fu">### Reconstruction scenarios</span></span>
+<span id="cb3-134"><a href="#cb3-134" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-135"><a href="#cb3-135" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Scenario <span class="pp">|</span> Declared manipulation <span class="pp">|</span> Main boundary <span class="pp">|</span></span>
+<span id="cb3-136"><a href="#cb3-136" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|---|</span></span>
+<span id="cb3-137"><a href="#cb3-137" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`reference_curved`</span> <span class="pp">|</span> curvature $c=1$, sizes <span class="in">`120/60/90`</span> <span class="pp">|</span> in-support nonlinear reconstruction <span class="pp">|</span></span>
+<span id="cb3-138"><a href="#cb3-138" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`low_curvature`</span> <span class="pp">|</span> $c=0.25$ <span class="pp">|</span> weak nonlinearity versus rank-one linear references <span class="pp">|</span></span>
+<span id="cb3-139"><a href="#cb3-139" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`high_curvature`</span> <span class="pp">|</span> $c=1.65$ <span class="pp">|</span> stronger curvature <span class="pp">|</span></span>
+<span id="cb3-140"><a href="#cb3-140" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`moment_matched_gaussian`</span> <span class="pp">|</span> full-dimensional Gaussian with reference population mean/covariance <span class="pp">|</span> compression without one-dimensional generator truth <span class="pp">|</span></span>
+<span id="cb3-141"><a href="#cb3-141" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`small_sample_high_capacity`</span> <span class="pp">|</span> sizes <span class="in">`28/42/90`</span>, hidden width 18 <span class="pp">|</span> finite-sample/capacity sensitivity <span class="pp">|</span></span>
+<span id="cb3-142"><a href="#cb3-142" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`high_variance_nuisance`</span> <span class="pp">|</span> standard deviation 2.4 in the last two coordinates <span class="pp">|</span> aggregate reconstruction dominated by nuisance variance <span class="pp">|</span></span>
+<span id="cb3-143"><a href="#cb3-143" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`support_shift`</span> <span class="pp">|</span> reference train/validation; test outside training support <span class="pp">|</span> frozen-model extrapolation <span class="pp">|</span></span>
+<span id="cb3-144"><a href="#cb3-144" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-145"><a href="#cb3-145" aria-hidden="true" tabindex="-1"></a>All scenarios other than <span class="in">`small_sample_high_capacity`</span> use hidden width 8 for</span>
+<span id="cb3-146"><a href="#cb3-146" aria-hidden="true" tabindex="-1"></a>the nonlinear and frozen-encoder networks.</span>
+<span id="cb3-147"><a href="#cb3-147" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-148"><a href="#cb3-148" aria-hidden="true" tabindex="-1"></a><span class="fu">### Graph scenarios</span></span>
+<span id="cb3-149"><a href="#cb3-149" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-150"><a href="#cb3-150" aria-hidden="true" tabindex="-1"></a><span class="fu">#### Hairpin</span></span>
+<span id="cb3-151"><a href="#cb3-151" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-152"><a href="#cb3-152" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Scenario <span class="pp">|</span> Declared manipulation <span class="pp">|</span> Main boundary <span class="pp">|</span></span>
+<span id="cb3-153"><a href="#cb3-153" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|---|</span></span>
+<span id="cb3-154"><a href="#cb3-154" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`hairpin_reference`</span> <span class="pp">|</span> union-$k$NN, $k=6$ <span class="pp">|</span> nominal finite graph and extension behavior <span class="pp">|</span></span>
+<span id="cb3-155"><a href="#cb3-155" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`hairpin_sparse_gap`</span> <span class="pp">|</span> training gap, $k=6$ <span class="pp">|</span> disconnected support and failed extension applicability <span class="pp">|</span></span>
+<span id="cb3-156"><a href="#cb3-156" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`hairpin_shortcuts`</span> <span class="pp">|</span> branch radius <span class="in">`0.06`</span>, $k=6$ <span class="pp">|</span> cross-branch shortcuts <span class="pp">|</span></span>
+<span id="cb3-157"><a href="#cb3-157" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`hairpin_nonuniform`</span> <span class="pp">|</span> nonuniform arc-length sampling, $k=6$ <span class="pp">|</span> density/connectivity sensitivity <span class="pp">|</span></span>
+<span id="cb3-158"><a href="#cb3-158" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`hairpin_disconnected`</span> <span class="pp">|</span> $k=1$ <span class="pp">|</span> explicit disconnection <span class="pp">|</span></span>
+<span id="cb3-159"><a href="#cb3-159" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`hairpin_large_k`</span> <span class="pp">|</span> $k=16$ <span class="pp">|</span> overly broad neighborhoods <span class="pp">|</span></span>
+<span id="cb3-160"><a href="#cb3-160" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`hairpin_nearly_complete`</span> <span class="pp">|</span> $k=100$ <span class="pp">|</span> near-complete graph and chord shortcuts <span class="pp">|</span></span>
+<span id="cb3-161"><a href="#cb3-161" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`hairpin_metric_scaling`</span> <span class="pp">|</span> observed transform <span class="in">`diag(1,1,3)`</span>, $k=6$ <span class="pp">|</span> feature-metric dependence <span class="pp">|</span></span>
+<span id="cb3-162"><a href="#cb3-162" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-163"><a href="#cb3-163" aria-hidden="true" tabindex="-1"></a><span class="fu">#### Circle</span></span>
+<span id="cb3-164"><a href="#cb3-164" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-165"><a href="#cb3-165" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Scenario <span class="pp">|</span> Declared manipulation <span class="pp">|</span> Main boundary <span class="pp">|</span></span>
+<span id="cb3-166"><a href="#cb3-166" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|---|</span></span>
+<span id="cb3-167"><a href="#cb3-167" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`circle_reference`</span> <span class="pp">|</span> uniform grid, $\varepsilon=0.18$ <span class="pp">|</span> finite operator/eigenspace and extension reference <span class="pp">|</span></span>
+<span id="cb3-168"><a href="#cb3-168" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`circle_nonuniform`</span> <span class="pp">|</span> nonuniform training density, $\varepsilon=0.18$ <span class="pp">|</span> density sensitivity <span class="pp">|</span></span>
+<span id="cb3-169"><a href="#cb3-169" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`circle_bandwidth_small`</span> <span class="pp">|</span> $\varepsilon=0.008$ <span class="pp">|</span> narrow affinity bandwidth and spectral truncation <span class="pp">|</span></span>
+<span id="cb3-170"><a href="#cb3-170" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`circle_bandwidth_large`</span> <span class="pp">|</span> $\varepsilon=4.0$ <span class="pp">|</span> broad affinity bandwidth <span class="pp">|</span></span>
+<span id="cb3-171"><a href="#cb3-171" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`circle_metric_scaling`</span> <span class="pp">|</span> transform <span class="in">`diag(1,1,3)`</span>, $\varepsilon=0.18$ <span class="pp">|</span> observed-metric dependence <span class="pp">|</span></span>
+<span id="cb3-172"><a href="#cb3-172" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-173"><a href="#cb3-173" aria-hidden="true" tabindex="-1"></a>Neighborhood sizes and bandwidths are predeclared scenario values; they are</span>
+<span id="cb3-174"><a href="#cb3-174" aria-hidden="true" tabindex="-1"></a>not selected from test truth or test score.</span>
+<span id="cb3-175"><a href="#cb3-175" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-176"><a href="#cb3-176" aria-hidden="true" tabindex="-1"></a><span class="fu">## Negative controls and stress cases</span></span>
+<span id="cb3-177"><a href="#cb3-177" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-178"><a href="#cb3-178" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>The moment-matched Gaussian controls first and second moments while removing</span>
+<span id="cb3-179"><a href="#cb3-179" aria-hidden="true" tabindex="-1"></a>  the declared scalar/noiseless reconstruction target.</span>
+<span id="cb3-180"><a href="#cb3-180" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>The frozen random encoder fixes its encoder and trains only its decoder,</span>
+<span id="cb3-181"><a href="#cb3-181" aria-hidden="true" tabindex="-1"></a>  separating useful random nonlinear features from a learned encoder.</span>
+<span id="cb3-182"><a href="#cb3-182" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>High-capacity/small-sample and nuisance scenarios expose architecture and</span>
+<span id="cb3-183"><a href="#cb3-183" aria-hidden="true" tabindex="-1"></a>  loss-composition sensitivity without forcing a particular failure story.</span>
+<span id="cb3-184"><a href="#cb3-184" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`support_shift`</span> uses the exact reference train/validation observations and an</span>
+<span id="cb3-185"><a href="#cb3-185" aria-hidden="true" tabindex="-1"></a>  exactly identical fitted state; only the exterior-support test bundle differs.</span>
+<span id="cb3-186"><a href="#cb3-186" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Hairpin gaps and $k=1$ retain disconnected graphs and infinite shortest-path</span>
+<span id="cb3-187"><a href="#cb3-187" aria-hidden="true" tabindex="-1"></a>  pairs rather than silently repairing connectivity.</span>
+<span id="cb3-188"><a href="#cb3-188" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Reduced branch separation, large/nearly-complete neighborhoods and feature</span>
+<span id="cb3-189"><a href="#cb3-189" aria-hidden="true" tabindex="-1"></a>  scaling expose shortcut and metric dependence.</span>
+<span id="cb3-190"><a href="#cb3-190" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Circle density, bandwidth and metric-scaling scenarios stress the finite</span>
+<span id="cb3-191"><a href="#cb3-191" aria-hidden="true" tabindex="-1"></a>  Markov operator, spectral truncation and frozen Nyström extension.</span>
+<span id="cb3-192"><a href="#cb3-192" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-193"><a href="#cb3-193" aria-hidden="true" tabindex="-1"></a>Failures and inapplicability remain in the raw Cartesian result inventories and</span>
+<span id="cb3-194"><a href="#cb3-194" aria-hidden="true" tabindex="-1"></a>are not tuned away after inspection.</span>
+<span id="cb3-195"><a href="#cb3-195" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-196"><a href="#cb3-196" aria-hidden="true" tabindex="-1"></a><span class="fu">## Replicates and deterministic seeds</span></span>
+<span id="cb3-197"><a href="#cb3-197" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-198"><a href="#cb3-198" aria-hidden="true" tabindex="-1"></a>Every scenario uses three independent deterministic replicates under master</span>
+<span id="cb3-199"><a href="#cb3-199" aria-hidden="true" tabindex="-1"></a>seed <span class="in">`20260820`</span>. Seed words include task, a stable SHA-256-derived scenario</span>
+<span id="cb3-200"><a href="#cb3-200" aria-hidden="true" tabindex="-1"></a>code, replicate, stage, split and candidate where relevant. Methods within a</span>
+<span id="cb3-201"><a href="#cb3-201" aria-hidden="true" tabindex="-1"></a>scenario-replicate share generated data for paired descriptive comparison.</span>
+<span id="cb3-202"><a href="#cb3-202" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-203"><a href="#cb3-203" aria-hidden="true" tabindex="-1"></a>Three replicates support only bounded descriptive q10/median/q90 summaries.</span>
+<span id="cb3-204"><a href="#cb3-204" aria-hidden="true" tabindex="-1"></a>They do not provide confidence intervals or stable tail estimates.</span>
+<span id="cb3-205"><a href="#cb3-205" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-206"><a href="#cb3-206" aria-hidden="true" tabindex="-1"></a><span class="fu">## Split discipline</span></span>
+<span id="cb3-207"><a href="#cb3-207" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-208"><a href="#cb3-208" aria-hidden="true" tabindex="-1"></a><span class="fu">### Reconstruction</span></span>
+<span id="cb3-209"><a href="#cb3-209" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-210"><a href="#cb3-210" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Training observations fit the standardizer, mean and PCA/analytic linear</span>
+<span id="cb3-211"><a href="#cb3-211" aria-hidden="true" tabindex="-1"></a>  autoencoder.</span>
+<span id="cb3-212"><a href="#cb3-212" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Training and validation observations fit two deterministic candidate seeds</span>
+<span id="cb3-213"><a href="#cb3-213" aria-hidden="true" tabindex="-1"></a>  for the nonlinear autoencoder and frozen-encoder control; validation MSE</span>
+<span id="cb3-214"><a href="#cb3-214" aria-hidden="true" tabindex="-1"></a>  selects one candidate with deterministic index tie breaking.</span>
+<span id="cb3-215"><a href="#cb3-215" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Test observations are passed only to frozen reconstruction.</span>
+<span id="cb3-216"><a href="#cb3-216" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Test $s$ and noiseless signal are added only in scoring.</span>
+<span id="cb3-217"><a href="#cb3-217" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>The support-shift scenario reuses the exact reference train/validation</span>
+<span id="cb3-218"><a href="#cb3-218" aria-hidden="true" tabindex="-1"></a>  observations and fitted state. The verifier records zero fitted-state</span>
+<span id="cb3-219"><a href="#cb3-219" aria-hidden="true" tabindex="-1"></a>  difference.</span>
+<span id="cb3-220"><a href="#cb3-220" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-221"><a href="#cb3-221" aria-hidden="true" tabindex="-1"></a><span class="fu">### Graph geometry</span></span>
+<span id="cb3-222"><a href="#cb3-222" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-223"><a href="#cb3-223" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>The training observations alone construct the hairpin graph or circle</span>
+<span id="cb3-224"><a href="#cb3-224" aria-hidden="true" tabindex="-1"></a>  operator. The generated validation split is reserved but is not used for</span>
+<span id="cb3-225"><a href="#cb3-225" aria-hidden="true" tabindex="-1"></a>  hyperparameter selection in this bounded implementation.</span>
+<span id="cb3-226"><a href="#cb3-226" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>A training-truth affine map is fitted solely as a scoring alignment for</span>
+<span id="cb3-227"><a href="#cb3-227" aria-hidden="true" tabindex="-1"></a>  hairpin one-dimensional coordinates; it does not change the graph,</span>
+<span id="cb3-228"><a href="#cb3-228" aria-hidden="true" tabindex="-1"></a>  embedding or raw extension.</span>
+<span id="cb3-229"><a href="#cb3-229" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Test points are extended against the frozen training graph/operator. They are</span>
+<span id="cb3-230"><a href="#cb3-230" aria-hidden="true" tabindex="-1"></a>  never inserted into a transductive refit. For circles, the test set is the</span>
+<span id="cb3-231"><a href="#cb3-231" aria-hidden="true" tabindex="-1"></a>  exact set of circular midpoints of the realized training angles; the maximum</span>
+<span id="cb3-232"><a href="#cb3-232" aria-hidden="true" tabindex="-1"></a>  midpoint-construction error over all 15 scenario-replicate records is <span class="in">`0.0`</span>.</span>
+<span id="cb3-233"><a href="#cb3-233" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Test arc length, circle angle and cosine--sine truth enter only after raw</span>
+<span id="cb3-234"><a href="#cb3-234" aria-hidden="true" tabindex="-1"></a>  extension.</span>
+<span id="cb3-235"><a href="#cb3-235" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-236"><a href="#cb3-236" aria-hidden="true" tabindex="-1"></a>The verifier's restricted signatures, test/truth poison checks and support</span>
+<span id="cb3-237"><a href="#cb3-237" aria-hidden="true" tabindex="-1"></a>reuse checks all pass with maximum differences <span class="in">`0.0`</span> in the protected fitted</span>
+<span id="cb3-238"><a href="#cb3-238" aria-hidden="true" tabindex="-1"></a>states or raw recoveries.</span>
+<span id="cb3-239"><a href="#cb3-239" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-240"><a href="#cb3-240" aria-hidden="true" tabindex="-1"></a><span class="fu">## Methods and information sets</span></span>
+<span id="cb3-241"><a href="#cb3-241" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-242"><a href="#cb3-242" aria-hidden="true" tabindex="-1"></a><span class="fu">### Reconstruction methods</span></span>
+<span id="cb3-243"><a href="#cb3-243" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-244"><a href="#cb3-244" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Method <span class="pp">|</span> Fit/parameter source <span class="pp">|</span> Information set <span class="pp">|</span></span>
+<span id="cb3-245"><a href="#cb3-245" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|---|</span></span>
+<span id="cb3-246"><a href="#cb3-246" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`mean`</span> <span class="pp">|</span> training mean after train-only standardization <span class="pp">|</span> train fit, frozen test reconstruction <span class="pp">|</span></span>
+<span id="cb3-247"><a href="#cb3-247" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`pca`</span> <span class="pp">|</span> rank-one training PCA <span class="pp">|</span> train fit, frozen test projection/reconstruction <span class="pp">|</span></span>
+<span id="cb3-248"><a href="#cb3-248" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`linear_autoencoder`</span> <span class="pp">|</span> analytic PCA-equivalent rank-one linear map <span class="pp">|</span> train fit, frozen test projection/reconstruction <span class="pp">|</span></span>
+<span id="cb3-249"><a href="#cb3-249" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`nonlinear_autoencoder`</span> <span class="pp">|</span> hidden width 8 or 18; two seed candidates selected by validation MSE <span class="pp">|</span> train/validation fit, frozen test encoding/decoding <span class="pp">|</span></span>
+<span id="cb3-250"><a href="#cb3-250" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`frozen_encoder`</span> <span class="pp">|</span> random fixed encoder; decoder trained; two candidates selected by validation MSE <span class="pp">|</span> train/validation fit, frozen test encoding/decoding <span class="pp">|</span></span>
+<span id="cb3-251"><a href="#cb3-251" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-252"><a href="#cb3-252" aria-hidden="true" tabindex="-1"></a><span class="fu">### Graph methods</span></span>
+<span id="cb3-253"><a href="#cb3-253" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-254"><a href="#cb3-254" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Method <span class="pp">|</span> Domain and role <span class="pp">|</span> Information set <span class="pp">|</span></span>
+<span id="cb3-255"><a href="#cb3-255" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|---|</span></span>
+<span id="cb3-256"><a href="#cb3-256" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`mean`</span> <span class="pp">|</span> hairpin arc-coordinate scoring reference <span class="pp">|</span> training scoring mean, frozen test prediction <span class="pp">|</span></span>
+<span id="cb3-257"><a href="#cb3-257" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`pca`</span> <span class="pp">|</span> hairpin rank-one PCA plus frozen linear extension <span class="pp">|</span> training fit, test observations only <span class="pp">|</span></span>
+<span id="cb3-258"><a href="#cb3-258" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`ambient_mds`</span> <span class="pp">|</span> classical MDS of ambient pairwise distances plus Gower extension <span class="pp">|</span> training distance fit, frozen test extension <span class="pp">|</span></span>
+<span id="cb3-259"><a href="#cb3-259" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`isomap`</span> <span class="pp">|</span> union-$k$NN shortest paths, classical MDS and graph-distance Gower extension <span class="pp">|</span> training graph fit, frozen test attachment/extension <span class="pp">|</span></span>
+<span id="cb3-260"><a href="#cb3-260" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`graph_diagnostics`</span> <span class="pp">|</span> connectivity, shortcut and path-distance diagnostics <span class="pp">|</span> training graph/operator diagnostic only <span class="pp">|</span></span>
+<span id="cb3-261"><a href="#cb3-261" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`diffusion_maps`</span> <span class="pp">|</span> circle finite Markov operator and retained two-mode diagnostics <span class="pp">|</span> training operator only <span class="pp">|</span></span>
+<span id="cb3-262"><a href="#cb3-262" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`direct_operator`</span> <span class="pp">|</span> direct finite-operator numerical references <span class="pp">|</span> training operator only <span class="pp">|</span></span>
+<span id="cb3-263"><a href="#cb3-263" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`nystrom_extension`</span> <span class="pp">|</span> normalized extension of the frozen circle operator <span class="pp">|</span> frozen training fit, held-out test observations <span class="pp">|</span></span>
+<span id="cb3-264"><a href="#cb3-264" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-265"><a href="#cb3-265" aria-hidden="true" tabindex="-1"></a>Isomap coordinate and MDS diagnostics are inapplicable when the training graph</span>
+<span id="cb3-266"><a href="#cb3-266" aria-hidden="true" tabindex="-1"></a>is disconnected. A connected one-dimensional display is not forced.</span>
+<span id="cb3-267"><a href="#cb3-267" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-268"><a href="#cb3-268" aria-hidden="true" tabindex="-1"></a><span class="fu">## Parameter selection</span></span>
+<span id="cb3-269"><a href="#cb3-269" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-270"><a href="#cb3-270" aria-hidden="true" tabindex="-1"></a>The reconstruction networks use a fixed architecture per scenario and two</span>
+<span id="cb3-271"><a href="#cb3-271" aria-hidden="true" tabindex="-1"></a>predeclared initialization candidates for each method--scenario--replicate.</span>
+<span id="cb3-272"><a href="#cb3-272" aria-hidden="true" tabindex="-1"></a>The selected candidate minimizes validation transformed-coordinate MSE; ties</span>
+<span id="cb3-273"><a href="#cb3-273" aria-hidden="true" tabindex="-1"></a>use lower candidate index. <span class="in">`diagnostics.json`</span> contains all **42 network-selection records** (seven scenarios $\times$ three replicates $\times$ two network</span>
+<span id="cb3-274"><a href="#cb3-274" aria-hidden="true" tabindex="-1"></a>methods) and all **84 candidate runs**. Each record stores candidate index,</span>
+<span id="cb3-275"><a href="#cb3-275" aria-hidden="true" tabindex="-1"></a>full deterministic PCG64 seed ID, validation loss, best epoch, epochs run,</span>
+<span id="cb3-276"><a href="#cb3-276" aria-hidden="true" tabindex="-1"></a>epoch cap, stop reason, selected candidate/seed/loss/epoch and the tie rule.</span>
+<span id="cb3-277"><a href="#cb3-277" aria-hidden="true" tabindex="-1"></a>The <span class="in">`selected_validation_mse`</span> and <span class="in">`parameter_count`</span> result rows are validation</span>
+<span id="cb3-278"><a href="#cb3-278" aria-hidden="true" tabindex="-1"></a>and architecture diagnostics, not held-out reconstruction scores.</span>
+<span id="cb3-279"><a href="#cb3-279" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-280"><a href="#cb3-280" aria-hidden="true" tabindex="-1"></a>Across the 84 candidate runs, 49 stop at the epoch budget and 35 stop after the</span>
+<span id="cb3-281"><a href="#cb3-281" aria-hidden="true" tabindex="-1"></a>fixed patience rule; among the 42 selected candidates, the counts are 26 and</span>
+<span id="cb3-282"><a href="#cb3-282" aria-hidden="true" tabindex="-1"></a><span class="ss">16. </span>Hidden-width-8 runs have a 260-epoch cap, while the hidden-width-18</span>
+<span id="cb3-283"><a href="#cb3-283" aria-hidden="true" tabindex="-1"></a>small-sample stress has a 340-epoch cap. Reaching <span class="in">`epoch_budget`</span> means only that</span>
+<span id="cb3-284"><a href="#cb3-284" aria-hidden="true" tabindex="-1"></a>no patience stop occurred before the declared cap. A finite selected model at</span>
+<span id="cb3-285"><a href="#cb3-285" aria-hidden="true" tabindex="-1"></a>the epoch cap is **not automatically labelled `nonconvergence`**. The benchmark</span>
+<span id="cb3-286"><a href="#cb3-286" aria-hidden="true" tabindex="-1"></a>reserves <span class="in">`nonconvergence`</span> for an applicable path that raises a numerical</span>
+<span id="cb3-287"><a href="#cb3-287" aria-hidden="true" tabindex="-1"></a>linear-algebra failure; natural execution produced none.</span>
+<span id="cb3-288"><a href="#cb3-288" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-289"><a href="#cb3-289" aria-hidden="true" tabindex="-1"></a>For the reference scenario, the selected nonlinear candidates for replicates</span>
+<span id="cb3-290"><a href="#cb3-290" aria-hidden="true" tabindex="-1"></a>0/1/2 are <span class="in">`0/0/1`</span>, with validation losses</span>
+<span id="cb3-291"><a href="#cb3-291" aria-hidden="true" tabindex="-1"></a><span class="in">`0.147593/0.0432484/0.0671336`</span>; all have selected best epoch 260 and stop reason</span>
+<span id="cb3-292"><a href="#cb3-292" aria-hidden="true" tabindex="-1"></a><span class="in">`epoch_budget`</span>. The selected frozen-encoder candidates are <span class="in">`1/0/0`</span>, with losses</span>
+<span id="cb3-293"><a href="#cb3-293" aria-hidden="true" tabindex="-1"></a><span class="in">`0.408717/0.513976/0.652788`</span>, selected best epochs <span class="in">`260/260/259`</span>, and the same</span>
+<span id="cb3-294"><a href="#cb3-294" aria-hidden="true" tabindex="-1"></a>selected stop reason. The complete seed IDs and both candidates' losses,</span>
+<span id="cb3-295"><a href="#cb3-295" aria-hidden="true" tabindex="-1"></a>epochs and stop reasons remain machine-readable in the diagnostics rather than</span>
+<span id="cb3-296"><a href="#cb3-296" aria-hidden="true" tabindex="-1"></a>being abbreviated in the result CSV.</span>
+<span id="cb3-297"><a href="#cb3-297" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-298"><a href="#cb3-298" aria-hidden="true" tabindex="-1"></a>PCA, the analytic linear autoencoder, mean, $k$, $\varepsilon$, retained circle</span>
+<span id="cb3-299"><a href="#cb3-299" aria-hidden="true" tabindex="-1"></a>modes and extension rules have no data-driven search in this implementation.</span>
+<span id="cb3-300"><a href="#cb3-300" aria-hidden="true" tabindex="-1"></a>Graph scenario parameters are frozen before generation and never selected from</span>
+<span id="cb3-301"><a href="#cb3-301" aria-hidden="true" tabindex="-1"></a>held-out truth.</span>
+<span id="cb3-302"><a href="#cb3-302" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-303"><a href="#cb3-303" aria-hidden="true" tabindex="-1"></a><span class="fu">## Inference</span></span>
+<span id="cb3-304"><a href="#cb3-304" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-305"><a href="#cb3-305" aria-hidden="true" tabindex="-1"></a>Reconstruction recovery applies the frozen training standardizer and frozen</span>
+<span id="cb3-306"><a href="#cb3-306" aria-hidden="true" tabindex="-1"></a>method state to test observations, returns a six-dimensional reconstruction in</span>
+<span id="cb3-307"><a href="#cb3-307" aria-hidden="true" tabindex="-1"></a>original units and a one-dimensional code. The frozen encoder remains fixed at</span>
+<span id="cb3-308"><a href="#cb3-308" aria-hidden="true" tabindex="-1"></a>test time.</span>
+<span id="cb3-309"><a href="#cb3-309" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-310"><a href="#cb3-310" aria-hidden="true" tabindex="-1"></a>Hairpin recovery applies frozen PCA or Gower extension. Isomap test points</span>
+<span id="cb3-311"><a href="#cb3-311" aria-hidden="true" tabindex="-1"></a>attach to their $k$ nearest training vertices without rebuilding the training</span>
+<span id="cb3-312"><a href="#cb3-312" aria-hidden="true" tabindex="-1"></a>graph; resulting graph distances feed the frozen MDS extension. Circle recovery</span>
+<span id="cb3-313"><a href="#cb3-313" aria-hidden="true" tabindex="-1"></a>uses normalized Nyström extension against the frozen training operator.</span>
+<span id="cb3-314"><a href="#cb3-314" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-315"><a href="#cb3-315" aria-hidden="true" tabindex="-1"></a>Graph fitting, shortest paths, eigendecomposition and extension are distinct</span>
+<span id="cb3-316"><a href="#cb3-316" aria-hidden="true" tabindex="-1"></a>from scoring alignment and truth-based diagnostics.</span>
+<span id="cb3-317"><a href="#cb3-317" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-318"><a href="#cb3-318" aria-hidden="true" tabindex="-1"></a><span class="fu">## Scoring</span></span>
+<span id="cb3-319"><a href="#cb3-319" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-320"><a href="#cb3-320" aria-hidden="true" tabindex="-1"></a>Each raw row identifies task, scenario, replicate, seed, split/evaluation</span>
+<span id="cb3-321"><a href="#cb3-321" aria-hidden="true" tabindex="-1"></a>stage, method family, information set, parameter source, target, metric,</span>
+<span id="cb3-322"><a href="#cb3-322" aria-hidden="true" tabindex="-1"></a>status/reason, split sizes, selected hyperparameter and domain. Only the metrics</span>
+<span id="cb3-323"><a href="#cb3-323" aria-hidden="true" tabindex="-1"></a>below occur in the artifacts.</span>
+<span id="cb3-324"><a href="#cb3-324" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-325"><a href="#cb3-325" aria-hidden="true" tabindex="-1"></a><span class="fu">### Reconstruction metrics</span></span>
+<span id="cb3-326"><a href="#cb3-326" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-327"><a href="#cb3-327" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Metric <span class="pp">|</span> Provenance/target <span class="pp">|</span> Definition <span class="pp">|</span></span>
+<span id="cb3-328"><a href="#cb3-328" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|---|</span></span>
+<span id="cb3-329"><a href="#cb3-329" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`observed_reconstruction_mse`</span> <span class="pp">|</span> test; observed test reconstruction <span class="pp">|</span> mean squared error to observed test vectors in original units <span class="pp">|</span></span>
+<span id="cb3-330"><a href="#cb3-330" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`noiseless_signal_mse`</span> <span class="pp">|</span> test; known noiseless test signal <span class="pp">|</span> mean squared error to $f_c(s)$; inapplicable to the full-dimensional Gaussian <span class="pp">|</span></span>
+<span id="cb3-331"><a href="#cb3-331" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`code_variance`</span> <span class="pp">|</span> test; deterministic test code activity <span class="pp">|</span> variance of the one-dimensional test code <span class="pp">|</span></span>
+<span id="cb3-332"><a href="#cb3-332" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`code_abs_spearman_truth`</span> <span class="pp">|</span> test; scoring-only generator parameter <span class="pp">|</span> absolute Spearman correlation between code and known $s$; inapplicable to the Gaussian <span class="pp">|</span></span>
+<span id="cb3-333"><a href="#cb3-333" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`code_collision_rate`</span> <span class="pp">|</span> test; scoring-only generator collision diagnostic <span class="pp">|</span> among code-close test pairs, fraction with $<span class="pp">|</span>\Delta s<span class="pp">|</span>&gt;0.5$ using the fixed 5%-of-code-range threshold; inapplicable to the Gaussian <span class="pp">|</span></span>
+<span id="cb3-334"><a href="#cb3-334" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`selected_validation_mse`</span> <span class="pp">|</span> validation <span class="pp">|</span> selected or deterministic validation reconstruction MSE in transformed coordinates <span class="pp">|</span></span>
+<span id="cb3-335"><a href="#cb3-335" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`parameter_count`</span> <span class="pp">|</span> architecture diagnostic <span class="pp">|</span> declared fitted architecture/model parameter count <span class="pp">|</span></span>
+<span id="cb3-336"><a href="#cb3-336" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-337"><a href="#cb3-337" aria-hidden="true" tabindex="-1"></a>Code correlation and collision are simulator diagnostics. They do not prove</span>
+<span id="cb3-338"><a href="#cb3-338" aria-hidden="true" tabindex="-1"></a>injectivity, semantic coordinates, representation or intrinsic dimension.</span>
+<span id="cb3-339"><a href="#cb3-339" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-340"><a href="#cb3-340" aria-hidden="true" tabindex="-1"></a><span class="fu">### Graph metrics</span></span>
+<span id="cb3-341"><a href="#cb3-341" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-342"><a href="#cb3-342" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Metric <span class="pp">|</span> Provenance/target <span class="pp">|</span> Definition <span class="pp">|</span></span>
+<span id="cb3-343"><a href="#cb3-343" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|---|</span></span>
+<span id="cb3-344"><a href="#cb3-344" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`heldout_coordinate_rmse`</span> <span class="pp">|</span> test extension; aligned known hairpin arc length <span class="pp">|</span> held-out RMSE after one training-fitted affine scoring alignment <span class="pp">|</span></span>
+<span id="cb3-345"><a href="#cb3-345" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`graph_distance_relative_rmse`</span> <span class="pp">|</span> training diagnostic; known pairwise arc separation <span class="pp">|</span> RMS shortest-path error divided by RMS analytic arc separation over finite pairs <span class="pp">|</span></span>
+<span id="cb3-346"><a href="#cb3-346" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`component_count`</span> <span class="pp">|</span> training graph diagnostic <span class="pp">|</span> number of finite connected components <span class="pp">|</span></span>
+<span id="cb3-347"><a href="#cb3-347" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`material_shortcut_rate`</span> <span class="pp">|</span> training graph diagnostic <span class="pp">|</span> fraction of graph edges whose arc separation exceeds edge length by the stable Phase 3 material threshold <span class="pp">|</span></span>
+<span id="cb3-348"><a href="#cb3-348" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`infinite_pair_rate`</span> <span class="pp">|</span> training graph diagnostic <span class="pp">|</span> fraction of unordered training pairs with infinite shortest-path distance <span class="pp">|</span></span>
+<span id="cb3-349"><a href="#cb3-349" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`mds_negative_eigenmass`</span> <span class="pp">|</span> training MDS diagnostic <span class="pp">|</span> total absolute negative eigenvalue mass of classical MDS <span class="pp">|</span></span>
+<span id="cb3-350"><a href="#cb3-350" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`diffusion_eigenspace_angle_max_degrees`</span> <span class="pp">|</span> training finite-operator diagnostic <span class="pp">|</span> maximum $L^2(\pi)$ principal angle between the first two nonconstant right-eigenfunction modes and cosine--sine truth <span class="pp">|</span></span>
+<span id="cb3-351"><a href="#cb3-351" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`diffusion_truncation_relative_rmse`</span> <span class="pp">|</span> training finite-operator diagnostic <span class="pp">|</span> relative pairwise RMSE between full finite-operator diffusion distance and its two-mode truncation <span class="pp">|</span></span>
+<span id="cb3-352"><a href="#cb3-352" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`direct_spectral_distance_max_abs`</span> <span class="pp">|</span> training numerical oracle <span class="pp">|</span> maximum discrepancy between spectral and direct finite-operator diffusion distances <span class="pp">|</span></span>
+<span id="cb3-353"><a href="#cb3-353" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`heldout_extension_rmse`</span> <span class="pp">|</span> test extension <span class="pp">|</span> RMSE of frozen Nyström cosine--sine extension after training alignment <span class="pp">|</span></span>
+<span id="cb3-354"><a href="#cb3-354" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`operator_row_sum_max_abs`</span> <span class="pp">|</span> training numerical oracle <span class="pp">|</span> maximum absolute Markov row-sum error from one <span class="pp">|</span></span>
+<span id="cb3-355"><a href="#cb3-355" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-356"><a href="#cb3-356" aria-hidden="true" tabindex="-1"></a>For every task $\times$ scenario $\times$ method $\times$ metric group,</span>
+<span id="cb3-357"><a href="#cb3-357" aria-hidden="true" tabindex="-1"></a><span class="in">`diagnostics.json`</span> reports q10, median, q90, <span class="in">`ok_rate`</span>, applicability rate and</span>
+<span id="cb3-358"><a href="#cb3-358" aria-hidden="true" tabindex="-1"></a>failure rate across the three replicate rows. No metric is normalized against</span>
+<span id="cb3-359"><a href="#cb3-359" aria-hidden="true" tabindex="-1"></a>or averaged with a metric from the other task.</span>
+<span id="cb3-360"><a href="#cb3-360" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-361"><a href="#cb3-361" aria-hidden="true" tabindex="-1"></a><span class="fu">## Failure and applicability labels</span></span>
+<span id="cb3-362"><a href="#cb3-362" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-363"><a href="#cb3-363" aria-hidden="true" tabindex="-1"></a>The full task-specific Cartesian inventories are retained:</span>
+<span id="cb3-364"><a href="#cb3-364" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-365"><a href="#cb3-365" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>reconstruction: $7\times3\times5\times7=735$ rows;</span>
+<span id="cb3-366"><a href="#cb3-366" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>graph geometry: $13\times3\times8\times11=3{,}432$ rows;</span>
+<span id="cb3-367"><a href="#cb3-367" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>total: **4,167** unique canonical rows and **1,389** summary groups.</span>
+<span id="cb3-368"><a href="#cb3-368" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-369"><a href="#cb3-369" aria-hidden="true" tabindex="-1"></a>Natural execution produced:</span>
+<span id="cb3-370"><a href="#cb3-370" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-371"><a href="#cb3-371" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Task <span class="pp">|</span> <span class="in">`ok`</span> <span class="pp">|</span> <span class="in">`inapplicable`</span> <span class="pp">|</span> <span class="in">`invalid`</span> <span class="pp">|</span> <span class="in">`nonconvergence`</span> <span class="pp">|</span></span>
+<span id="cb3-372"><a href="#cb3-372" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---:|---:|---:|---:|</span></span>
+<span id="cb3-373"><a href="#cb3-373" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Reconstruction <span class="pp">|</span> 690 <span class="pp">|</span> 45 <span class="pp">|</span> 0 <span class="pp">|</span> 0 <span class="pp">|</span></span>
+<span id="cb3-374"><a href="#cb3-374" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Graph geometry <span class="pp">|</span> 299 <span class="pp">|</span> 3,133 <span class="pp">|</span> 0 <span class="pp">|</span> 0 <span class="pp">|</span></span>
+<span id="cb3-375"><a href="#cb3-375" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **Total** | **989** | **3,178** | **0** | **0** <span class="pp">|</span></span>
+<span id="cb3-376"><a href="#cb3-376" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-377"><a href="#cb3-377" aria-hidden="true" tabindex="-1"></a>Applicability is resolved before numerical failure. <span class="in">`ok`</span> requires an applicable</span>
+<span id="cb3-378"><a href="#cb3-378" aria-hidden="true" tabindex="-1"></a>finite value; <span class="in">`inapplicable`</span> retains method--metric or truth-target mismatches;</span>
+<span id="cb3-379"><a href="#cb3-379" aria-hidden="true" tabindex="-1"></a><span class="in">`invalid`</span> represents malformed/non-finite applicable scoring; and</span>
+<span id="cb3-380"><a href="#cb3-380" aria-hidden="true" tabindex="-1"></a><span class="in">`nonconvergence`</span> represents linear-algebra failure in an applicable path. Every</span>
+<span id="cb3-381"><a href="#cb3-381" aria-hidden="true" tabindex="-1"></a>non-<span class="in">`ok`</span> row has a machine-readable reason and no numeric value.</span>
+<span id="cb3-382"><a href="#cb3-382" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-383"><a href="#cb3-383" aria-hidden="true" tabindex="-1"></a>The natural absence of <span class="in">`invalid`</span> and <span class="in">`nonconvergence`</span> is not a global robustness</span>
+<span id="cb3-384"><a href="#cb3-384" aria-hidden="true" tabindex="-1"></a>claim. Real-path fault injection verifies both labels while preserving</span>
+<span id="cb3-385"><a href="#cb3-385" aria-hidden="true" tabindex="-1"></a>inapplicability precedence. In disconnected hairpin replicates, Isomap</span>
+<span id="cb3-386"><a href="#cb3-386" aria-hidden="true" tabindex="-1"></a>coordinate/MDS rows remain <span class="in">`inapplicable`</span> rather than receiving fabricated</span>
+<span id="cb3-387"><a href="#cb3-387" aria-hidden="true" tabindex="-1"></a>coordinates.</span>
+<span id="cb3-388"><a href="#cb3-388" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-389"><a href="#cb3-389" aria-hidden="true" tabindex="-1"></a><span class="fu">## Artifact contract</span></span>
+<span id="cb3-390"><a href="#cb3-390" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-391"><a href="#cb3-391" aria-hidden="true" tabindex="-1"></a><span class="in">`benchmarks/artifacts/nonlinear-graph-robustness/`</span> contains exactly:</span>
+<span id="cb3-392"><a href="#cb3-392" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-393"><a href="#cb3-393" aria-hidden="true" tabindex="-1"></a><span class="in">```text</span></span>
+<span id="cb3-394"><a href="#cb3-394" aria-hidden="true" tabindex="-1"></a><span class="in">manifest.json</span></span>
+<span id="cb3-395"><a href="#cb3-395" aria-hidden="true" tabindex="-1"></a><span class="in">results.csv</span></span>
+<span id="cb3-396"><a href="#cb3-396" aria-hidden="true" tabindex="-1"></a><span class="in">diagnostics.json</span></span>
+<span id="cb3-397"><a href="#cb3-397" aria-hidden="true" tabindex="-1"></a><span class="in">summary.png</span></span>
+<span id="cb3-398"><a href="#cb3-398" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb3-399"><a href="#cb3-399" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-400"><a href="#cb3-400" aria-hidden="true" tabindex="-1"></a>The manifest freezes scenario/method/metric inventories, stage and status</span>
+<span id="cb3-401"><a href="#cb3-401" aria-hidden="true" tabindex="-1"></a>vocabularies, three-replicate seed contract, canonical lexicographic row order,</span>
+<span id="cb3-402"><a href="#cb3-402" aria-hidden="true" tabindex="-1"></a>runtime, source digests, exact commands and SHA-256 hashes. <span class="in">`results.csv`</span></span>
+<span id="cb3-403"><a href="#cb3-403" aria-hidden="true" tabindex="-1"></a>retains all replicate-level rows. <span class="in">`diagnostics.json`</span> stores target-specific</span>
+<span id="cb3-404"><a href="#cb3-404" aria-hidden="true" tabindex="-1"></a>summaries and verification checks. <span class="in">`summary.png`</span> is a separated diagnostic view,</span>
+<span id="cb3-405"><a href="#cb3-405" aria-hidden="true" tabindex="-1"></a>not acceptance evidence or a leaderboard. Each plotted value carries an</span>
+<span id="cb3-406"><a href="#cb3-406" aria-hidden="true" tabindex="-1"></a>explicit <span class="in">`n=ok/total`</span> applicability label; an inapplicable group is labelled</span>
+<span id="cb3-407"><a href="#cb3-407" aria-hidden="true" tabindex="-1"></a><span class="in">`NA`</span> rather than plotted as a zero-valued result.</span>
+<span id="cb3-408"><a href="#cb3-408" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-409"><a href="#cb3-409" aria-hidden="true" tabindex="-1"></a><span class="fu">## Results</span></span>
+<span id="cb3-410"><a href="#cb3-410" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-411"><a href="#cb3-411" aria-hidden="true" tabindex="-1"></a>The following q10/median/q90 values are read from the authoritative artifact</span>
+<span id="cb3-412"><a href="#cb3-412" aria-hidden="true" tabindex="-1"></a>tree. They are conditional on the declared simulator, split, method, metric and</span>
+<span id="cb3-413"><a href="#cb3-413" aria-hidden="true" tabindex="-1"></a>information set.</span>
+<span id="cb3-414"><a href="#cb3-414" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-415"><a href="#cb3-415" aria-hidden="true" tabindex="-1"></a><span class="fu">### Reconstruction results</span></span>
+<span id="cb3-416"><a href="#cb3-416" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-417"><a href="#cb3-417" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Scenario and target <span class="pp">|</span> Method <span class="pp">|</span> q10 <span class="pp">|</span> Median <span class="pp">|</span> q90 <span class="pp">|</span></span>
+<span id="cb3-418"><a href="#cb3-418" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|---:|---:|---:|</span></span>
+<span id="cb3-419"><a href="#cb3-419" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Reference observed reconstruction MSE <span class="pp">|</span> mean <span class="pp">|</span> 0.2234 <span class="pp">|</span> 0.2423 <span class="pp">|</span> 0.2552 <span class="pp">|</span></span>
+<span id="cb3-420"><a href="#cb3-420" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Reference observed reconstruction MSE <span class="pp">|</span> PCA <span class="pp">|</span> 0.0943 <span class="pp">|</span> 0.1166 <span class="pp">|</span> 0.1298 <span class="pp">|</span></span>
+<span id="cb3-421"><a href="#cb3-421" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Reference observed reconstruction MSE <span class="pp">|</span> analytic linear AE <span class="pp">|</span> 0.0943 <span class="pp">|</span> 0.1166 <span class="pp">|</span> 0.1298 <span class="pp">|</span></span>
+<span id="cb3-422"><a href="#cb3-422" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Reference observed reconstruction MSE <span class="pp">|</span> nonlinear AE <span class="pp">|</span> 0.0059 <span class="pp">|</span> 0.0091 <span class="pp">|</span> 0.0295 <span class="pp">|</span></span>
+<span id="cb3-423"><a href="#cb3-423" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Reference observed reconstruction MSE <span class="pp">|</span> frozen encoder <span class="pp">|</span> 0.0770 <span class="pp">|</span> 0.1333 <span class="pp">|</span> 0.1405 <span class="pp">|</span></span>
+<span id="cb3-424"><a href="#cb3-424" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Moment-matched Gaussian observed MSE <span class="pp">|</span> PCA <span class="pp">|</span> 0.0948 <span class="pp">|</span> 0.1196 <span class="pp">|</span> 0.1312 <span class="pp">|</span></span>
+<span id="cb3-425"><a href="#cb3-425" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Moment-matched Gaussian observed MSE <span class="pp">|</span> nonlinear AE <span class="pp">|</span> 0.1045 <span class="pp">|</span> 0.1157 <span class="pp">|</span> 0.1752 <span class="pp">|</span></span>
+<span id="cb3-426"><a href="#cb3-426" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> High-curvature observed MSE <span class="pp">|</span> PCA <span class="pp">|</span> 0.2629 <span class="pp">|</span> 0.2702 <span class="pp">|</span> 0.3324 <span class="pp">|</span></span>
+<span id="cb3-427"><a href="#cb3-427" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> High-curvature observed MSE <span class="pp">|</span> nonlinear AE <span class="pp">|</span> 0.0085 <span class="pp">|</span> 0.0091 <span class="pp">|</span> 0.0100 <span class="pp">|</span></span>
+<span id="cb3-428"><a href="#cb3-428" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> High-nuisance observed MSE <span class="pp">|</span> nonlinear AE <span class="pp">|</span> 1.6526 <span class="pp">|</span> 1.7647 <span class="pp">|</span> 2.1852 <span class="pp">|</span></span>
+<span id="cb3-429"><a href="#cb3-429" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> High-nuisance observed MSE <span class="pp">|</span> frozen encoder <span class="pp">|</span> 1.3691 <span class="pp">|</span> 1.4110 <span class="pp">|</span> 1.9084 <span class="pp">|</span></span>
+<span id="cb3-430"><a href="#cb3-430" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Support-shift observed MSE <span class="pp">|</span> PCA <span class="pp">|</span> 2.0082 <span class="pp">|</span> 2.2370 <span class="pp">|</span> 2.3075 <span class="pp">|</span></span>
+<span id="cb3-431"><a href="#cb3-431" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Support-shift observed MSE <span class="pp">|</span> nonlinear AE <span class="pp">|</span> 1.0416 <span class="pp">|</span> 1.2731 <span class="pp">|</span> 1.5169 <span class="pp">|</span></span>
+<span id="cb3-432"><a href="#cb3-432" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Support-shift observed MSE <span class="pp">|</span> frozen encoder <span class="pp">|</span> 1.7829 <span class="pp">|</span> 1.7922 <span class="pp">|</span> 1.8110 <span class="pp">|</span></span>
+<span id="cb3-433"><a href="#cb3-433" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-434"><a href="#cb3-434" aria-hidden="true" tabindex="-1"></a>On the reference curved generator, the nonlinear code's absolute Spearman</span>
+<span id="cb3-435"><a href="#cb3-435" aria-hidden="true" tabindex="-1"></a>correlation with scoring-only $s$ has median <span class="in">`0.9975`</span>, and its collision-rate</span>
+<span id="cb3-436"><a href="#cb3-436" aria-hidden="true" tabindex="-1"></a>median is <span class="in">`0.00217`</span>. Under support shift those medians become <span class="in">`0.6451`</span> and</span>
+<span id="cb3-437"><a href="#cb3-437" aria-hidden="true" tabindex="-1"></a><span class="in">`0.1505`</span>. This deterioration is an extrapolation diagnostic only. The</span>
+<span id="cb3-438"><a href="#cb3-438" aria-hidden="true" tabindex="-1"></a>small-sample/high-capacity nonlinear observed-MSE median is <span class="in">`0.00744`</span>; the</span>
+<span id="cb3-439"><a href="#cb3-439" aria-hidden="true" tabindex="-1"></a>predeclared validation procedure did not force a dramatic failure in these</span>
+<span id="cb3-440"><a href="#cb3-440" aria-hidden="true" tabindex="-1"></a>three replicates.</span>
+<span id="cb3-441"><a href="#cb3-441" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-442"><a href="#cb3-442" aria-hidden="true" tabindex="-1"></a>The moment-matched Gaussian result shows that nonlinear reconstruction behavior</span>
+<span id="cb3-443"><a href="#cb3-443" aria-hidden="true" tabindex="-1"></a>can be discussed without a scalar-manifold target. High nuisance variance also</span>
+<span id="cb3-444"><a href="#cb3-444" aria-hidden="true" tabindex="-1"></a>shows that aggregate observed-space MSE can favor a different method from the</span>
+<span id="cb3-445"><a href="#cb3-445" aria-hidden="true" tabindex="-1"></a>curved-signal question. These rows do not establish a universal reconstruction</span>
+<span id="cb3-446"><a href="#cb3-446" aria-hidden="true" tabindex="-1"></a>order.</span>
+<span id="cb3-447"><a href="#cb3-447" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-448"><a href="#cb3-448" aria-hidden="true" tabindex="-1"></a><span class="fu">### Graph-geometry results</span></span>
+<span id="cb3-449"><a href="#cb3-449" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-450"><a href="#cb3-450" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Scenario and target <span class="pp">|</span> Method <span class="pp">|</span> q10 <span class="pp">|</span> Median <span class="pp">|</span> q90 <span class="pp">|</span></span>
+<span id="cb3-451"><a href="#cb3-451" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|---:|---:|---:|</span></span>
+<span id="cb3-452"><a href="#cb3-452" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Hairpin reference held-out coordinate RMSE <span class="pp">|</span> mean <span class="pp">|</span> 2.0374 <span class="pp">|</span> 2.0554 <span class="pp">|</span> 2.0647 <span class="pp">|</span></span>
+<span id="cb3-453"><a href="#cb3-453" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Hairpin reference held-out coordinate RMSE <span class="pp">|</span> PCA <span class="pp">|</span> 2.0371 <span class="pp">|</span> 2.0548 <span class="pp">|</span> 2.1343 <span class="pp">|</span></span>
+<span id="cb3-454"><a href="#cb3-454" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Hairpin reference held-out coordinate RMSE <span class="pp">|</span> ambient MDS <span class="pp">|</span> 2.0371 <span class="pp">|</span> 2.0548 <span class="pp">|</span> 2.1343 <span class="pp">|</span></span>
+<span id="cb3-455"><a href="#cb3-455" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Hairpin reference held-out coordinate RMSE <span class="pp">|</span> Isomap <span class="pp">|</span> 1.9997 <span class="pp">|</span> 2.0484 <span class="pp">|</span> 2.1207 <span class="pp">|</span></span>
+<span id="cb3-456"><a href="#cb3-456" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Hairpin reference graph-distance relative RMSE <span class="pp">|</span> graph diagnostic <span class="pp">|</span> 0.4936 <span class="pp">|</span> 0.5813 <span class="pp">|</span> 0.6294 <span class="pp">|</span></span>
+<span id="cb3-457"><a href="#cb3-457" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Hairpin reference component count <span class="pp">|</span> graph diagnostic <span class="pp">|</span> 1.0 <span class="pp">|</span> 1.0 <span class="pp">|</span> 1.0 <span class="pp">|</span></span>
+<span id="cb3-458"><a href="#cb3-458" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Hairpin reference infinite-pair rate <span class="pp">|</span> graph diagnostic <span class="pp">|</span> 0.0 <span class="pp">|</span> 0.0 <span class="pp">|</span> 0.0 <span class="pp">|</span></span>
+<span id="cb3-459"><a href="#cb3-459" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Sparse-gap infinite-pair rate <span class="pp">|</span> graph diagnostic <span class="pp">|</span> 0.0942 <span class="pp">|</span> 0.4708 <span class="pp">|</span> 0.4890 <span class="pp">|</span></span>
+<span id="cb3-460"><a href="#cb3-460" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Reduced-separation material-shortcut rate <span class="pp">|</span> graph diagnostic <span class="pp">|</span> 0.2588 <span class="pp">|</span> 0.2687 <span class="pp">|</span> 0.2853 <span class="pp">|</span></span>
+<span id="cb3-461"><a href="#cb3-461" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> $k=1$ component count <span class="pp">|</span> graph diagnostic <span class="pp">|</span> 35.0 <span class="pp">|</span> 35.0 <span class="pp">|</span> 35.8 <span class="pp">|</span></span>
+<span id="cb3-462"><a href="#cb3-462" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Nearly-complete material-shortcut rate <span class="pp">|</span> graph diagnostic <span class="pp">|</span> 0.3754 <span class="pp">|</span> 0.4128 <span class="pp">|</span> 0.4518 <span class="pp">|</span></span>
+<span id="cb3-463"><a href="#cb3-463" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Circle reference eigenspace max angle <span class="pp">|</span> Diffusion Maps <span class="pp">|</span> $1.71\times10^{-7}$° <span class="pp">|</span> $8.54\times10^{-7}$° <span class="pp">|</span> $1.35\times10^{-6}$° <span class="pp">|</span></span>
+<span id="cb3-464"><a href="#cb3-464" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Circle reference two-mode truncation relative RMSE <span class="pp">|</span> Diffusion Maps <span class="pp">|</span> 0.4417 <span class="pp">|</span> 0.4417 <span class="pp">|</span> 0.4417 <span class="pp">|</span></span>
+<span id="cb3-465"><a href="#cb3-465" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Circle reference exact-midpoint extension RMSE <span class="pp">|</span> Nyström <span class="pp">|</span> $2.40\times10^{-15}$ <span class="pp">|</span> $2.82\times10^{-15}$ <span class="pp">|</span> $5.42\times10^{-15}$ <span class="pp">|</span></span>
+<span id="cb3-466"><a href="#cb3-466" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Circle nonuniform eigenspace max angle <span class="pp">|</span> Diffusion Maps <span class="pp">|</span> 15.19° <span class="pp">|</span> 20.13° <span class="pp">|</span> 26.01° <span class="pp">|</span></span>
+<span id="cb3-467"><a href="#cb3-467" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Circle nonuniform exact-midpoint extension RMSE <span class="pp">|</span> Nyström <span class="pp">|</span> 0.1342 <span class="pp">|</span> 0.1718 <span class="pp">|</span> 0.2133 <span class="pp">|</span></span>
+<span id="cb3-468"><a href="#cb3-468" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Small-bandwidth truncation relative RMSE <span class="pp">|</span> Diffusion Maps <span class="pp">|</span> 0.7631 <span class="pp">|</span> 0.7631 <span class="pp">|</span> 0.7631 <span class="pp">|</span></span>
+<span id="cb3-469"><a href="#cb3-469" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Metric-scaled circle eigenspace max angle <span class="pp">|</span> Diffusion Maps <span class="pp">|</span> 5.8798° <span class="pp">|</span> 5.8798° <span class="pp">|</span> 5.8798° <span class="pp">|</span></span>
+<span id="cb3-470"><a href="#cb3-470" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Metric-scaled circle exact-midpoint extension RMSE <span class="pp">|</span> Nyström <span class="pp">|</span> 0.06285 <span class="pp">|</span> 0.06285 <span class="pp">|</span> 0.06285 <span class="pp">|</span></span>
+<span id="cb3-471"><a href="#cb3-471" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-472"><a href="#cb3-472" aria-hidden="true" tabindex="-1"></a>With the authoritative nominal $k=6$, all three reference hairpin graphs are</span>
+<span id="cb3-473"><a href="#cb3-473" aria-hidden="true" tabindex="-1"></a>connected: component count is exactly one, infinite-pair rate is zero, and</span>
+<span id="cb3-474"><a href="#cb3-474" aria-hidden="true" tabindex="-1"></a>Isomap held-out-coordinate rows are applicable in all three replicates</span>
+<span id="cb3-475"><a href="#cb3-475" aria-hidden="true" tabindex="-1"></a>(<span class="in">`n=3/3`</span>). The Isomap median <span class="in">`2.0484`</span> is nevertheless close to the mean, PCA and</span>
+<span id="cb3-476"><a href="#cb3-476" aria-hidden="true" tabindex="-1"></a>ambient-MDS coordinate errors, while the graph-distance relative-RMSE median is</span>
+<span id="cb3-477"><a href="#cb3-477" aria-hidden="true" tabindex="-1"></a><span class="in">`0.5813`</span>. Connectivity and applicability therefore do not imply accurate</span>
+<span id="cb3-478"><a href="#cb3-478" aria-hidden="true" tabindex="-1"></a>recovery. Sparse gaps, nonuniform sampling, $k=1$ and metric scaling expose</span>
+<span id="cb3-479"><a href="#cb3-479" aria-hidden="true" tabindex="-1"></a>stronger connectivity boundaries; large/nearly-complete neighborhoods restore</span>
+<span id="cb3-480"><a href="#cb3-480" aria-hidden="true" tabindex="-1"></a>connectivity but retain path-error or shortcut failures.</span>
+<span id="cb3-481"><a href="#cb3-481" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-482"><a href="#cb3-482" aria-hidden="true" tabindex="-1"></a>For every circle scenario and replicate, the held-out extension target is the</span>
+<span id="cb3-483"><a href="#cb3-483" aria-hidden="true" tabindex="-1"></a>exact circular midpoint set derived from that realized training grid. The</span>
+<span id="cb3-484"><a href="#cb3-484" aria-hidden="true" tabindex="-1"></a>integrity diagnostic reports maximum angular construction error <span class="in">`0.0`</span>. Thus the</span>
+<span id="cb3-485"><a href="#cb3-485" aria-hidden="true" tabindex="-1"></a>Nyström rows evaluate one precise frozen midpoint-extension contract; they do</span>
+<span id="cb3-486"><a href="#cb3-486" aria-hidden="true" tabindex="-1"></a>not establish general out-of-support extension.</span>
+<span id="cb3-487"><a href="#cb3-487" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-488"><a href="#cb3-488" aria-hidden="true" tabindex="-1"></a>The circle direct/spectral distance discrepancy is at most about</span>
+<span id="cb3-489"><a href="#cb3-489" aria-hidden="true" tabindex="-1"></a><span class="in">`7.55e-15`</span> in the verifier, and Markov row-sum error is about <span class="in">`2.22e-16`</span>.</span>
+<span id="cb3-490"><a href="#cb3-490" aria-hidden="true" tabindex="-1"></a>Those are implementation checks. Accurate reference eigenspaces or Nyström</span>
+<span id="cb3-491"><a href="#cb3-491" aria-hidden="true" tabindex="-1"></a>extension do not establish topology, a manifold, geodesic recovery or a</span>
+<span id="cb3-492"><a href="#cb3-492" aria-hidden="true" tabindex="-1"></a>Riemannian metric.</span>
+<span id="cb3-493"><a href="#cb3-493" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-494"><a href="#cb3-494" aria-hidden="true" tabindex="-1"></a><span class="al">![P4-U05 separated diagnostic summary](artifacts/nonlinear-graph-robustness/summary.png)</span></span>
+<span id="cb3-495"><a href="#cb3-495" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-496"><a href="#cb3-496" aria-hidden="true" tabindex="-1"></a><span class="fu">## Interpretation limits</span></span>
+<span id="cb3-497"><a href="#cb3-497" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-498"><a href="#cb3-498" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Low held-out reconstruction error does **not** prove a manifold, low or</span>
+<span id="cb3-499"><a href="#cb3-499" aria-hidden="true" tabindex="-1"></a>  intrinsic dimension, injective chart, representation, dynamics, mechanism or</span>
+<span id="cb3-500"><a href="#cb3-500" aria-hidden="true" tabindex="-1"></a>  causality.</span>
+<span id="cb3-501"><a href="#cb3-501" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>A one-dimensional bottleneck is an analyst choice, not an intrinsic-dimension</span>
+<span id="cb3-502"><a href="#cb3-502" aria-hidden="true" tabindex="-1"></a>  estimate. Code correlation or low collision rate on known simulation truth</span>
+<span id="cb3-503"><a href="#cb3-503" aria-hidden="true" tabindex="-1"></a>  does not create a unique coordinate.</span>
+<span id="cb3-504"><a href="#cb3-504" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>A nonlinear method outperforming a linear reconstruction baseline on one</span>
+<span id="cb3-505"><a href="#cb3-505" aria-hidden="true" tabindex="-1"></a>  curved simulator does not imply universal superiority or real-data validity.</span>
+<span id="cb3-506"><a href="#cb3-506" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>A visually ordered Isomap coordinate, finite graph-path accuracy or low MDS</span>
+<span id="cb3-507"><a href="#cb3-507" aria-hidden="true" tabindex="-1"></a>  strain does **not** prove topology, geodesics or Riemannian geometry.</span>
+<span id="cb3-508"><a href="#cb3-508" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>A Diffusion Maps eigenspace is a finite operator output. It does not recover</span>
+<span id="cb3-509"><a href="#cb3-509" aria-hidden="true" tabindex="-1"></a>  circle topology, a manifold Laplacian, intrinsic dimension, physical time or</span>
+<span id="cb3-510"><a href="#cb3-510" aria-hidden="true" tabindex="-1"></a>  dynamics without additional assumptions and evidence.</span>
+<span id="cb3-511"><a href="#cb3-511" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Connectivity is a property of the constructed finite graph, not evidence that</span>
+<span id="cb3-512"><a href="#cb3-512" aria-hidden="true" tabindex="-1"></a>  the unknown latent support is topologically connected.</span>
+<span id="cb3-513"><a href="#cb3-513" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Frozen extension is not transductive refitting and need not agree with it.</span>
+<span id="cb3-514"><a href="#cb3-514" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Three replicates and bounded scenarios do not support significance,</span>
+<span id="cb3-515"><a href="#cb3-515" aria-hidden="true" tabindex="-1"></a>  confidence, causal-factor isolation or a universal leaderboard.</span>
+<span id="cb3-516"><a href="#cb3-516" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-517"><a href="#cb3-517" aria-hidden="true" tabindex="-1"></a><span class="fu">## Reproducibility</span></span>
+<span id="cb3-518"><a href="#cb3-518" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-519"><a href="#cb3-519" aria-hidden="true" tabindex="-1"></a>Run from the repository root with the manifest-recorded runtime:</span>
+<span id="cb3-520"><a href="#cb3-520" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-521"><a href="#cb3-521" aria-hidden="true" tabindex="-1"></a><span class="in">```bash</span></span>
+<span id="cb3-522"><a href="#cb3-522" aria-hidden="true" tabindex="-1"></a><span class="ex">/Users/bytedance/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3</span> benchmarks/nonlinear-graph-robustness.py <span class="at">--generate</span></span>
+<span id="cb3-523"><a href="#cb3-523" aria-hidden="true" tabindex="-1"></a><span class="ex">/Users/bytedance/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3</span> benchmarks/nonlinear-graph-robustness.py <span class="at">--generate</span> <span class="at">--resume</span></span>
+<span id="cb3-524"><a href="#cb3-524" aria-hidden="true" tabindex="-1"></a><span class="ex">/Users/bytedance/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3</span> benchmarks/nonlinear-graph-robustness.py <span class="at">--verify</span></span>
+<span id="cb3-525"><a href="#cb3-525" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb3-526"><a href="#cb3-526" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-527"><a href="#cb3-527" aria-hidden="true" tabindex="-1"></a>The verifier checks the exact four-artifact inventory and hashes; 4,167 unique</span>
+<span id="cb3-528"><a href="#cb3-528" aria-hidden="true" tabindex="-1"></a>complete canonical rows; summary recomputation; byte-identical clean,</span>
+<span id="cb3-529"><a href="#cb3-529" aria-hidden="true" tabindex="-1"></a>reverse-order and valid-resume generation; rejection of corrupted, stale,</span>
+<span id="cb3-530"><a href="#cb3-530" aria-hidden="true" tabindex="-1"></a>duplicate, unknown and incomplete resume rows; restricted fitting/recovery</span>
+<span id="cb3-531"><a href="#cb3-531" aria-hidden="true" tabindex="-1"></a>capabilities; truth/test poison behavior; exact support-shift fitted-state</span>
+<span id="cb3-532"><a href="#cb3-532" aria-hidden="true" tabindex="-1"></a>reuse; graph symmetry, shortest paths, MDS/Gower, Nyström, spectral/direct and</span>
+<span id="cb3-533"><a href="#cb3-533" aria-hidden="true" tabindex="-1"></a>relabeling oracles; exact circle-midpoint integrity; the complete network</span>
+<span id="cb3-534"><a href="#cb3-534" aria-hidden="true" tabindex="-1"></a>candidate/seed/loss/epoch/stop records; distinct Phase 3 provenance roles;</span>
+<span id="cb3-535"><a href="#cb3-535" aria-hidden="true" tabindex="-1"></a>metric-scaling sensitivity; finite values; and real-path</span>
+<span id="cb3-536"><a href="#cb3-536" aria-hidden="true" tabindex="-1"></a><span class="in">`invalid`</span>/<span class="in">`nonconvergence`</span> fault labels with applicability precedence.</span>
+<span id="cb3-537"><a href="#cb3-537" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-538"><a href="#cb3-538" aria-hidden="true" tabindex="-1"></a>The current verification diagnostics include:</span>
+<span id="cb3-539"><a href="#cb3-539" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-540"><a href="#cb3-540" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>support-shift train, validation and fitted-state differences: <span class="in">`0.0`</span>;</span>
+<span id="cb3-541"><a href="#cb3-541" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>metric-scaling hairpin undirected edge symmetric difference: <span class="in">`61`</span>;</span>
+<span id="cb3-542"><a href="#cb3-542" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>ambient-MDS training extension replay maximum error:</span>
+<span id="cb3-543"><a href="#cb3-543" aria-hidden="true" tabindex="-1"></a>  <span class="in">`2.44e-15`</span>;</span>
+<span id="cb3-544"><a href="#cb3-544" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Isomap training extension replay maximum error: <span class="in">`2.22e-15`</span>;</span>
+<span id="cb3-545"><a href="#cb3-545" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>diffusion training Nyström replay maximum error: <span class="in">`2.44e-15`</span>;</span>
+<span id="cb3-546"><a href="#cb3-546" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>direct/spectral diffusion-distance maximum error: <span class="in">`7.55e-15`</span>;</span>
+<span id="cb3-547"><a href="#cb3-547" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>graph-distance relabeling maximum error: <span class="in">`8.88e-16`</span>;</span>
+<span id="cb3-548"><a href="#cb3-548" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>exact circle midpoint construction maximum error: <span class="in">`0.0`</span>;</span>
+<span id="cb3-549"><a href="#cb3-549" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>network selection records: <span class="in">`42/42`</span>, containing <span class="in">`84`</span> candidate runs;</span>
+<span id="cb3-550"><a href="#cb3-550" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Phase 3 roles: nonlinear <span class="in">`hash_only_design_provenance`</span>, graph</span>
+<span id="cb3-551"><a href="#cb3-551" aria-hidden="true" tabindex="-1"></a>  <span class="in">`actual_executable_routine_reuse`</span>.</span>
+<span id="cb3-552"><a href="#cb3-552" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-553"><a href="#cb3-553" aria-hidden="true" tabindex="-1"></a><span class="fu">## Review record</span></span>
+<span id="cb3-554"><a href="#cb3-554" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-555"><a href="#cb3-555" aria-hidden="true" tabindex="-1"></a>Independent scientific and implementation reviewers were read-only and independent of the executors. Their initial</span>
+<span id="cb3-556"><a href="#cb3-556" aria-hidden="true" tabindex="-1"></a>reviews returned <span class="in">`REVISE`</span> on the nominal hairpin neighborhood contract, exact circle midpoint extension, auditable network selection/epoch records, applicability-aware visualization, and distinct Phase 3 provenance roles. The bounded correction pass addressed only</span>
+<span id="cb3-557"><a href="#cb3-557" aria-hidden="true" tabindex="-1"></a>those findings; focused scientific and implementation re-reviews both returned</span>
+<span id="cb3-558"><a href="#cb3-558" aria-hidden="true" tabindex="-1"></a><span class="in">`PASS`</span> with no unresolved finding.</span>
+<span id="cb3-559"><a href="#cb3-559" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-560"><a href="#cb3-560" aria-hidden="true" tabindex="-1"></a>The accepted validation record includes 62-object structural validation, 33 repository tests, the enhanced artifact verifier, target/index renders, workflow validation, and <span class="in">`git diff --check`</span>. The recorded review decision then authorized the</span>
+<span id="cb3-561"><a href="#cb3-561" aria-hidden="true" tabindex="-1"></a>mechanical promotion to <span class="in">`L1/stable`</span>. Stable status records bounded acceptance of</span>
+<span id="cb3-562"><a href="#cb3-562" aria-hidden="true" tabindex="-1"></a>this declared synthetic Benchmark Object; it does not expand its evidence,</span>
+<span id="cb3-563"><a href="#cb3-563" aria-hidden="true" tabindex="-1"></a>information-set, target, or interpretation boundaries.</span>
+<span id="cb3-564"><a href="#cb3-564" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-565"><a href="#cb3-565" aria-hidden="true" tabindex="-1"></a><span class="fu">## Maturity checklist</span></span>
+<span id="cb3-566"><a href="#cb3-566" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-567"><a href="#cb3-567" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> Reconstruction and graph-geometry tasks are separate with no pooled score.</span>
+<span id="cb3-568"><a href="#cb3-568" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> Ground truth, generation, scenarios, replicates and deterministic seeds are declared.</span>
+<span id="cb3-569"><a href="#cb3-569" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> Train/validation/test, fitting, frozen recovery, scoring and extension boundaries are documented.</span>
+<span id="cb3-570"><a href="#cb3-570" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> Reconstruction capacity, nuisance, Gaussian and support-shift controls are retained.</span>
+<span id="cb3-571"><a href="#cb3-571" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> Graph gap, shortcut, density, connectivity, neighborhood, bandwidth, truncation, metric-scaling and held-out-extension boundaries are retained.</span>
+<span id="cb3-572"><a href="#cb3-572" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> All raw metrics, targets, provenance and applicability/failure labels match the artifacts.</span>
+<span id="cb3-573"><a href="#cb3-573" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> Exactly four byte-verifiable artifacts and exact commands are recorded.</span>
+<span id="cb3-574"><a href="#cb3-574" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> Reconstruction is not interpreted as manifold or intrinsic-dimension evidence.</span>
+<span id="cb3-575"><a href="#cb3-575" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> Graph embedding/operator output is not interpreted as topology or Riemannian geometry.</span>
+<span id="cb3-576"><a href="#cb3-576" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> Focused scientific re-review passes.</span>
+<span id="cb3-577"><a href="#cb3-577" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> Focused implementation re-review passes.</span>
+<span id="cb3-578"><a href="#cb3-578" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> Mechanical stable promotion completed under the recorded review decision after both focused verdicts passed.</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></div>
+</div></div></div></div></div>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

@@ -1,0 +1,2128 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.10.18">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Demixing and Rotational Projection Robustness Benchmark – Latent Dynamics &amp; Geometry</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-445b8638c3d06994fee0907d791121c4.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-chtml.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../index.html">
+    <span class="navbar-title">Latent Dynamics &amp; Geometry</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../index.html"> 
+<span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../knowledge/concepts/index.html"> 
+<span class="menu-text">Concepts</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../knowledge/methods/index.html"> 
+<span class="menu-text">Methods</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../knowledge/math/index.html"> 
+<span class="menu-text">Math</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../knowledge/papers/index.html"> 
+<span class="menu-text">Papers</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../toy-models/index.html"> 
+<span class="menu-text">Toy Models</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../research-questions/index.html"> 
+<span class="menu-text">Research Questions</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../benchmarks/index.html"> 
+<span class="menu-text">Benchmarks</span></a>
+  </li>  
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/AbelZheng/latent-dynamics-geometry-public"> <i class="bi bi-github" role="img" aria-label="GitHub repository">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="https://github.com/AbelZheng/latent-dynamics-geometry-public/discussions"> 
+<span class="menu-text">Discussions</span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#demixing-and-rotational-projection-robustness-benchmark" id="toc-demixing-and-rotational-projection-robustness-benchmark" class="nav-link active" data-scroll-target="#demixing-and-rotational-projection-robustness-benchmark">Demixing and Rotational Projection Robustness Benchmark</a>
+  <ul class="collapse">
+  <li><a href="#scientific-question" id="toc-scientific-question" class="nav-link" data-scroll-target="#scientific-question">Scientific question</a></li>
+  <li><a href="#ground-truth" id="toc-ground-truth" class="nav-link" data-scroll-target="#ground-truth">Ground truth</a>
+  <ul class="collapse">
+  <li><a href="#demixing-task" id="toc-demixing-task" class="nav-link" data-scroll-target="#demixing-task">Demixing task</a></li>
+  <li><a href="#rotational-task" id="toc-rotational-task" class="nav-link" data-scroll-target="#rotational-task">Rotational task</a></li>
+  </ul></li>
+  <li><a href="#generation" id="toc-generation" class="nav-link" data-scroll-target="#generation">Generation</a></li>
+  <li><a href="#scenario-grid" id="toc-scenario-grid" class="nav-link" data-scroll-target="#scenario-grid">Scenario grid</a>
+  <ul class="collapse">
+  <li><a href="#demixing-scenarios" id="toc-demixing-scenarios" class="nav-link" data-scroll-target="#demixing-scenarios">Demixing scenarios</a></li>
+  <li><a href="#rotational-scenarios" id="toc-rotational-scenarios" class="nav-link" data-scroll-target="#rotational-scenarios">Rotational scenarios</a></li>
+  </ul></li>
+  <li><a href="#negative-controls-and-stress-cases" id="toc-negative-controls-and-stress-cases" class="nav-link" data-scroll-target="#negative-controls-and-stress-cases">Negative controls and stress cases</a></li>
+  <li><a href="#replicates-and-deterministic-seeds" id="toc-replicates-and-deterministic-seeds" class="nav-link" data-scroll-target="#replicates-and-deterministic-seeds">Replicates and deterministic seeds</a></li>
+  <li><a href="#split-discipline" id="toc-split-discipline" class="nav-link" data-scroll-target="#split-discipline">Split discipline</a></li>
+  <li><a href="#methods-and-information-sets" id="toc-methods-and-information-sets" class="nav-link" data-scroll-target="#methods-and-information-sets">Methods and information sets</a>
+  <ul class="collapse">
+  <li><a href="#demixing-methods" id="toc-demixing-methods" class="nav-link" data-scroll-target="#demixing-methods">Demixing methods</a></li>
+  <li><a href="#rotational-methods" id="toc-rotational-methods" class="nav-link" data-scroll-target="#rotational-methods">Rotational methods</a></li>
+  </ul></li>
+  <li><a href="#parameter-selection" id="toc-parameter-selection" class="nav-link" data-scroll-target="#parameter-selection">Parameter selection</a></li>
+  <li><a href="#inference" id="toc-inference" class="nav-link" data-scroll-target="#inference">Inference</a></li>
+  <li><a href="#scoring" id="toc-scoring" class="nav-link" data-scroll-target="#scoring">Scoring</a>
+  <ul class="collapse">
+  <li><a href="#demixing-metrics" id="toc-demixing-metrics" class="nav-link" data-scroll-target="#demixing-metrics">Demixing metrics</a></li>
+  <li><a href="#rotational-metrics" id="toc-rotational-metrics" class="nav-link" data-scroll-target="#rotational-metrics">Rotational metrics</a></li>
+  </ul></li>
+  <li><a href="#failure-and-applicability-labels" id="toc-failure-and-applicability-labels" class="nav-link" data-scroll-target="#failure-and-applicability-labels">Failure and applicability labels</a></li>
+  <li><a href="#artifact-contract" id="toc-artifact-contract" class="nav-link" data-scroll-target="#artifact-contract">Artifact contract</a></li>
+  <li><a href="#results" id="toc-results" class="nav-link" data-scroll-target="#results">Results</a>
+  <ul class="collapse">
+  <li><a href="#demixing-results" id="toc-demixing-results" class="nav-link" data-scroll-target="#demixing-results">Demixing results</a></li>
+  <li><a href="#rotational-results" id="toc-rotational-results" class="nav-link" data-scroll-target="#rotational-results">Rotational results</a></li>
+  </ul></li>
+  <li><a href="#interpretation-limits" id="toc-interpretation-limits" class="nav-link" data-scroll-target="#interpretation-limits">Interpretation limits</a></li>
+  <li><a href="#reproducibility" id="toc-reproducibility" class="nav-link" data-scroll-target="#reproducibility">Reproducibility</a></li>
+  <li><a href="#review-record" id="toc-review-record" class="nav-link" data-scroll-target="#review-record">Review record</a></li>
+  <li><a href="#maturity-checklist" id="toc-maturity-checklist" class="nav-link" data-scroll-target="#maturity-checklist">Maturity checklist</a></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<div class="quarto-title-block"><div><h1 class="title">Demixing and Rotational Projection Robustness Benchmark</h1><button type="button" class="btn code-tools-button" id="quarto-code-tools-source"><i class="bi"></i> Code</button></div></div>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="demixing-and-rotational-projection-robustness-benchmark" class="level1">
+<h1>Demixing and Rotational Projection Robustness Benchmark</h1>
+<section id="scientific-question" class="level2">
+<h2 class="anchored" data-anchor-id="scientific-question">Scientific question</h2>
+<p>P4-U04 asks two separate synthetic questions.</p>
+<ol type="1">
+<li><strong>Label-dependent demixing:</strong> under known stimulus- and decision-dependent linear effects, when do condition means, PCA, marginal PCA, bounded dPCA and ridge decoding recover their own declared held-out targets, and how do those targets respond to collinearity, cell imbalance, label permutation, pseudo-populations, trial averaging and sample size?</li>
+<li><strong>Rotational projection:</strong> under known rotational and non-rotational trajectory families, when do PCA planes, unrestricted derivative regression, skew-constrained jPCA-like fitting, symmetric fitting, input-aware fitting and fixed/random/control planes recover held-out derivative, plane, angular-rate, tangential-motion or covariance-control targets?</li>
+</ol>
+<p>The two tasks have separate generators, scenario grids, methods, applicability rules, metrics, summaries and figure panels. No cross-task normalization, aggregate score, rank or winner is computed. Marginal reconstruction, label decoding, marginal-subspace recovery, rotational-plane recovery, angular-rate recovery and derivative prediction are also never combined into one score.</p>
+</section>
+<section id="ground-truth" class="level2">
+<h2 class="anchored" data-anchor-id="ground-truth">Ground truth</h2>
+<section id="demixing-task" class="level3">
+<h3 class="anchored" data-anchor-id="demixing-task">Demixing task</h3>
+<p>The demixing generator has eight observed features, 12 aligned time bins and a balanced binary stimulus <span class="math inline">\(s\in\{-1,1\}\)</span> and decision <span class="math inline">\(d\in\{-1,1\}\)</span> design in the reference scenario. A trial has clean signal</p>
+<p><span class="math display">\[
+y_{s,d}(t)
+= \mu(t)
++0.9\,s\,f_s(t)v_s
++0.75\,d\,f_d(t)v_d,
+\]</span></p>
+<p>plus independent Gaussian observation noise with standard deviation <span class="math inline">\(0.42\)</span>. The reference <span class="math inline">\(v_s\)</span> and <span class="math inline">\(v_d\)</span> are orthonormal. The near-collinear scenario replaces the second direction by a normalized perturbation of the first. There is no interaction effect in this bounded generator. Trial shifts, feature-wise trial reassignment and label permutations are scenario operations, not hidden changes to the reference target.</p>
+<p>The known targets are the stimulus and decision condition-mean marginalizations and their generating one-dimensional feature directions. Labels are observed supervision for fitting; clean signals and generating directions are unavailable to fitting and enter only scoring or verification.</p>
+</section>
+<section id="rotational-task" class="level3">
+<h3 class="anchored" data-anchor-id="rotational-task">Rotational task</h3>
+<p>The rotational generator has four latent coordinates, eight observed features, six conditions, 31 physical-time samples on <span class="math inline">\([0,1.2]\)</span>, and independent trials. The reference latent matrix contains a rate-four planar rotation and a second, slower damped rotational block. The primary plane/rate target is the first known observed-space plane and angular rate <span class="math inline">\(4\)</span>. Other scenarios replace the latent family with symmetric decay, latency sequences or input-driven trajectories, or alter the observation metric and preprocessing.</p>
+<p>The observation map is an eight-by-four orthonormal embedding in ordinary scenarios and a declared nonorthogonal embedding in the metric stress. Gaussian latent and observation perturbations are added independently. Known latent states, embedding and generating matrices are scoring/verification truth only. They are not supplied to fitted projections.</p>
+</section>
+</section>
+<section id="generation" class="level2">
+<h2 class="anchored" data-anchor-id="generation">Generation</h2>
+<p>Generation is task-specific and precedes all fitting.</p>
+<ul>
+<li><strong>Demixing:</strong> each scenario-replicate independently generates train, validation and test trials. Reference per-cell counts are 20/10/12, giving actual split totals 80/40/48. The small-sample per-cell counts 5/4/12 give totals 20/16/48; large-sample counts 45/18/18 give totals 180/72/72. The missing-cell training matrix is <code>[[20,20],[20,0]]</code>, for total 60 and design rank three; validation/test remain balanced with totals 40/48. The unbalanced training matrix is <code>[[40,5],[6,20]]</code>, for total 71 and design rank four; its validation/test totals are 40/48.</li>
+<li><strong>Rotation:</strong> each scenario-replicate independently generates 7/4/5 trials per condition for train/validation/test. Across six conditions, the actual totals are 42/24/30. Condition trajectories share the declared scenario family but receive independent perturbations.</li>
+</ul>
+<p>Demixing condition means are arithmetic means within each observed cell. The complete-design marginalization then gives the four cells equal weight rather than weighting them by trial count. Rotational preprocessing first averages trials within each condition; when subtraction is enabled, it subtracts the across-condition mean separately at each time point.</p>
+<p>The executable is benchmark-local. It records SHA-256 digests of the stable Phase 3 demixing and rotational-control executables as scientific-design provenance, but it does not claim to call or executable-reuse their numerical routines.</p>
+</section>
+<section id="scenario-grid" class="level2">
+<h2 class="anchored" data-anchor-id="scenario-grid">Scenario grid</h2>
+<section id="demixing-scenarios" class="level3">
+<h3 class="anchored" data-anchor-id="demixing-scenarios">Demixing scenarios</h3>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Scenario</th>
+<th>Declared manipulation</th>
+<th>Primary boundary</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>balanced_reference</code></td>
+<td>complete <span class="math inline">\(2\times2\)</span> design with orthogonal generating directions</td>
+<td>bounded reference</td>
+</tr>
+<tr class="even">
+<td><code>near_collinear</code></td>
+<td>decision direction nearly aligned with stimulus direction</td>
+<td>target overlap and unstable separation</td>
+</tr>
+<tr class="odd">
+<td><code>missing_cell</code></td>
+<td>training counts <code>[[20,20],[20,0]]</code>; factorial design rank three of four</td>
+<td>balanced marginal recovery is undefined</td>
+</tr>
+<tr class="even">
+<td><code>unbalanced_cells</code></td>
+<td>training counts <code>[[40,5],[6,20]]</code>, with complete rank-four support</td>
+<td>equal-cell marginalization versus unequal precision</td>
+</tr>
+<tr class="odd">
+<td><code>label_shuffle</code></td>
+<td>deterministic permutation of training labels before lawful fitting</td>
+<td>supervision-destruction control</td>
+</tr>
+<tr class="even">
+<td><code>pseudo_population</code></td>
+<td>within each split and condition cell, each feature’s complete trial trajectory is independently permuted</td>
+<td>cell means are preserved while simultaneous trial covariance changes</td>
+</tr>
+<tr class="odd">
+<td><code>averaging_mismatch</code></td>
+<td>independent trial-level shifts of <span class="math inline">\(-1,0,+1\)</span> bins with nearest-edge fill and no circular wrap</td>
+<td>aligned condition means blur trial structure</td>
+</tr>
+<tr class="even">
+<td><code>small_sample</code></td>
+<td>5/4 train/validation trials per cell</td>
+<td>estimation stress</td>
+</tr>
+<tr class="odd">
+<td><code>large_sample</code></td>
+<td>45/18/18 trials per cell</td>
+<td>higher-information comparison</td>
+</tr>
+</tbody>
+</table>
+<p>The grid is core-plus-stress, not a factorial isolation of individual causes. The missing-cell training design has rank three rather than the required rank four. The benchmark therefore reports the design-rank diagnostic and retains held-out decoder scores, but labels every otherwise applicable balanced marginal-reconstruction and marginal-subspace row <code>invalid</code> with reason <code>incomplete_factorial_design_rank_3_of_4</code>. It does not use grand-mean filling to claim identified balanced marginal recovery.</p>
+</section>
+<section id="rotational-scenarios" class="level3">
+<h3 class="anchored" data-anchor-id="rotational-scenarios">Rotational scenarios</h3>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Scenario</th>
+<th>Declared manipulation</th>
+<th>Primary boundary</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>clean_rotation</code></td>
+<td>reference rotational generator and standard preprocessing</td>
+<td>bounded positive reference</td>
+</tr>
+<tr class="even">
+<td><code>symmetric_decay</code></td>
+<td>diagonal negative generator without a true rotational plane</td>
+<td>structure-specific negative control</td>
+</tr>
+<tr class="odd">
+<td><code>latency_sequence</code></td>
+<td>sequential transient bumps rather than an autonomous rotation</td>
+<td>latency-induced apparent sequence</td>
+</tr>
+<tr class="even">
+<td><code>common_input</code></td>
+<td>input-driven state equation with known two-dimensional input</td>
+<td>state-only versus input-aware prediction</td>
+</tr>
+<tr class="odd">
+<td><code>short_arcs</code></td>
+<td>first 12 time points only</td>
+<td>limited angular occupancy</td>
+</tr>
+<tr class="even">
+<td><code>time_jitter</code></td>
+<td>condition-dependent shifts <span class="math inline">\((-1,0,+1)\)</span> applied to latent path and input with nearest-edge fill, never wrapping</td>
+<td>alignment stress</td>
+</tr>
+<tr class="odd">
+<td><code>smoothed</code></td>
+<td>three-point moving average fitted/applied before projection</td>
+<td>preprocessing dependence</td>
+</tr>
+<tr class="even">
+<td><code>no_condition_subtraction</code></td>
+<td>omit across-condition time-mean subtraction</td>
+<td>subtraction dependence</td>
+</tr>
+<tr class="odd">
+<td><code>nonorthogonal_metric</code></td>
+<td>nonorthogonal observation map</td>
+<td>Euclidean metric dependence</td>
+</tr>
+<tr class="even">
+<td><code>covariance_control</code></td>
+<td>select among admissible training-only feature-wise cyclic condition-shift proposals by covariance cosine; uniform global shifts are excluded</td>
+<td>thresholded covariance-match control</td>
+</tr>
+</tbody>
+</table>
+<p>Plane and angular-rate truth are reported only for declared rotational scenarios and are omitted for decay, latency, input and covariance-control families where that target is not defined.</p>
+</section>
+</section>
+<section id="negative-controls-and-stress-cases" class="level2">
+<h2 class="anchored" data-anchor-id="negative-controls-and-stress-cases">Negative controls and stress cases</h2>
+<p>Demixing controls include permuted labels, incomplete and unequal cells, within-cell pseudo-population reassignment and non-wrapping trial-alignment mismatch. The shuffled-dPCA control independently permutes both training and validation labels, reselects its own dPCA ridge parameter on the shuffled validation target, and then refits. Each shuffled decoder likewise independently reselects its own ridge parameter from shuffled training/validation labels. Thus shuffled controls do not inherit the lawful method’s selected parameter. A label permutation is expected to change supervised fitted states; it is not another independent replicate.</p>
+<p>The pseudo-population operation permutes each feature’s complete trajectory only among trials in the same split and condition cell. Labels and cell means are preserved to numerical precision across all replicates (maximum discrepancy <span class="math inline">\(3.33\times10^{-16}\)</span>). Across the three replicates, the off-diagonal trial-noise covariance change ranges from 0.0523–0.0644 in train, 0.0685–0.0766 in validation and 0.0690–0.0772 in test. It therefore isolates loss of simultaneous within-cell trial covariance rather than destroying condition means.</p>
+<p>Rotational controls include symmetric dynamics, latency sequences, common input, short arcs, non-wrapping timing jitter, smoothing and subtraction alternatives, nonorthogonal metric distortion, a deterministic seed-derived random plane and a selected covariance control. The latter attempts 24 predeclared seed-derived proposals, each applying a cyclic condition shift separately to every PCA coordinate. A proposal is admissible only when at least two coordinate shifts are distinct and it materially changes cross-coordinate condition correspondence; a uniform all-coordinate shift is excluded as a global relabeling/no-op. Selection maximizes training covariance cosine similarity among admissible proposals only, with match threshold 0.97. Replicates 0/1/2 have 23/24/24 admissible proposals and select proposals 0/19/4 with similarities 0.999995, 0.999990 and 0.999985. All selected controls use multiple distinct shifts, materially alter cross-coordinate correspondence, and are labelled <code>matched</code>. Selection and matching occur on training scores; the control does not preserve condition pairing or establish dynamics.</p>
+<p>No stress case is discarded because it weakens the preferred method, and no post-hoc scenario-specific parameter search is performed.</p>
+</section>
+<section id="replicates-and-deterministic-seeds" class="level2">
+<h2 class="anchored" data-anchor-id="replicates-and-deterministic-seeds">Replicates and deterministic seeds</h2>
+<p>Each of the 19 scenarios has three independent replicates. PCG64 seeds are deterministically derived from master seed <code>20260820</code>, task, stable scenario hash, replicate, stage, split and, where needed, trial/control index. Methods within a replicate share the same generated data for paired comparison.</p>
+<p>The q10, median and q90 summaries therefore use three replicate-level values. They are descriptive finite-sample summaries, not confidence intervals or stable tail estimates. Trials, conditions, cells and time points are not promoted to independent replicates.</p>
+</section>
+<section id="split-discipline" class="level2">
+<h2 class="anchored" data-anchor-id="split-discipline">Split discipline</h2>
+<p>Generation, fitting/selection, frozen recovery and scoring are separate stages.</p>
+<ul>
+<li>Demixing fitting accepts only train/validation observations and labels. dPCA regularization and ridge-decoder regularization are selected without test data. Frozen recovery accepts fitted states and test observations/labels; truth is joined only in scoring.</li>
+<li>Rotational preprocessing, PCA and derivative models are fitted from training observations and known training inputs where declared. Frozen recovery accepts fitted states, test observations and test inputs. Test latent states and the true embedding remain scoring-only.</li>
+<li>Excluded test observations and truth cannot enter fitting by function signature. Poison diagnostics report zero fitted-state discrepancy for test exclusion and zero fixed-observation recovery discrepancy for truth poison.</li>
+<li>Complete trials remain within one split. Adjacent time bins are never split across train and test.</li>
+</ul>
+<p>The label- and condition-permutation controls are explicit alternate fitting paths, not leakage into the lawful path.</p>
+</section>
+<section id="methods-and-information-sets" class="level2">
+<h2 class="anchored" data-anchor-id="methods-and-information-sets">Methods and information sets</h2>
+<section id="demixing-methods" class="level3">
+<h3 class="anchored" data-anchor-id="demixing-methods">Demixing methods</h3>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Method</th>
+<th>Role</th>
+<th>Parameter source</th>
+<th>Recorded information set</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>condition_mean</code></td>
+<td>training condition-mean marginal reference</td>
+<td>train labels</td>
+<td>supervised train</td>
+</tr>
+<tr class="even">
+<td><code>pca</code></td>
+<td>rank-two global PCA projection of each marginal target</td>
+<td>train fit</td>
+<td>supervised train</td>
+</tr>
+<tr class="odd">
+<td><code>marginal_pca</code></td>
+<td>rank-one PCA fitted separately to each training marginal</td>
+<td>train labels</td>
+<td>supervised train</td>
+</tr>
+<tr class="even">
+<td><code>selected_dpca</code></td>
+<td>ridge reduced-rank marginal map</td>
+<td>train plus validation</td>
+<td>supervised train, with <code>parameter_source=train_validation</code></td>
+</tr>
+<tr class="odd">
+<td><code>ridge_decoder</code></td>
+<td>separate stimulus and decision trial classifier</td>
+<td>train plus validation</td>
+<td>supervised train/validation</td>
+</tr>
+<tr class="even">
+<td><code>shuffled_dpca_control</code></td>
+<td>marginal map with independently selected ridge after deterministic train/validation-label permutations</td>
+<td>permuted train/validation labels</td>
+<td>permuted train/validation control</td>
+</tr>
+<tr class="odd">
+<td><code>shuffled_decoder_control</code></td>
+<td>decoder with independently selected ridge after deterministic train/validation-label permutations</td>
+<td>permuted train/validation labels</td>
+<td>permuted train/validation control</td>
+</tr>
+<tr class="even">
+<td><code>factorial_design_diagnostic</code></td>
+<td>rank of the training design <span class="math inline">\([1,s,d,sd]\)</span></td>
+<td>train labels</td>
+<td>design diagnostic</td>
+</tr>
+</tbody>
+</table>
+<p>Reconstruction/subspace methods are not assigned decoding scores. Decoders are not assigned marginal-reconstruction or marginal-subspace scores.</p>
+</section>
+<section id="rotational-methods" class="level3">
+<h3 class="anchored" data-anchor-id="rotational-methods">Rotational methods</h3>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Method</th>
+<th>Role</th>
+<th>Parameter source</th>
+<th>Information set</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>pca_plane</code></td>
+<td>first two coordinates of the training PCA representation</td>
+<td>train fit</td>
+<td>train-fitted projection</td>
+</tr>
+<tr class="even">
+<td><code>unrestricted_fit</code></td>
+<td>unrestricted linear derivative regression; plane extracted from its skew part</td>
+<td>train fit</td>
+<td>train-fitted projection</td>
+</tr>
+<tr class="odd">
+<td><code>skew_fit</code></td>
+<td>skew-constrained derivative regression</td>
+<td>train fit</td>
+<td>train-fitted projection</td>
+</tr>
+<tr class="even">
+<td><code>symmetric_fit</code></td>
+<td>symmetric derivative regression control</td>
+<td>train fit</td>
+<td>train-fitted projection</td>
+</tr>
+<tr class="odd">
+<td><code>input_aware_fit</code></td>
+<td>derivative regression on state and known input</td>
+<td>train fit plus known input</td>
+<td>train-fitted projection</td>
+</tr>
+<tr class="even">
+<td><code>fixed_plane</code></td>
+<td>predeclared PCA-coordinate axes 0 and 2</td>
+<td>predeclared</td>
+<td>fixed reference</td>
+</tr>
+<tr class="odd">
+<td><code>random_plane</code></td>
+<td>deterministic seed-derived rank-two plane</td>
+<td>deterministic seed</td>
+<td>train-fitted projection</td>
+</tr>
+<tr class="even">
+<td><code>covariance_shuffle_control</code></td>
+<td>plane/control from the highest-similarity admissible training-only condition-shift proposal; uniform global shifts excluded</td>
+<td>selected permuted conditions</td>
+<td>selected permutation control</td>
+</tr>
+</tbody>
+</table>
+<p>The unrestricted, skew, symmetric and input-aware models share the same training PCA coordinate system. Their derivative predictions are evaluated on held-out central finite differences. <code>pca_plane</code> is coordinates <code>[0,1]</code>, whereas <code>fixed_plane</code> is the deliberately distinct coordinates <code>[0,2]</code>; they are not aliases. The verifier’s maximum projector difference is 1.0, and their clean plane-angle medians are 0.5389° and 89.6500°, respectively. A retrospective condition-mean projection is not an online state estimator, and no online claim is made.</p>
+</section>
+</section>
+<section id="parameter-selection" class="level2">
+<h2 class="anchored" data-anchor-id="parameter-selection">Parameter selection</h2>
+<p>For <code>selected_dpca</code>, the ridge grid is</p>
+<p><span class="math display">\[
+\lambda\in\{10^{-4},10^{-2},10^{-1},1\}.
+\]</span></p>
+<p>Each candidate is fitted on training condition means and scored by the sum of validation stimulus- and decision-marginal mean-squared errors; ties use the smaller ordered <span class="math inline">\(\lambda\)</span>. Each ridge decoder uses the same grid with validation classification error and the same deterministic tie rule. The lawful and shuffled dPCA/decoder paths each perform their own selection on their own labels before their states are frozen. In the reference replicate used by the verifier, lawful/shuffled dPCA both select 1.0; lawful stimulus/decision decoders select <span class="math inline">\(10^{-4}/10^{-4}\)</span>, while shuffled decoders select <span class="math inline">\(10^{-4}/1.0\)</span>. These values are diagnostics for that replicate, not universal hyperparameters.</p>
+<p>Rotational methods have no fitted hyperparameter search in this bounded implementation. Window, smoothing, subtraction, fixed/random planes and condition permutation are predeclared scenario or method choices, not selected from test performance.</p>
+</section>
+<section id="inference" class="level2">
+<h2 class="anchored" data-anchor-id="inference">Inference</h2>
+<p>Demixing recovery rebuilds held-out condition means and marginalizations from complete test trials. Training condition means, global/marginal PCA projectors, selected dPCA maps and shuffled-control maps are then applied according to their fixed roles. Trial decoders use three predeclared temporal averages per feature. The clean trial signal and generating directions are never inputs to recovery.</p>
+<p>Rotational recovery applies training-fitted smoothing/subtraction statistics, feature mean and rank-four PCA basis to held-out condition means. Central finite differences define held-out derivative targets. Fitted derivative maps predict in the frozen PCA coordinate system. Plane methods project those same held-out scores. The input-aware model alone receives the declared held-out input sequence.</p>
+</section>
+<section id="scoring" class="level2">
+<h2 class="anchored" data-anchor-id="scoring">Scoring</h2>
+<p>Every <code>results.csv</code> row has task, scenario, replicate, seed, metric-specific provenance/split/evaluation stage, method family, information set, parameter source, target, status/reason, per-cell count arrays and actual split totals. Where relevant it also records selected hyperparameter, design rank, covariance-control match status and proposal index. The artifact contains only the following metrics.</p>
+<section id="demixing-metrics" class="level3">
+<h3 class="anchored" data-anchor-id="demixing-metrics">Demixing metrics</h3>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Metric</th>
+<th>Target</th>
+<th>Definition</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>stimulus_marginal_nmse</code></td>
+<td>stimulus marginal reconstruction</td>
+<td>held-out marginal reconstruction MSE divided by held-out stimulus-marginal mean square</td>
+</tr>
+<tr class="even">
+<td><code>decision_marginal_nmse</code></td>
+<td>decision marginal reconstruction</td>
+<td>analogous held-out decision score</td>
+</tr>
+<tr class="odd">
+<td><code>stimulus_subspace_angle_degrees</code></td>
+<td>stimulus marginal subspace</td>
+<td>principal angle between the leading recovered stimulus-marginal direction and known <span class="math inline">\(v_s\)</span></td>
+</tr>
+<tr class="even">
+<td><code>decision_subspace_angle_degrees</code></td>
+<td>decision marginal subspace</td>
+<td>analogous angle to known <span class="math inline">\(v_d\)</span></td>
+</tr>
+<tr class="odd">
+<td><code>stimulus_decoding_accuracy</code></td>
+<td>stimulus label decoding</td>
+<td>held-out complete-trial accuracy</td>
+</tr>
+<tr class="even">
+<td><code>decision_decoding_accuracy</code></td>
+<td>decision label decoding</td>
+<td>held-out complete-trial accuracy</td>
+</tr>
+<tr class="odd">
+<td><code>factorial_design_rank</code></td>
+<td>factorial-design identification</td>
+<td>rank of the training design <span class="math inline">\([1,s,d,sd]\)</span>; it is a training diagnostic rather than a test score</td>
+</tr>
+</tbody>
+</table>
+<p>Marginal NMSE, subspace angle and decoding accuracy answer different questions. A decoder can predict a label without reconstructing its condition-mean marginal, and low marginal error does not establish single-trial decoding.</p>
+</section>
+<section id="rotational-metrics" class="level3">
+<h3 class="anchored" data-anchor-id="rotational-metrics">Rotational metrics</h3>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Metric</th>
+<th>Target</th>
+<th>Definition</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>plane_angle_degrees</code></td>
+<td>rotational plane</td>
+<td>observed-space principal angle to the first known rotational plane; only in applicable rotational scenarios</td>
+</tr>
+<tr class="even">
+<td><code>angular_rate_abs_error</code></td>
+<td>angular rate</td>
+<td>absolute error from the known first-plane rate <span class="math inline">\(4\)</span>; only in applicable rotational scenarios</td>
+</tr>
+<tr class="odd">
+<td><code>derivative_rmse</code></td>
+<td>held-out derivative prediction</td>
+<td>RMSE between predicted and central-difference held-out derivatives in training-PCA coordinates</td>
+</tr>
+<tr class="even">
+<td><code>tangential_velocity_ratio</code></td>
+<td>plane tangential motion</td>
+<td>norm of tangential projected velocity divided by total projected-velocity norm</td>
+</tr>
+<tr class="odd">
+<td><code>covariance_similarity</code></td>
+<td>condition covariance control</td>
+<td>Frobenius-cosine similarity of flattened score covariance before and after condition permutation</td>
+</tr>
+</tbody>
+</table>
+<p>Derivative RMSE, plane angle, angular-rate error and tangential ratio are not interchangeable evidence. In particular, tangential motion in a selected plane can occur for transients or input-driven sequences.</p>
+<p>Each metric is first aggregated across its declared held-out cells/trials, conditions or derivative pairs into one scenario-replicate-method value. <code>diagnostics.json</code> then reports q10, median, q90, applicability rate and failure rate across the three replicates for each task <span class="math inline">\(\times\)</span> scenario <span class="math inline">\(\times\)</span> method <span class="math inline">\(\times\)</span> metric group.</p>
+</section>
+</section>
+<section id="failure-and-applicability-labels" class="level2">
+<h2 class="anchored" data-anchor-id="failure-and-applicability-labels">Failure and applicability labels</h2>
+<p>The full Cartesian task-specific inventories are retained:</p>
+<ul>
+<li>demixing: <span class="math inline">\(9\times3\times8\times7=1{,}512\)</span> rows;</li>
+<li>rotation: <span class="math inline">\(10\times3\times8\times5=1{,}200\)</span> rows;</li>
+<li>total: 2,712 unique canonical rows.</li>
+</ul>
+<p>Applicability is resolved before numerical failure. Every row has one status:</p>
+<ul>
+<li><code>ok</code>: applicable and finite;</li>
+<li><code>nonconvergence</code>: linear-algebra failure in an applicable path;</li>
+<li><code>invalid</code>: malformed, missing or non-finite applicable score;</li>
+<li><code>inapplicable</code>: the method/scenario does not define the metric target.</li>
+</ul>
+<p>Natural execution produced 1,041 <code>ok</code>, 1,617 <code>inapplicable</code>, 54 <code>invalid</code> and zero <code>nonconvergence</code> rows. By task, demixing has 567 <code>ok</code>, 891 <code>inapplicable</code> and 54 <code>invalid</code>; rotation has 474 <code>ok</code> and 726 <code>inapplicable</code>. All 54 natural invalid rows are the three missing-cell replicates’ otherwise applicable balanced marginal reconstruction/subspace combinations; the design rank is three of four. Every non-<code>ok</code> row has a machine-readable reason and no value. The absence of natural nonconvergence is not a robustness claim: real-path fault injection verifies both <code>invalid</code> and <code>nonconvergence</code>, while preserving <code>inapplicable</code> precedence.</p>
+<p>Examples of inapplicability are decoder methods on marginal reconstruction, reconstruction methods on decoding, symmetric/input-aware fits on plane or rate targets, and plane/rate truth in non-rotational scenarios.</p>
+</section>
+<section id="artifact-contract" class="level2">
+<h2 class="anchored" data-anchor-id="artifact-contract">Artifact contract</h2>
+<p><code>benchmarks/artifacts/demixing-rotational-robustness/</code> contains exactly:</p>
+<pre class="text"><code>manifest.json
+results.csv
+diagnostics.json
+summary.png</code></pre>
+<p>The manifest freezes the two task inventories, three-replicate seed contract, stage/split/status vocabulary, canonical lexical row order, commands, runtime, Phase 3 provenance digests and artifact hashes. <code>results.csv</code> retains all raw replicate rows. <code>diagnostics.json</code> contains only task-specific summaries and verification diagnostics. <code>summary.png</code> uses four separate task/target panels and is a diagnostic view rather than acceptance evidence or a leaderboard.</p>
+</section>
+<section id="results" class="level2">
+<h2 class="anchored" data-anchor-id="results">Results</h2>
+<p>The following values are q10/median/q90 across three replicates, recomputed from the authoritative <code>diagnostics.json</code>. They are scenario- and target-conditional.</p>
+<section id="demixing-results" class="level3">
+<h3 class="anchored" data-anchor-id="demixing-results">Demixing results</h3>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 16%">
+<col style="width: 16%">
+<col style="width: 22%">
+<col style="width: 22%">
+<col style="width: 22%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Scenario and target</th>
+<th>Method</th>
+<th style="text-align: right;">q10</th>
+<th style="text-align: right;">Median</th>
+<th style="text-align: right;">q90</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Reference stimulus marginal NMSE</td>
+<td>condition mean</td>
+<td style="text-align: right;">0.1808</td>
+<td style="text-align: right;">0.1995</td>
+<td style="text-align: right;">0.2691</td>
+</tr>
+<tr class="even">
+<td>Reference stimulus marginal NMSE</td>
+<td>PCA</td>
+<td style="text-align: right;">0.1187</td>
+<td style="text-align: right;">0.1251</td>
+<td style="text-align: right;">0.1362</td>
+</tr>
+<tr class="odd">
+<td>Reference stimulus marginal NMSE</td>
+<td>marginal PCA</td>
+<td style="text-align: right;">0.1278</td>
+<td style="text-align: right;">0.1368</td>
+<td style="text-align: right;">0.1496</td>
+</tr>
+<tr class="even">
+<td>Reference stimulus marginal NMSE</td>
+<td>selected dPCA</td>
+<td style="text-align: right;">0.1787</td>
+<td style="text-align: right;">0.1789</td>
+<td style="text-align: right;">0.1934</td>
+</tr>
+<tr class="odd">
+<td>Reference stimulus marginal NMSE</td>
+<td>independently selected shuffled-dPCA control</td>
+<td style="text-align: right;">0.7650</td>
+<td style="text-align: right;">0.8885</td>
+<td style="text-align: right;">1.0291</td>
+</tr>
+<tr class="even">
+<td>Reference decision marginal NMSE</td>
+<td>selected dPCA</td>
+<td style="text-align: right;">0.0925</td>
+<td style="text-align: right;">0.1045</td>
+<td style="text-align: right;">0.1302</td>
+</tr>
+<tr class="odd">
+<td>Reference stimulus subspace angle</td>
+<td>selected dPCA</td>
+<td style="text-align: right;">5.0274°</td>
+<td style="text-align: right;">5.2335°</td>
+<td style="text-align: right;">7.9515°</td>
+</tr>
+<tr class="even">
+<td>Reference decision subspace angle</td>
+<td>selected dPCA</td>
+<td style="text-align: right;">1.5773°</td>
+<td style="text-align: right;">1.7486°</td>
+<td style="text-align: right;">1.8960°</td>
+</tr>
+<tr class="odd">
+<td>Reference stimulus decoding</td>
+<td>ridge decoder</td>
+<td style="text-align: right;">1.0000</td>
+<td style="text-align: right;">1.0000</td>
+<td style="text-align: right;">1.0000</td>
+</tr>
+<tr class="even">
+<td>Reference stimulus decoding</td>
+<td>independently selected shuffled-decoder control</td>
+<td style="text-align: right;">0.4625</td>
+<td style="text-align: right;">0.4792</td>
+<td style="text-align: right;">0.5792</td>
+</tr>
+</tbody>
+</table>
+<p>These rows do not define one method order: PCA’s reference marginal NMSE, dPCA’s supervised marginal map and the decoder’s label accuracy are different targets. Under the <code>label_shuffle</code> scenario, selected-dPCA stimulus marginal NMSE has median 0.9821. The complete but unbalanced design has median 0.1739. The missing-cell design reports rank 3. Its 54 balanced marginal reconstruction and subspace rows are <code>invalid</code>, so no missing-cell marginal-recovery median is reported; its held-out decoder rows remain valid.</p>
+<p>The within-cell pseudo-population preserves condition means but changes simultaneous covariance. Consequently, its selected-dPCA stimulus marginal NMSE remains finite with median 0.1917 and its stimulus decoder median remains 1.0000; those values do not show preservation of joint trial-level population information. The non-wrapping averaging-mismatch median is 0.1819. Small- and large-sample selected-dPCA stimulus NMSE medians are 0.2230 and 0.1679. These are bounded stress observations, not isolated causal effects.</p>
+</section>
+<section id="rotational-results" class="level3">
+<h3 class="anchored" data-anchor-id="rotational-results">Rotational results</h3>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 16%">
+<col style="width: 16%">
+<col style="width: 22%">
+<col style="width: 22%">
+<col style="width: 22%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Scenario and target</th>
+<th>Method</th>
+<th style="text-align: right;">q10</th>
+<th style="text-align: right;">Median</th>
+<th style="text-align: right;">q90</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Clean derivative RMSE</td>
+<td>unrestricted fit</td>
+<td style="text-align: right;">0.6680</td>
+<td style="text-align: right;">0.6844</td>
+<td style="text-align: right;">0.6926</td>
+</tr>
+<tr class="even">
+<td>Clean derivative RMSE</td>
+<td>skew fit</td>
+<td style="text-align: right;">0.6726</td>
+<td style="text-align: right;">0.6872</td>
+<td style="text-align: right;">0.6948</td>
+</tr>
+<tr class="odd">
+<td>Clean derivative RMSE</td>
+<td>symmetric fit</td>
+<td style="text-align: right;">2.5650</td>
+<td style="text-align: right;">2.5741</td>
+<td style="text-align: right;">2.5858</td>
+</tr>
+<tr class="even">
+<td>Clean derivative RMSE</td>
+<td>input-aware fit</td>
+<td style="text-align: right;">0.6680</td>
+<td style="text-align: right;">0.6844</td>
+<td style="text-align: right;">0.6926</td>
+</tr>
+<tr class="odd">
+<td>Clean plane angle</td>
+<td>PCA plane <code>[0,1]</code></td>
+<td style="text-align: right;">0.4619°</td>
+<td style="text-align: right;">0.5389°</td>
+<td style="text-align: right;">0.6176°</td>
+</tr>
+<tr class="even">
+<td>Clean plane angle</td>
+<td>fixed plane <code>[0,2]</code></td>
+<td style="text-align: right;">89.5811°</td>
+<td style="text-align: right;">89.6500°</td>
+<td style="text-align: right;">89.9175°</td>
+</tr>
+<tr class="odd">
+<td>Clean plane angle</td>
+<td>skew fit</td>
+<td style="text-align: right;">0.3565°</td>
+<td style="text-align: right;">0.4838°</td>
+<td style="text-align: right;">0.7605°</td>
+</tr>
+<tr class="even">
+<td>Clean plane angle</td>
+<td>random plane</td>
+<td style="text-align: right;">57.1430°</td>
+<td style="text-align: right;">72.6218°</td>
+<td style="text-align: right;">82.8646°</td>
+</tr>
+<tr class="odd">
+<td>Clean angular-rate error</td>
+<td>skew fit</td>
+<td style="text-align: right;">0.0082</td>
+<td style="text-align: right;">0.0083</td>
+<td style="text-align: right;">0.0309</td>
+</tr>
+<tr class="even">
+<td>Clean tangential ratio</td>
+<td>skew fit</td>
+<td style="text-align: right;">0.9556</td>
+<td style="text-align: right;">0.9647</td>
+<td style="text-align: right;">0.9677</td>
+</tr>
+<tr class="odd">
+<td>Symmetric-decay derivative RMSE</td>
+<td>symmetric fit</td>
+<td style="text-align: right;">0.6519</td>
+<td style="text-align: right;">0.6738</td>
+<td style="text-align: right;">0.6863</td>
+</tr>
+<tr class="even">
+<td>Common-input derivative RMSE</td>
+<td>input-aware fit</td>
+<td style="text-align: right;">0.6861</td>
+<td style="text-align: right;">0.6866</td>
+<td style="text-align: right;">0.6933</td>
+</tr>
+<tr class="odd">
+<td>Covariance-control similarity</td>
+<td>selected admissible covariance control</td>
+<td style="text-align: right;">0.999986</td>
+<td style="text-align: right;">0.999990</td>
+<td style="text-align: right;">0.999994</td>
+</tr>
+</tbody>
+</table>
+<p>The matching state-only common-input derivative-RMSE median is 0.7001, a small scenario-specific difference rather than proof of autonomous or input-driven mechanism. Short-arc and non-wrapping jittered skew-plane median angles are 1.0015° and 0.8561°. Smoothing lowers the skew derivative-RMSE median to 0.3413, showing preprocessing dependence rather than improved mechanistic truth. Under the nonorthogonal observation metric, skew-plane median angle is 12.2467° and skew derivative RMSE is 5.3649.</p>
+<p>For the covariance control, replicate 0 excludes proposal 17 because its shifts <code>[3,3,3,3]</code> are one global common relabeling; replicates 1 and 2 contain no uniform proposal. The selected admissible proposals in replicates 0/1/2 are 0/19/4, with shifts <code>[5,5,3,3]</code>, <code>[3,3,5,5]</code> and <code>[1,4,2,2]</code>. Their covariance similarities are 0.999995, 0.999990 and 0.999985; all exceed the predeclared 0.97 threshold and therefore have machine-readable status <code>matched</code>. The selected cross-coordinate correspondence-change fractions are 2/3, 2/3 and 5/6, and selected score arrays change by nonzero amounts. These are selected near-matches from the admissible training proposal family, not preservation of condition identity or evidence for a rotational mechanism.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="artifacts/demixing-rotational-robustness/summary.png" class="img-fluid figure-img"></p>
+<figcaption>Separate demixing and rotational task summaries</figcaption>
+</figure>
+</div>
+<p>The upper panels show only reference stimulus marginal NMSE and reference stimulus decoding. The lower panels show only clean held-out derivative RMSE and clean rotational-plane angle. <code>pca_plane</code> and <code>fixed_plane</code> are visibly and numerically distinct. No panel mixes the two tasks or treats one target as a proxy for another.</p>
+</section>
+</section>
+<section id="interpretation-limits" class="level2">
+<h2 class="anchored" data-anchor-id="interpretation-limits">Interpretation limits</h2>
+<p>This object establishes only behavior under the declared generators, splits, scenario grids, targets, metrics and fitted information sets.</p>
+<ul>
+<li><strong>Demixing is label- and loss-dependent.</strong> It does not establish statistical independence, blind-source separation, unique latent causes, neural modules, anatomy, mechanism or causality.</li>
+<li>Decoding accuracy is not representation, marginal reconstruction or demixing. A shuffled-label control is a supervision control, not a causal intervention on the data-generating system.</li>
+<li>Missing/unbalanced cells and pseudo-populations change the estimand and available joint information. Finite output does not restore unidentified factorial effects or simultaneous noise structure.</li>
+<li>Trial averaging and aligned smooth condition means can hide trial-level variability. They are not evidence for latent dynamics.</li>
+<li><strong>A rotational projection is not an oscillator, autonomous dynamical system, vector field or mechanism.</strong> Skew-constrained derivative fit describes a projection under declared preprocessing and metric.</li>
+<li>A good plane angle does not imply good derivative prediction; high tangential ratio does not imply a true rotational generator; good derivative prediction does not imply autonomy or causality.</li>
+<li>Latency sequences, common input, smoothing, subtraction, short windows, timing jitter and nonorthogonal coordinates can create, remove or distort rotational summaries.</li>
+<li>No result establishes manifold structure, intrinsic dimension, biological validity, real-data transfer or universal method superiority.</li>
+</ul>
+</section>
+<section id="reproducibility" class="level2">
+<h2 class="anchored" data-anchor-id="reproducibility">Reproducibility</h2>
+<p>Use the recorded bundled runtime:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">/Users/bytedance/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3</span> benchmarks/demixing-rotational-robustness.py <span class="at">--generate</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="ex">/Users/bytedance/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3</span> benchmarks/demixing-rotational-robustness.py <span class="at">--verify</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="ex">/Users/bytedance/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3</span> benchmarks/demixing-rotational-robustness.py <span class="at">--generate</span> <span class="at">--resume</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>The verifier checks:</p>
+<ul>
+<li>exact four-artifact inventory and SHA-256 hashes;</li>
+<li>all 2,712 complete, unique, canonical raw rows and all 904 recomputed summaries;</li>
+<li>byte-identical clean regeneration and reversed task/scenario traversal;</li>
+<li>byte-identical valid partial resume and rejection of corrupted, duplicate, unknown-key or incomplete resume rows;</li>
+<li>capability exclusion of test/truth from fitting;</li>
+<li>fixed-recovery invariance under truth poison;</li>
+<li>deterministic replay and independent hyperparameter selection for shuffled dPCA/decoder controls;</li>
+<li>missing-cell rank/invalid routing, within-cell pseudo-population preservation, non-wrapping shift replay and covariance-proposal argmax/threshold checks;</li>
+<li>direct demixing-direction, rotation-embedding, generator and analytic-derivative diagnostics; and</li>
+<li>real-path non-finite and linear-algebra fault labels with applicability precedence.</li>
+</ul>
+<p>The maximum clean-generator diagnostics are a stimulus/decision direction inner product of approximately <span class="math inline">\(2.08\times10^{-17}\)</span>, an actual embedding-plane angle of approximately <span class="math inline">\(1.21\times10^{-6}\)</span> degrees, a direct generator-recovery error of approximately <span class="math inline">\(2.35\times10^{-15}\)</span>, and a central-finite-difference versus analytic derivative discrepancy of approximately <span class="math inline">\(2.04\times10^{-2}\)</span>. The last value is a finite-grid discretization diagnostic, not a performance score.</p>
+</section>
+<section id="review-record" class="level2">
+<h2 class="anchored" data-anchor-id="review-record">Review record</h2>
+<p>Independent scientific and implementation reviewers were read-only and independent of the executors. Their initial reviews returned <code>REVISE</code> on missing-cell design-rank invalidity, within-cell pseudo-populations, independent shuffled-control selection, non-wrapping shifts, split metadata, distinct plane references, and nontrivial covariance-matched proposals. The bounded correction pass addressed only those findings; focused scientific and implementation re-reviews both returned <code>PASS</code> with no unresolved finding.</p>
+<p>The accepted validation record includes 61-object structural validation, 33 repository tests, the enhanced artifact verifier, target/index renders, workflow validation, and <code>git diff --check</code>. The recorded review decision then authorized the mechanical promotion to <code>L1/stable</code>. Stable status records bounded acceptance of this declared synthetic Benchmark Object; it does not expand its evidence, information-set, target, or interpretation boundaries.</p>
+</section>
+<section id="maturity-checklist" class="level2">
+<h2 class="anchored" data-anchor-id="maturity-checklist">Maturity checklist</h2>
+<ul class="task-list">
+<li><label><input type="checkbox" checked="">Demixing and rotational projection are separate tasks with separate grids, methods, targets, metrics, summaries and panels.</label></li>
+<li><label><input type="checkbox" checked="">All 19 scenarios and three independent replicates are declared.</label></li>
+<li><label><input type="checkbox" checked="">Generation, fitting/selection, frozen recovery and scoring boundaries are explicit.</label></li>
+<li><label><input type="checkbox" checked="">Label and condition permutations are explicit negative-control paths.</label></li>
+<li><label><input type="checkbox" checked="">Marginal reconstruction, decoding, subspace, plane, rate, derivative, tangential and covariance targets remain distinct.</label></li>
+<li><label><input type="checkbox" checked="">Applicability precedes failure, and raw replicate rows are retained.</label></li>
+<li><label><input type="checkbox" checked="">Exactly four byte-verifiable artifacts and authoritative commands are recorded.</label></li>
+<li><label><input type="checkbox" checked="">Bounded results and interpretation limits are reconciled to the artifacts.</label></li>
+<li><label><input type="checkbox" checked="">Final focused scientific re-review PASS is recorded.</label></li>
+<li><label><input type="checkbox" checked="">Final focused implementation re-review PASS is recorded.</label></li>
+<li><label><input type="checkbox" checked="">review-authorized mechanical promotion to <code>L1/stable</code> is complete.</label></li>
+</ul>
+
+
+<!-- -->
+
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+    const viewSource = window.document.getElementById('quarto-view-source') ||
+                       window.document.getElementById('quarto-code-tools-source');
+    if (viewSource) {
+      const sourceUrl = viewSource.getAttribute("data-quarto-source-url");
+      viewSource.addEventListener("click", function(e) {
+        if (sourceUrl) {
+          // rstudio viewer pane
+          if (/\bcapabilities=\b/.test(window.location)) {
+            window.open(sourceUrl);
+          } else {
+            window.location.href = sourceUrl;
+          }
+        } else {
+          const modal = new bootstrap.Modal(document.getElementById('quarto-embedded-source-code-modal'));
+          modal.show();
+        }
+        return false;
+      });
+    }
+    function toggleCodeHandler(show) {
+      return function(e) {
+        const cellDetails = window.document.querySelectorAll(".cell details.code-fold");
+        for (let i=0; i<cellDetails.length; i++) {
+          const details = cellDetails[i];
+          if (show) {
+            details.open = true;
+          } else {
+            details.removeAttribute("open");
+          }
+        }
+        const cellCodeDivs = window.document.querySelectorAll(".cell div.sourceCode.cell-code");
+        const fromCls = show ? "hidden" : "unhidden";
+        const toCls = show ? "unhidden" : "hidden";
+        for (let i=0; i<cellCodeDivs.length; i++) {
+          const codeDiv = cellCodeDivs[i];
+          if (codeDiv.classList.contains(fromCls)) {
+            codeDiv.classList.remove(fromCls);
+            codeDiv.classList.add(toCls);
+          } 
+        }
+        return false;
+      }
+    }
+    const hideAllCode = window.document.getElementById("quarto-hide-all-code");
+    if (hideAllCode) {
+      hideAllCode.addEventListener("click", toggleCodeHandler(false));
+    }
+    const showAllCode = window.document.getElementById("quarto-show-all-code");
+    if (showAllCode) {
+      showAllCode.addEventListener("click", toggleCodeHandler(true));
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/abelzheng\.github\.io\/latent-dynamics-geometry-public\/");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+            // target, if specified
+            link.setAttribute("target", "_blank");
+            if (link.getAttribute("rel") === null) {
+              link.setAttribute("rel", "noopener");
+            }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<input type="hidden" id="giscus-base-theme" value="preferred_color_scheme">
+<input type="hidden" id="giscus-alt-theme" value="preferred_color_scheme">
+<script>
+  function loadGiscus() {
+    // Function to get the theme based on body class
+    const getTheme = () => {
+      let baseTheme = document.getElementById('giscus-base-theme').value;
+      let altTheme = document.getElementById('giscus-alt-theme').value;
+      return document.body.classList.contains('quarto-dark') ? altTheme : baseTheme;
+    };
+    const script = document.createElement("script");
+    script.src = "https://giscus.app/client.js";
+    script.async = true;
+    script.dataset.repo = "AbelZheng/latent-dynamics-geometry-public";
+    script.dataset.repoId = "R_kgDOT-VBkw";
+    script.dataset.category = "Announcements";
+    script.dataset.categoryId = "DIC_kwDOT-VBk84DDyEz";
+    script.dataset.mapping = "pathname";
+    script.dataset.reactionsEnabled = "1";
+    script.dataset.emitMetadata = "0";
+    script.dataset.inputPosition = "bottom";
+    script.dataset.theme = getTheme();
+    script.dataset.lang = "en";
+    script.crossOrigin = "anonymous";
+    // Append the script to the desired div instead of at the end of the body
+    document.getElementById("quarto-content").appendChild(script);
+  }
+  loadGiscus();
+</script><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">Source Code</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3" data-shortcodes="false"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="an">title:</span><span class="co"> "Demixing and Rotational Projection Robustness Benchmark"</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="an">object_type:</span><span class="co"> benchmark</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="an">maturity:</span><span class="co"> L1</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="an">status:</span><span class="co"> stable</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="an">domain:</span><span class="co"> [dimensionality-reduction, supervised-learning, dynamical-systems, neuroscience]</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="an">tags:</span><span class="co"> [benchmark, dpca, jpca, demixing, rotation, negative-controls]</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="an">prerequisites:</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="co">- knowledge/methods/demixed-principal-component-analysis.qmd</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="co">- knowledge/methods/jpca.qmd</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a><span class="co">- toy-models/label-dependent-demixing.qmd</span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a><span class="co">- toy-models/rotational-projection-controls.qmd</span></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a><span class="an">related:</span></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a><span class="co">- knowledge/methods/principal-component-analysis.qmd</span></span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a><span class="co">- knowledge/concepts/identifiability.qmd</span></span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a><span class="co">- knowledge/concepts/latent-trajectory.qmd</span></span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a><span class="an">created:</span><span class="co"> 2026-08-20</span></span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a><span class="an">updated:</span><span class="co"> 2026-08-20</span></span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a><span class="fu"># Demixing and Rotational Projection Robustness Benchmark</span></span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a><span class="fu">## Scientific question</span></span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a>P4-U04 asks two separate synthetic questions.</span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>**Label-dependent demixing:** under known stimulus- and decision-dependent</span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a>   linear effects, when do condition means, PCA, marginal PCA, bounded dPCA and</span>
+<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a>   ridge decoding recover their own declared held-out targets, and how do those</span>
+<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a>   targets respond to collinearity, cell imbalance, label permutation,</span>
+<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a>   pseudo-populations, trial averaging and sample size?</span>
+<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>**Rotational projection:** under known rotational and non-rotational</span>
+<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a>   trajectory families, when do PCA planes, unrestricted derivative regression,</span>
+<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a>   skew-constrained jPCA-like fitting, symmetric fitting, input-aware fitting and</span>
+<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a>   fixed/random/control planes recover held-out derivative, plane, angular-rate,</span>
+<span id="cb3-36"><a href="#cb3-36" aria-hidden="true" tabindex="-1"></a>   tangential-motion or covariance-control targets?</span>
+<span id="cb3-37"><a href="#cb3-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-38"><a href="#cb3-38" aria-hidden="true" tabindex="-1"></a>The two tasks have separate generators, scenario grids, methods, applicability</span>
+<span id="cb3-39"><a href="#cb3-39" aria-hidden="true" tabindex="-1"></a>rules, metrics, summaries and figure panels. No cross-task normalization,</span>
+<span id="cb3-40"><a href="#cb3-40" aria-hidden="true" tabindex="-1"></a>aggregate score, rank or winner is computed. Marginal reconstruction, label</span>
+<span id="cb3-41"><a href="#cb3-41" aria-hidden="true" tabindex="-1"></a>decoding, marginal-subspace recovery, rotational-plane recovery, angular-rate</span>
+<span id="cb3-42"><a href="#cb3-42" aria-hidden="true" tabindex="-1"></a>recovery and derivative prediction are also never combined into one score.</span>
+<span id="cb3-43"><a href="#cb3-43" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-44"><a href="#cb3-44" aria-hidden="true" tabindex="-1"></a><span class="fu">## Ground truth</span></span>
+<span id="cb3-45"><a href="#cb3-45" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-46"><a href="#cb3-46" aria-hidden="true" tabindex="-1"></a><span class="fu">### Demixing task</span></span>
+<span id="cb3-47"><a href="#cb3-47" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-48"><a href="#cb3-48" aria-hidden="true" tabindex="-1"></a>The demixing generator has eight observed features, 12 aligned time bins and a</span>
+<span id="cb3-49"><a href="#cb3-49" aria-hidden="true" tabindex="-1"></a>balanced binary stimulus $s\in<span class="sc">\{</span>-1,1<span class="sc">\}</span>$ and decision $d\in<span class="sc">\{</span>-1,1<span class="sc">\}</span>$ design in</span>
+<span id="cb3-50"><a href="#cb3-50" aria-hidden="true" tabindex="-1"></a>the reference scenario. A trial has clean signal</span>
+<span id="cb3-51"><a href="#cb3-51" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-52"><a href="#cb3-52" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb3-53"><a href="#cb3-53" aria-hidden="true" tabindex="-1"></a>y_{s,d}(t)</span>
+<span id="cb3-54"><a href="#cb3-54" aria-hidden="true" tabindex="-1"></a>= \mu(t)</span>
+<span id="cb3-55"><a href="#cb3-55" aria-hidden="true" tabindex="-1"></a>+0.9\,s\,f_s(t)v_s</span>
+<span id="cb3-56"><a href="#cb3-56" aria-hidden="true" tabindex="-1"></a>+0.75\,d\,f_d(t)v_d,</span>
+<span id="cb3-57"><a href="#cb3-57" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb3-58"><a href="#cb3-58" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-59"><a href="#cb3-59" aria-hidden="true" tabindex="-1"></a>plus independent Gaussian observation noise with standard deviation $0.42$.</span>
+<span id="cb3-60"><a href="#cb3-60" aria-hidden="true" tabindex="-1"></a>The reference $v_s$ and $v_d$ are orthonormal. The near-collinear scenario</span>
+<span id="cb3-61"><a href="#cb3-61" aria-hidden="true" tabindex="-1"></a>replaces the second direction by a normalized perturbation of the first. There</span>
+<span id="cb3-62"><a href="#cb3-62" aria-hidden="true" tabindex="-1"></a>is no interaction effect in this bounded generator. Trial shifts,</span>
+<span id="cb3-63"><a href="#cb3-63" aria-hidden="true" tabindex="-1"></a>feature-wise trial reassignment and label permutations are scenario operations,</span>
+<span id="cb3-64"><a href="#cb3-64" aria-hidden="true" tabindex="-1"></a>not hidden changes to the reference target.</span>
+<span id="cb3-65"><a href="#cb3-65" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-66"><a href="#cb3-66" aria-hidden="true" tabindex="-1"></a>The known targets are the stimulus and decision condition-mean</span>
+<span id="cb3-67"><a href="#cb3-67" aria-hidden="true" tabindex="-1"></a>marginalizations and their generating one-dimensional feature directions.</span>
+<span id="cb3-68"><a href="#cb3-68" aria-hidden="true" tabindex="-1"></a>Labels are observed supervision for fitting; clean signals and generating</span>
+<span id="cb3-69"><a href="#cb3-69" aria-hidden="true" tabindex="-1"></a>directions are unavailable to fitting and enter only scoring or verification.</span>
+<span id="cb3-70"><a href="#cb3-70" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-71"><a href="#cb3-71" aria-hidden="true" tabindex="-1"></a><span class="fu">### Rotational task</span></span>
+<span id="cb3-72"><a href="#cb3-72" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-73"><a href="#cb3-73" aria-hidden="true" tabindex="-1"></a>The rotational generator has four latent coordinates, eight observed features,</span>
+<span id="cb3-74"><a href="#cb3-74" aria-hidden="true" tabindex="-1"></a>six conditions, 31 physical-time samples on $<span class="co">[</span><span class="ot">0,1.2</span><span class="co">]</span>$, and independent trials.</span>
+<span id="cb3-75"><a href="#cb3-75" aria-hidden="true" tabindex="-1"></a>The reference latent matrix contains a rate-four planar rotation and a second,</span>
+<span id="cb3-76"><a href="#cb3-76" aria-hidden="true" tabindex="-1"></a>slower damped rotational block. The primary plane/rate target is the first</span>
+<span id="cb3-77"><a href="#cb3-77" aria-hidden="true" tabindex="-1"></a>known observed-space plane and angular rate $4$. Other scenarios replace the</span>
+<span id="cb3-78"><a href="#cb3-78" aria-hidden="true" tabindex="-1"></a>latent family with symmetric decay, latency sequences or input-driven</span>
+<span id="cb3-79"><a href="#cb3-79" aria-hidden="true" tabindex="-1"></a>trajectories, or alter the observation metric and preprocessing.</span>
+<span id="cb3-80"><a href="#cb3-80" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-81"><a href="#cb3-81" aria-hidden="true" tabindex="-1"></a>The observation map is an eight-by-four orthonormal embedding in ordinary</span>
+<span id="cb3-82"><a href="#cb3-82" aria-hidden="true" tabindex="-1"></a>scenarios and a declared nonorthogonal embedding in the metric stress. Gaussian</span>
+<span id="cb3-83"><a href="#cb3-83" aria-hidden="true" tabindex="-1"></a>latent and observation perturbations are added independently. Known latent</span>
+<span id="cb3-84"><a href="#cb3-84" aria-hidden="true" tabindex="-1"></a>states, embedding and generating matrices are scoring/verification truth only.</span>
+<span id="cb3-85"><a href="#cb3-85" aria-hidden="true" tabindex="-1"></a>They are not supplied to fitted projections.</span>
+<span id="cb3-86"><a href="#cb3-86" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-87"><a href="#cb3-87" aria-hidden="true" tabindex="-1"></a><span class="fu">## Generation</span></span>
+<span id="cb3-88"><a href="#cb3-88" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-89"><a href="#cb3-89" aria-hidden="true" tabindex="-1"></a>Generation is task-specific and precedes all fitting.</span>
+<span id="cb3-90"><a href="#cb3-90" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-91"><a href="#cb3-91" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Demixing:** each scenario-replicate independently generates train,</span>
+<span id="cb3-92"><a href="#cb3-92" aria-hidden="true" tabindex="-1"></a>  validation and test trials. Reference per-cell counts are 20/10/12, giving</span>
+<span id="cb3-93"><a href="#cb3-93" aria-hidden="true" tabindex="-1"></a>  actual split totals 80/40/48. The small-sample per-cell counts 5/4/12 give</span>
+<span id="cb3-94"><a href="#cb3-94" aria-hidden="true" tabindex="-1"></a>  totals 20/16/48; large-sample counts 45/18/18 give totals 180/72/72. The</span>
+<span id="cb3-95"><a href="#cb3-95" aria-hidden="true" tabindex="-1"></a>  missing-cell training matrix is <span class="in">`[[20,20],[20,0]]`</span>, for total 60 and design</span>
+<span id="cb3-96"><a href="#cb3-96" aria-hidden="true" tabindex="-1"></a>  rank three; validation/test remain balanced with totals 40/48. The</span>
+<span id="cb3-97"><a href="#cb3-97" aria-hidden="true" tabindex="-1"></a>  unbalanced training matrix is <span class="in">`[[40,5],[6,20]]`</span>, for total 71 and design rank</span>
+<span id="cb3-98"><a href="#cb3-98" aria-hidden="true" tabindex="-1"></a>  four; its validation/test totals are 40/48.</span>
+<span id="cb3-99"><a href="#cb3-99" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Rotation:** each scenario-replicate independently generates 7/4/5 trials</span>
+<span id="cb3-100"><a href="#cb3-100" aria-hidden="true" tabindex="-1"></a>  per condition for train/validation/test. Across six conditions, the actual</span>
+<span id="cb3-101"><a href="#cb3-101" aria-hidden="true" tabindex="-1"></a>  totals are 42/24/30. Condition trajectories share the declared scenario</span>
+<span id="cb3-102"><a href="#cb3-102" aria-hidden="true" tabindex="-1"></a>  family but receive independent perturbations.</span>
+<span id="cb3-103"><a href="#cb3-103" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-104"><a href="#cb3-104" aria-hidden="true" tabindex="-1"></a>Demixing condition means are arithmetic means within each observed cell. The</span>
+<span id="cb3-105"><a href="#cb3-105" aria-hidden="true" tabindex="-1"></a>complete-design marginalization then gives the four cells equal weight rather</span>
+<span id="cb3-106"><a href="#cb3-106" aria-hidden="true" tabindex="-1"></a>than weighting them by trial count. Rotational preprocessing first averages</span>
+<span id="cb3-107"><a href="#cb3-107" aria-hidden="true" tabindex="-1"></a>trials within each condition; when subtraction is enabled, it subtracts the</span>
+<span id="cb3-108"><a href="#cb3-108" aria-hidden="true" tabindex="-1"></a>across-condition mean separately at each time point.</span>
+<span id="cb3-109"><a href="#cb3-109" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-110"><a href="#cb3-110" aria-hidden="true" tabindex="-1"></a>The executable is benchmark-local. It records SHA-256 digests of the stable</span>
+<span id="cb3-111"><a href="#cb3-111" aria-hidden="true" tabindex="-1"></a>Phase 3 demixing and rotational-control executables as scientific-design</span>
+<span id="cb3-112"><a href="#cb3-112" aria-hidden="true" tabindex="-1"></a>provenance, but it does not claim to call or executable-reuse their numerical</span>
+<span id="cb3-113"><a href="#cb3-113" aria-hidden="true" tabindex="-1"></a>routines.</span>
+<span id="cb3-114"><a href="#cb3-114" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-115"><a href="#cb3-115" aria-hidden="true" tabindex="-1"></a><span class="fu">## Scenario grid</span></span>
+<span id="cb3-116"><a href="#cb3-116" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-117"><a href="#cb3-117" aria-hidden="true" tabindex="-1"></a><span class="fu">### Demixing scenarios</span></span>
+<span id="cb3-118"><a href="#cb3-118" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-119"><a href="#cb3-119" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Scenario <span class="pp">|</span> Declared manipulation <span class="pp">|</span> Primary boundary <span class="pp">|</span></span>
+<span id="cb3-120"><a href="#cb3-120" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|---|</span></span>
+<span id="cb3-121"><a href="#cb3-121" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`balanced_reference`</span> <span class="pp">|</span> complete $2\times2$ design with orthogonal generating directions <span class="pp">|</span> bounded reference <span class="pp">|</span></span>
+<span id="cb3-122"><a href="#cb3-122" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`near_collinear`</span> <span class="pp">|</span> decision direction nearly aligned with stimulus direction <span class="pp">|</span> target overlap and unstable separation <span class="pp">|</span></span>
+<span id="cb3-123"><a href="#cb3-123" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`missing_cell`</span> <span class="pp">|</span> training counts <span class="in">`[[20,20],[20,0]]`</span>; factorial design rank three of four <span class="pp">|</span> balanced marginal recovery is undefined <span class="pp">|</span></span>
+<span id="cb3-124"><a href="#cb3-124" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`unbalanced_cells`</span> <span class="pp">|</span> training counts <span class="in">`[[40,5],[6,20]]`</span>, with complete rank-four support <span class="pp">|</span> equal-cell marginalization versus unequal precision <span class="pp">|</span></span>
+<span id="cb3-125"><a href="#cb3-125" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`label_shuffle`</span> <span class="pp">|</span> deterministic permutation of training labels before lawful fitting <span class="pp">|</span> supervision-destruction control <span class="pp">|</span></span>
+<span id="cb3-126"><a href="#cb3-126" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`pseudo_population`</span> <span class="pp">|</span> within each split and condition cell, each feature's complete trial trajectory is independently permuted <span class="pp">|</span> cell means are preserved while simultaneous trial covariance changes <span class="pp">|</span></span>
+<span id="cb3-127"><a href="#cb3-127" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`averaging_mismatch`</span> <span class="pp">|</span> independent trial-level shifts of $-1,0,+1$ bins with nearest-edge fill and no circular wrap <span class="pp">|</span> aligned condition means blur trial structure <span class="pp">|</span></span>
+<span id="cb3-128"><a href="#cb3-128" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`small_sample`</span> <span class="pp">|</span> 5/4 train/validation trials per cell <span class="pp">|</span> estimation stress <span class="pp">|</span></span>
+<span id="cb3-129"><a href="#cb3-129" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`large_sample`</span> <span class="pp">|</span> 45/18/18 trials per cell <span class="pp">|</span> higher-information comparison <span class="pp">|</span></span>
+<span id="cb3-130"><a href="#cb3-130" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-131"><a href="#cb3-131" aria-hidden="true" tabindex="-1"></a>The grid is core-plus-stress, not a factorial isolation of individual causes.</span>
+<span id="cb3-132"><a href="#cb3-132" aria-hidden="true" tabindex="-1"></a>The missing-cell training design has rank three rather than the required rank</span>
+<span id="cb3-133"><a href="#cb3-133" aria-hidden="true" tabindex="-1"></a>four. The benchmark therefore reports the design-rank diagnostic and retains</span>
+<span id="cb3-134"><a href="#cb3-134" aria-hidden="true" tabindex="-1"></a>held-out decoder scores, but labels every otherwise applicable balanced</span>
+<span id="cb3-135"><a href="#cb3-135" aria-hidden="true" tabindex="-1"></a>marginal-reconstruction and marginal-subspace row <span class="in">`invalid`</span> with reason</span>
+<span id="cb3-136"><a href="#cb3-136" aria-hidden="true" tabindex="-1"></a><span class="in">`incomplete_factorial_design_rank_3_of_4`</span>. It does not use grand-mean filling to</span>
+<span id="cb3-137"><a href="#cb3-137" aria-hidden="true" tabindex="-1"></a>claim identified balanced marginal recovery.</span>
+<span id="cb3-138"><a href="#cb3-138" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-139"><a href="#cb3-139" aria-hidden="true" tabindex="-1"></a><span class="fu">### Rotational scenarios</span></span>
+<span id="cb3-140"><a href="#cb3-140" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-141"><a href="#cb3-141" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Scenario <span class="pp">|</span> Declared manipulation <span class="pp">|</span> Primary boundary <span class="pp">|</span></span>
+<span id="cb3-142"><a href="#cb3-142" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|---|</span></span>
+<span id="cb3-143"><a href="#cb3-143" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`clean_rotation`</span> <span class="pp">|</span> reference rotational generator and standard preprocessing <span class="pp">|</span> bounded positive reference <span class="pp">|</span></span>
+<span id="cb3-144"><a href="#cb3-144" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`symmetric_decay`</span> <span class="pp">|</span> diagonal negative generator without a true rotational plane <span class="pp">|</span> structure-specific negative control <span class="pp">|</span></span>
+<span id="cb3-145"><a href="#cb3-145" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`latency_sequence`</span> <span class="pp">|</span> sequential transient bumps rather than an autonomous rotation <span class="pp">|</span> latency-induced apparent sequence <span class="pp">|</span></span>
+<span id="cb3-146"><a href="#cb3-146" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`common_input`</span> <span class="pp">|</span> input-driven state equation with known two-dimensional input <span class="pp">|</span> state-only versus input-aware prediction <span class="pp">|</span></span>
+<span id="cb3-147"><a href="#cb3-147" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`short_arcs`</span> <span class="pp">|</span> first 12 time points only <span class="pp">|</span> limited angular occupancy <span class="pp">|</span></span>
+<span id="cb3-148"><a href="#cb3-148" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`time_jitter`</span> <span class="pp">|</span> condition-dependent shifts $(-1,0,+1)$ applied to latent path and input with nearest-edge fill, never wrapping <span class="pp">|</span> alignment stress <span class="pp">|</span></span>
+<span id="cb3-149"><a href="#cb3-149" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`smoothed`</span> <span class="pp">|</span> three-point moving average fitted/applied before projection <span class="pp">|</span> preprocessing dependence <span class="pp">|</span></span>
+<span id="cb3-150"><a href="#cb3-150" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`no_condition_subtraction`</span> <span class="pp">|</span> omit across-condition time-mean subtraction <span class="pp">|</span> subtraction dependence <span class="pp">|</span></span>
+<span id="cb3-151"><a href="#cb3-151" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`nonorthogonal_metric`</span> <span class="pp">|</span> nonorthogonal observation map <span class="pp">|</span> Euclidean metric dependence <span class="pp">|</span></span>
+<span id="cb3-152"><a href="#cb3-152" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`covariance_control`</span> <span class="pp">|</span> select among admissible training-only feature-wise cyclic condition-shift proposals by covariance cosine; uniform global shifts are excluded <span class="pp">|</span> thresholded covariance-match control <span class="pp">|</span></span>
+<span id="cb3-153"><a href="#cb3-153" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-154"><a href="#cb3-154" aria-hidden="true" tabindex="-1"></a>Plane and angular-rate truth are reported only for declared rotational</span>
+<span id="cb3-155"><a href="#cb3-155" aria-hidden="true" tabindex="-1"></a>scenarios and are omitted for decay, latency, input and covariance-control</span>
+<span id="cb3-156"><a href="#cb3-156" aria-hidden="true" tabindex="-1"></a>families where that target is not defined.</span>
+<span id="cb3-157"><a href="#cb3-157" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-158"><a href="#cb3-158" aria-hidden="true" tabindex="-1"></a><span class="fu">## Negative controls and stress cases</span></span>
+<span id="cb3-159"><a href="#cb3-159" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-160"><a href="#cb3-160" aria-hidden="true" tabindex="-1"></a>Demixing controls include permuted labels, incomplete and unequal cells,</span>
+<span id="cb3-161"><a href="#cb3-161" aria-hidden="true" tabindex="-1"></a>within-cell pseudo-population reassignment and non-wrapping trial-alignment</span>
+<span id="cb3-162"><a href="#cb3-162" aria-hidden="true" tabindex="-1"></a>mismatch. The shuffled-dPCA control independently permutes both training and</span>
+<span id="cb3-163"><a href="#cb3-163" aria-hidden="true" tabindex="-1"></a>validation labels, reselects its own dPCA ridge parameter on the shuffled</span>
+<span id="cb3-164"><a href="#cb3-164" aria-hidden="true" tabindex="-1"></a>validation target, and then refits. Each shuffled decoder likewise independently</span>
+<span id="cb3-165"><a href="#cb3-165" aria-hidden="true" tabindex="-1"></a>reselects its own ridge parameter from shuffled training/validation labels.</span>
+<span id="cb3-166"><a href="#cb3-166" aria-hidden="true" tabindex="-1"></a>Thus shuffled controls do not inherit the lawful method's selected parameter.</span>
+<span id="cb3-167"><a href="#cb3-167" aria-hidden="true" tabindex="-1"></a>A label permutation is expected to change supervised fitted states; it is not</span>
+<span id="cb3-168"><a href="#cb3-168" aria-hidden="true" tabindex="-1"></a>another independent replicate.</span>
+<span id="cb3-169"><a href="#cb3-169" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-170"><a href="#cb3-170" aria-hidden="true" tabindex="-1"></a>The pseudo-population operation permutes each feature's complete trajectory only</span>
+<span id="cb3-171"><a href="#cb3-171" aria-hidden="true" tabindex="-1"></a>among trials in the same split and condition cell. Labels and cell means are</span>
+<span id="cb3-172"><a href="#cb3-172" aria-hidden="true" tabindex="-1"></a>preserved to numerical precision across all replicates (maximum discrepancy</span>
+<span id="cb3-173"><a href="#cb3-173" aria-hidden="true" tabindex="-1"></a>$3.33\times10^{-16}$). Across the three replicates, the off-diagonal</span>
+<span id="cb3-174"><a href="#cb3-174" aria-hidden="true" tabindex="-1"></a>trial-noise covariance change ranges from 0.0523--0.0644 in train,</span>
+<span id="cb3-175"><a href="#cb3-175" aria-hidden="true" tabindex="-1"></a>0.0685--0.0766 in validation and 0.0690--0.0772 in test. It therefore isolates</span>
+<span id="cb3-176"><a href="#cb3-176" aria-hidden="true" tabindex="-1"></a>loss of simultaneous within-cell trial covariance rather than destroying</span>
+<span id="cb3-177"><a href="#cb3-177" aria-hidden="true" tabindex="-1"></a>condition means.</span>
+<span id="cb3-178"><a href="#cb3-178" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-179"><a href="#cb3-179" aria-hidden="true" tabindex="-1"></a>Rotational controls include symmetric dynamics, latency sequences, common</span>
+<span id="cb3-180"><a href="#cb3-180" aria-hidden="true" tabindex="-1"></a>input, short arcs, non-wrapping timing jitter, smoothing and subtraction</span>
+<span id="cb3-181"><a href="#cb3-181" aria-hidden="true" tabindex="-1"></a>alternatives, nonorthogonal metric distortion, a deterministic seed-derived</span>
+<span id="cb3-182"><a href="#cb3-182" aria-hidden="true" tabindex="-1"></a>random plane and a selected covariance control. The latter attempts 24</span>
+<span id="cb3-183"><a href="#cb3-183" aria-hidden="true" tabindex="-1"></a>predeclared seed-derived proposals, each applying a cyclic condition shift</span>
+<span id="cb3-184"><a href="#cb3-184" aria-hidden="true" tabindex="-1"></a>separately to every PCA coordinate. A proposal is admissible only when at least</span>
+<span id="cb3-185"><a href="#cb3-185" aria-hidden="true" tabindex="-1"></a>two coordinate shifts are distinct and it materially changes cross-coordinate</span>
+<span id="cb3-186"><a href="#cb3-186" aria-hidden="true" tabindex="-1"></a>condition correspondence; a uniform all-coordinate shift is excluded as a</span>
+<span id="cb3-187"><a href="#cb3-187" aria-hidden="true" tabindex="-1"></a>global relabeling/no-op. Selection maximizes training covariance cosine</span>
+<span id="cb3-188"><a href="#cb3-188" aria-hidden="true" tabindex="-1"></a>similarity among admissible proposals only, with match threshold 0.97.</span>
+<span id="cb3-189"><a href="#cb3-189" aria-hidden="true" tabindex="-1"></a>Replicates 0/1/2 have 23/24/24 admissible proposals and select proposals</span>
+<span id="cb3-190"><a href="#cb3-190" aria-hidden="true" tabindex="-1"></a>0/19/4 with similarities 0.999995, 0.999990 and 0.999985. All selected controls</span>
+<span id="cb3-191"><a href="#cb3-191" aria-hidden="true" tabindex="-1"></a>use multiple distinct shifts, materially alter cross-coordinate correspondence,</span>
+<span id="cb3-192"><a href="#cb3-192" aria-hidden="true" tabindex="-1"></a>and are labelled <span class="in">`matched`</span>. Selection and matching occur on training scores;</span>
+<span id="cb3-193"><a href="#cb3-193" aria-hidden="true" tabindex="-1"></a>the control does not preserve condition pairing or establish dynamics.</span>
+<span id="cb3-194"><a href="#cb3-194" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-195"><a href="#cb3-195" aria-hidden="true" tabindex="-1"></a>No stress case is discarded because it weakens the preferred method, and no</span>
+<span id="cb3-196"><a href="#cb3-196" aria-hidden="true" tabindex="-1"></a>post-hoc scenario-specific parameter search is performed.</span>
+<span id="cb3-197"><a href="#cb3-197" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-198"><a href="#cb3-198" aria-hidden="true" tabindex="-1"></a><span class="fu">## Replicates and deterministic seeds</span></span>
+<span id="cb3-199"><a href="#cb3-199" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-200"><a href="#cb3-200" aria-hidden="true" tabindex="-1"></a>Each of the 19 scenarios has three independent replicates. PCG64 seeds are</span>
+<span id="cb3-201"><a href="#cb3-201" aria-hidden="true" tabindex="-1"></a>deterministically derived from master seed <span class="in">`20260820`</span>, task, stable scenario</span>
+<span id="cb3-202"><a href="#cb3-202" aria-hidden="true" tabindex="-1"></a>hash, replicate, stage, split and, where needed, trial/control index. Methods</span>
+<span id="cb3-203"><a href="#cb3-203" aria-hidden="true" tabindex="-1"></a>within a replicate share the same generated data for paired comparison.</span>
+<span id="cb3-204"><a href="#cb3-204" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-205"><a href="#cb3-205" aria-hidden="true" tabindex="-1"></a>The q10, median and q90 summaries therefore use three replicate-level values.</span>
+<span id="cb3-206"><a href="#cb3-206" aria-hidden="true" tabindex="-1"></a>They are descriptive finite-sample summaries, not confidence intervals or</span>
+<span id="cb3-207"><a href="#cb3-207" aria-hidden="true" tabindex="-1"></a>stable tail estimates. Trials, conditions, cells and time points are not</span>
+<span id="cb3-208"><a href="#cb3-208" aria-hidden="true" tabindex="-1"></a>promoted to independent replicates.</span>
+<span id="cb3-209"><a href="#cb3-209" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-210"><a href="#cb3-210" aria-hidden="true" tabindex="-1"></a><span class="fu">## Split discipline</span></span>
+<span id="cb3-211"><a href="#cb3-211" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-212"><a href="#cb3-212" aria-hidden="true" tabindex="-1"></a>Generation, fitting/selection, frozen recovery and scoring are separate stages.</span>
+<span id="cb3-213"><a href="#cb3-213" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-214"><a href="#cb3-214" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Demixing fitting accepts only train/validation observations and labels.</span>
+<span id="cb3-215"><a href="#cb3-215" aria-hidden="true" tabindex="-1"></a>  dPCA regularization and ridge-decoder regularization are selected without test</span>
+<span id="cb3-216"><a href="#cb3-216" aria-hidden="true" tabindex="-1"></a>  data. Frozen recovery accepts fitted states and test observations/labels;</span>
+<span id="cb3-217"><a href="#cb3-217" aria-hidden="true" tabindex="-1"></a>  truth is joined only in scoring.</span>
+<span id="cb3-218"><a href="#cb3-218" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Rotational preprocessing, PCA and derivative models are fitted from training</span>
+<span id="cb3-219"><a href="#cb3-219" aria-hidden="true" tabindex="-1"></a>  observations and known training inputs where declared. Frozen recovery accepts</span>
+<span id="cb3-220"><a href="#cb3-220" aria-hidden="true" tabindex="-1"></a>  fitted states, test observations and test inputs. Test latent states and the</span>
+<span id="cb3-221"><a href="#cb3-221" aria-hidden="true" tabindex="-1"></a>  true embedding remain scoring-only.</span>
+<span id="cb3-222"><a href="#cb3-222" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Excluded test observations and truth cannot enter fitting by function</span>
+<span id="cb3-223"><a href="#cb3-223" aria-hidden="true" tabindex="-1"></a>  signature. Poison diagnostics report zero fitted-state discrepancy for test</span>
+<span id="cb3-224"><a href="#cb3-224" aria-hidden="true" tabindex="-1"></a>  exclusion and zero fixed-observation recovery discrepancy for truth poison.</span>
+<span id="cb3-225"><a href="#cb3-225" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Complete trials remain within one split. Adjacent time bins are never split</span>
+<span id="cb3-226"><a href="#cb3-226" aria-hidden="true" tabindex="-1"></a>  across train and test.</span>
+<span id="cb3-227"><a href="#cb3-227" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-228"><a href="#cb3-228" aria-hidden="true" tabindex="-1"></a>The label- and condition-permutation controls are explicit alternate fitting</span>
+<span id="cb3-229"><a href="#cb3-229" aria-hidden="true" tabindex="-1"></a>paths, not leakage into the lawful path.</span>
+<span id="cb3-230"><a href="#cb3-230" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-231"><a href="#cb3-231" aria-hidden="true" tabindex="-1"></a><span class="fu">## Methods and information sets</span></span>
+<span id="cb3-232"><a href="#cb3-232" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-233"><a href="#cb3-233" aria-hidden="true" tabindex="-1"></a><span class="fu">### Demixing methods</span></span>
+<span id="cb3-234"><a href="#cb3-234" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-235"><a href="#cb3-235" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Method <span class="pp">|</span> Role <span class="pp">|</span> Parameter source <span class="pp">|</span> Recorded information set <span class="pp">|</span></span>
+<span id="cb3-236"><a href="#cb3-236" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|---|---|</span></span>
+<span id="cb3-237"><a href="#cb3-237" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`condition_mean`</span> <span class="pp">|</span> training condition-mean marginal reference <span class="pp">|</span> train labels <span class="pp">|</span> supervised train <span class="pp">|</span></span>
+<span id="cb3-238"><a href="#cb3-238" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`pca`</span> <span class="pp">|</span> rank-two global PCA projection of each marginal target <span class="pp">|</span> train fit <span class="pp">|</span> supervised train <span class="pp">|</span></span>
+<span id="cb3-239"><a href="#cb3-239" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`marginal_pca`</span> <span class="pp">|</span> rank-one PCA fitted separately to each training marginal <span class="pp">|</span> train labels <span class="pp">|</span> supervised train <span class="pp">|</span></span>
+<span id="cb3-240"><a href="#cb3-240" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`selected_dpca`</span> <span class="pp">|</span> ridge reduced-rank marginal map <span class="pp">|</span> train plus validation <span class="pp">|</span> supervised train, with <span class="in">`parameter_source=train_validation`</span> <span class="pp">|</span></span>
+<span id="cb3-241"><a href="#cb3-241" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`ridge_decoder`</span> <span class="pp">|</span> separate stimulus and decision trial classifier <span class="pp">|</span> train plus validation <span class="pp">|</span> supervised train/validation <span class="pp">|</span></span>
+<span id="cb3-242"><a href="#cb3-242" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`shuffled_dpca_control`</span> <span class="pp">|</span> marginal map with independently selected ridge after deterministic train/validation-label permutations <span class="pp">|</span> permuted train/validation labels <span class="pp">|</span> permuted train/validation control <span class="pp">|</span></span>
+<span id="cb3-243"><a href="#cb3-243" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`shuffled_decoder_control`</span> <span class="pp">|</span> decoder with independently selected ridge after deterministic train/validation-label permutations <span class="pp">|</span> permuted train/validation labels <span class="pp">|</span> permuted train/validation control <span class="pp">|</span></span>
+<span id="cb3-244"><a href="#cb3-244" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`factorial_design_diagnostic`</span> <span class="pp">|</span> rank of the training design $<span class="co">[</span><span class="ot">1,s,d,sd</span><span class="co">]</span>$ <span class="pp">|</span> train labels <span class="pp">|</span> design diagnostic <span class="pp">|</span></span>
+<span id="cb3-245"><a href="#cb3-245" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-246"><a href="#cb3-246" aria-hidden="true" tabindex="-1"></a>Reconstruction/subspace methods are not assigned decoding scores. Decoders are</span>
+<span id="cb3-247"><a href="#cb3-247" aria-hidden="true" tabindex="-1"></a>not assigned marginal-reconstruction or marginal-subspace scores.</span>
+<span id="cb3-248"><a href="#cb3-248" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-249"><a href="#cb3-249" aria-hidden="true" tabindex="-1"></a><span class="fu">### Rotational methods</span></span>
+<span id="cb3-250"><a href="#cb3-250" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-251"><a href="#cb3-251" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Method <span class="pp">|</span> Role <span class="pp">|</span> Parameter source <span class="pp">|</span> Information set <span class="pp">|</span></span>
+<span id="cb3-252"><a href="#cb3-252" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|---|---|</span></span>
+<span id="cb3-253"><a href="#cb3-253" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`pca_plane`</span> <span class="pp">|</span> first two coordinates of the training PCA representation <span class="pp">|</span> train fit <span class="pp">|</span> train-fitted projection <span class="pp">|</span></span>
+<span id="cb3-254"><a href="#cb3-254" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`unrestricted_fit`</span> <span class="pp">|</span> unrestricted linear derivative regression; plane extracted from its skew part <span class="pp">|</span> train fit <span class="pp">|</span> train-fitted projection <span class="pp">|</span></span>
+<span id="cb3-255"><a href="#cb3-255" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`skew_fit`</span> <span class="pp">|</span> skew-constrained derivative regression <span class="pp">|</span> train fit <span class="pp">|</span> train-fitted projection <span class="pp">|</span></span>
+<span id="cb3-256"><a href="#cb3-256" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`symmetric_fit`</span> <span class="pp">|</span> symmetric derivative regression control <span class="pp">|</span> train fit <span class="pp">|</span> train-fitted projection <span class="pp">|</span></span>
+<span id="cb3-257"><a href="#cb3-257" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`input_aware_fit`</span> <span class="pp">|</span> derivative regression on state and known input <span class="pp">|</span> train fit plus known input <span class="pp">|</span> train-fitted projection <span class="pp">|</span></span>
+<span id="cb3-258"><a href="#cb3-258" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`fixed_plane`</span> <span class="pp">|</span> predeclared PCA-coordinate axes 0 and 2 <span class="pp">|</span> predeclared <span class="pp">|</span> fixed reference <span class="pp">|</span></span>
+<span id="cb3-259"><a href="#cb3-259" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`random_plane`</span> <span class="pp">|</span> deterministic seed-derived rank-two plane <span class="pp">|</span> deterministic seed <span class="pp">|</span> train-fitted projection <span class="pp">|</span></span>
+<span id="cb3-260"><a href="#cb3-260" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`covariance_shuffle_control`</span> <span class="pp">|</span> plane/control from the highest-similarity admissible training-only condition-shift proposal; uniform global shifts excluded <span class="pp">|</span> selected permuted conditions <span class="pp">|</span> selected permutation control <span class="pp">|</span></span>
+<span id="cb3-261"><a href="#cb3-261" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-262"><a href="#cb3-262" aria-hidden="true" tabindex="-1"></a>The unrestricted, skew, symmetric and input-aware models share the same</span>
+<span id="cb3-263"><a href="#cb3-263" aria-hidden="true" tabindex="-1"></a>training PCA coordinate system. Their derivative predictions are evaluated on</span>
+<span id="cb3-264"><a href="#cb3-264" aria-hidden="true" tabindex="-1"></a>held-out central finite differences. <span class="in">`pca_plane`</span> is coordinates <span class="in">`[0,1]`</span>, whereas</span>
+<span id="cb3-265"><a href="#cb3-265" aria-hidden="true" tabindex="-1"></a><span class="in">`fixed_plane`</span> is the deliberately distinct coordinates <span class="in">`[0,2]`</span>; they are not</span>
+<span id="cb3-266"><a href="#cb3-266" aria-hidden="true" tabindex="-1"></a>aliases. The verifier's maximum projector difference is 1.0, and their clean</span>
+<span id="cb3-267"><a href="#cb3-267" aria-hidden="true" tabindex="-1"></a>plane-angle medians are 0.5389° and 89.6500°, respectively. A retrospective</span>
+<span id="cb3-268"><a href="#cb3-268" aria-hidden="true" tabindex="-1"></a>condition-mean projection is not an online state estimator, and no online claim</span>
+<span id="cb3-269"><a href="#cb3-269" aria-hidden="true" tabindex="-1"></a>is made.</span>
+<span id="cb3-270"><a href="#cb3-270" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-271"><a href="#cb3-271" aria-hidden="true" tabindex="-1"></a><span class="fu">## Parameter selection</span></span>
+<span id="cb3-272"><a href="#cb3-272" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-273"><a href="#cb3-273" aria-hidden="true" tabindex="-1"></a>For <span class="in">`selected_dpca`</span>, the ridge grid is</span>
+<span id="cb3-274"><a href="#cb3-274" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-275"><a href="#cb3-275" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb3-276"><a href="#cb3-276" aria-hidden="true" tabindex="-1"></a>\lambda\in<span class="sc">\{</span>10^{-4},10^{-2},10^{-1},1<span class="sc">\}</span>.</span>
+<span id="cb3-277"><a href="#cb3-277" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb3-278"><a href="#cb3-278" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-279"><a href="#cb3-279" aria-hidden="true" tabindex="-1"></a>Each candidate is fitted on training condition means and scored by the sum of</span>
+<span id="cb3-280"><a href="#cb3-280" aria-hidden="true" tabindex="-1"></a>validation stimulus- and decision-marginal mean-squared errors; ties use the</span>
+<span id="cb3-281"><a href="#cb3-281" aria-hidden="true" tabindex="-1"></a>smaller ordered $\lambda$. Each ridge decoder uses the same grid with</span>
+<span id="cb3-282"><a href="#cb3-282" aria-hidden="true" tabindex="-1"></a>validation classification error and the same deterministic tie rule. The</span>
+<span id="cb3-283"><a href="#cb3-283" aria-hidden="true" tabindex="-1"></a>lawful and shuffled dPCA/decoder paths each perform their own selection on their</span>
+<span id="cb3-284"><a href="#cb3-284" aria-hidden="true" tabindex="-1"></a>own labels before their states are frozen. In the reference replicate used by</span>
+<span id="cb3-285"><a href="#cb3-285" aria-hidden="true" tabindex="-1"></a>the verifier, lawful/shuffled dPCA both select 1.0; lawful stimulus/decision</span>
+<span id="cb3-286"><a href="#cb3-286" aria-hidden="true" tabindex="-1"></a>decoders select $10^{-4}/10^{-4}$, while shuffled decoders select</span>
+<span id="cb3-287"><a href="#cb3-287" aria-hidden="true" tabindex="-1"></a>$10^{-4}/1.0$. These values are diagnostics for that replicate, not universal</span>
+<span id="cb3-288"><a href="#cb3-288" aria-hidden="true" tabindex="-1"></a>hyperparameters.</span>
+<span id="cb3-289"><a href="#cb3-289" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-290"><a href="#cb3-290" aria-hidden="true" tabindex="-1"></a>Rotational methods have no fitted hyperparameter search in this bounded</span>
+<span id="cb3-291"><a href="#cb3-291" aria-hidden="true" tabindex="-1"></a>implementation. Window, smoothing, subtraction, fixed/random planes and</span>
+<span id="cb3-292"><a href="#cb3-292" aria-hidden="true" tabindex="-1"></a>condition permutation are predeclared scenario or method choices, not selected</span>
+<span id="cb3-293"><a href="#cb3-293" aria-hidden="true" tabindex="-1"></a>from test performance.</span>
+<span id="cb3-294"><a href="#cb3-294" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-295"><a href="#cb3-295" aria-hidden="true" tabindex="-1"></a><span class="fu">## Inference</span></span>
+<span id="cb3-296"><a href="#cb3-296" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-297"><a href="#cb3-297" aria-hidden="true" tabindex="-1"></a>Demixing recovery rebuilds held-out condition means and marginalizations from</span>
+<span id="cb3-298"><a href="#cb3-298" aria-hidden="true" tabindex="-1"></a>complete test trials. Training condition means, global/marginal PCA projectors,</span>
+<span id="cb3-299"><a href="#cb3-299" aria-hidden="true" tabindex="-1"></a>selected dPCA maps and shuffled-control maps are then applied according to their</span>
+<span id="cb3-300"><a href="#cb3-300" aria-hidden="true" tabindex="-1"></a>fixed roles. Trial decoders use three predeclared temporal averages per feature.</span>
+<span id="cb3-301"><a href="#cb3-301" aria-hidden="true" tabindex="-1"></a>The clean trial signal and generating directions are never inputs to recovery.</span>
+<span id="cb3-302"><a href="#cb3-302" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-303"><a href="#cb3-303" aria-hidden="true" tabindex="-1"></a>Rotational recovery applies training-fitted smoothing/subtraction statistics,</span>
+<span id="cb3-304"><a href="#cb3-304" aria-hidden="true" tabindex="-1"></a>feature mean and rank-four PCA basis to held-out condition means. Central</span>
+<span id="cb3-305"><a href="#cb3-305" aria-hidden="true" tabindex="-1"></a>finite differences define held-out derivative targets. Fitted derivative maps</span>
+<span id="cb3-306"><a href="#cb3-306" aria-hidden="true" tabindex="-1"></a>predict in the frozen PCA coordinate system. Plane methods project those same</span>
+<span id="cb3-307"><a href="#cb3-307" aria-hidden="true" tabindex="-1"></a>held-out scores. The input-aware model alone receives the declared held-out</span>
+<span id="cb3-308"><a href="#cb3-308" aria-hidden="true" tabindex="-1"></a>input sequence.</span>
+<span id="cb3-309"><a href="#cb3-309" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-310"><a href="#cb3-310" aria-hidden="true" tabindex="-1"></a><span class="fu">## Scoring</span></span>
+<span id="cb3-311"><a href="#cb3-311" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-312"><a href="#cb3-312" aria-hidden="true" tabindex="-1"></a>Every <span class="in">`results.csv`</span> row has task, scenario, replicate, seed, metric-specific</span>
+<span id="cb3-313"><a href="#cb3-313" aria-hidden="true" tabindex="-1"></a>provenance/split/evaluation stage, method family, information set, parameter</span>
+<span id="cb3-314"><a href="#cb3-314" aria-hidden="true" tabindex="-1"></a>source, target, status/reason, per-cell count arrays and actual split totals.</span>
+<span id="cb3-315"><a href="#cb3-315" aria-hidden="true" tabindex="-1"></a>Where relevant it also records selected hyperparameter, design rank,</span>
+<span id="cb3-316"><a href="#cb3-316" aria-hidden="true" tabindex="-1"></a>covariance-control match status and proposal index. The artifact contains only</span>
+<span id="cb3-317"><a href="#cb3-317" aria-hidden="true" tabindex="-1"></a>the following metrics.</span>
+<span id="cb3-318"><a href="#cb3-318" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-319"><a href="#cb3-319" aria-hidden="true" tabindex="-1"></a><span class="fu">### Demixing metrics</span></span>
+<span id="cb3-320"><a href="#cb3-320" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-321"><a href="#cb3-321" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Metric <span class="pp">|</span> Target <span class="pp">|</span> Definition <span class="pp">|</span></span>
+<span id="cb3-322"><a href="#cb3-322" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|---|</span></span>
+<span id="cb3-323"><a href="#cb3-323" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`stimulus_marginal_nmse`</span> <span class="pp">|</span> stimulus marginal reconstruction <span class="pp">|</span> held-out marginal reconstruction MSE divided by held-out stimulus-marginal mean square <span class="pp">|</span></span>
+<span id="cb3-324"><a href="#cb3-324" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`decision_marginal_nmse`</span> <span class="pp">|</span> decision marginal reconstruction <span class="pp">|</span> analogous held-out decision score <span class="pp">|</span></span>
+<span id="cb3-325"><a href="#cb3-325" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`stimulus_subspace_angle_degrees`</span> <span class="pp">|</span> stimulus marginal subspace <span class="pp">|</span> principal angle between the leading recovered stimulus-marginal direction and known $v_s$ <span class="pp">|</span></span>
+<span id="cb3-326"><a href="#cb3-326" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`decision_subspace_angle_degrees`</span> <span class="pp">|</span> decision marginal subspace <span class="pp">|</span> analogous angle to known $v_d$ <span class="pp">|</span></span>
+<span id="cb3-327"><a href="#cb3-327" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`stimulus_decoding_accuracy`</span> <span class="pp">|</span> stimulus label decoding <span class="pp">|</span> held-out complete-trial accuracy <span class="pp">|</span></span>
+<span id="cb3-328"><a href="#cb3-328" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`decision_decoding_accuracy`</span> <span class="pp">|</span> decision label decoding <span class="pp">|</span> held-out complete-trial accuracy <span class="pp">|</span></span>
+<span id="cb3-329"><a href="#cb3-329" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`factorial_design_rank`</span> <span class="pp">|</span> factorial-design identification <span class="pp">|</span> rank of the training design $<span class="co">[</span><span class="ot">1,s,d,sd</span><span class="co">]</span>$; it is a training diagnostic rather than a test score <span class="pp">|</span></span>
+<span id="cb3-330"><a href="#cb3-330" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-331"><a href="#cb3-331" aria-hidden="true" tabindex="-1"></a>Marginal NMSE, subspace angle and decoding accuracy answer different questions.</span>
+<span id="cb3-332"><a href="#cb3-332" aria-hidden="true" tabindex="-1"></a>A decoder can predict a label without reconstructing its condition-mean</span>
+<span id="cb3-333"><a href="#cb3-333" aria-hidden="true" tabindex="-1"></a>marginal, and low marginal error does not establish single-trial decoding.</span>
+<span id="cb3-334"><a href="#cb3-334" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-335"><a href="#cb3-335" aria-hidden="true" tabindex="-1"></a><span class="fu">### Rotational metrics</span></span>
+<span id="cb3-336"><a href="#cb3-336" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-337"><a href="#cb3-337" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Metric <span class="pp">|</span> Target <span class="pp">|</span> Definition <span class="pp">|</span></span>
+<span id="cb3-338"><a href="#cb3-338" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|---|</span></span>
+<span id="cb3-339"><a href="#cb3-339" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`plane_angle_degrees`</span> <span class="pp">|</span> rotational plane <span class="pp">|</span> observed-space principal angle to the first known rotational plane; only in applicable rotational scenarios <span class="pp">|</span></span>
+<span id="cb3-340"><a href="#cb3-340" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`angular_rate_abs_error`</span> <span class="pp">|</span> angular rate <span class="pp">|</span> absolute error from the known first-plane rate $4$; only in applicable rotational scenarios <span class="pp">|</span></span>
+<span id="cb3-341"><a href="#cb3-341" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`derivative_rmse`</span> <span class="pp">|</span> held-out derivative prediction <span class="pp">|</span> RMSE between predicted and central-difference held-out derivatives in training-PCA coordinates <span class="pp">|</span></span>
+<span id="cb3-342"><a href="#cb3-342" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`tangential_velocity_ratio`</span> <span class="pp">|</span> plane tangential motion <span class="pp">|</span> norm of tangential projected velocity divided by total projected-velocity norm <span class="pp">|</span></span>
+<span id="cb3-343"><a href="#cb3-343" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`covariance_similarity`</span> <span class="pp">|</span> condition covariance control <span class="pp">|</span> Frobenius-cosine similarity of flattened score covariance before and after condition permutation <span class="pp">|</span></span>
+<span id="cb3-344"><a href="#cb3-344" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-345"><a href="#cb3-345" aria-hidden="true" tabindex="-1"></a>Derivative RMSE, plane angle, angular-rate error and tangential ratio are not</span>
+<span id="cb3-346"><a href="#cb3-346" aria-hidden="true" tabindex="-1"></a>interchangeable evidence. In particular, tangential motion in a selected plane</span>
+<span id="cb3-347"><a href="#cb3-347" aria-hidden="true" tabindex="-1"></a>can occur for transients or input-driven sequences.</span>
+<span id="cb3-348"><a href="#cb3-348" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-349"><a href="#cb3-349" aria-hidden="true" tabindex="-1"></a>Each metric is first aggregated across its declared held-out cells/trials,</span>
+<span id="cb3-350"><a href="#cb3-350" aria-hidden="true" tabindex="-1"></a>conditions or derivative pairs into one scenario-replicate-method value.</span>
+<span id="cb3-351"><a href="#cb3-351" aria-hidden="true" tabindex="-1"></a><span class="in">`diagnostics.json`</span> then reports q10, median, q90, applicability rate and failure</span>
+<span id="cb3-352"><a href="#cb3-352" aria-hidden="true" tabindex="-1"></a>rate across the three replicates for each task $\times$ scenario $\times$</span>
+<span id="cb3-353"><a href="#cb3-353" aria-hidden="true" tabindex="-1"></a>method $\times$ metric group.</span>
+<span id="cb3-354"><a href="#cb3-354" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-355"><a href="#cb3-355" aria-hidden="true" tabindex="-1"></a><span class="fu">## Failure and applicability labels</span></span>
+<span id="cb3-356"><a href="#cb3-356" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-357"><a href="#cb3-357" aria-hidden="true" tabindex="-1"></a>The full Cartesian task-specific inventories are retained:</span>
+<span id="cb3-358"><a href="#cb3-358" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-359"><a href="#cb3-359" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>demixing: $9\times3\times8\times7=1{,}512$ rows;</span>
+<span id="cb3-360"><a href="#cb3-360" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>rotation: $10\times3\times8\times5=1{,}200$ rows;</span>
+<span id="cb3-361"><a href="#cb3-361" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>total: 2,712 unique canonical rows.</span>
+<span id="cb3-362"><a href="#cb3-362" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-363"><a href="#cb3-363" aria-hidden="true" tabindex="-1"></a>Applicability is resolved before numerical failure. Every row has one status:</span>
+<span id="cb3-364"><a href="#cb3-364" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-365"><a href="#cb3-365" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`ok`</span>: applicable and finite;</span>
+<span id="cb3-366"><a href="#cb3-366" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`nonconvergence`</span>: linear-algebra failure in an applicable path;</span>
+<span id="cb3-367"><a href="#cb3-367" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`invalid`</span>: malformed, missing or non-finite applicable score;</span>
+<span id="cb3-368"><a href="#cb3-368" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`inapplicable`</span>: the method/scenario does not define the metric target.</span>
+<span id="cb3-369"><a href="#cb3-369" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-370"><a href="#cb3-370" aria-hidden="true" tabindex="-1"></a>Natural execution produced 1,041 <span class="in">`ok`</span>, 1,617 <span class="in">`inapplicable`</span>, 54 <span class="in">`invalid`</span></span>
+<span id="cb3-371"><a href="#cb3-371" aria-hidden="true" tabindex="-1"></a>and zero <span class="in">`nonconvergence`</span> rows. By task, demixing has 567 <span class="in">`ok`</span>, 891</span>
+<span id="cb3-372"><a href="#cb3-372" aria-hidden="true" tabindex="-1"></a><span class="in">`inapplicable`</span> and 54 <span class="in">`invalid`</span>; rotation has 474 <span class="in">`ok`</span> and 726 <span class="in">`inapplicable`</span>.</span>
+<span id="cb3-373"><a href="#cb3-373" aria-hidden="true" tabindex="-1"></a>All 54 natural invalid rows are the three missing-cell replicates' otherwise</span>
+<span id="cb3-374"><a href="#cb3-374" aria-hidden="true" tabindex="-1"></a>applicable balanced marginal reconstruction/subspace combinations; the design</span>
+<span id="cb3-375"><a href="#cb3-375" aria-hidden="true" tabindex="-1"></a>rank is three of four. Every non-<span class="in">`ok`</span> row has a machine-readable reason and no</span>
+<span id="cb3-376"><a href="#cb3-376" aria-hidden="true" tabindex="-1"></a>value. The absence of natural nonconvergence is not a robustness claim:</span>
+<span id="cb3-377"><a href="#cb3-377" aria-hidden="true" tabindex="-1"></a>real-path fault injection verifies both <span class="in">`invalid`</span> and <span class="in">`nonconvergence`</span>, while</span>
+<span id="cb3-378"><a href="#cb3-378" aria-hidden="true" tabindex="-1"></a>preserving <span class="in">`inapplicable`</span> precedence.</span>
+<span id="cb3-379"><a href="#cb3-379" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-380"><a href="#cb3-380" aria-hidden="true" tabindex="-1"></a>Examples of inapplicability are decoder methods on marginal reconstruction,</span>
+<span id="cb3-381"><a href="#cb3-381" aria-hidden="true" tabindex="-1"></a>reconstruction methods on decoding, symmetric/input-aware fits on plane or rate</span>
+<span id="cb3-382"><a href="#cb3-382" aria-hidden="true" tabindex="-1"></a>targets, and plane/rate truth in non-rotational scenarios.</span>
+<span id="cb3-383"><a href="#cb3-383" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-384"><a href="#cb3-384" aria-hidden="true" tabindex="-1"></a><span class="fu">## Artifact contract</span></span>
+<span id="cb3-385"><a href="#cb3-385" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-386"><a href="#cb3-386" aria-hidden="true" tabindex="-1"></a><span class="in">`benchmarks/artifacts/demixing-rotational-robustness/`</span> contains exactly:</span>
+<span id="cb3-387"><a href="#cb3-387" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-388"><a href="#cb3-388" aria-hidden="true" tabindex="-1"></a><span class="in">```text</span></span>
+<span id="cb3-389"><a href="#cb3-389" aria-hidden="true" tabindex="-1"></a><span class="in">manifest.json</span></span>
+<span id="cb3-390"><a href="#cb3-390" aria-hidden="true" tabindex="-1"></a><span class="in">results.csv</span></span>
+<span id="cb3-391"><a href="#cb3-391" aria-hidden="true" tabindex="-1"></a><span class="in">diagnostics.json</span></span>
+<span id="cb3-392"><a href="#cb3-392" aria-hidden="true" tabindex="-1"></a><span class="in">summary.png</span></span>
+<span id="cb3-393"><a href="#cb3-393" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb3-394"><a href="#cb3-394" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-395"><a href="#cb3-395" aria-hidden="true" tabindex="-1"></a>The manifest freezes the two task inventories, three-replicate seed contract,</span>
+<span id="cb3-396"><a href="#cb3-396" aria-hidden="true" tabindex="-1"></a>stage/split/status vocabulary, canonical lexical row order, commands, runtime,</span>
+<span id="cb3-397"><a href="#cb3-397" aria-hidden="true" tabindex="-1"></a>Phase 3 provenance digests and artifact hashes. <span class="in">`results.csv`</span> retains all raw</span>
+<span id="cb3-398"><a href="#cb3-398" aria-hidden="true" tabindex="-1"></a>replicate rows. <span class="in">`diagnostics.json`</span> contains only task-specific summaries and</span>
+<span id="cb3-399"><a href="#cb3-399" aria-hidden="true" tabindex="-1"></a>verification diagnostics. <span class="in">`summary.png`</span> uses four separate task/target panels</span>
+<span id="cb3-400"><a href="#cb3-400" aria-hidden="true" tabindex="-1"></a>and is a diagnostic view rather than acceptance evidence or a leaderboard.</span>
+<span id="cb3-401"><a href="#cb3-401" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-402"><a href="#cb3-402" aria-hidden="true" tabindex="-1"></a><span class="fu">## Results</span></span>
+<span id="cb3-403"><a href="#cb3-403" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-404"><a href="#cb3-404" aria-hidden="true" tabindex="-1"></a>The following values are q10/median/q90 across three replicates, recomputed from</span>
+<span id="cb3-405"><a href="#cb3-405" aria-hidden="true" tabindex="-1"></a>the authoritative <span class="in">`diagnostics.json`</span>. They are scenario- and target-conditional.</span>
+<span id="cb3-406"><a href="#cb3-406" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-407"><a href="#cb3-407" aria-hidden="true" tabindex="-1"></a><span class="fu">### Demixing results</span></span>
+<span id="cb3-408"><a href="#cb3-408" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-409"><a href="#cb3-409" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Scenario and target <span class="pp">|</span> Method <span class="pp">|</span> q10 <span class="pp">|</span> Median <span class="pp">|</span> q90 <span class="pp">|</span></span>
+<span id="cb3-410"><a href="#cb3-410" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|---:|---:|---:|</span></span>
+<span id="cb3-411"><a href="#cb3-411" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Reference stimulus marginal NMSE <span class="pp">|</span> condition mean <span class="pp">|</span> 0.1808 <span class="pp">|</span> 0.1995 <span class="pp">|</span> 0.2691 <span class="pp">|</span></span>
+<span id="cb3-412"><a href="#cb3-412" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Reference stimulus marginal NMSE <span class="pp">|</span> PCA <span class="pp">|</span> 0.1187 <span class="pp">|</span> 0.1251 <span class="pp">|</span> 0.1362 <span class="pp">|</span></span>
+<span id="cb3-413"><a href="#cb3-413" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Reference stimulus marginal NMSE <span class="pp">|</span> marginal PCA <span class="pp">|</span> 0.1278 <span class="pp">|</span> 0.1368 <span class="pp">|</span> 0.1496 <span class="pp">|</span></span>
+<span id="cb3-414"><a href="#cb3-414" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Reference stimulus marginal NMSE <span class="pp">|</span> selected dPCA <span class="pp">|</span> 0.1787 <span class="pp">|</span> 0.1789 <span class="pp">|</span> 0.1934 <span class="pp">|</span></span>
+<span id="cb3-415"><a href="#cb3-415" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Reference stimulus marginal NMSE <span class="pp">|</span> independently selected shuffled-dPCA control <span class="pp">|</span> 0.7650 <span class="pp">|</span> 0.8885 <span class="pp">|</span> 1.0291 <span class="pp">|</span></span>
+<span id="cb3-416"><a href="#cb3-416" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Reference decision marginal NMSE <span class="pp">|</span> selected dPCA <span class="pp">|</span> 0.0925 <span class="pp">|</span> 0.1045 <span class="pp">|</span> 0.1302 <span class="pp">|</span></span>
+<span id="cb3-417"><a href="#cb3-417" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Reference stimulus subspace angle <span class="pp">|</span> selected dPCA <span class="pp">|</span> 5.0274° <span class="pp">|</span> 5.2335° <span class="pp">|</span> 7.9515° <span class="pp">|</span></span>
+<span id="cb3-418"><a href="#cb3-418" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Reference decision subspace angle <span class="pp">|</span> selected dPCA <span class="pp">|</span> 1.5773° <span class="pp">|</span> 1.7486° <span class="pp">|</span> 1.8960° <span class="pp">|</span></span>
+<span id="cb3-419"><a href="#cb3-419" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Reference stimulus decoding <span class="pp">|</span> ridge decoder <span class="pp">|</span> 1.0000 <span class="pp">|</span> 1.0000 <span class="pp">|</span> 1.0000 <span class="pp">|</span></span>
+<span id="cb3-420"><a href="#cb3-420" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Reference stimulus decoding <span class="pp">|</span> independently selected shuffled-decoder control <span class="pp">|</span> 0.4625 <span class="pp">|</span> 0.4792 <span class="pp">|</span> 0.5792 <span class="pp">|</span></span>
+<span id="cb3-421"><a href="#cb3-421" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-422"><a href="#cb3-422" aria-hidden="true" tabindex="-1"></a>These rows do not define one method order: PCA's reference marginal NMSE,</span>
+<span id="cb3-423"><a href="#cb3-423" aria-hidden="true" tabindex="-1"></a>dPCA's supervised marginal map and the decoder's label accuracy are different</span>
+<span id="cb3-424"><a href="#cb3-424" aria-hidden="true" tabindex="-1"></a>targets. Under the <span class="in">`label_shuffle`</span> scenario, selected-dPCA stimulus marginal</span>
+<span id="cb3-425"><a href="#cb3-425" aria-hidden="true" tabindex="-1"></a>NMSE has median 0.9821. The complete but unbalanced design has median 0.1739.</span>
+<span id="cb3-426"><a href="#cb3-426" aria-hidden="true" tabindex="-1"></a>The missing-cell design reports rank 3. Its 54 balanced marginal reconstruction</span>
+<span id="cb3-427"><a href="#cb3-427" aria-hidden="true" tabindex="-1"></a>and subspace rows are <span class="in">`invalid`</span>, so no missing-cell marginal-recovery median is</span>
+<span id="cb3-428"><a href="#cb3-428" aria-hidden="true" tabindex="-1"></a>reported; its held-out decoder rows remain valid.</span>
+<span id="cb3-429"><a href="#cb3-429" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-430"><a href="#cb3-430" aria-hidden="true" tabindex="-1"></a>The within-cell pseudo-population preserves condition means but changes</span>
+<span id="cb3-431"><a href="#cb3-431" aria-hidden="true" tabindex="-1"></a>simultaneous covariance. Consequently, its selected-dPCA stimulus marginal</span>
+<span id="cb3-432"><a href="#cb3-432" aria-hidden="true" tabindex="-1"></a>NMSE remains finite with median 0.1917 and its stimulus decoder median remains</span>
+<span id="cb3-433"><a href="#cb3-433" aria-hidden="true" tabindex="-1"></a>1.0000; those values do not show preservation of joint trial-level population</span>
+<span id="cb3-434"><a href="#cb3-434" aria-hidden="true" tabindex="-1"></a>information. The non-wrapping averaging-mismatch median is 0.1819. Small- and</span>
+<span id="cb3-435"><a href="#cb3-435" aria-hidden="true" tabindex="-1"></a>large-sample selected-dPCA stimulus NMSE medians are 0.2230 and 0.1679. These</span>
+<span id="cb3-436"><a href="#cb3-436" aria-hidden="true" tabindex="-1"></a>are bounded stress observations, not isolated causal effects.</span>
+<span id="cb3-437"><a href="#cb3-437" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-438"><a href="#cb3-438" aria-hidden="true" tabindex="-1"></a><span class="fu">### Rotational results</span></span>
+<span id="cb3-439"><a href="#cb3-439" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-440"><a href="#cb3-440" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Scenario and target <span class="pp">|</span> Method <span class="pp">|</span> q10 <span class="pp">|</span> Median <span class="pp">|</span> q90 <span class="pp">|</span></span>
+<span id="cb3-441"><a href="#cb3-441" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|---:|---:|---:|</span></span>
+<span id="cb3-442"><a href="#cb3-442" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Clean derivative RMSE <span class="pp">|</span> unrestricted fit <span class="pp">|</span> 0.6680 <span class="pp">|</span> 0.6844 <span class="pp">|</span> 0.6926 <span class="pp">|</span></span>
+<span id="cb3-443"><a href="#cb3-443" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Clean derivative RMSE <span class="pp">|</span> skew fit <span class="pp">|</span> 0.6726 <span class="pp">|</span> 0.6872 <span class="pp">|</span> 0.6948 <span class="pp">|</span></span>
+<span id="cb3-444"><a href="#cb3-444" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Clean derivative RMSE <span class="pp">|</span> symmetric fit <span class="pp">|</span> 2.5650 <span class="pp">|</span> 2.5741 <span class="pp">|</span> 2.5858 <span class="pp">|</span></span>
+<span id="cb3-445"><a href="#cb3-445" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Clean derivative RMSE <span class="pp">|</span> input-aware fit <span class="pp">|</span> 0.6680 <span class="pp">|</span> 0.6844 <span class="pp">|</span> 0.6926 <span class="pp">|</span></span>
+<span id="cb3-446"><a href="#cb3-446" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Clean plane angle <span class="pp">|</span> PCA plane <span class="in">`[0,1]`</span> <span class="pp">|</span> 0.4619° <span class="pp">|</span> 0.5389° <span class="pp">|</span> 0.6176° <span class="pp">|</span></span>
+<span id="cb3-447"><a href="#cb3-447" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Clean plane angle <span class="pp">|</span> fixed plane <span class="in">`[0,2]`</span> <span class="pp">|</span> 89.5811° <span class="pp">|</span> 89.6500° <span class="pp">|</span> 89.9175° <span class="pp">|</span></span>
+<span id="cb3-448"><a href="#cb3-448" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Clean plane angle <span class="pp">|</span> skew fit <span class="pp">|</span> 0.3565° <span class="pp">|</span> 0.4838° <span class="pp">|</span> 0.7605° <span class="pp">|</span></span>
+<span id="cb3-449"><a href="#cb3-449" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Clean plane angle <span class="pp">|</span> random plane <span class="pp">|</span> 57.1430° <span class="pp">|</span> 72.6218° <span class="pp">|</span> 82.8646° <span class="pp">|</span></span>
+<span id="cb3-450"><a href="#cb3-450" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Clean angular-rate error <span class="pp">|</span> skew fit <span class="pp">|</span> 0.0082 <span class="pp">|</span> 0.0083 <span class="pp">|</span> 0.0309 <span class="pp">|</span></span>
+<span id="cb3-451"><a href="#cb3-451" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Clean tangential ratio <span class="pp">|</span> skew fit <span class="pp">|</span> 0.9556 <span class="pp">|</span> 0.9647 <span class="pp">|</span> 0.9677 <span class="pp">|</span></span>
+<span id="cb3-452"><a href="#cb3-452" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Symmetric-decay derivative RMSE <span class="pp">|</span> symmetric fit <span class="pp">|</span> 0.6519 <span class="pp">|</span> 0.6738 <span class="pp">|</span> 0.6863 <span class="pp">|</span></span>
+<span id="cb3-453"><a href="#cb3-453" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Common-input derivative RMSE <span class="pp">|</span> input-aware fit <span class="pp">|</span> 0.6861 <span class="pp">|</span> 0.6866 <span class="pp">|</span> 0.6933 <span class="pp">|</span></span>
+<span id="cb3-454"><a href="#cb3-454" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Covariance-control similarity <span class="pp">|</span> selected admissible covariance control <span class="pp">|</span> 0.999986 <span class="pp">|</span> 0.999990 <span class="pp">|</span> 0.999994 <span class="pp">|</span></span>
+<span id="cb3-455"><a href="#cb3-455" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-456"><a href="#cb3-456" aria-hidden="true" tabindex="-1"></a>The matching state-only common-input derivative-RMSE median is 0.7001, a small</span>
+<span id="cb3-457"><a href="#cb3-457" aria-hidden="true" tabindex="-1"></a>scenario-specific difference rather than proof of autonomous or input-driven</span>
+<span id="cb3-458"><a href="#cb3-458" aria-hidden="true" tabindex="-1"></a>mechanism. Short-arc and non-wrapping jittered skew-plane median angles are</span>
+<span id="cb3-459"><a href="#cb3-459" aria-hidden="true" tabindex="-1"></a>1.0015° and 0.8561°. Smoothing lowers the skew derivative-RMSE median to 0.3413,</span>
+<span id="cb3-460"><a href="#cb3-460" aria-hidden="true" tabindex="-1"></a>showing preprocessing dependence rather than improved mechanistic truth. Under</span>
+<span id="cb3-461"><a href="#cb3-461" aria-hidden="true" tabindex="-1"></a>the nonorthogonal observation metric, skew-plane median angle is 12.2467° and</span>
+<span id="cb3-462"><a href="#cb3-462" aria-hidden="true" tabindex="-1"></a>skew derivative RMSE is 5.3649.</span>
+<span id="cb3-463"><a href="#cb3-463" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-464"><a href="#cb3-464" aria-hidden="true" tabindex="-1"></a>For the covariance control, replicate 0 excludes proposal 17 because its</span>
+<span id="cb3-465"><a href="#cb3-465" aria-hidden="true" tabindex="-1"></a>shifts <span class="in">`[3,3,3,3]`</span> are one global common relabeling; replicates 1 and 2 contain</span>
+<span id="cb3-466"><a href="#cb3-466" aria-hidden="true" tabindex="-1"></a>no uniform proposal. The selected admissible proposals in replicates 0/1/2 are</span>
+<span id="cb3-467"><a href="#cb3-467" aria-hidden="true" tabindex="-1"></a>0/19/4, with shifts <span class="in">`[5,5,3,3]`</span>, <span class="in">`[3,3,5,5]`</span> and <span class="in">`[1,4,2,2]`</span>. Their covariance</span>
+<span id="cb3-468"><a href="#cb3-468" aria-hidden="true" tabindex="-1"></a>similarities are 0.999995, 0.999990 and 0.999985; all exceed the predeclared</span>
+<span id="cb3-469"><a href="#cb3-469" aria-hidden="true" tabindex="-1"></a>0.97 threshold and therefore have machine-readable status <span class="in">`matched`</span>. The</span>
+<span id="cb3-470"><a href="#cb3-470" aria-hidden="true" tabindex="-1"></a>selected cross-coordinate correspondence-change fractions are 2/3, 2/3 and</span>
+<span id="cb3-471"><a href="#cb3-471" aria-hidden="true" tabindex="-1"></a>5/6, and selected score arrays change by nonzero amounts. These are selected</span>
+<span id="cb3-472"><a href="#cb3-472" aria-hidden="true" tabindex="-1"></a>near-matches from the admissible training proposal family, not preservation of</span>
+<span id="cb3-473"><a href="#cb3-473" aria-hidden="true" tabindex="-1"></a>condition identity or evidence for a rotational mechanism.</span>
+<span id="cb3-474"><a href="#cb3-474" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-475"><a href="#cb3-475" aria-hidden="true" tabindex="-1"></a><span class="al">![Separate demixing and rotational task summaries](artifacts/demixing-rotational-robustness/summary.png)</span></span>
+<span id="cb3-476"><a href="#cb3-476" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-477"><a href="#cb3-477" aria-hidden="true" tabindex="-1"></a>The upper panels show only reference stimulus marginal NMSE and reference</span>
+<span id="cb3-478"><a href="#cb3-478" aria-hidden="true" tabindex="-1"></a>stimulus decoding. The lower panels show only clean held-out derivative RMSE</span>
+<span id="cb3-479"><a href="#cb3-479" aria-hidden="true" tabindex="-1"></a>and clean rotational-plane angle. <span class="in">`pca_plane`</span> and <span class="in">`fixed_plane`</span> are visibly and</span>
+<span id="cb3-480"><a href="#cb3-480" aria-hidden="true" tabindex="-1"></a>numerically distinct. No panel mixes the two tasks or treats one target as a</span>
+<span id="cb3-481"><a href="#cb3-481" aria-hidden="true" tabindex="-1"></a>proxy for another.</span>
+<span id="cb3-482"><a href="#cb3-482" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-483"><a href="#cb3-483" aria-hidden="true" tabindex="-1"></a><span class="fu">## Interpretation limits</span></span>
+<span id="cb3-484"><a href="#cb3-484" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-485"><a href="#cb3-485" aria-hidden="true" tabindex="-1"></a>This object establishes only behavior under the declared generators, splits,</span>
+<span id="cb3-486"><a href="#cb3-486" aria-hidden="true" tabindex="-1"></a>scenario grids, targets, metrics and fitted information sets.</span>
+<span id="cb3-487"><a href="#cb3-487" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-488"><a href="#cb3-488" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Demixing is label- and loss-dependent.** It does not establish statistical</span>
+<span id="cb3-489"><a href="#cb3-489" aria-hidden="true" tabindex="-1"></a>  independence, blind-source separation, unique latent causes, neural modules,</span>
+<span id="cb3-490"><a href="#cb3-490" aria-hidden="true" tabindex="-1"></a>  anatomy, mechanism or causality.</span>
+<span id="cb3-491"><a href="#cb3-491" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Decoding accuracy is not representation, marginal reconstruction or</span>
+<span id="cb3-492"><a href="#cb3-492" aria-hidden="true" tabindex="-1"></a>  demixing. A shuffled-label control is a supervision control, not a causal</span>
+<span id="cb3-493"><a href="#cb3-493" aria-hidden="true" tabindex="-1"></a>  intervention on the data-generating system.</span>
+<span id="cb3-494"><a href="#cb3-494" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Missing/unbalanced cells and pseudo-populations change the estimand and</span>
+<span id="cb3-495"><a href="#cb3-495" aria-hidden="true" tabindex="-1"></a>  available joint information. Finite output does not restore unidentified</span>
+<span id="cb3-496"><a href="#cb3-496" aria-hidden="true" tabindex="-1"></a>  factorial effects or simultaneous noise structure.</span>
+<span id="cb3-497"><a href="#cb3-497" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Trial averaging and aligned smooth condition means can hide trial-level</span>
+<span id="cb3-498"><a href="#cb3-498" aria-hidden="true" tabindex="-1"></a>  variability. They are not evidence for latent dynamics.</span>
+<span id="cb3-499"><a href="#cb3-499" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**A rotational projection is not an oscillator, autonomous dynamical system,</span>
+<span id="cb3-500"><a href="#cb3-500" aria-hidden="true" tabindex="-1"></a>  vector field or mechanism.** Skew-constrained derivative fit describes a</span>
+<span id="cb3-501"><a href="#cb3-501" aria-hidden="true" tabindex="-1"></a>  projection under declared preprocessing and metric.</span>
+<span id="cb3-502"><a href="#cb3-502" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>A good plane angle does not imply good derivative prediction; high tangential</span>
+<span id="cb3-503"><a href="#cb3-503" aria-hidden="true" tabindex="-1"></a>  ratio does not imply a true rotational generator; good derivative prediction</span>
+<span id="cb3-504"><a href="#cb3-504" aria-hidden="true" tabindex="-1"></a>  does not imply autonomy or causality.</span>
+<span id="cb3-505"><a href="#cb3-505" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Latency sequences, common input, smoothing, subtraction, short windows,</span>
+<span id="cb3-506"><a href="#cb3-506" aria-hidden="true" tabindex="-1"></a>  timing jitter and nonorthogonal coordinates can create, remove or distort</span>
+<span id="cb3-507"><a href="#cb3-507" aria-hidden="true" tabindex="-1"></a>  rotational summaries.</span>
+<span id="cb3-508"><a href="#cb3-508" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>No result establishes manifold structure, intrinsic dimension, biological</span>
+<span id="cb3-509"><a href="#cb3-509" aria-hidden="true" tabindex="-1"></a>  validity, real-data transfer or universal method superiority.</span>
+<span id="cb3-510"><a href="#cb3-510" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-511"><a href="#cb3-511" aria-hidden="true" tabindex="-1"></a><span class="fu">## Reproducibility</span></span>
+<span id="cb3-512"><a href="#cb3-512" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-513"><a href="#cb3-513" aria-hidden="true" tabindex="-1"></a>Use the recorded bundled runtime:</span>
+<span id="cb3-514"><a href="#cb3-514" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-515"><a href="#cb3-515" aria-hidden="true" tabindex="-1"></a><span class="in">```bash</span></span>
+<span id="cb3-516"><a href="#cb3-516" aria-hidden="true" tabindex="-1"></a><span class="ex">/Users/bytedance/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3</span> benchmarks/demixing-rotational-robustness.py <span class="at">--generate</span></span>
+<span id="cb3-517"><a href="#cb3-517" aria-hidden="true" tabindex="-1"></a><span class="ex">/Users/bytedance/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3</span> benchmarks/demixing-rotational-robustness.py <span class="at">--verify</span></span>
+<span id="cb3-518"><a href="#cb3-518" aria-hidden="true" tabindex="-1"></a><span class="ex">/Users/bytedance/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3</span> benchmarks/demixing-rotational-robustness.py <span class="at">--generate</span> <span class="at">--resume</span></span>
+<span id="cb3-519"><a href="#cb3-519" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb3-520"><a href="#cb3-520" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-521"><a href="#cb3-521" aria-hidden="true" tabindex="-1"></a>The verifier checks:</span>
+<span id="cb3-522"><a href="#cb3-522" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-523"><a href="#cb3-523" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>exact four-artifact inventory and SHA-256 hashes;</span>
+<span id="cb3-524"><a href="#cb3-524" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>all 2,712 complete, unique, canonical raw rows and all 904 recomputed summaries;</span>
+<span id="cb3-525"><a href="#cb3-525" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>byte-identical clean regeneration and reversed task/scenario traversal;</span>
+<span id="cb3-526"><a href="#cb3-526" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>byte-identical valid partial resume and rejection of corrupted, duplicate,</span>
+<span id="cb3-527"><a href="#cb3-527" aria-hidden="true" tabindex="-1"></a>  unknown-key or incomplete resume rows;</span>
+<span id="cb3-528"><a href="#cb3-528" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>capability exclusion of test/truth from fitting;</span>
+<span id="cb3-529"><a href="#cb3-529" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>fixed-recovery invariance under truth poison;</span>
+<span id="cb3-530"><a href="#cb3-530" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>deterministic replay and independent hyperparameter selection for shuffled</span>
+<span id="cb3-531"><a href="#cb3-531" aria-hidden="true" tabindex="-1"></a>  dPCA/decoder controls;</span>
+<span id="cb3-532"><a href="#cb3-532" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>missing-cell rank/invalid routing, within-cell pseudo-population preservation,</span>
+<span id="cb3-533"><a href="#cb3-533" aria-hidden="true" tabindex="-1"></a>  non-wrapping shift replay and covariance-proposal argmax/threshold checks;</span>
+<span id="cb3-534"><a href="#cb3-534" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>direct demixing-direction, rotation-embedding, generator and</span>
+<span id="cb3-535"><a href="#cb3-535" aria-hidden="true" tabindex="-1"></a>  analytic-derivative diagnostics; and</span>
+<span id="cb3-536"><a href="#cb3-536" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>real-path non-finite and linear-algebra fault labels with applicability</span>
+<span id="cb3-537"><a href="#cb3-537" aria-hidden="true" tabindex="-1"></a>  precedence.</span>
+<span id="cb3-538"><a href="#cb3-538" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-539"><a href="#cb3-539" aria-hidden="true" tabindex="-1"></a>The maximum clean-generator diagnostics are a stimulus/decision direction inner</span>
+<span id="cb3-540"><a href="#cb3-540" aria-hidden="true" tabindex="-1"></a>product of approximately $2.08\times10^{-17}$, an actual embedding-plane angle</span>
+<span id="cb3-541"><a href="#cb3-541" aria-hidden="true" tabindex="-1"></a>of approximately $1.21\times10^{-6}$ degrees, a direct generator-recovery</span>
+<span id="cb3-542"><a href="#cb3-542" aria-hidden="true" tabindex="-1"></a>error of approximately $2.35\times10^{-15}$, and a</span>
+<span id="cb3-543"><a href="#cb3-543" aria-hidden="true" tabindex="-1"></a>central-finite-difference versus analytic derivative discrepancy of</span>
+<span id="cb3-544"><a href="#cb3-544" aria-hidden="true" tabindex="-1"></a>approximately $2.04\times10^{-2}$. The last value is a finite-grid</span>
+<span id="cb3-545"><a href="#cb3-545" aria-hidden="true" tabindex="-1"></a>discretization diagnostic, not a performance score.</span>
+<span id="cb3-546"><a href="#cb3-546" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-547"><a href="#cb3-547" aria-hidden="true" tabindex="-1"></a><span class="fu">## Review record</span></span>
+<span id="cb3-548"><a href="#cb3-548" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-549"><a href="#cb3-549" aria-hidden="true" tabindex="-1"></a>Independent scientific and implementation reviewers were read-only and independent of the executors. Their initial</span>
+<span id="cb3-550"><a href="#cb3-550" aria-hidden="true" tabindex="-1"></a>reviews returned <span class="in">`REVISE`</span> on missing-cell design-rank invalidity, within-cell pseudo-populations, independent shuffled-control selection, non-wrapping shifts, split metadata, distinct plane references, and nontrivial covariance-matched proposals. The bounded correction pass addressed only</span>
+<span id="cb3-551"><a href="#cb3-551" aria-hidden="true" tabindex="-1"></a>those findings; focused scientific and implementation re-reviews both returned</span>
+<span id="cb3-552"><a href="#cb3-552" aria-hidden="true" tabindex="-1"></a><span class="in">`PASS`</span> with no unresolved finding.</span>
+<span id="cb3-553"><a href="#cb3-553" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-554"><a href="#cb3-554" aria-hidden="true" tabindex="-1"></a>The accepted validation record includes 61-object structural validation, 33 repository tests, the enhanced artifact verifier, target/index renders, workflow validation, and <span class="in">`git diff --check`</span>. The recorded review decision then authorized the</span>
+<span id="cb3-555"><a href="#cb3-555" aria-hidden="true" tabindex="-1"></a>mechanical promotion to <span class="in">`L1/stable`</span>. Stable status records bounded acceptance of</span>
+<span id="cb3-556"><a href="#cb3-556" aria-hidden="true" tabindex="-1"></a>this declared synthetic Benchmark Object; it does not expand its evidence,</span>
+<span id="cb3-557"><a href="#cb3-557" aria-hidden="true" tabindex="-1"></a>information-set, target, or interpretation boundaries.</span>
+<span id="cb3-558"><a href="#cb3-558" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-559"><a href="#cb3-559" aria-hidden="true" tabindex="-1"></a><span class="fu">## Maturity checklist</span></span>
+<span id="cb3-560"><a href="#cb3-560" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-561"><a href="#cb3-561" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> Demixing and rotational projection are separate tasks with separate grids,</span>
+<span id="cb3-562"><a href="#cb3-562" aria-hidden="true" tabindex="-1"></a>  methods, targets, metrics, summaries and panels.</span>
+<span id="cb3-563"><a href="#cb3-563" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> All 19 scenarios and three independent replicates are declared.</span>
+<span id="cb3-564"><a href="#cb3-564" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> Generation, fitting/selection, frozen recovery and scoring boundaries are</span>
+<span id="cb3-565"><a href="#cb3-565" aria-hidden="true" tabindex="-1"></a>  explicit.</span>
+<span id="cb3-566"><a href="#cb3-566" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> Label and condition permutations are explicit negative-control paths.</span>
+<span id="cb3-567"><a href="#cb3-567" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> Marginal reconstruction, decoding, subspace, plane, rate, derivative,</span>
+<span id="cb3-568"><a href="#cb3-568" aria-hidden="true" tabindex="-1"></a>  tangential and covariance targets remain distinct.</span>
+<span id="cb3-569"><a href="#cb3-569" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> Applicability precedes failure, and raw replicate rows are retained.</span>
+<span id="cb3-570"><a href="#cb3-570" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> Exactly four byte-verifiable artifacts and authoritative commands are</span>
+<span id="cb3-571"><a href="#cb3-571" aria-hidden="true" tabindex="-1"></a>  recorded.</span>
+<span id="cb3-572"><a href="#cb3-572" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> Bounded results and interpretation limits are reconciled to the artifacts.</span>
+<span id="cb3-573"><a href="#cb3-573" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> Final focused scientific re-review PASS is recorded.</span>
+<span id="cb3-574"><a href="#cb3-574" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> Final focused implementation re-review PASS is recorded.</span>
+<span id="cb3-575"><a href="#cb3-575" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> review-authorized mechanical promotion to <span class="in">`L1/stable`</span> is complete.</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></div>
+</div></div></div></div></div>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

@@ -1,0 +1,1913 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.10.18">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Linear-Gaussian Inference Ladder – Latent Dynamics &amp; Geometry</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-445b8638c3d06994fee0907d791121c4.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-chtml.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../index.html">
+    <span class="navbar-title">Latent Dynamics &amp; Geometry</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../index.html"> 
+<span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../knowledge/concepts/index.html"> 
+<span class="menu-text">Concepts</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../knowledge/methods/index.html"> 
+<span class="menu-text">Methods</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../knowledge/math/index.html"> 
+<span class="menu-text">Math</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../knowledge/papers/index.html"> 
+<span class="menu-text">Papers</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../toy-models/index.html"> 
+<span class="menu-text">Toy Models</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../research-questions/index.html"> 
+<span class="menu-text">Research Questions</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../benchmarks/index.html"> 
+<span class="menu-text">Benchmarks</span></a>
+  </li>  
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/AbelZheng/latent-dynamics-geometry-public"> <i class="bi bi-github" role="img" aria-label="GitHub repository">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="https://github.com/AbelZheng/latent-dynamics-geometry-public/discussions"> 
+<span class="menu-text">Discussions</span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#linear-gaussian-inference-ladder" id="toc-linear-gaussian-inference-ladder" class="nav-link active" data-scroll-target="#linear-gaussian-inference-ladder">Linear-Gaussian Inference Ladder</a>
+  <ul class="collapse">
+  <li><a href="#question" id="toc-question" class="nav-link" data-scroll-target="#question">Question</a></li>
+  <li><a href="#ground-truth" id="toc-ground-truth" class="nav-link" data-scroll-target="#ground-truth">Ground truth</a></li>
+  <li><a href="#generative-model" id="toc-generative-model" class="nav-link" data-scroll-target="#generative-model">Generative model</a></li>
+  <li><a href="#parameters" id="toc-parameters" class="nav-link" data-scroll-target="#parameters">Parameters</a>
+  <ul class="collapse">
+  <li><a href="#primary-data-contract" id="toc-primary-data-contract" class="nav-link" data-scroll-target="#primary-data-contract">Primary data contract</a></li>
+  <li><a href="#finite-parameter-grid" id="toc-finite-parameter-grid" class="nav-link" data-scroll-target="#finite-parameter-grid">Finite parameter grid</a></li>
+  <li><a href="#stress-parameters" id="toc-stress-parameters" class="nav-link" data-scroll-target="#stress-parameters">Stress parameters</a></li>
+  </ul></li>
+  <li><a href="#simulation" id="toc-simulation" class="nav-link" data-scroll-target="#simulation">Simulation</a>
+  <ul class="collapse">
+  <li><a href="#correctly-specified-filtering" id="toc-correctly-specified-filtering" class="nav-link" data-scroll-target="#correctly-specified-filtering">Correctly specified filtering</a></li>
+  <li><a href="#fixed-interval-smoothing" id="toc-fixed-interval-smoothing" class="nav-link" data-scroll-target="#fixed-interval-smoothing">Fixed-interval smoothing</a></li>
+  <li><a href="#direct-batch-gaussian-conditioning-oracle" id="toc-direct-batch-gaussian-conditioning-oracle" class="nav-link" data-scroll-target="#direct-batch-gaussian-conditioning-oracle">Direct batch Gaussian conditioning oracle</a></li>
+  </ul></li>
+  <li><a href="#visualization" id="toc-visualization" class="nav-link" data-scroll-target="#visualization">Visualization</a></li>
+  <li><a href="#expected-behavior" id="toc-expected-behavior" class="nav-link" data-scroll-target="#expected-behavior">Expected behavior</a></li>
+  <li><a href="#parameter-manipulations" id="toc-parameter-manipulations" class="nav-link" data-scroll-target="#parameter-manipulations">Parameter manipulations</a>
+  <ul class="collapse">
+  <li><a href="#a.-correct-model-condition" id="toc-a.-correct-model-condition" class="nav-link" data-scroll-target="#a.-correct-model-condition">A. Correct-model condition</a></li>
+  <li><a href="#b.-wrong-processobservation-noise-ratios" id="toc-b.-wrong-processobservation-noise-ratios" class="nav-link" data-scroll-target="#b.-wrong-processobservation-noise-ratios">B. Wrong process/observation noise ratios</a></li>
+  <li><a href="#c.-contiguous-missing-block" id="toc-c.-contiguous-missing-block" class="nav-link" data-scroll-target="#c.-contiguous-missing-block">C. Contiguous missing block</a></li>
+  <li><a href="#d.-reset-boundary-failure" id="toc-d.-reset-boundary-failure" class="nav-link" data-scroll-target="#d.-reset-boundary-failure">D. Reset-boundary failure</a></li>
+  <li><a href="#e.-near-unit-root-stress" id="toc-e.-near-unit-root-stress" class="nav-link" data-scroll-target="#e.-near-unit-root-stress">E. Near-unit-root stress</a></li>
+  <li><a href="#f.-informative-missingness-warning" id="toc-f.-informative-missingness-warning" class="nav-link" data-scroll-target="#f.-informative-missingness-warning">F. Informative-missingness warning</a></li>
+  </ul></li>
+  <li><a href="#sanity-checks" id="toc-sanity-checks" class="nav-link" data-scroll-target="#sanity-checks">Sanity checks</a></li>
+  <li><a href="#failure-cases" id="toc-failure-cases" class="nav-link" data-scroll-target="#failure-cases">Failure cases</a></li>
+  <li><a href="#recovery-task" id="toc-recovery-task" class="nav-link" data-scroll-target="#recovery-task">Recovery task</a>
+  <ul class="collapse">
+  <li><a href="#prediction" id="toc-prediction" class="nav-link" data-scroll-target="#prediction">Prediction</a></li>
+  <li><a href="#latent-recovery" id="toc-latent-recovery" class="nav-link" data-scroll-target="#latent-recovery">Latent recovery</a></li>
+  <li><a href="#model-conditional-uncertainty" id="toc-model-conditional-uncertainty" class="nav-link" data-scroll-target="#model-conditional-uncertainty">Model-conditional uncertainty</a></li>
+  <li><a href="#parameter-uncertainty" id="toc-parameter-uncertainty" class="nav-link" data-scroll-target="#parameter-uncertainty">Parameter uncertainty</a></li>
+  </ul></li>
+  <li><a href="#candidate-analysis-methods" id="toc-candidate-analysis-methods" class="nav-link" data-scroll-target="#candidate-analysis-methods">Candidate analysis methods</a></li>
+  <li><a href="#evaluation" id="toc-evaluation" class="nav-link" data-scroll-target="#evaluation">Evaluation</a>
+  <ul class="collapse">
+  <li><a href="#empirical-results" id="toc-empirical-results" class="nav-link" data-scroll-target="#empirical-results">Empirical results</a></li>
+  </ul></li>
+  <li><a href="#interpretation" id="toc-interpretation" class="nav-link" data-scroll-target="#interpretation">Interpretation</a></li>
+  <li><a href="#what-this-toy-model-does-not-establish" id="toc-what-this-toy-model-does-not-establish" class="nav-link" data-scroll-target="#what-this-toy-model-does-not-establish">What this toy model does NOT establish</a></li>
+  <li><a href="#extensions-to-real-data" id="toc-extensions-to-real-data" class="nav-link" data-scroll-target="#extensions-to-real-data">Extensions to real data</a></li>
+  <li><a href="#reproducibility" id="toc-reproducibility" class="nav-link" data-scroll-target="#reproducibility">Reproducibility</a>
+  <ul class="collapse">
+  <li><a href="#bounded-artifact-contract" id="toc-bounded-artifact-contract" class="nav-link" data-scroll-target="#bounded-artifact-contract">Bounded artifact contract</a></li>
+  <li><a href="#evidence-inspected" id="toc-evidence-inspected" class="nav-link" data-scroll-target="#evidence-inspected">Evidence inspected</a></li>
+  <li><a href="#integration-and-validation-state" id="toc-integration-and-validation-state" class="nav-link" data-scroll-target="#integration-and-validation-state">Integration and validation state</a></li>
+  </ul></li>
+  <li><a href="#maturity-checklist" id="toc-maturity-checklist" class="nav-link" data-scroll-target="#maturity-checklist">Maturity checklist</a></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<div class="quarto-title-block"><div><h1 class="title">Linear-Gaussian Inference Ladder</h1><button type="button" class="btn code-tools-button" id="quarto-code-tools-source"><i class="bi"></i> Code</button></div></div>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="linear-gaussian-inference-ladder" class="level1">
+<h1>Linear-Gaussian Inference Ladder</h1>
+<p>This L1/stable object is the scientific and reproducibility record for the first Phase 3 generation/recovery vertical slice. It deliberately separates a known simulator, exact inference conditional on fixed parameters, finite-grid parameter selection, predictive scoring, latent-state recovery, and stress tests. Reported numerical values are deterministic outputs of the bounded implementation under master seed <code>20260819</code>; they are not inferred from the equations or generalized beyond this simulator.</p>
+<p><strong>Assumed background:</strong> scalar Gaussian conditioning, conditional expectation, covariance, and elementary time-series evaluation. The stable prerequisite Method Objects fix LDG terminology, but they are not substitutes for the external-source inspection recorded in <a href="#evidence-inspected">Evidence inspected</a>.</p>
+<section id="question" class="level2">
+<h2 class="anchored" data-anchor-id="question">Question</h2>
+<p>For a scalar discrete-time linear-Gaussian state-space model (LGSSM) with retained latent ground truth:</p>
+<ol type="1">
+<li>do a known-parameter Kalman filter, a known-parameter fixed-interval Rauch–Tung–Striebel (RTS) smoother, and direct batch Gaussian conditioning return the same model-conditional posterior marginals under their respective information sets;</li>
+<li>how do online prediction, online filtering, and retrospective smoothing differ from latent recovery and from observation prediction;</li>
+<li>how much performance and calibration change when parameters are selected from a finite grid rather than supplied by the generator; and</li>
+<li>how do wrong noise ratios, a contiguous missing block, a false sequence boundary, near-unit-root dynamics, and informative missingness expose model or interpretation failures?</li>
+</ol>
+<p>The primary acceptance question is numerical and inferential correctness under the declared model. It is not whether the recovered mean merely looks smooth.</p>
+</section>
+<section id="ground-truth" class="level2">
+<h2 class="anchored" data-anchor-id="ground-truth">Ground truth</h2>
+<p>For each independent sequence, the retained scalar latent state is (z_{1:T}), the observed scalar is (x_{1:T}), and the complete-data generator is</p>
+<p><span class="math display">\[
+z_1\sim\mathcal N(0,p_1),
+\qquad
+p_1=\frac{q}{1-a^2},
+\]</span></p>
+<p><span class="math display">\[
+z_{t+1}=a z_t+w_t,
+\qquad
+w_t\overset{\mathrm{iid}}\sim\mathcal N(0,q),
+\]</span></p>
+<p><span class="math display">\[
+x_t=z_t+v_t,
+\qquad
+v_t\overset{\mathrm{iid}}\sim\mathcal N(0,r),
+\]</span></p>
+<p>with (z_1), all (w_t), and all (v_t) mutually independent. The primary parameters are fixed before simulation:</p>
+<p><span class="math display">\[
+a=0.85,
+\qquad
+q=0.10,
+\qquad
+r=0.40,
+\qquad
+p_1=\frac{0.10}{1-0.85^2}.
+\]</span></p>
+<p>The initialization is the stationary zero-mean law for this scalar stable model. Stationarity is a property of the declared generator and initialization, not a conclusion inferred from a finite simulated trace.</p>
+<p>The observation map is the identity. This removes latent-coordinate ambiguity for this bounded scalar recovery test, but it does not make the latent state directly observed: (x_t) still contains independent measurement noise. Retaining (z_t) for scoring is a simulation privilege. Test latent truth is never an input to parameter selection, filtering, smoothing, or batch conditioning.</p>
+</section>
+<section id="generative-model" class="level2">
+<h2 class="anchored" data-anchor-id="generative-model">Generative model</h2>
+<p>Generation, masking, parameter selection, inference, and scoring are separate stages with separate function boundaries in the implementation.</p>
+<ol type="1">
+<li><strong>Generate complete sequences.</strong> For every sequence, draw a fresh (z_1), process-noise stream, and observation-noise stream from its split-specific random generator. Store the latent and complete observation arrays before applying any mask.</li>
+<li><strong>Assign immutable sequence boundaries.</strong> Train, validation, and test sequences are independent replicates. Every recovery method starts each sequence from the declared prior; no posterior mean or covariance crosses a true boundary.</li>
+<li><strong>Create masks without changing the complete arrays.</strong> The primary complete-data mask retains every observation. The missing-block mask removes a predeclared contiguous interval only on test copies. The informative-missingness negative control derives a separate observation-magnitude-dependent mask from the frozen test observations and is never treated as ignorable evidence.</li>
+<li><strong>Select parameters without latent truth.</strong> The finite grid reads only train and validation observations, masks, and sequence boundaries. It may use innovation likelihood, but no latent state or test quantity.</li>
+<li><strong>Run recovery.</strong> Known-parameter and selected-parameter methods receive observations, masks, boundaries, and their declared parameter tuple.</li>
+<li><strong>Score last.</strong> Latent truth is joined only after all posterior and predictive outputs have been frozen.</li>
+</ol>
+<p>This ordering prevents generation from being mistaken for recovery and prevents test latent states from becoming pseudo-observations.</p>
+</section>
+<section id="parameters" class="level2">
+<h2 class="anchored" data-anchor-id="parameters">Parameters</h2>
+<section id="primary-data-contract" class="level3">
+<h3 class="anchored" data-anchor-id="primary-data-contract">Primary data contract</h3>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 42%">
+<col style="width: 57%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Component</th>
+<th style="text-align: right;">Predeclared value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Train sequences</td>
+<td style="text-align: right;">12 independent sequences</td>
+</tr>
+<tr class="even">
+<td>Validation sequences</td>
+<td style="text-align: right;">6 independent sequences</td>
+</tr>
+<tr class="odd">
+<td>Test sequences</td>
+<td style="text-align: right;">8 independent sequences</td>
+</tr>
+<tr class="even">
+<td>Primary sequence length</td>
+<td style="text-align: right;">(T=80)</td>
+</tr>
+<tr class="odd">
+<td>Master seed</td>
+<td style="text-align: right;"><code>20260819</code> with split- and sequence-specific <code>SeedSequence</code> words</td>
+</tr>
+<tr class="even">
+<td>Primary parameters</td>
+<td style="text-align: right;">((a,q,r)=(0.85,0.10,0.40))</td>
+</tr>
+<tr class="odd">
+<td>Prior</td>
+<td style="text-align: right;">(m_1=0,&nbsp;p_1=q/(1-a^2))</td>
+</tr>
+<tr class="even">
+<td>Missing block</td>
+<td style="text-align: right;">zero-based indices ([30,45)), equivalently (t=31,,45) in one-based notation</td>
+</tr>
+<tr class="odd">
+<td>Nominal pointwise interval</td>
+<td style="text-align: right;">95% Gaussian posterior interval</td>
+</tr>
+<tr class="even">
+<td>Short-sequence batch oracle</td>
+<td style="text-align: right;">first 24 time points of the first test sequence</td>
+</tr>
+</tbody>
+</table>
+<p>The implementation uses NumPy <code>Generator(PCG64(SeedSequence(words)))</code> with distinct split and sequence words. Any change to these values is a contract change, not routine tuning. No primary-parameter correction was required.</p>
+</section>
+<section id="finite-parameter-grid" class="level3">
+<h3 class="anchored" data-anchor-id="finite-parameter-grid">Finite parameter grid</h3>
+<p>The learned-parameter variant is a bounded plug-in baseline over the 27 predeclared tuples</p>
+<p><span class="math display">\[
+a\in\{0.75,0.85,0.95\},
+\qquad
+q\in\{0.05,0.10,0.20\},
+\qquad
+r\in\{0.20,0.40,0.80\}.
+\]</span></p>
+<p>For every tuple, each sequence is reset to (m_1=0) and the tuple’s stationary variance (q/(1-a^2)). Selection minimizes the sum of the mean train and mean validation one-step innovation negative log likelihood. Test observations, test latent truth, and all test metrics remain unavailable until one tuple is frozen. Exact ties are broken lexicographically by ((a,q,r)), not by distance to the true parameters.</p>
+<p>This is finite-grid model selection over a declared candidate set. It is <strong>not</strong> a claim of unrestricted LGSSM maximum-likelihood estimation, consistency, or parameter-identification. Särkkä distinguishes known-parameter state inference from parameter inference and gives the prediction-error factorization of the marginal likelihood used here as a scoring rule <span class="citation" data-cites="Sarkka2013">(<a href="#ref-Sarkka2013" role="doc-biblioref">Särkkä 2013</a>, ch.&nbsp;12, especially sec.&nbsp;12.1)</span>.</p>
+</section>
+<section id="stress-parameters" class="level3">
+<h3 class="anchored" data-anchor-id="stress-parameters">Stress parameters</h3>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Condition</th>
+<th>Inference or generator change</th>
+<th>Role</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>correct</strong></td>
+<td>infer with ((0.85,0.10,0.40))</td>
+<td>primary correctness condition</td>
+</tr>
+<tr class="even">
+<td><strong>q_small_r_large</strong></td>
+<td>infer with ((0.85,0.025,0.80))</td>
+<td>overconfident transition / weak measurement weighting stress</td>
+</tr>
+<tr class="odd">
+<td><strong>q_large_r_small</strong></td>
+<td>infer with ((0.85,0.40,0.10))</td>
+<td>weak transition / strong measurement weighting stress</td>
+</tr>
+<tr class="even">
+<td><strong>selected_grid</strong></td>
+<td>infer with frozen grid-selected tuple</td>
+<td>bounded parameter-selection baseline</td>
+</tr>
+<tr class="odd">
+<td><strong>near_unit_root</strong></td>
+<td>generate and infer with ((0.99,0.02,0.40))</td>
+<td>separate stability and initialization stress</td>
+</tr>
+</tbody>
+</table>
+<p>The wrong-(q/r) conditions alter inference only; their data remain the primary generator. The near-unit-root condition is a separate generated data set of four sequences of length (T=160), using the dedicated stage word <code>40</code>. It is evaluated once with its matched stationary prior and once with a deliberately tight prior variance <code>0.05</code>. It is not pooled into primary success criteria.</p>
+</section>
+</section>
+<section id="simulation" class="level2">
+<h2 class="anchored" data-anchor-id="simulation">Simulation</h2>
+<p>The implementation must use the existing Python/NumPy runtime and must not install a dependency. For each split, generation is vectorized across independent sequences only where this does not obscure resets. Stored arrays preserve a sequence axis; flattening sequences before inference is prohibited except in the explicit reset-boundary negative control.</p>
+<p>The generator retains (z) and (x) with split and sequence identities. Recovery functions receive observations, masks, boundaries, and parameters rather than the latent array. Computed poison diagnostics change test observations or every latent array and verify that grid selection and recovery outputs remain unchanged; separate-sequence invocation is also compared numerically with the stacked multi-sequence path. Retained latent values enter only the later scoring functions.</p>
+<section id="correctly-specified-filtering" class="level3">
+<h3 class="anchored" data-anchor-id="correctly-specified-filtering">Correctly specified filtering</h3>
+<p>Let</p>
+<p><span class="math display">\[
+\mathcal I_t^{\mathrm{F}}=\sigma(x_s:\ s\le t,\ x_s\text{ observed})
+\]</span></p>
+<p>be the online information set. Before observing (x_t), the scalar prediction is</p>
+<p><span class="math display">\[
+m_{t\mid t-1}=a m_{t-1\mid t-1},
+\qquad
+p_{t\mid t-1}=a^2p_{t-1\mid t-1}+q,
+\]</span></p>
+<p>with (m_{1}=0) and (p_{1}=p_1). For an observed (x_t),</p>
+<p><span class="math display">\[
+\nu_t=x_t-m_{t\mid t-1},
+\qquad
+s_t=p_{t\mid t-1}+r,
+\qquad
+k_t=\frac{p_{t\mid t-1}}{s_t},
+\]</span></p>
+<p><span class="math display">\[
+m_{t\mid t}=m_{t\mid t-1}+k_t\nu_t,
+\qquad
+p_{t\mid t}=p_{t\mid t-1}-k_t^2s_t.
+\]</span></p>
+<p>These are the scalar specialization of exact linear-Gaussian Bayesian filtering <span class="citation" data-cites="Kalman1960 Sarkka2013">(<a href="#ref-Kalman1960" role="doc-biblioref">Kalman 1960</a>; <a href="#ref-Sarkka2013" role="doc-biblioref">Särkkä 2013</a>, theorem 4.2)</span>. If (x_t) is missing, no pseudo-observation is inserted:</p>
+<p><span class="math display">\[
+m_{t\mid t}=m_{t\mid t-1},
+\qquad
+p_{t\mid t}=p_{t\mid t-1}.
+\]</span></p>
+<p>Thus a filter traverses the declared missing block by repeated open-loop prediction. It cannot use observations after the current time.</p>
+</section>
+<section id="fixed-interval-smoothing" class="level3">
+<h3 class="anchored" data-anchor-id="fixed-interval-smoothing">Fixed-interval smoothing</h3>
+<p>Let</p>
+<p><span class="math display">\[
+\mathcal I_T^{\mathrm{S}}=\sigma(x_s:\ 1\le s\le T,\ x_s\text{ observed})
+\]</span></p>
+<p>be the retrospective information set. Starting from (m_{TT},p_{TT}), the scalar RTS recursion is</p>
+<p><span class="math display">\[
+j_t=\frac{p_{t\mid t}a}{p_{t+1\mid t}},
+\]</span></p>
+<p><span class="math display">\[
+m_{t\mid T}=m_{t\mid t}+j_t\left(m_{t+1\mid T}-m_{t+1\mid t}\right),
+\]</span></p>
+<p><span class="math display">\[
+p_{t\mid T}=p_{t\mid t}+j_t^2\left(p_{t+1\mid T}-p_{t+1\mid t}\right).
+\]</span></p>
+<p>Rauch, Tung, and Striebel derive the backward recursion from the forward filtering solution; the modern Bayesian statement makes explicit that it computes (p(z_tx_{1:T})), whereas filtering computes (p(z_tx_{1:t})) <span class="citation" data-cites="RauchTungStriebel1965 Sarkka2013">(<a href="#ref-RauchTungStriebel1965" role="doc-biblioref">Rauch et al. 1965, sec. 3.2</a>; <a href="#ref-Sarkka2013" role="doc-biblioref">Särkkä 2013, secs. 8.1–8.2</a>)</span>. Later observations may therefore revise states inside the missing block. That revision is valid only retrospectively and must never be described as information available online at time (t).</p>
+</section>
+<section id="direct-batch-gaussian-conditioning-oracle" class="level3">
+<h3 class="anchored" data-anchor-id="direct-batch-gaussian-conditioning-oracle">Direct batch Gaussian conditioning oracle</h3>
+<p>For a bounded sequence, construct the prior path mean (m_z=0) and covariance (K_z) from the declared prior and transition recursion. Under the stationary primary model,</p>
+<p><span class="math display">\[
+(K_z)_{ij}=p_1 a^{|i-j|}.
+\]</span></p>
+<p>For observed time indices (O), let (H_O) select those state coordinates and let (x_O) be the corresponding observation vector. Direct conditioning gives</p>
+<p><span class="math display">\[
+\mu_{z\mid x_O}
+=m_z+K_zH_O^\top
+\left(H_OK_zH_O^\top+rI\right)^{-1}
+(x_O-H_Om_z),
+\]</span></p>
+<p><span class="math display">\[
+\Sigma_{z\mid x_O}
+=K_z-K_zH_O^\top
+\left(H_OK_zH_O^\top+rI\right)^{-1}
+H_OK_z.
+\]</span></p>
+<p>The implementation must use a linear solve, not an explicit matrix inverse. For each short oracle sequence, conditioning on observations through (t) supplies the current-time filter oracle, while conditioning on every observed time through (T) supplies the full smoother oracle. Agreement with this independently assembled joint Gaussian is an implementation test, not an additional estimator <span class="citation" data-cites="Sarkka2013">(<a href="#ref-Sarkka2013" role="doc-biblioref">Särkkä 2013, secs. 4.1–4.3, 8.1–8.2</a>)</span>.</p>
+</section>
+</section>
+<section id="visualization" class="level2">
+<h2 class="anchored" data-anchor-id="visualization">Visualization</h2>
+<p>Exactly one composite <strong>summary.png</strong> is allowed. It must have a scientific checking purpose and contain no decorative panels:</p>
+<ol type="1">
+<li>one predeclared test sequence with latent truth, observations, filter mean, smoother mean, and filter 95% model-conditional intervals;</li>
+<li>the same sequence with the missing block visibly marked;</li>
+<li>numerical oracle and leakage summaries; and</li>
+<li>compact metric and failure-diagnostic panels distinguishing known parameters, selected parameters, wrong-(q/r), reset, near-unit-root, and informative-missingness stresses.</li>
+</ol>
+<p>The caption must state that the smoother is retrospective and that the intervals condition on fixed parameters. Visual overlap, smoothness, or a compelling trajectory is never an acceptance oracle.</p>
+</section>
+<section id="expected-behavior" class="level2">
+<h2 class="anchored" data-anchor-id="expected-behavior">Expected behavior</h2>
+<p>These are model-derived expectations, not prefilled empirical results.</p>
+<ul>
+<li>In exact arithmetic under the correct fixed model, recursive filtering and smoothing should equal direct Gaussian conditioning for the same observations and information set <span class="citation" data-cites="Sarkka2013">(<a href="#ref-Sarkka2013" role="doc-biblioref">Särkkä 2013</a>, theorems 4.2 and 8.2)</span>.</li>
+<li>Under the exact fixed model, (p_{tT}p_{tt}) because smoothing conditions on a superset of observations. Floating-point violations beyond tolerance indicate an implementation problem, not negative variance.</li>
+<li>Under the correct generator, posterior means are conditional-MSE-optimal for their own information sets. Across repeated draws, the smoother can have lower expected latent MSE than the filter, but any finite test realization may deviate. Lower smoothing RMSE does not make smoothing suitable for an online task.</li>
+<li>During a missing block, the filter mean and variance evolve only through the transition. The smoother may revise that interval using later observations, but only after the interval endpoint is available.</li>
+<li>Wrong (q/r) changes gains, innovation variance, posterior width, and retrospective coupling. The direction and size of finite-sample metric changes are empirical outputs, not guaranteed numerical values.</li>
+<li>Near (a=1), stationary variance and long-horizon predictive uncertainty are larger and initialization effects can persist. This stress is reported separately rather than used to redefine primary success.</li>
+</ul>
+</section>
+<section id="parameter-manipulations" class="level2">
+<h2 class="anchored" data-anchor-id="parameter-manipulations">Parameter manipulations</h2>
+<section id="a.-correct-model-condition" class="level3">
+<h3 class="anchored" data-anchor-id="a.-correct-model-condition">A. Correct-model condition</h3>
+<p>Use the true tuple for filtering, smoothing, prediction, and batch conditioning. This condition tests exact-inference implementation and finite-sample recovery separately:</p>
+<ul>
+<li>batch-versus-recursion discrepancies test numerical implementation;</li>
+<li>latent RMSE and coverage test recovery under one realized sample from the declared correct model; and</li>
+<li>predictive negative log likelihood and innovations test the observation distribution.</li>
+</ul>
+<p>Low RMSE is not required for posterior correctness on every realization, because process and observation noise leave irreducible uncertainty.</p>
+</section>
+<section id="b.-wrong-processobservation-noise-ratios" class="level3">
+<h3 class="anchored" data-anchor-id="b.-wrong-processobservation-noise-ratios">B. Wrong process/observation noise ratios</h3>
+<p>Apply <strong>q_small_r_large</strong> and <strong>q_large_r_small</strong> to the unchanged primary test observations. Score predictive likelihood, filter and smoother latent RMSE, interval coverage, mean posterior variance, standardized innovation variance, and lag-1 autocorrelation. These are plug-in, misspecified posteriors. Their intervals do not become valid uncertainty statements about the true generator merely because the covariance recursion remains algebraically valid.</p>
+</section>
+<section id="c.-contiguous-missing-block" class="level3">
+<h3 class="anchored" data-anchor-id="c.-contiguous-missing-block">C. Contiguous missing block</h3>
+<p>Remove zero-based observations (x_{30:45}) from every primary test sequence before both forward and backward inference. Score missing-block and observed-region errors separately. Innovation likelihood is computed only where observations are available. The filter’s block trajectory is an online prediction from pre-block information; the smoother’s block trajectory is a retrospective reconstruction using both sides. Comparing their RMSE must preserve that information-set difference.</p>
+</section>
+<section id="d.-reset-boundary-failure" class="level3">
+<h3 class="anchored" data-anchor-id="d.-reset-boundary-failure">D. Reset-boundary failure</h3>
+<p>Take the first two independently generated primary test sequences and, only for this negative control, concatenate them without resetting the prior at the join. Run the same parameter tuple as though the join were a real transition. Compare against correct separate-sequence inference using the inherited boundary prediction, first-state estimate difference, artificial-continuity magnitude, and proper-versus-joined RMSE over the first eight states of the second sequence.</p>
+<p>The intended demonstration is that carrying a posterior across an independent reset can impose artificial continuity or otherwise distort inference near the join. The realized direction and magnitude are reported, not guaranteed. The negative control must never alter ordinary split handling.</p>
+</section>
+<section id="e.-near-unit-root-stress" class="level3">
+<h3 class="anchored" data-anchor-id="e.-near-unit-root-stress">E. Near-unit-root stress</h3>
+<p>Generate the separate (a=0.99) condition and compare matched-stationary versus tight-variance initialization. Report stationary prior variance, maximum filter and smoother variance, first-20-step mean/variance sensitivity, and covariance finiteness/nonnegativity. In addition, propagate variance without observations to fixed horizons (h{1,10,50,100,200}) under both initializations. This diagnostic separates long-horizon predictive uncertainty from posterior variance under continuous measurement updates. It is not a second primary model and cannot rescue a failed primary oracle.</p>
+</section>
+<section id="f.-informative-missingness-warning" class="level3">
+<h3 class="anchored" data-anchor-id="f.-informative-missingness-warning">F. Informative-missingness warning</h3>
+<p>For a warning-only negative control, hide an observation whenever (|x_t|&gt;0.9). The ordinary skipped-update filter and smoother deliberately ignore the information carried by that observation-dependent mask. The posterior target under a joint observation–missingness model is therefore not the same as conditioning only on retained values. The resulting missing fraction, latent magnitude inside/outside the mask, and skipped-update filter RMSE are labeled <strong>uncorrected informative-missingness stress</strong>, excluded from primary acceptance, and used only to show why an ignorable-missingness interpretation fails. No correction or calibrated uncertainty claim is permitted without explicitly modeling the missingness process.</p>
+</section>
+</section>
+<section id="sanity-checks" class="level2">
+<h2 class="anchored" data-anchor-id="sanity-checks">Sanity checks</h2>
+<p>The implementation and generated diagnostics must assert all of the following.</p>
+<ol type="1">
+<li><strong>Filter batch equivalence:</strong> for every short oracle prefix and observed mask, the recursive (m_{tt},p_{tt}) equal the current-time marginal from direct conditioning on observations through (t).</li>
+<li><strong>Smoother batch equivalence:</strong> all short-sequence (m_{tT},p_{tT}) equal the corresponding full batch posterior marginals.</li>
+<li><strong>Nested-information variance:</strong> (p_{tT}p_{tt}+10^{-12}) for the regular correct-model computations.</li>
+<li><strong>No look-ahead:</strong> changing (x_{t+1:T}) while holding (x_{1:t}) fixed cannot change any stored filter output through (t); it may change smoother outputs.</li>
+<li><strong>No latent leakage:</strong> parameter selection and inference inputs contain no latent array, and test latent truth is joined only by the scoring stage.</li>
+<li><strong>Boundary reset:</strong> separate-sequence outputs equal outputs obtained by running each sequence independently; only the named negative control omits the reset.</li>
+<li><strong>Numerical covariance:</strong> assembled batch covariances are symmetric within (10^{-12}); all scalar variances are at least (-10^{-12}); oracle mean and variance discrepancies are at most (10^{-10}) in absolute value.</li>
+<li><strong>Missing-block handling:</strong> no innovation or likelihood contribution is emitted at hidden times, and skipped updates equal predictions exactly within floating-point tolerance.</li>
+<li><strong>Determinism:</strong> two clean executions with the same runtime and command produce byte-identical <strong>manifest.json</strong>, <strong>metrics.csv</strong>, <strong>diagnostics.json</strong>, and <strong>summary.png</strong>.</li>
+<li><strong>Metric provenance:</strong> every metrics row identifies split, condition, parameter source, method, inference target, region, metric, and value.</li>
+</ol>
+<p>Tolerance values belong in the manifest. Passing structural checks does not establish scientific model adequacy.</p>
+</section>
+<section id="failure-cases" class="level2">
+<h2 class="anchored" data-anchor-id="failure-cases">Failure cases</h2>
+<ul>
+<li><strong>Filter reads the future:</strong> any dependence of a filter output at (t) on (x_{t+1:T}) is leakage and a hard failure.</li>
+<li><strong>Smoother mislabeled online:</strong> a retrospective estimate presented as available at time (t) is an inferential failure even if its arithmetic is correct.</li>
+<li><strong>Batch disagreement:</strong> discrepancies above tolerance under the same fixed model indicate indexing, covariance, masking, or conditioning errors.</li>
+<li><strong>Latent truth enters selection:</strong> any grid criterion, preprocessing decision, or posterior conditioned on (z_t) invalidates the learned-parameter comparison.</li>
+<li><strong>State propagates across true boundaries:</strong> failure to reset invents dependence between independent sequences.</li>
+<li><strong>Wrong-noise certainty interpreted as calibrated:</strong> covariance is conditional on the assumed tuple; misspecified plug-in intervals can be narrow and wrong.</li>
+<li><strong>Parameter uncertainty omitted silently:</strong> selected-grid posterior intervals exclude uncertainty over the selection procedure and candidate tuple.</li>
+<li><strong>Missingness treated as ignorable without justification:</strong> state-dependent absence changes the conditioning problem.</li>
+<li><strong>Near-unit-root results pooled with primary results:</strong> doing so changes the acceptance population and obscures initialization sensitivity.</li>
+<li><strong>Plausible figure replaces numerical checks:</strong> visual smoothness cannot verify a posterior, a boundary, or calibration.</li>
+<li><strong>Recovery treated as mechanism:</strong> successful state estimation in a simulator does not establish a causal or biological transition law.</li>
+</ul>
+</section>
+<section id="recovery-task" class="level2">
+<h2 class="anchored" data-anchor-id="recovery-task">Recovery task</h2>
+<p>The recovery outputs are kept distinct.</p>
+<section id="prediction" class="level3">
+<h3 class="anchored" data-anchor-id="prediction">Prediction</h3>
+<p>For observed times, the one-step observation predictive law is</p>
+<p><span class="math display">\[
+x_t\mid x_{1:t-1}\sim
+\mathcal N(m_{t\mid t-1},s_t),
+\qquad
+s_t=p_{t\mid t-1}+r.
+\]</span></p>
+<p>The held-out one-step negative log likelihood and standardized innovation (_t/) score this observation prediction. Smoothing does not produce a new prospective sequence likelihood; the same forward predictive factorization supplies the fixed-parameter likelihood <span class="citation" data-cites="Sarkka2013">(<a href="#ref-Sarkka2013" role="doc-biblioref">Särkkä 2013, sec. 12.1.1</a>)</span>.</p>
+</section>
+<section id="latent-recovery" class="level3">
+<h3 class="anchored" data-anchor-id="latent-recovery">Latent recovery</h3>
+<p>Filter and smoother posterior means are scored against retained (z_t) only after inference. Filtering RMSE evaluates online recovery; smoothing RMSE evaluates retrospective recovery. They are different tasks because their conditioning sigma-fields differ.</p>
+</section>
+<section id="model-conditional-uncertainty" class="level3">
+<h3 class="anchored" data-anchor-id="model-conditional-uncertainty">Model-conditional uncertainty</h3>
+<p>Pointwise 95% coverage uses</p>
+<p><span class="math display">\[
+m\pm 1.959963984540054\sqrt{p}
+\]</span></p>
+<p>for the relevant filter or smoother posterior. Coverage is aggregated across independent test sequences and time points, with missing-block inside/outside records. It describes repeated-simulation behavior under a fixed assumed tuple. A single interval does not carry a frequentist guarantee for one state, and finite-sample aggregate coverage need not equal 0.95 exactly.</p>
+</section>
+<section id="parameter-uncertainty" class="level3">
+<h3 class="anchored" data-anchor-id="parameter-uncertainty">Parameter uncertainty</h3>
+<p>Known-parameter intervals condition on the true tuple. Selected-grid intervals condition on one frozen selected tuple. Neither integrates over parameter uncertainty. The learned-versus-known gap is reported in prediction, recovery, and coverage metrics, but no plug-in covariance is called total uncertainty.</p>
+</section>
+</section>
+<section id="candidate-analysis-methods" class="level2">
+<h2 class="anchored" data-anchor-id="candidate-analysis-methods">Candidate analysis methods</h2>
+<ol type="1">
+<li><strong>Stationary-mean reference.</strong> Use the generator’s zero stationary mean as a deliberately non-temporal latent point reference. No latent posterior coverage is reported.</li>
+<li><strong>Persistence / last observation.</strong> Use a latent point proxy equal to the most recent observed (x); before any observation use zero. It has no model-conditional state interval.</li>
+<li><strong>Open-loop state prediction.</strong> Assimilate the first available observation once using the declared model, then propagate without further updates. It is a bounded no-reassimilation baseline; prediction-only propagation inside a missing block is also the filter’s exact behavior conditional on its last filtered state.</li>
+<li><strong>Known-parameter Kalman filter.</strong> Compute online predictive and filtering distributions using only data through the current time <span class="citation" data-cites="Kalman1960 Sarkka2013">(<a href="#ref-Kalman1960" role="doc-biblioref">Kalman 1960</a>; <a href="#ref-Sarkka2013" role="doc-biblioref">Särkkä 2013</a>, ch.&nbsp;4)</span>.</li>
+<li><strong>Known-parameter RTS smoother.</strong> Run the fixed-interval backward pass after the complete declared interval is available <span class="citation" data-cites="RauchTungStriebel1965 Sarkka2013">(<a href="#ref-RauchTungStriebel1965" role="doc-biblioref">Rauch et al. 1965</a>; <a href="#ref-Sarkka2013" role="doc-biblioref">Särkkä 2013</a>, ch.&nbsp;8)</span>.</li>
+<li><strong>Direct batch Gaussian conditioning.</strong> Use only bounded short sequences as an independently assembled correctness oracle.</li>
+<li><strong>Selected-grid filter and smoother.</strong> Freeze the finite-grid tuple selected by train/validation innovation likelihood, then evaluate on untouched test sequences.</li>
+</ol>
+<p>Static Factor Analysis is a conceptual prerequisite and order-blind comparison, not an executable candidate in this scalar unit. It cannot represent the transition or distinguish online from retrospective information merely because factor scores happen to be smooth.</p>
+</section>
+<section id="evaluation" class="level2">
+<h2 class="anchored" data-anchor-id="evaluation">Evaluation</h2>
+<p>Every metrics row includes:</p>
+<pre class="text"><code>split, condition, parameter_source, method, inference_target,
+region, metric, value</code></pre>
+<p>Required metrics are:</p>
+<ul>
+<li>held-out one-step predictive negative log likelihood at observed test times;</li>
+<li>filtering latent RMSE and smoothing latent RMSE;</li>
+<li>pointwise 95% posterior interval coverage;</li>
+<li>innovation mean, variance, and lag-1 autocorrelation, using standardized innovations for calibration summaries;</li>
+<li>mean filtering variance and mean smoothing variance;</li>
+<li>maximum absolute batch-versus-recursion mean and variance discrepancy;</li>
+<li>missing-block inside and outside RMSE/coverage;</li>
+<li>wrong-parameter stress metrics;</li>
+<li>selected-grid versus known-parameter gaps; and</li>
+<li>reset-boundary predictive and local-recovery diagnostics.</li>
+</ul>
+<p>Train and validation likelihood rows used for selection remain distinct from test evaluation rows. Metrics that do not apply are omitted rather than coerced to zero. In particular, baselines without a latent posterior have no coverage row, and smoothing has no separate prospective one-step likelihood row.</p>
+<section id="empirical-results" class="level3">
+<h3 class="anchored" data-anchor-id="empirical-results">Empirical results</h3>
+<p>These values are read from the generated <code>manifest.json</code>, <code>metrics.csv</code>, and <code>diagnostics.json</code>; they remain conditional on this implementation and fixed random seed.</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Acceptance item</th>
+<th>Result</th>
+<th>Artifact field</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Selected grid tuple</td>
+<td>((0.85,0.10,0.40)), equal to the generating tuple within this finite grid</td>
+<td>manifest: selected parameters</td>
+</tr>
+<tr class="even">
+<td>Maximum filter-versus-batch mean discrepancy</td>
+<td>(1.94^{-16})</td>
+<td>diagnostics: filter mean maximum absolute discrepancy</td>
+</tr>
+<tr class="odd">
+<td>Maximum filter-versus-batch variance discrepancy</td>
+<td>(2.78^{-17})</td>
+<td>diagnostics: filter variance maximum absolute discrepancy</td>
+</tr>
+<tr class="even">
+<td>Maximum smoother-versus-batch mean discrepancy</td>
+<td>(2.36^{-16})</td>
+<td>diagnostics: smoother mean maximum absolute discrepancy</td>
+</tr>
+<tr class="odd">
+<td>Maximum smoother-versus-batch variance discrepancy</td>
+<td>(1.39^{-16})</td>
+<td>diagnostics: smoother variance maximum absolute discrepancy</td>
+</tr>
+<tr class="even">
+<td>Maximum smoothing-over-filtering variance violation</td>
+<td>(0)</td>
+<td>diagnostics: covariance excess</td>
+</tr>
+<tr class="odd">
+<td>Correct-model test predictive NLL</td>
+<td>1.1115 per observed point</td>
+<td>metrics: correct-model filter</td>
+</tr>
+<tr class="even">
+<td>Correct-model filter / smoother RMSE</td>
+<td>0.3558 / 0.3141</td>
+<td>metrics: correct-model all times</td>
+</tr>
+<tr class="odd">
+<td>Correct-model filter / smoother coverage</td>
+<td>0.9484 / 0.9484</td>
+<td>metrics: correct-model 95% intervals</td>
+</tr>
+<tr class="even">
+<td>Missing-block filter RMSE inside / outside</td>
+<td>0.6148 / 0.3649</td>
+<td>metrics: missing block</td>
+</tr>
+<tr class="odd">
+<td>Missing-block smoother RMSE inside / outside</td>
+<td>0.5950 / 0.3233</td>
+<td>metrics: missing block</td>
+</tr>
+<tr class="even">
+<td>Wrong-(q/r) filter RMSE</td>
+<td>0.4788 for small-(q)/large-(r); 0.5070 for large-(q)/small-(r)</td>
+<td>metrics: wrong-parameter stresses</td>
+</tr>
+<tr class="odd">
+<td>Wrong-(q/r) filter coverage</td>
+<td>0.7063 / 0.7438, below the correct-model 0.9484</td>
+<td>metrics: wrong-parameter stresses</td>
+</tr>
+<tr class="even">
+<td>Reset-boundary failure diagnostic</td>
+<td>artificial boundary continuity 0.8724; proper/joined first-eight RMSE 0.3335 / 0.3828</td>
+<td>diagnostics: reset boundary</td>
+</tr>
+<tr class="odd">
+<td>Near-unit-root stress</td>
+<td>stationary prior variance 1.0050; first-20 initialization mean sensitivity 1.0643; tight-prior open-loop variance rises from 0.0690 at (h=1) to 0.9879 at (h=200), approaching the stationary 1.0050; finite nonnegative variances</td>
+<td>diagnostics: near-unit-root</td>
+</tr>
+<tr class="even">
+<td>Informative-missingness warning</td>
+<td>missing fraction 0.2844; mean (</td>
+<td>z</td>
+</tr>
+<tr class="odd">
+<td>Deterministic rerun</td>
+<td>byte-identical manifest, CSV, diagnostics, and PNG in temporary regeneration</td>
+<td>verifier and manifest hashes</td>
+</tr>
+</tbody>
+</table>
+<p>The selected-grid prediction, recovery, and coverage gaps are zero here because the finite grid selected the generating tuple. This favorable finite-sample outcome is not a general parameter-learning result. The smoother’s lower RMSE uses later observations and is not an online comparison. Both wrong-noise conditions degraded RMSE and interval coverage, while the reset negative control imposed a nonzero inherited boundary prediction. In the near-unit stress, a tight initial variance approached the model’s stationary variance slowly under open-loop propagation; this is a diagnostic of the declared (a=0.99) model, not a universal unit-root effect size.</p>
+</section>
+</section>
+<section id="interpretation" class="level2">
+<h2 class="anchored" data-anchor-id="interpretation">Interpretation</h2>
+<p>The passed correct-model oracle establishes that, for the declared scalar LGSSM and numerical tolerance, the implementation returns the same fixed-parameter Gaussian marginals by recursive and batch routes. Recovery metrics would then describe finite simulations from that generator. They would not establish that any real data source is linear, Gaussian, stationary, first-order Markov, correctly segmented, or governed by the recovered transition.</p>
+<p>Filtering and smoothing must remain separate in every table and caption. The filter answers an online question with (x_{1:t}); the smoother answers a retrospective question with (x_{1:T}). More information can improve retrospective state reconstruction without making the smoother a fair competitor for a prospective decision.</p>
+<p>Wrong-(q/r), missing-block, boundary, and near-unit-root conditions diagnose sensitivity to assumptions. They do not provide a generic ranking of all state-space methods. A selected grid point is one data-dependent plug-in model among 27 candidates, not recovered ground truth.</p>
+</section>
+<section id="what-this-toy-model-does-not-establish" class="level2">
+<h2 class="anchored" data-anchor-id="what-this-toy-model-does-not-establish">What this toy model does NOT establish</h2>
+<ul>
+<li>It does not prove that observed data lie on a manifold or possess non-Euclidean geometry.</li>
+<li>It does not identify a causal, physical, neural, or biological state.</li>
+<li>It does not show that temporal correlation is a mechanistic dynamical law.</li>
+<li>It does not turn decoding or latent RMSE into evidence of representation.</li>
+<li>It does not prove unrestricted parameter identifiability or successful maximum-likelihood learning.</li>
+<li>It does not include parameter uncertainty in plug-in posterior intervals.</li>
+<li>It does not make fixed-interval smoothing online, causal, or prospectively available.</li>
+<li>It does not validate skipped updates under informative missingness.</li>
+<li>It does not imply that low reconstruction error, nominal coverage, or a smooth plot is sufficient evidence for model adequacy.</li>
+<li>It does not authorize extension to another Phase 3 candidate or promotion to <strong>stable</strong>.</li>
+</ul>
+</section>
+<section id="extensions-to-real-data" class="level2">
+<h2 class="anchored" data-anchor-id="extensions-to-real-data">Extensions to real data</h2>
+<p>Before a real-data use, the analyst would need to justify observation units, sampling intervals, sequence resets, covariates, latent dimension, transition and noise structure, missingness, nonstationarity, and evaluation splits. Parameters and preprocessing must be learned on independent training units. Prospective tasks require filtering or forecasting; retrospective smoothing outputs cannot be backdated into an online analysis. Residual and predictive checks should test Gaussianity, white innovations, heteroscedasticity, regime changes, and boundary effects. None of those extensions is executed here.</p>
+</section>
+<section id="reproducibility" class="level2">
+<h2 class="anchored" data-anchor-id="reproducibility">Reproducibility</h2>
+<section id="bounded-artifact-contract" class="level3">
+<h3 class="anchored" data-anchor-id="bounded-artifact-contract">Bounded artifact contract</h3>
+<p>The implementation owner may create only:</p>
+<pre class="text"><code>toy-models/linear-gaussian-inference-ladder.py
+toy-models/artifacts/linear-gaussian-inference-ladder/manifest.json
+toy-models/artifacts/linear-gaussian-inference-ladder/metrics.csv
+toy-models/artifacts/linear-gaussian-inference-ladder/diagnostics.json
+toy-models/artifacts/linear-gaussian-inference-ladder/summary.png</code></pre>
+<p>The source script must regenerate every artifact from scratch. The manifest records equations, all seeds, split sizes, sequence lengths, parameter grid and tie rule, selected tuple, missing-block indices, stress definitions, runtime and package versions, numerical tolerances, generation command, verification command, and SHA-256 hashes. <strong>metrics.csv</strong> contains tidy labelled records, not hand-entered summaries. <strong>diagnostics.json</strong> contains oracle, leakage, covariance, reset, near-unit-root, informative-missingness-warning, and deterministic-rerun checks. The single PNG is derived from the same frozen arrays and metrics.</p>
+<p>The required execution in the bundled runtime is:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">/Users/bytedance/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3</span> toy-models/linear-gaussian-inference-ladder.py</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>By default the script generates the repository artifacts and verifies them, including a clean temporary regeneration and byte comparison. Explicit <code>--generate</code> and <code>--verify</code> modes are also available. JSON serialization order, float formatting, CSV row order, and PNG output are fixed so determinism is testable. No external data, network access, system package, or private resource is used at execution time.</p>
+</section>
+<section id="evidence-inspected" class="level3">
+<h3 class="anchored" data-anchor-id="evidence-inspected">Evidence inspected</h3>
+<p>The following external evidence was actually retrieved and inspected for this design; repository Method summaries were used only as terminology anchors.</p>
+<ul>
+<li><strong>Kalman (1960):</strong> 12-page article PDF, bibliographic metadata and article-level text inspected. Equation-level inspection covered the “Optimal Estimates” distinction among smoothing, filtering, and prediction; the state-space Problem I; the recursive innovation/projection construction and Theorem 3; covariance recursion; examples; and conclusion. The appendix was not inspected line by line. Kalman’s displayed observation formulation is historically broader/different in notation from the additive-noise scalar model used here, so Särkkä supplies the direct Bayesian additive-noise equations <span class="citation" data-cites="Kalman1960">(<a href="#ref-Kalman1960" role="doc-biblioref">Kalman 1960</a>)</span>.</li>
+<li><strong>Rauch, Tung, and Striebel (1965):</strong> 14-page publisher-rendered PDF containing the six-page AIAA article plus appended citation material. Publication metadata, abstract, model/criterion setup, sections 3.1 and 3.2 at equation level, the numerical-example discussion, and section 5 conclusion were inspected. Appended citation lists and every continuous-time appendix equation were not inspected in detail <span class="citation" data-cites="RauchTungStriebel1965">(<a href="#ref-RauchTungStriebel1965" role="doc-biblioref">Rauch et al. 1965</a>)</span>.</li>
+<li><strong>Särkkä (2013):</strong> author-hosted 252-page book PDF. Equation-level inspection covered sections 4.1–4.3 (state-space factorization, Bayesian filter, Kalman filter), 8.1–8.2 (fixed-interval Bayesian smoothing and RTS recursions), and 12.1–12.1.1 (unknown parameters and prediction-error/marginal-likelihood factorization). The full book was not read line by line <span class="citation" data-cites="Sarkka2013">(<a href="#ref-Sarkka2013" role="doc-biblioref">Särkkä 2013</a>)</span>.</li>
+</ul>
+<p>The inspected sources support the fixed-parameter filtering/smoothing targets, recursions, and likelihood factorization. They do not supply the particular seeds, finite grid, stress magnitudes, or acceptance tolerances; those are predeclared LDG design choices.</p>
+</section>
+<section id="integration-and-validation-state" class="level3">
+<h3 class="anchored" data-anchor-id="integration-and-validation-state">Integration and validation state</h3>
+<p>The scientific-design executor ran target structural and diff checks, the implementation owner ran deterministic script and artifact checks, and the parent orchestrator completed repository validation, tests, target/index/full-site renders, independent scientific and implementation focused review, and owner-authorized promotion under the recorded review decision. The executor did not review its own work.</p>
+</section>
+</section>
+<section id="maturity-checklist" class="level2">
+<h2 class="anchored" data-anchor-id="maturity-checklist">Maturity checklist</h2>
+<ul class="task-list">
+<li><label><input type="checkbox" checked="">Complete Toy Model schema at <strong>L1/stable</strong> with generated empirical results distinguished from model-derived expectations.</label></li>
+<li><label><input type="checkbox" checked="">Generation, masking, parameter selection, inference, and scoring are separated.</label></li>
+<li><label><input type="checkbox" checked="">Ground truth, primary parameters, splits, seeds, boundaries, and missing block are predeclared.</label></li>
+<li><label><input type="checkbox" checked="">Known-parameter filtering, RTS smoothing, and direct batch conditioning have distinct information sets.</label></li>
+<li><label><input type="checkbox" checked="">Prediction, latent recovery, model-conditional uncertainty, and parameter uncertainty are distinguished.</label></li>
+<li><label><input type="checkbox" checked="">Finite-grid selection excludes test observations and all latent truth and is not called general ML estimation.</label></li>
+<li><label><input type="checkbox" checked="">Correct-model, wrong-(q/r), missing-block, reset-boundary, near-unit-root, and informative-missingness conditions are bounded.</label></li>
+<li><label><input type="checkbox" checked="">Online versus retrospective non-implication limits are explicit.</label></li>
+<li><label><input type="checkbox" checked="">Artifact inventory, manifest fields, determinism, metrics schema, and numerical oracles match the backlog contract.</label></li>
+<li><label><input type="checkbox" checked="">External evidence scope is recorded without claiming complete inspection.</label></li>
+<li><label><input type="checkbox" checked="">Bounded implementation and artifacts generated and deterministically verified.</label></li>
+<li><label><input type="checkbox" checked="">Independent scientific review PASS after focused re-review of the near-unit-root horizon diagnostic.</label></li>
+<li><label><input type="checkbox" checked="">Independent implementation review PASS after focused re-review of seven bounded verification and consistency corrections.</label></li>
+<li><label><input type="checkbox" checked="">Target and repository validation PASS, including deterministic regeneration, 51-object structural validation, 31 unit tests, target/index/full-site renders, and diff checks.</label></li>
+<li><label><input type="checkbox" checked="">Stable promotion explicitly authorized by the owner under the recorded review decision.</label></li>
+</ul>
+
+
+<!-- -->
+
+
+</section>
+</section>
+
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography" id="quarto-bibliography"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body hanging-indent" role="list">
+<div id="ref-Kalman1960" class="csl-entry" role="listitem">
+Kalman, Rudolf E. 1960. <span>“A New Approach to Linear Filtering and Prediction Problems.”</span> <em>Journal of Basic Engineering</em> 82 (1): 35–45. <a href="https://doi.org/10.1115/1.3662552">https://doi.org/10.1115/1.3662552</a>.
+</div>
+<div id="ref-RauchTungStriebel1965" class="csl-entry" role="listitem">
+Rauch, H. E., F. Tung, and C. T. Striebel. 1965. <span>“Maximum Likelihood Estimates of Linear Dynamic Systems.”</span> <em>AIAA Journal</em> 3 (8): 1445–50. <a href="https://doi.org/10.2514/3.3166">https://doi.org/10.2514/3.3166</a>.
+</div>
+<div id="ref-Sarkka2013" class="csl-entry" role="listitem">
+Särkkä, Simo. 2013. <em>Bayesian Filtering and Smoothing</em>. Vol. 3. Institute of Mathematical Statistics Textbooks. Cambridge University Press. <a href="https://doi.org/10.1017/CBO9781139344203">https://doi.org/10.1017/CBO9781139344203</a>.
+</div>
+</div></section></div></main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+    const viewSource = window.document.getElementById('quarto-view-source') ||
+                       window.document.getElementById('quarto-code-tools-source');
+    if (viewSource) {
+      const sourceUrl = viewSource.getAttribute("data-quarto-source-url");
+      viewSource.addEventListener("click", function(e) {
+        if (sourceUrl) {
+          // rstudio viewer pane
+          if (/\bcapabilities=\b/.test(window.location)) {
+            window.open(sourceUrl);
+          } else {
+            window.location.href = sourceUrl;
+          }
+        } else {
+          const modal = new bootstrap.Modal(document.getElementById('quarto-embedded-source-code-modal'));
+          modal.show();
+        }
+        return false;
+      });
+    }
+    function toggleCodeHandler(show) {
+      return function(e) {
+        const cellDetails = window.document.querySelectorAll(".cell details.code-fold");
+        for (let i=0; i<cellDetails.length; i++) {
+          const details = cellDetails[i];
+          if (show) {
+            details.open = true;
+          } else {
+            details.removeAttribute("open");
+          }
+        }
+        const cellCodeDivs = window.document.querySelectorAll(".cell div.sourceCode.cell-code");
+        const fromCls = show ? "hidden" : "unhidden";
+        const toCls = show ? "unhidden" : "hidden";
+        for (let i=0; i<cellCodeDivs.length; i++) {
+          const codeDiv = cellCodeDivs[i];
+          if (codeDiv.classList.contains(fromCls)) {
+            codeDiv.classList.remove(fromCls);
+            codeDiv.classList.add(toCls);
+          } 
+        }
+        return false;
+      }
+    }
+    const hideAllCode = window.document.getElementById("quarto-hide-all-code");
+    if (hideAllCode) {
+      hideAllCode.addEventListener("click", toggleCodeHandler(false));
+    }
+    const showAllCode = window.document.getElementById("quarto-show-all-code");
+    if (showAllCode) {
+      showAllCode.addEventListener("click", toggleCodeHandler(true));
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/abelzheng\.github\.io\/latent-dynamics-geometry-public\/");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+            // target, if specified
+            link.setAttribute("target", "_blank");
+            if (link.getAttribute("rel") === null) {
+              link.setAttribute("rel", "noopener");
+            }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<input type="hidden" id="giscus-base-theme" value="preferred_color_scheme">
+<input type="hidden" id="giscus-alt-theme" value="preferred_color_scheme">
+<script>
+  function loadGiscus() {
+    // Function to get the theme based on body class
+    const getTheme = () => {
+      let baseTheme = document.getElementById('giscus-base-theme').value;
+      let altTheme = document.getElementById('giscus-alt-theme').value;
+      return document.body.classList.contains('quarto-dark') ? altTheme : baseTheme;
+    };
+    const script = document.createElement("script");
+    script.src = "https://giscus.app/client.js";
+    script.async = true;
+    script.dataset.repo = "AbelZheng/latent-dynamics-geometry-public";
+    script.dataset.repoId = "R_kgDOT-VBkw";
+    script.dataset.category = "Announcements";
+    script.dataset.categoryId = "DIC_kwDOT-VBk84DDyEz";
+    script.dataset.mapping = "pathname";
+    script.dataset.reactionsEnabled = "1";
+    script.dataset.emitMetadata = "0";
+    script.dataset.inputPosition = "bottom";
+    script.dataset.theme = getTheme();
+    script.dataset.lang = "en";
+    script.crossOrigin = "anonymous";
+    // Append the script to the desired div instead of at the end of the body
+    document.getElementById("quarto-content").appendChild(script);
+  }
+  loadGiscus();
+</script><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">Source Code</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4" data-shortcodes="false"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="an">title:</span><span class="co"> "Linear-Gaussian Inference Ladder"</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="an">object_type:</span><span class="co"> toy-model</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="an">maturity:</span><span class="co"> L1</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="an">status:</span><span class="co"> stable</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="an">domain:</span><span class="co"> [latent-modeling, temporal-modeling, state-estimation, statistics]</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="an">tags:</span><span class="co"> [linear-gaussian, kalman-filter, rts-smoother, batch-conditioning, parameter-selection]</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="an">prerequisites:</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a><span class="co">- knowledge/methods/linear-gaussian-state-space-model.qmd</span></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a><span class="co">- knowledge/methods/kalman-filtering.qmd</span></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a><span class="co">- knowledge/methods/kalman-smoothing.qmd</span></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a><span class="co">- knowledge/methods/factor-analysis.qmd</span></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a><span class="an">related:</span></span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a><span class="co">- knowledge/concepts/latent-trajectory.qmd</span></span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a><span class="co">- knowledge/concepts/process-noise.qmd</span></span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a><span class="co">- knowledge/concepts/observation-noise.qmd</span></span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a><span class="an">created:</span><span class="co"> 2026-08-19</span></span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a><span class="an">updated:</span><span class="co"> 2026-08-19</span></span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a><span class="fu"># Linear-Gaussian Inference Ladder</span></span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a>This L1/stable object is the scientific and reproducibility record for the first Phase 3 generation/recovery vertical slice. It deliberately separates a known simulator, exact inference conditional on fixed parameters, finite-grid parameter selection, predictive scoring, latent-state recovery, and stress tests. Reported numerical values are deterministic outputs of the bounded implementation under master seed <span class="in">`20260819`</span>; they are not inferred from the equations or generalized beyond this simulator.</span>
+<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a>**Assumed background:** scalar Gaussian conditioning, conditional expectation, covariance, and elementary time-series evaluation. The stable prerequisite Method Objects fix LDG terminology, but they are not substitutes for the external-source inspection recorded in <span class="co">[</span><span class="ot">Evidence inspected</span><span class="co">](#evidence-inspected)</span>.</span>
+<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a><span class="fu">## Question</span></span>
+<span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-29"><a href="#cb4-29" aria-hidden="true" tabindex="-1"></a>For a scalar discrete-time linear-Gaussian state-space model (LGSSM) with retained latent ground truth:</span>
+<span id="cb4-30"><a href="#cb4-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-31"><a href="#cb4-31" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>do a known-parameter Kalman filter, a known-parameter fixed-interval Rauch--Tung--Striebel (RTS) smoother, and direct batch Gaussian conditioning return the same model-conditional posterior marginals under their respective information sets;</span>
+<span id="cb4-32"><a href="#cb4-32" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>how do online prediction, online filtering, and retrospective smoothing differ from latent recovery and from observation prediction;</span>
+<span id="cb4-33"><a href="#cb4-33" aria-hidden="true" tabindex="-1"></a><span class="ss">3. </span>how much performance and calibration change when parameters are selected from a finite grid rather than supplied by the generator; and</span>
+<span id="cb4-34"><a href="#cb4-34" aria-hidden="true" tabindex="-1"></a><span class="ss">4. </span>how do wrong noise ratios, a contiguous missing block, a false sequence boundary, near-unit-root dynamics, and informative missingness expose model or interpretation failures?</span>
+<span id="cb4-35"><a href="#cb4-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-36"><a href="#cb4-36" aria-hidden="true" tabindex="-1"></a>The primary acceptance question is numerical and inferential correctness under the declared model. It is not whether the recovered mean merely looks smooth.</span>
+<span id="cb4-37"><a href="#cb4-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-38"><a href="#cb4-38" aria-hidden="true" tabindex="-1"></a><span class="fu">## Ground truth</span></span>
+<span id="cb4-39"><a href="#cb4-39" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-40"><a href="#cb4-40" aria-hidden="true" tabindex="-1"></a>For each independent sequence, the retained scalar latent state is <span class="sc">\(</span>z_{1:T}<span class="sc">\)</span>, the observed scalar is <span class="sc">\(</span>x_{1:T}<span class="sc">\)</span>, and the complete-data generator is</span>
+<span id="cb4-41"><a href="#cb4-41" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-42"><a href="#cb4-42" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb4-43"><a href="#cb4-43" aria-hidden="true" tabindex="-1"></a>z_1\sim\mathcal N(0,p_1),</span>
+<span id="cb4-44"><a href="#cb4-44" aria-hidden="true" tabindex="-1"></a>\qquad</span>
+<span id="cb4-45"><a href="#cb4-45" aria-hidden="true" tabindex="-1"></a>p_1=\frac{q}{1-a^2},</span>
+<span id="cb4-46"><a href="#cb4-46" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb4-47"><a href="#cb4-47" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-48"><a href="#cb4-48" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb4-49"><a href="#cb4-49" aria-hidden="true" tabindex="-1"></a>z_{t+1}=a z_t+w_t,</span>
+<span id="cb4-50"><a href="#cb4-50" aria-hidden="true" tabindex="-1"></a>\qquad</span>
+<span id="cb4-51"><a href="#cb4-51" aria-hidden="true" tabindex="-1"></a>w_t\overset{\mathrm{iid}}\sim\mathcal N(0,q),</span>
+<span id="cb4-52"><a href="#cb4-52" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb4-53"><a href="#cb4-53" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-54"><a href="#cb4-54" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb4-55"><a href="#cb4-55" aria-hidden="true" tabindex="-1"></a>x_t=z_t+v_t,</span>
+<span id="cb4-56"><a href="#cb4-56" aria-hidden="true" tabindex="-1"></a>\qquad</span>
+<span id="cb4-57"><a href="#cb4-57" aria-hidden="true" tabindex="-1"></a>v_t\overset{\mathrm{iid}}\sim\mathcal N(0,r),</span>
+<span id="cb4-58"><a href="#cb4-58" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb4-59"><a href="#cb4-59" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-60"><a href="#cb4-60" aria-hidden="true" tabindex="-1"></a>with <span class="sc">\(</span>z_1<span class="sc">\)</span>, all <span class="sc">\(</span>w_t<span class="sc">\)</span>, and all <span class="sc">\(</span>v_t<span class="sc">\)</span> mutually independent. The primary parameters are fixed before simulation:</span>
+<span id="cb4-61"><a href="#cb4-61" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-62"><a href="#cb4-62" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb4-63"><a href="#cb4-63" aria-hidden="true" tabindex="-1"></a>a=0.85,</span>
+<span id="cb4-64"><a href="#cb4-64" aria-hidden="true" tabindex="-1"></a>\qquad</span>
+<span id="cb4-65"><a href="#cb4-65" aria-hidden="true" tabindex="-1"></a>q=0.10,</span>
+<span id="cb4-66"><a href="#cb4-66" aria-hidden="true" tabindex="-1"></a>\qquad</span>
+<span id="cb4-67"><a href="#cb4-67" aria-hidden="true" tabindex="-1"></a>r=0.40,</span>
+<span id="cb4-68"><a href="#cb4-68" aria-hidden="true" tabindex="-1"></a>\qquad</span>
+<span id="cb4-69"><a href="#cb4-69" aria-hidden="true" tabindex="-1"></a>p_1=\frac{0.10}{1-0.85^2}.</span>
+<span id="cb4-70"><a href="#cb4-70" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb4-71"><a href="#cb4-71" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-72"><a href="#cb4-72" aria-hidden="true" tabindex="-1"></a>The initialization is the stationary zero-mean law for this scalar stable model. Stationarity is a property of the declared generator and initialization, not a conclusion inferred from a finite simulated trace.</span>
+<span id="cb4-73"><a href="#cb4-73" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-74"><a href="#cb4-74" aria-hidden="true" tabindex="-1"></a>The observation map is the identity. This removes latent-coordinate ambiguity for this bounded scalar recovery test, but it does not make the latent state directly observed: <span class="sc">\(</span>x_t<span class="sc">\)</span> still contains independent measurement noise. Retaining <span class="sc">\(</span>z_t<span class="sc">\)</span> for scoring is a simulation privilege. Test latent truth is never an input to parameter selection, filtering, smoothing, or batch conditioning.</span>
+<span id="cb4-75"><a href="#cb4-75" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-76"><a href="#cb4-76" aria-hidden="true" tabindex="-1"></a><span class="fu">## Generative model</span></span>
+<span id="cb4-77"><a href="#cb4-77" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-78"><a href="#cb4-78" aria-hidden="true" tabindex="-1"></a>Generation, masking, parameter selection, inference, and scoring are separate stages with separate function boundaries in the implementation.</span>
+<span id="cb4-79"><a href="#cb4-79" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-80"><a href="#cb4-80" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>**Generate complete sequences.** For every sequence, draw a fresh <span class="sc">\(</span>z_1<span class="sc">\)</span>, process-noise stream, and observation-noise stream from its split-specific random generator. Store the latent and complete observation arrays before applying any mask.</span>
+<span id="cb4-81"><a href="#cb4-81" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>**Assign immutable sequence boundaries.** Train, validation, and test sequences are independent replicates. Every recovery method starts each sequence from the declared prior; no posterior mean or covariance crosses a true boundary.</span>
+<span id="cb4-82"><a href="#cb4-82" aria-hidden="true" tabindex="-1"></a><span class="ss">3. </span>**Create masks without changing the complete arrays.** The primary complete-data mask retains every observation. The missing-block mask removes a predeclared contiguous interval only on test copies. The informative-missingness negative control derives a separate observation-magnitude-dependent mask from the frozen test observations and is never treated as ignorable evidence.</span>
+<span id="cb4-83"><a href="#cb4-83" aria-hidden="true" tabindex="-1"></a><span class="ss">4. </span>**Select parameters without latent truth.** The finite grid reads only train and validation observations, masks, and sequence boundaries. It may use innovation likelihood, but no latent state or test quantity.</span>
+<span id="cb4-84"><a href="#cb4-84" aria-hidden="true" tabindex="-1"></a><span class="ss">5. </span>**Run recovery.** Known-parameter and selected-parameter methods receive observations, masks, boundaries, and their declared parameter tuple.</span>
+<span id="cb4-85"><a href="#cb4-85" aria-hidden="true" tabindex="-1"></a><span class="ss">6. </span>**Score last.** Latent truth is joined only after all posterior and predictive outputs have been frozen.</span>
+<span id="cb4-86"><a href="#cb4-86" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-87"><a href="#cb4-87" aria-hidden="true" tabindex="-1"></a>This ordering prevents generation from being mistaken for recovery and prevents test latent states from becoming pseudo-observations.</span>
+<span id="cb4-88"><a href="#cb4-88" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-89"><a href="#cb4-89" aria-hidden="true" tabindex="-1"></a><span class="fu">## Parameters</span></span>
+<span id="cb4-90"><a href="#cb4-90" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-91"><a href="#cb4-91" aria-hidden="true" tabindex="-1"></a><span class="fu">### Primary data contract</span></span>
+<span id="cb4-92"><a href="#cb4-92" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-93"><a href="#cb4-93" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Component <span class="pp">|</span> Predeclared value <span class="pp">|</span></span>
+<span id="cb4-94"><a href="#cb4-94" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---:|</span></span>
+<span id="cb4-95"><a href="#cb4-95" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Train sequences <span class="pp">|</span> 12 independent sequences <span class="pp">|</span></span>
+<span id="cb4-96"><a href="#cb4-96" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Validation sequences <span class="pp">|</span> 6 independent sequences <span class="pp">|</span></span>
+<span id="cb4-97"><a href="#cb4-97" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Test sequences <span class="pp">|</span> 8 independent sequences <span class="pp">|</span></span>
+<span id="cb4-98"><a href="#cb4-98" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Primary sequence length <span class="pp">|</span> <span class="sc">\(</span>T=80<span class="sc">\)</span> <span class="pp">|</span></span>
+<span id="cb4-99"><a href="#cb4-99" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Master seed <span class="pp">|</span> <span class="in">`20260819`</span> with split- and sequence-specific <span class="in">`SeedSequence`</span> words <span class="pp">|</span></span>
+<span id="cb4-100"><a href="#cb4-100" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Primary parameters <span class="pp">|</span> <span class="sc">\(</span>(a,q,r)=(0.85,0.10,0.40)<span class="sc">\)</span> <span class="pp">|</span></span>
+<span id="cb4-101"><a href="#cb4-101" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Prior <span class="pp">|</span> <span class="sc">\(</span>m_1=0,\ p_1=q/(1-a^2)<span class="sc">\)</span> <span class="pp">|</span></span>
+<span id="cb4-102"><a href="#cb4-102" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Missing block <span class="pp">|</span> zero-based indices <span class="sc">\(</span>[30,45)<span class="sc">\)</span>, equivalently <span class="sc">\(</span>t=31,\ldots,45<span class="sc">\)</span> in one-based notation <span class="pp">|</span></span>
+<span id="cb4-103"><a href="#cb4-103" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Nominal pointwise interval <span class="pp">|</span> 95% Gaussian posterior interval <span class="pp">|</span></span>
+<span id="cb4-104"><a href="#cb4-104" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Short-sequence batch oracle <span class="pp">|</span> first 24 time points of the first test sequence <span class="pp">|</span></span>
+<span id="cb4-105"><a href="#cb4-105" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-106"><a href="#cb4-106" aria-hidden="true" tabindex="-1"></a>The implementation uses NumPy <span class="in">`Generator(PCG64(SeedSequence(words)))`</span> with distinct split and sequence words. Any change to these values is a contract change, not routine tuning. No primary-parameter correction was required.</span>
+<span id="cb4-107"><a href="#cb4-107" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-108"><a href="#cb4-108" aria-hidden="true" tabindex="-1"></a><span class="fu">### Finite parameter grid</span></span>
+<span id="cb4-109"><a href="#cb4-109" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-110"><a href="#cb4-110" aria-hidden="true" tabindex="-1"></a>The learned-parameter variant is a bounded plug-in baseline over the 27 predeclared tuples</span>
+<span id="cb4-111"><a href="#cb4-111" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-112"><a href="#cb4-112" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb4-113"><a href="#cb4-113" aria-hidden="true" tabindex="-1"></a>a\in<span class="sc">\{</span>0.75,0.85,0.95<span class="sc">\}</span>,</span>
+<span id="cb4-114"><a href="#cb4-114" aria-hidden="true" tabindex="-1"></a>\qquad</span>
+<span id="cb4-115"><a href="#cb4-115" aria-hidden="true" tabindex="-1"></a>q\in<span class="sc">\{</span>0.05,0.10,0.20<span class="sc">\}</span>,</span>
+<span id="cb4-116"><a href="#cb4-116" aria-hidden="true" tabindex="-1"></a>\qquad</span>
+<span id="cb4-117"><a href="#cb4-117" aria-hidden="true" tabindex="-1"></a>r\in<span class="sc">\{</span>0.20,0.40,0.80<span class="sc">\}</span>.</span>
+<span id="cb4-118"><a href="#cb4-118" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb4-119"><a href="#cb4-119" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-120"><a href="#cb4-120" aria-hidden="true" tabindex="-1"></a>For every tuple, each sequence is reset to <span class="sc">\(</span>m_1=0<span class="sc">\)</span> and the tuple's stationary variance <span class="sc">\(</span>q/(1-a^2)<span class="sc">\)</span>. Selection minimizes the sum of the mean train and mean validation one-step innovation negative log likelihood. Test observations, test latent truth, and all test metrics remain unavailable until one tuple is frozen. Exact ties are broken lexicographically by <span class="sc">\(</span>(a,q,r)<span class="sc">\)</span>, not by distance to the true parameters.</span>
+<span id="cb4-121"><a href="#cb4-121" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-122"><a href="#cb4-122" aria-hidden="true" tabindex="-1"></a>This is finite-grid model selection over a declared candidate set. It is **not** a claim of unrestricted LGSSM maximum-likelihood estimation, consistency, or parameter-identification. Särkkä distinguishes known-parameter state inference from parameter inference and gives the prediction-error factorization of the marginal likelihood used here as a scoring rule <span class="co">[</span><span class="ot">@Sarkka2013, ch. 12, especially sec. 12.1</span><span class="co">]</span>.</span>
+<span id="cb4-123"><a href="#cb4-123" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-124"><a href="#cb4-124" aria-hidden="true" tabindex="-1"></a><span class="fu">### Stress parameters</span></span>
+<span id="cb4-125"><a href="#cb4-125" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-126"><a href="#cb4-126" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Condition <span class="pp">|</span> Inference or generator change <span class="pp">|</span> Role <span class="pp">|</span></span>
+<span id="cb4-127"><a href="#cb4-127" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|---|</span></span>
+<span id="cb4-128"><a href="#cb4-128" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **correct** <span class="pp">|</span> infer with <span class="sc">\(</span>(0.85,0.10,0.40)<span class="sc">\)</span> <span class="pp">|</span> primary correctness condition <span class="pp">|</span></span>
+<span id="cb4-129"><a href="#cb4-129" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **q_small_r_large** <span class="pp">|</span> infer with <span class="sc">\(</span>(0.85,0.025,0.80)<span class="sc">\)</span> <span class="pp">|</span> overconfident transition / weak measurement weighting stress <span class="pp">|</span></span>
+<span id="cb4-130"><a href="#cb4-130" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **q_large_r_small** <span class="pp">|</span> infer with <span class="sc">\(</span>(0.85,0.40,0.10)<span class="sc">\)</span> <span class="pp">|</span> weak transition / strong measurement weighting stress <span class="pp">|</span></span>
+<span id="cb4-131"><a href="#cb4-131" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **selected_grid** <span class="pp">|</span> infer with frozen grid-selected tuple <span class="pp">|</span> bounded parameter-selection baseline <span class="pp">|</span></span>
+<span id="cb4-132"><a href="#cb4-132" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **near_unit_root** <span class="pp">|</span> generate and infer with <span class="sc">\(</span>(0.99,0.02,0.40)<span class="sc">\)</span> <span class="pp">|</span> separate stability and initialization stress <span class="pp">|</span></span>
+<span id="cb4-133"><a href="#cb4-133" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-134"><a href="#cb4-134" aria-hidden="true" tabindex="-1"></a>The wrong-<span class="sc">\(</span>q/r<span class="sc">\)</span> conditions alter inference only; their data remain the primary generator. The near-unit-root condition is a separate generated data set of four sequences of length <span class="sc">\(</span>T=160<span class="sc">\)</span>, using the dedicated stage word <span class="in">`40`</span>. It is evaluated once with its matched stationary prior and once with a deliberately tight prior variance <span class="in">`0.05`</span>. It is not pooled into primary success criteria.</span>
+<span id="cb4-135"><a href="#cb4-135" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-136"><a href="#cb4-136" aria-hidden="true" tabindex="-1"></a><span class="fu">## Simulation</span></span>
+<span id="cb4-137"><a href="#cb4-137" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-138"><a href="#cb4-138" aria-hidden="true" tabindex="-1"></a>The implementation must use the existing Python/NumPy runtime and must not install a dependency. For each split, generation is vectorized across independent sequences only where this does not obscure resets. Stored arrays preserve a sequence axis; flattening sequences before inference is prohibited except in the explicit reset-boundary negative control.</span>
+<span id="cb4-139"><a href="#cb4-139" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-140"><a href="#cb4-140" aria-hidden="true" tabindex="-1"></a>The generator retains <span class="sc">\(</span>z<span class="sc">\)</span> and <span class="sc">\(</span>x<span class="sc">\)</span> with split and sequence identities. Recovery functions receive observations, masks, boundaries, and parameters rather than the latent array. Computed poison diagnostics change test observations or every latent array and verify that grid selection and recovery outputs remain unchanged; separate-sequence invocation is also compared numerically with the stacked multi-sequence path. Retained latent values enter only the later scoring functions.</span>
+<span id="cb4-141"><a href="#cb4-141" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-142"><a href="#cb4-142" aria-hidden="true" tabindex="-1"></a><span class="fu">### Correctly specified filtering</span></span>
+<span id="cb4-143"><a href="#cb4-143" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-144"><a href="#cb4-144" aria-hidden="true" tabindex="-1"></a>Let</span>
+<span id="cb4-145"><a href="#cb4-145" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-146"><a href="#cb4-146" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb4-147"><a href="#cb4-147" aria-hidden="true" tabindex="-1"></a>\mathcal I_t^{\mathrm{F}}=\sigma(x_s:\ s\le t,\ x_s\text{ observed})</span>
+<span id="cb4-148"><a href="#cb4-148" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb4-149"><a href="#cb4-149" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-150"><a href="#cb4-150" aria-hidden="true" tabindex="-1"></a>be the online information set. Before observing <span class="sc">\(</span>x_t<span class="sc">\)</span>, the scalar prediction is</span>
+<span id="cb4-151"><a href="#cb4-151" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-152"><a href="#cb4-152" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb4-153"><a href="#cb4-153" aria-hidden="true" tabindex="-1"></a>m_{t\mid t-1}=a m_{t-1\mid t-1},</span>
+<span id="cb4-154"><a href="#cb4-154" aria-hidden="true" tabindex="-1"></a>\qquad</span>
+<span id="cb4-155"><a href="#cb4-155" aria-hidden="true" tabindex="-1"></a>p_{t\mid t-1}=a^2p_{t-1\mid t-1}+q,</span>
+<span id="cb4-156"><a href="#cb4-156" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb4-157"><a href="#cb4-157" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-158"><a href="#cb4-158" aria-hidden="true" tabindex="-1"></a>with <span class="sc">\(</span>m_{1\mid0}=0<span class="sc">\)</span> and <span class="sc">\(</span>p_{1\mid0}=p_1<span class="sc">\)</span>. For an observed <span class="sc">\(</span>x_t<span class="sc">\)</span>,</span>
+<span id="cb4-159"><a href="#cb4-159" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-160"><a href="#cb4-160" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb4-161"><a href="#cb4-161" aria-hidden="true" tabindex="-1"></a>\nu_t=x_t-m_{t\mid t-1},</span>
+<span id="cb4-162"><a href="#cb4-162" aria-hidden="true" tabindex="-1"></a>\qquad</span>
+<span id="cb4-163"><a href="#cb4-163" aria-hidden="true" tabindex="-1"></a>s_t=p_{t\mid t-1}+r,</span>
+<span id="cb4-164"><a href="#cb4-164" aria-hidden="true" tabindex="-1"></a>\qquad</span>
+<span id="cb4-165"><a href="#cb4-165" aria-hidden="true" tabindex="-1"></a>k_t=\frac{p_{t\mid t-1}}{s_t},</span>
+<span id="cb4-166"><a href="#cb4-166" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb4-167"><a href="#cb4-167" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-168"><a href="#cb4-168" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb4-169"><a href="#cb4-169" aria-hidden="true" tabindex="-1"></a>m_{t\mid t}=m_{t\mid t-1}+k_t\nu_t,</span>
+<span id="cb4-170"><a href="#cb4-170" aria-hidden="true" tabindex="-1"></a>\qquad</span>
+<span id="cb4-171"><a href="#cb4-171" aria-hidden="true" tabindex="-1"></a>p_{t\mid t}=p_{t\mid t-1}-k_t^2s_t.</span>
+<span id="cb4-172"><a href="#cb4-172" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb4-173"><a href="#cb4-173" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-174"><a href="#cb4-174" aria-hidden="true" tabindex="-1"></a>These are the scalar specialization of exact linear-Gaussian Bayesian filtering <span class="co">[</span><span class="ot">@Kalman1960; @Sarkka2013, theorem 4.2</span><span class="co">]</span>. If <span class="sc">\(</span>x_t<span class="sc">\)</span> is missing, no pseudo-observation is inserted:</span>
+<span id="cb4-175"><a href="#cb4-175" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-176"><a href="#cb4-176" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb4-177"><a href="#cb4-177" aria-hidden="true" tabindex="-1"></a>m_{t\mid t}=m_{t\mid t-1},</span>
+<span id="cb4-178"><a href="#cb4-178" aria-hidden="true" tabindex="-1"></a>\qquad</span>
+<span id="cb4-179"><a href="#cb4-179" aria-hidden="true" tabindex="-1"></a>p_{t\mid t}=p_{t\mid t-1}.</span>
+<span id="cb4-180"><a href="#cb4-180" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb4-181"><a href="#cb4-181" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-182"><a href="#cb4-182" aria-hidden="true" tabindex="-1"></a>Thus a filter traverses the declared missing block by repeated open-loop prediction. It cannot use observations after the current time.</span>
+<span id="cb4-183"><a href="#cb4-183" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-184"><a href="#cb4-184" aria-hidden="true" tabindex="-1"></a><span class="fu">### Fixed-interval smoothing</span></span>
+<span id="cb4-185"><a href="#cb4-185" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-186"><a href="#cb4-186" aria-hidden="true" tabindex="-1"></a>Let</span>
+<span id="cb4-187"><a href="#cb4-187" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-188"><a href="#cb4-188" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb4-189"><a href="#cb4-189" aria-hidden="true" tabindex="-1"></a>\mathcal I_T^{\mathrm{S}}=\sigma(x_s:\ 1\le s\le T,\ x_s\text{ observed})</span>
+<span id="cb4-190"><a href="#cb4-190" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb4-191"><a href="#cb4-191" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-192"><a href="#cb4-192" aria-hidden="true" tabindex="-1"></a>be the retrospective information set. Starting from <span class="sc">\(</span>m_{T\mid T},p_{T\mid T}<span class="sc">\)</span>, the scalar RTS recursion is</span>
+<span id="cb4-193"><a href="#cb4-193" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-194"><a href="#cb4-194" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb4-195"><a href="#cb4-195" aria-hidden="true" tabindex="-1"></a>j_t=\frac{p_{t\mid t}a}{p_{t+1\mid t}},</span>
+<span id="cb4-196"><a href="#cb4-196" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb4-197"><a href="#cb4-197" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-198"><a href="#cb4-198" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb4-199"><a href="#cb4-199" aria-hidden="true" tabindex="-1"></a>m_{t\mid T}=m_{t\mid t}+j_t\left(m_{t+1\mid T}-m_{t+1\mid t}\right),</span>
+<span id="cb4-200"><a href="#cb4-200" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb4-201"><a href="#cb4-201" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-202"><a href="#cb4-202" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb4-203"><a href="#cb4-203" aria-hidden="true" tabindex="-1"></a>p_{t\mid T}=p_{t\mid t}+j_t^2\left(p_{t+1\mid T}-p_{t+1\mid t}\right).</span>
+<span id="cb4-204"><a href="#cb4-204" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb4-205"><a href="#cb4-205" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-206"><a href="#cb4-206" aria-hidden="true" tabindex="-1"></a>Rauch, Tung, and Striebel derive the backward recursion from the forward filtering solution; the modern Bayesian statement makes explicit that it computes <span class="sc">\(</span>p(z_t\mid x_{1:T})<span class="sc">\)</span>, whereas filtering computes <span class="sc">\(</span>p(z_t\mid x_{1:t})<span class="sc">\)</span> <span class="co">[</span><span class="ot">@RauchTungStriebel1965, sec. 3.2; @Sarkka2013, secs. 8.1--8.2</span><span class="co">]</span>. Later observations may therefore revise states inside the missing block. That revision is valid only retrospectively and must never be described as information available online at time <span class="sc">\(</span>t<span class="sc">\)</span>.</span>
+<span id="cb4-207"><a href="#cb4-207" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-208"><a href="#cb4-208" aria-hidden="true" tabindex="-1"></a><span class="fu">### Direct batch Gaussian conditioning oracle</span></span>
+<span id="cb4-209"><a href="#cb4-209" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-210"><a href="#cb4-210" aria-hidden="true" tabindex="-1"></a>For a bounded sequence, construct the prior path mean <span class="sc">\(</span>m_z=0<span class="sc">\)</span> and covariance <span class="sc">\(</span>K_z<span class="sc">\)</span> from the declared prior and transition recursion. Under the stationary primary model,</span>
+<span id="cb4-211"><a href="#cb4-211" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-212"><a href="#cb4-212" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb4-213"><a href="#cb4-213" aria-hidden="true" tabindex="-1"></a>(K_z)_{ij}=p_1 a^{|i-j|}.</span>
+<span id="cb4-214"><a href="#cb4-214" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb4-215"><a href="#cb4-215" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-216"><a href="#cb4-216" aria-hidden="true" tabindex="-1"></a>For observed time indices <span class="sc">\(</span>O<span class="sc">\)</span>, let <span class="sc">\(</span>H_O<span class="sc">\)</span> select those state coordinates and let <span class="sc">\(</span>x_O<span class="sc">\)</span> be the corresponding observation vector. Direct conditioning gives</span>
+<span id="cb4-217"><a href="#cb4-217" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-218"><a href="#cb4-218" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb4-219"><a href="#cb4-219" aria-hidden="true" tabindex="-1"></a>\mu_{z\mid x_O}</span>
+<span id="cb4-220"><a href="#cb4-220" aria-hidden="true" tabindex="-1"></a>=m_z+K_zH_O^\top</span>
+<span id="cb4-221"><a href="#cb4-221" aria-hidden="true" tabindex="-1"></a>\left(H_OK_zH_O^\top+rI\right)^{-1}</span>
+<span id="cb4-222"><a href="#cb4-222" aria-hidden="true" tabindex="-1"></a>(x_O-H_Om_z),</span>
+<span id="cb4-223"><a href="#cb4-223" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb4-224"><a href="#cb4-224" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-225"><a href="#cb4-225" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb4-226"><a href="#cb4-226" aria-hidden="true" tabindex="-1"></a>\Sigma_{z\mid x_O}</span>
+<span id="cb4-227"><a href="#cb4-227" aria-hidden="true" tabindex="-1"></a>=K_z-K_zH_O^\top</span>
+<span id="cb4-228"><a href="#cb4-228" aria-hidden="true" tabindex="-1"></a>\left(H_OK_zH_O^\top+rI\right)^{-1}</span>
+<span id="cb4-229"><a href="#cb4-229" aria-hidden="true" tabindex="-1"></a>H_OK_z.</span>
+<span id="cb4-230"><a href="#cb4-230" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb4-231"><a href="#cb4-231" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-232"><a href="#cb4-232" aria-hidden="true" tabindex="-1"></a>The implementation must use a linear solve, not an explicit matrix inverse. For each short oracle sequence, conditioning on observations through <span class="sc">\(</span>t<span class="sc">\)</span> supplies the current-time filter oracle, while conditioning on every observed time through <span class="sc">\(</span>T<span class="sc">\)</span> supplies the full smoother oracle. Agreement with this independently assembled joint Gaussian is an implementation test, not an additional estimator <span class="co">[</span><span class="ot">@Sarkka2013, secs. 4.1--4.3, 8.1--8.2</span><span class="co">]</span>.</span>
+<span id="cb4-233"><a href="#cb4-233" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-234"><a href="#cb4-234" aria-hidden="true" tabindex="-1"></a><span class="fu">## Visualization</span></span>
+<span id="cb4-235"><a href="#cb4-235" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-236"><a href="#cb4-236" aria-hidden="true" tabindex="-1"></a>Exactly one composite **summary.png** is allowed. It must have a scientific checking purpose and contain no decorative panels:</span>
+<span id="cb4-237"><a href="#cb4-237" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-238"><a href="#cb4-238" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>one predeclared test sequence with latent truth, observations, filter mean, smoother mean, and filter 95% model-conditional intervals;</span>
+<span id="cb4-239"><a href="#cb4-239" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>the same sequence with the missing block visibly marked;</span>
+<span id="cb4-240"><a href="#cb4-240" aria-hidden="true" tabindex="-1"></a><span class="ss">3. </span>numerical oracle and leakage summaries; and</span>
+<span id="cb4-241"><a href="#cb4-241" aria-hidden="true" tabindex="-1"></a><span class="ss">4. </span>compact metric and failure-diagnostic panels distinguishing known parameters, selected parameters, wrong-<span class="sc">\(</span>q/r<span class="sc">\)</span>, reset, near-unit-root, and informative-missingness stresses.</span>
+<span id="cb4-242"><a href="#cb4-242" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-243"><a href="#cb4-243" aria-hidden="true" tabindex="-1"></a>The caption must state that the smoother is retrospective and that the intervals condition on fixed parameters. Visual overlap, smoothness, or a compelling trajectory is never an acceptance oracle.</span>
+<span id="cb4-244"><a href="#cb4-244" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-245"><a href="#cb4-245" aria-hidden="true" tabindex="-1"></a><span class="fu">## Expected behavior</span></span>
+<span id="cb4-246"><a href="#cb4-246" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-247"><a href="#cb4-247" aria-hidden="true" tabindex="-1"></a>These are model-derived expectations, not prefilled empirical results.</span>
+<span id="cb4-248"><a href="#cb4-248" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-249"><a href="#cb4-249" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>In exact arithmetic under the correct fixed model, recursive filtering and smoothing should equal direct Gaussian conditioning for the same observations and information set <span class="co">[</span><span class="ot">@Sarkka2013, theorems 4.2 and 8.2</span><span class="co">]</span>.</span>
+<span id="cb4-250"><a href="#cb4-250" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Under the exact fixed model, <span class="sc">\(</span>p_{t\mid T}\le p_{t\mid t}<span class="sc">\)</span> because smoothing conditions on a superset of observations. Floating-point violations beyond tolerance indicate an implementation problem, not negative variance.</span>
+<span id="cb4-251"><a href="#cb4-251" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Under the correct generator, posterior means are conditional-MSE-optimal for their own information sets. Across repeated draws, the smoother can have lower expected latent MSE than the filter, but any finite test realization may deviate. Lower smoothing RMSE does not make smoothing suitable for an online task.</span>
+<span id="cb4-252"><a href="#cb4-252" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>During a missing block, the filter mean and variance evolve only through the transition. The smoother may revise that interval using later observations, but only after the interval endpoint is available.</span>
+<span id="cb4-253"><a href="#cb4-253" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Wrong <span class="sc">\(</span>q/r<span class="sc">\)</span> changes gains, innovation variance, posterior width, and retrospective coupling. The direction and size of finite-sample metric changes are empirical outputs, not guaranteed numerical values.</span>
+<span id="cb4-254"><a href="#cb4-254" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Near <span class="sc">\(</span>a=1<span class="sc">\)</span>, stationary variance and long-horizon predictive uncertainty are larger and initialization effects can persist. This stress is reported separately rather than used to redefine primary success.</span>
+<span id="cb4-255"><a href="#cb4-255" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-256"><a href="#cb4-256" aria-hidden="true" tabindex="-1"></a><span class="fu">## Parameter manipulations</span></span>
+<span id="cb4-257"><a href="#cb4-257" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-258"><a href="#cb4-258" aria-hidden="true" tabindex="-1"></a><span class="fu">### A. Correct-model condition</span></span>
+<span id="cb4-259"><a href="#cb4-259" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-260"><a href="#cb4-260" aria-hidden="true" tabindex="-1"></a>Use the true tuple for filtering, smoothing, prediction, and batch conditioning. This condition tests exact-inference implementation and finite-sample recovery separately:</span>
+<span id="cb4-261"><a href="#cb4-261" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-262"><a href="#cb4-262" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>batch-versus-recursion discrepancies test numerical implementation;</span>
+<span id="cb4-263"><a href="#cb4-263" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>latent RMSE and coverage test recovery under one realized sample from the declared correct model; and</span>
+<span id="cb4-264"><a href="#cb4-264" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>predictive negative log likelihood and innovations test the observation distribution.</span>
+<span id="cb4-265"><a href="#cb4-265" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-266"><a href="#cb4-266" aria-hidden="true" tabindex="-1"></a>Low RMSE is not required for posterior correctness on every realization, because process and observation noise leave irreducible uncertainty.</span>
+<span id="cb4-267"><a href="#cb4-267" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-268"><a href="#cb4-268" aria-hidden="true" tabindex="-1"></a><span class="fu">### B. Wrong process/observation noise ratios</span></span>
+<span id="cb4-269"><a href="#cb4-269" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-270"><a href="#cb4-270" aria-hidden="true" tabindex="-1"></a>Apply **q_small_r_large** and **q_large_r_small** to the unchanged primary test observations. Score predictive likelihood, filter and smoother latent RMSE, interval coverage, mean posterior variance, standardized innovation variance, and lag-1 autocorrelation. These are plug-in, misspecified posteriors. Their intervals do not become valid uncertainty statements about the true generator merely because the covariance recursion remains algebraically valid.</span>
+<span id="cb4-271"><a href="#cb4-271" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-272"><a href="#cb4-272" aria-hidden="true" tabindex="-1"></a><span class="fu">### C. Contiguous missing block</span></span>
+<span id="cb4-273"><a href="#cb4-273" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-274"><a href="#cb4-274" aria-hidden="true" tabindex="-1"></a>Remove zero-based observations <span class="sc">\(</span>x_{30:45}<span class="sc">\)</span> from every primary test sequence before both forward and backward inference. Score missing-block and observed-region errors separately. Innovation likelihood is computed only where observations are available. The filter's block trajectory is an online prediction from pre-block information; the smoother's block trajectory is a retrospective reconstruction using both sides. Comparing their RMSE must preserve that information-set difference.</span>
+<span id="cb4-275"><a href="#cb4-275" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-276"><a href="#cb4-276" aria-hidden="true" tabindex="-1"></a><span class="fu">### D. Reset-boundary failure</span></span>
+<span id="cb4-277"><a href="#cb4-277" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-278"><a href="#cb4-278" aria-hidden="true" tabindex="-1"></a>Take the first two independently generated primary test sequences and, only for this negative control, concatenate them without resetting the prior at the join. Run the same parameter tuple as though the join were a real transition. Compare against correct separate-sequence inference using the inherited boundary prediction, first-state estimate difference, artificial-continuity magnitude, and proper-versus-joined RMSE over the first eight states of the second sequence.</span>
+<span id="cb4-279"><a href="#cb4-279" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-280"><a href="#cb4-280" aria-hidden="true" tabindex="-1"></a>The intended demonstration is that carrying a posterior across an independent reset can impose artificial continuity or otherwise distort inference near the join. The realized direction and magnitude are reported, not guaranteed. The negative control must never alter ordinary split handling.</span>
+<span id="cb4-281"><a href="#cb4-281" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-282"><a href="#cb4-282" aria-hidden="true" tabindex="-1"></a><span class="fu">### E. Near-unit-root stress</span></span>
+<span id="cb4-283"><a href="#cb4-283" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-284"><a href="#cb4-284" aria-hidden="true" tabindex="-1"></a>Generate the separate <span class="sc">\(</span>a=0.99<span class="sc">\)</span> condition and compare matched-stationary versus tight-variance initialization. Report stationary prior variance, maximum filter and smoother variance, first-20-step mean/variance sensitivity, and covariance finiteness/nonnegativity. In addition, propagate variance without observations to fixed horizons <span class="sc">\(</span>h\in<span class="sc">\{</span>1,10,50,100,200<span class="sc">\}\)</span> under both initializations. This diagnostic separates long-horizon predictive uncertainty from posterior variance under continuous measurement updates. It is not a second primary model and cannot rescue a failed primary oracle.</span>
+<span id="cb4-285"><a href="#cb4-285" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-286"><a href="#cb4-286" aria-hidden="true" tabindex="-1"></a><span class="fu">### F. Informative-missingness warning</span></span>
+<span id="cb4-287"><a href="#cb4-287" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-288"><a href="#cb4-288" aria-hidden="true" tabindex="-1"></a>For a warning-only negative control, hide an observation whenever <span class="sc">\(</span>|x_t|&gt;0.9<span class="sc">\)</span>. The ordinary skipped-update filter and smoother deliberately ignore the information carried by that observation-dependent mask. The posterior target under a joint observation--missingness model is therefore not the same as conditioning only on retained values. The resulting missing fraction, latent magnitude inside/outside the mask, and skipped-update filter RMSE are labeled **uncorrected informative-missingness stress**, excluded from primary acceptance, and used only to show why an ignorable-missingness interpretation fails. No correction or calibrated uncertainty claim is permitted without explicitly modeling the missingness process.</span>
+<span id="cb4-289"><a href="#cb4-289" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-290"><a href="#cb4-290" aria-hidden="true" tabindex="-1"></a><span class="fu">## Sanity checks</span></span>
+<span id="cb4-291"><a href="#cb4-291" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-292"><a href="#cb4-292" aria-hidden="true" tabindex="-1"></a>The implementation and generated diagnostics must assert all of the following.</span>
+<span id="cb4-293"><a href="#cb4-293" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-294"><a href="#cb4-294" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>**Filter batch equivalence:** for every short oracle prefix and observed mask, the recursive <span class="sc">\(</span>m_{t\mid t},p_{t\mid t}<span class="sc">\)</span> equal the current-time marginal from direct conditioning on observations through <span class="sc">\(</span>t<span class="sc">\)</span>.</span>
+<span id="cb4-295"><a href="#cb4-295" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>**Smoother batch equivalence:** all short-sequence <span class="sc">\(</span>m_{t\mid T},p_{t\mid T}<span class="sc">\)</span> equal the corresponding full batch posterior marginals.</span>
+<span id="cb4-296"><a href="#cb4-296" aria-hidden="true" tabindex="-1"></a><span class="ss">3. </span>**Nested-information variance:** <span class="sc">\(</span>p_{t\mid T}\le p_{t\mid t}+10^{-12}<span class="sc">\)</span> for the regular correct-model computations.</span>
+<span id="cb4-297"><a href="#cb4-297" aria-hidden="true" tabindex="-1"></a><span class="ss">4. </span>**No look-ahead:** changing <span class="sc">\(</span>x_{t+1:T}\) while holding \(x_{1:t}<span class="sc">\)</span> fixed cannot change any stored filter output through <span class="sc">\(</span>t<span class="sc">\)</span>; it may change smoother outputs.</span>
+<span id="cb4-298"><a href="#cb4-298" aria-hidden="true" tabindex="-1"></a><span class="ss">5. </span>**No latent leakage:** parameter selection and inference inputs contain no latent array, and test latent truth is joined only by the scoring stage.</span>
+<span id="cb4-299"><a href="#cb4-299" aria-hidden="true" tabindex="-1"></a><span class="ss">6. </span>**Boundary reset:** separate-sequence outputs equal outputs obtained by running each sequence independently; only the named negative control omits the reset.</span>
+<span id="cb4-300"><a href="#cb4-300" aria-hidden="true" tabindex="-1"></a><span class="ss">7. </span>**Numerical covariance:** assembled batch covariances are symmetric within <span class="sc">\(</span>10^{-12}<span class="sc">\)</span>; all scalar variances are at least <span class="sc">\(</span>-10^{-12}<span class="sc">\)</span>; oracle mean and variance discrepancies are at most <span class="sc">\(</span>10^{-10}<span class="sc">\)</span> in absolute value.</span>
+<span id="cb4-301"><a href="#cb4-301" aria-hidden="true" tabindex="-1"></a><span class="ss">8. </span>**Missing-block handling:** no innovation or likelihood contribution is emitted at hidden times, and skipped updates equal predictions exactly within floating-point tolerance.</span>
+<span id="cb4-302"><a href="#cb4-302" aria-hidden="true" tabindex="-1"></a><span class="ss">9. </span>**Determinism:** two clean executions with the same runtime and command produce byte-identical **manifest.json**, **metrics.csv**, **diagnostics.json**, and **summary.png**.</span>
+<span id="cb4-303"><a href="#cb4-303" aria-hidden="true" tabindex="-1"></a><span class="ss">10. </span>**Metric provenance:** every metrics row identifies split, condition, parameter source, method, inference target, region, metric, and value.</span>
+<span id="cb4-304"><a href="#cb4-304" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-305"><a href="#cb4-305" aria-hidden="true" tabindex="-1"></a>Tolerance values belong in the manifest. Passing structural checks does not establish scientific model adequacy.</span>
+<span id="cb4-306"><a href="#cb4-306" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-307"><a href="#cb4-307" aria-hidden="true" tabindex="-1"></a><span class="fu">## Failure cases</span></span>
+<span id="cb4-308"><a href="#cb4-308" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-309"><a href="#cb4-309" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Filter reads the future:** any dependence of a filter output at <span class="sc">\(</span>t<span class="sc">\)</span> on <span class="sc">\(</span>x_{t+1:T}<span class="sc">\)</span> is leakage and a hard failure.</span>
+<span id="cb4-310"><a href="#cb4-310" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Smoother mislabeled online:** a retrospective estimate presented as available at time <span class="sc">\(</span>t<span class="sc">\)</span> is an inferential failure even if its arithmetic is correct.</span>
+<span id="cb4-311"><a href="#cb4-311" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Batch disagreement:** discrepancies above tolerance under the same fixed model indicate indexing, covariance, masking, or conditioning errors.</span>
+<span id="cb4-312"><a href="#cb4-312" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Latent truth enters selection:** any grid criterion, preprocessing decision, or posterior conditioned on <span class="sc">\(</span>z_t<span class="sc">\)</span> invalidates the learned-parameter comparison.</span>
+<span id="cb4-313"><a href="#cb4-313" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**State propagates across true boundaries:** failure to reset invents dependence between independent sequences.</span>
+<span id="cb4-314"><a href="#cb4-314" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Wrong-noise certainty interpreted as calibrated:** covariance is conditional on the assumed tuple; misspecified plug-in intervals can be narrow and wrong.</span>
+<span id="cb4-315"><a href="#cb4-315" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Parameter uncertainty omitted silently:** selected-grid posterior intervals exclude uncertainty over the selection procedure and candidate tuple.</span>
+<span id="cb4-316"><a href="#cb4-316" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Missingness treated as ignorable without justification:** state-dependent absence changes the conditioning problem.</span>
+<span id="cb4-317"><a href="#cb4-317" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Near-unit-root results pooled with primary results:** doing so changes the acceptance population and obscures initialization sensitivity.</span>
+<span id="cb4-318"><a href="#cb4-318" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Plausible figure replaces numerical checks:** visual smoothness cannot verify a posterior, a boundary, or calibration.</span>
+<span id="cb4-319"><a href="#cb4-319" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Recovery treated as mechanism:** successful state estimation in a simulator does not establish a causal or biological transition law.</span>
+<span id="cb4-320"><a href="#cb4-320" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-321"><a href="#cb4-321" aria-hidden="true" tabindex="-1"></a><span class="fu">## Recovery task</span></span>
+<span id="cb4-322"><a href="#cb4-322" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-323"><a href="#cb4-323" aria-hidden="true" tabindex="-1"></a>The recovery outputs are kept distinct.</span>
+<span id="cb4-324"><a href="#cb4-324" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-325"><a href="#cb4-325" aria-hidden="true" tabindex="-1"></a><span class="fu">### Prediction</span></span>
+<span id="cb4-326"><a href="#cb4-326" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-327"><a href="#cb4-327" aria-hidden="true" tabindex="-1"></a>For observed times, the one-step observation predictive law is</span>
+<span id="cb4-328"><a href="#cb4-328" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-329"><a href="#cb4-329" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb4-330"><a href="#cb4-330" aria-hidden="true" tabindex="-1"></a>x_t\mid x_{1:t-1}\sim</span>
+<span id="cb4-331"><a href="#cb4-331" aria-hidden="true" tabindex="-1"></a>\mathcal N(m_{t\mid t-1},s_t),</span>
+<span id="cb4-332"><a href="#cb4-332" aria-hidden="true" tabindex="-1"></a>\qquad</span>
+<span id="cb4-333"><a href="#cb4-333" aria-hidden="true" tabindex="-1"></a>s_t=p_{t\mid t-1}+r.</span>
+<span id="cb4-334"><a href="#cb4-334" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb4-335"><a href="#cb4-335" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-336"><a href="#cb4-336" aria-hidden="true" tabindex="-1"></a>The held-out one-step negative log likelihood and standardized innovation <span class="sc">\(</span>\nu_t/\sqrt{s_t}<span class="sc">\)</span> score this observation prediction. Smoothing does not produce a new prospective sequence likelihood; the same forward predictive factorization supplies the fixed-parameter likelihood <span class="co">[</span><span class="ot">@Sarkka2013, sec. 12.1.1</span><span class="co">]</span>.</span>
+<span id="cb4-337"><a href="#cb4-337" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-338"><a href="#cb4-338" aria-hidden="true" tabindex="-1"></a><span class="fu">### Latent recovery</span></span>
+<span id="cb4-339"><a href="#cb4-339" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-340"><a href="#cb4-340" aria-hidden="true" tabindex="-1"></a>Filter and smoother posterior means are scored against retained <span class="sc">\(</span>z_t<span class="sc">\)</span> only after inference. Filtering RMSE evaluates online recovery; smoothing RMSE evaluates retrospective recovery. They are different tasks because their conditioning sigma-fields differ.</span>
+<span id="cb4-341"><a href="#cb4-341" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-342"><a href="#cb4-342" aria-hidden="true" tabindex="-1"></a><span class="fu">### Model-conditional uncertainty</span></span>
+<span id="cb4-343"><a href="#cb4-343" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-344"><a href="#cb4-344" aria-hidden="true" tabindex="-1"></a>Pointwise 95% coverage uses</span>
+<span id="cb4-345"><a href="#cb4-345" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-346"><a href="#cb4-346" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb4-347"><a href="#cb4-347" aria-hidden="true" tabindex="-1"></a>m\pm 1.959963984540054\sqrt{p}</span>
+<span id="cb4-348"><a href="#cb4-348" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb4-349"><a href="#cb4-349" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-350"><a href="#cb4-350" aria-hidden="true" tabindex="-1"></a>for the relevant filter or smoother posterior. Coverage is aggregated across independent test sequences and time points, with missing-block inside/outside records. It describes repeated-simulation behavior under a fixed assumed tuple. A single interval does not carry a frequentist guarantee for one state, and finite-sample aggregate coverage need not equal 0.95 exactly.</span>
+<span id="cb4-351"><a href="#cb4-351" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-352"><a href="#cb4-352" aria-hidden="true" tabindex="-1"></a><span class="fu">### Parameter uncertainty</span></span>
+<span id="cb4-353"><a href="#cb4-353" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-354"><a href="#cb4-354" aria-hidden="true" tabindex="-1"></a>Known-parameter intervals condition on the true tuple. Selected-grid intervals condition on one frozen selected tuple. Neither integrates over parameter uncertainty. The learned-versus-known gap is reported in prediction, recovery, and coverage metrics, but no plug-in covariance is called total uncertainty.</span>
+<span id="cb4-355"><a href="#cb4-355" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-356"><a href="#cb4-356" aria-hidden="true" tabindex="-1"></a><span class="fu">## Candidate analysis methods</span></span>
+<span id="cb4-357"><a href="#cb4-357" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-358"><a href="#cb4-358" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>**Stationary-mean reference.** Use the generator's zero stationary mean as a deliberately non-temporal latent point reference. No latent posterior coverage is reported.</span>
+<span id="cb4-359"><a href="#cb4-359" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>**Persistence / last observation.** Use a latent point proxy equal to the most recent observed <span class="sc">\(</span>x<span class="sc">\)</span>; before any observation use zero. It has no model-conditional state interval.</span>
+<span id="cb4-360"><a href="#cb4-360" aria-hidden="true" tabindex="-1"></a><span class="ss">3. </span>**Open-loop state prediction.** Assimilate the first available observation once using the declared model, then propagate without further updates. It is a bounded no-reassimilation baseline; prediction-only propagation inside a missing block is also the filter's exact behavior conditional on its last filtered state.</span>
+<span id="cb4-361"><a href="#cb4-361" aria-hidden="true" tabindex="-1"></a><span class="ss">4. </span>**Known-parameter Kalman filter.** Compute online predictive and filtering distributions using only data through the current time <span class="co">[</span><span class="ot">@Kalman1960; @Sarkka2013, ch. 4</span><span class="co">]</span>.</span>
+<span id="cb4-362"><a href="#cb4-362" aria-hidden="true" tabindex="-1"></a><span class="ss">5. </span>**Known-parameter RTS smoother.** Run the fixed-interval backward pass after the complete declared interval is available <span class="co">[</span><span class="ot">@RauchTungStriebel1965; @Sarkka2013, ch. 8</span><span class="co">]</span>.</span>
+<span id="cb4-363"><a href="#cb4-363" aria-hidden="true" tabindex="-1"></a><span class="ss">6. </span>**Direct batch Gaussian conditioning.** Use only bounded short sequences as an independently assembled correctness oracle.</span>
+<span id="cb4-364"><a href="#cb4-364" aria-hidden="true" tabindex="-1"></a><span class="ss">7. </span>**Selected-grid filter and smoother.** Freeze the finite-grid tuple selected by train/validation innovation likelihood, then evaluate on untouched test sequences.</span>
+<span id="cb4-365"><a href="#cb4-365" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-366"><a href="#cb4-366" aria-hidden="true" tabindex="-1"></a>Static Factor Analysis is a conceptual prerequisite and order-blind comparison, not an executable candidate in this scalar unit. It cannot represent the transition or distinguish online from retrospective information merely because factor scores happen to be smooth.</span>
+<span id="cb4-367"><a href="#cb4-367" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-368"><a href="#cb4-368" aria-hidden="true" tabindex="-1"></a><span class="fu">## Evaluation</span></span>
+<span id="cb4-369"><a href="#cb4-369" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-370"><a href="#cb4-370" aria-hidden="true" tabindex="-1"></a>Every metrics row includes:</span>
+<span id="cb4-371"><a href="#cb4-371" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-372"><a href="#cb4-372" aria-hidden="true" tabindex="-1"></a><span class="in">~~~text</span></span>
+<span id="cb4-373"><a href="#cb4-373" aria-hidden="true" tabindex="-1"></a><span class="in">split, condition, parameter_source, method, inference_target,</span></span>
+<span id="cb4-374"><a href="#cb4-374" aria-hidden="true" tabindex="-1"></a><span class="in">region, metric, value</span></span>
+<span id="cb4-375"><a href="#cb4-375" aria-hidden="true" tabindex="-1"></a><span class="in">~~~</span></span>
+<span id="cb4-376"><a href="#cb4-376" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-377"><a href="#cb4-377" aria-hidden="true" tabindex="-1"></a>Required metrics are:</span>
+<span id="cb4-378"><a href="#cb4-378" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-379"><a href="#cb4-379" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>held-out one-step predictive negative log likelihood at observed test times;</span>
+<span id="cb4-380"><a href="#cb4-380" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>filtering latent RMSE and smoothing latent RMSE;</span>
+<span id="cb4-381"><a href="#cb4-381" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>pointwise 95% posterior interval coverage;</span>
+<span id="cb4-382"><a href="#cb4-382" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>innovation mean, variance, and lag-1 autocorrelation, using standardized innovations for calibration summaries;</span>
+<span id="cb4-383"><a href="#cb4-383" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>mean filtering variance and mean smoothing variance;</span>
+<span id="cb4-384"><a href="#cb4-384" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>maximum absolute batch-versus-recursion mean and variance discrepancy;</span>
+<span id="cb4-385"><a href="#cb4-385" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>missing-block inside and outside RMSE/coverage;</span>
+<span id="cb4-386"><a href="#cb4-386" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>wrong-parameter stress metrics;</span>
+<span id="cb4-387"><a href="#cb4-387" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>selected-grid versus known-parameter gaps; and</span>
+<span id="cb4-388"><a href="#cb4-388" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>reset-boundary predictive and local-recovery diagnostics.</span>
+<span id="cb4-389"><a href="#cb4-389" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-390"><a href="#cb4-390" aria-hidden="true" tabindex="-1"></a>Train and validation likelihood rows used for selection remain distinct from test evaluation rows. Metrics that do not apply are omitted rather than coerced to zero. In particular, baselines without a latent posterior have no coverage row, and smoothing has no separate prospective one-step likelihood row.</span>
+<span id="cb4-391"><a href="#cb4-391" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-392"><a href="#cb4-392" aria-hidden="true" tabindex="-1"></a><span class="fu">### Empirical results</span></span>
+<span id="cb4-393"><a href="#cb4-393" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-394"><a href="#cb4-394" aria-hidden="true" tabindex="-1"></a>These values are read from the generated <span class="in">`manifest.json`</span>, <span class="in">`metrics.csv`</span>, and <span class="in">`diagnostics.json`</span>; they remain conditional on this implementation and fixed random seed.</span>
+<span id="cb4-395"><a href="#cb4-395" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-396"><a href="#cb4-396" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Acceptance item <span class="pp">|</span> Result <span class="pp">|</span> Artifact field <span class="pp">|</span></span>
+<span id="cb4-397"><a href="#cb4-397" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|---|</span></span>
+<span id="cb4-398"><a href="#cb4-398" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Selected grid tuple <span class="pp">|</span> <span class="sc">\(</span>(0.85,0.10,0.40)<span class="sc">\)</span>, equal to the generating tuple within this finite grid <span class="pp">|</span> manifest: selected parameters <span class="pp">|</span></span>
+<span id="cb4-399"><a href="#cb4-399" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Maximum filter-versus-batch mean discrepancy <span class="pp">|</span> <span class="sc">\(</span>1.94\times10^{-16}<span class="sc">\)</span> <span class="pp">|</span> diagnostics: filter mean maximum absolute discrepancy <span class="pp">|</span></span>
+<span id="cb4-400"><a href="#cb4-400" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Maximum filter-versus-batch variance discrepancy <span class="pp">|</span> <span class="sc">\(</span>2.78\times10^{-17}<span class="sc">\)</span> <span class="pp">|</span> diagnostics: filter variance maximum absolute discrepancy <span class="pp">|</span></span>
+<span id="cb4-401"><a href="#cb4-401" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Maximum smoother-versus-batch mean discrepancy <span class="pp">|</span> <span class="sc">\(</span>2.36\times10^{-16}<span class="sc">\)</span> <span class="pp">|</span> diagnostics: smoother mean maximum absolute discrepancy <span class="pp">|</span></span>
+<span id="cb4-402"><a href="#cb4-402" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Maximum smoother-versus-batch variance discrepancy <span class="pp">|</span> <span class="sc">\(</span>1.39\times10^{-16}<span class="sc">\)</span> <span class="pp">|</span> diagnostics: smoother variance maximum absolute discrepancy <span class="pp">|</span></span>
+<span id="cb4-403"><a href="#cb4-403" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Maximum smoothing-over-filtering variance violation <span class="pp">|</span> <span class="sc">\(</span>0<span class="sc">\)</span> <span class="pp">|</span> diagnostics: covariance excess <span class="pp">|</span></span>
+<span id="cb4-404"><a href="#cb4-404" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Correct-model test predictive NLL <span class="pp">|</span> 1.1115 per observed point <span class="pp">|</span> metrics: correct-model filter <span class="pp">|</span></span>
+<span id="cb4-405"><a href="#cb4-405" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Correct-model filter / smoother RMSE <span class="pp">|</span> 0.3558 / 0.3141 <span class="pp">|</span> metrics: correct-model all times <span class="pp">|</span></span>
+<span id="cb4-406"><a href="#cb4-406" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Correct-model filter / smoother coverage <span class="pp">|</span> 0.9484 / 0.9484 <span class="pp">|</span> metrics: correct-model 95% intervals <span class="pp">|</span></span>
+<span id="cb4-407"><a href="#cb4-407" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Missing-block filter RMSE inside / outside <span class="pp">|</span> 0.6148 / 0.3649 <span class="pp">|</span> metrics: missing block <span class="pp">|</span></span>
+<span id="cb4-408"><a href="#cb4-408" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Missing-block smoother RMSE inside / outside <span class="pp">|</span> 0.5950 / 0.3233 <span class="pp">|</span> metrics: missing block <span class="pp">|</span></span>
+<span id="cb4-409"><a href="#cb4-409" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Wrong-<span class="sc">\(</span>q/r<span class="sc">\)</span> filter RMSE <span class="pp">|</span> 0.4788 for small-<span class="sc">\(</span>q<span class="sc">\)</span>/large-<span class="sc">\(</span>r<span class="sc">\)</span>; 0.5070 for large-<span class="sc">\(</span>q<span class="sc">\)</span>/small-<span class="sc">\(</span>r<span class="sc">\)</span> <span class="pp">|</span> metrics: wrong-parameter stresses <span class="pp">|</span></span>
+<span id="cb4-410"><a href="#cb4-410" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Wrong-<span class="sc">\(</span>q/r<span class="sc">\)</span> filter coverage <span class="pp">|</span> 0.7063 / 0.7438, below the correct-model 0.9484 <span class="pp">|</span> metrics: wrong-parameter stresses <span class="pp">|</span></span>
+<span id="cb4-411"><a href="#cb4-411" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Reset-boundary failure diagnostic <span class="pp">|</span> artificial boundary continuity 0.8724; proper/joined first-eight RMSE 0.3335 / 0.3828 <span class="pp">|</span> diagnostics: reset boundary <span class="pp">|</span></span>
+<span id="cb4-412"><a href="#cb4-412" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Near-unit-root stress <span class="pp">|</span> stationary prior variance 1.0050; first-20 initialization mean sensitivity 1.0643; tight-prior open-loop variance rises from 0.0690 at <span class="sc">\(</span>h=1<span class="sc">\)</span> to 0.9879 at <span class="sc">\(</span>h=200<span class="sc">\)</span>, approaching the stationary 1.0050; finite nonnegative variances <span class="pp">|</span> diagnostics: near-unit-root <span class="pp">|</span></span>
+<span id="cb4-413"><a href="#cb4-413" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Informative-missingness warning <span class="pp">|</span> missing fraction 0.2844; mean <span class="sc">\(</span><span class="pp">|</span>z<span class="pp">|</span><span class="sc">\)</span> missing/observed 0.7178 / 0.4060 <span class="pp">|</span> diagnostics: informative missingness <span class="pp">|</span></span>
+<span id="cb4-414"><a href="#cb4-414" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Deterministic rerun <span class="pp">|</span> byte-identical manifest, CSV, diagnostics, and PNG in temporary regeneration <span class="pp">|</span> verifier and manifest hashes <span class="pp">|</span></span>
+<span id="cb4-415"><a href="#cb4-415" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-416"><a href="#cb4-416" aria-hidden="true" tabindex="-1"></a>The selected-grid prediction, recovery, and coverage gaps are zero here because the finite grid selected the generating tuple. This favorable finite-sample outcome is not a general parameter-learning result. The smoother's lower RMSE uses later observations and is not an online comparison. Both wrong-noise conditions degraded RMSE and interval coverage, while the reset negative control imposed a nonzero inherited boundary prediction. In the near-unit stress, a tight initial variance approached the model's stationary variance slowly under open-loop propagation; this is a diagnostic of the declared <span class="sc">\(</span>a=0.99<span class="sc">\)</span> model, not a universal unit-root effect size.</span>
+<span id="cb4-417"><a href="#cb4-417" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-418"><a href="#cb4-418" aria-hidden="true" tabindex="-1"></a><span class="fu">## Interpretation</span></span>
+<span id="cb4-419"><a href="#cb4-419" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-420"><a href="#cb4-420" aria-hidden="true" tabindex="-1"></a>The passed correct-model oracle establishes that, for the declared scalar LGSSM and numerical tolerance, the implementation returns the same fixed-parameter Gaussian marginals by recursive and batch routes. Recovery metrics would then describe finite simulations from that generator. They would not establish that any real data source is linear, Gaussian, stationary, first-order Markov, correctly segmented, or governed by the recovered transition.</span>
+<span id="cb4-421"><a href="#cb4-421" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-422"><a href="#cb4-422" aria-hidden="true" tabindex="-1"></a>Filtering and smoothing must remain separate in every table and caption. The filter answers an online question with <span class="sc">\(</span>x_{1:t}<span class="sc">\)</span>; the smoother answers a retrospective question with <span class="sc">\(</span>x_{1:T}<span class="sc">\)</span>. More information can improve retrospective state reconstruction without making the smoother a fair competitor for a prospective decision.</span>
+<span id="cb4-423"><a href="#cb4-423" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-424"><a href="#cb4-424" aria-hidden="true" tabindex="-1"></a>Wrong-<span class="sc">\(</span>q/r<span class="sc">\)</span>, missing-block, boundary, and near-unit-root conditions diagnose sensitivity to assumptions. They do not provide a generic ranking of all state-space methods. A selected grid point is one data-dependent plug-in model among 27 candidates, not recovered ground truth.</span>
+<span id="cb4-425"><a href="#cb4-425" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-426"><a href="#cb4-426" aria-hidden="true" tabindex="-1"></a><span class="fu">## What this toy model does NOT establish</span></span>
+<span id="cb4-427"><a href="#cb4-427" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-428"><a href="#cb4-428" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>It does not prove that observed data lie on a manifold or possess non-Euclidean geometry.</span>
+<span id="cb4-429"><a href="#cb4-429" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>It does not identify a causal, physical, neural, or biological state.</span>
+<span id="cb4-430"><a href="#cb4-430" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>It does not show that temporal correlation is a mechanistic dynamical law.</span>
+<span id="cb4-431"><a href="#cb4-431" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>It does not turn decoding or latent RMSE into evidence of representation.</span>
+<span id="cb4-432"><a href="#cb4-432" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>It does not prove unrestricted parameter identifiability or successful maximum-likelihood learning.</span>
+<span id="cb4-433"><a href="#cb4-433" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>It does not include parameter uncertainty in plug-in posterior intervals.</span>
+<span id="cb4-434"><a href="#cb4-434" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>It does not make fixed-interval smoothing online, causal, or prospectively available.</span>
+<span id="cb4-435"><a href="#cb4-435" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>It does not validate skipped updates under informative missingness.</span>
+<span id="cb4-436"><a href="#cb4-436" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>It does not imply that low reconstruction error, nominal coverage, or a smooth plot is sufficient evidence for model adequacy.</span>
+<span id="cb4-437"><a href="#cb4-437" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>It does not authorize extension to another Phase 3 candidate or promotion to **stable**.</span>
+<span id="cb4-438"><a href="#cb4-438" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-439"><a href="#cb4-439" aria-hidden="true" tabindex="-1"></a><span class="fu">## Extensions to real data</span></span>
+<span id="cb4-440"><a href="#cb4-440" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-441"><a href="#cb4-441" aria-hidden="true" tabindex="-1"></a>Before a real-data use, the analyst would need to justify observation units, sampling intervals, sequence resets, covariates, latent dimension, transition and noise structure, missingness, nonstationarity, and evaluation splits. Parameters and preprocessing must be learned on independent training units. Prospective tasks require filtering or forecasting; retrospective smoothing outputs cannot be backdated into an online analysis. Residual and predictive checks should test Gaussianity, white innovations, heteroscedasticity, regime changes, and boundary effects. None of those extensions is executed here.</span>
+<span id="cb4-442"><a href="#cb4-442" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-443"><a href="#cb4-443" aria-hidden="true" tabindex="-1"></a><span class="fu">## Reproducibility</span></span>
+<span id="cb4-444"><a href="#cb4-444" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-445"><a href="#cb4-445" aria-hidden="true" tabindex="-1"></a><span class="fu">### Bounded artifact contract</span></span>
+<span id="cb4-446"><a href="#cb4-446" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-447"><a href="#cb4-447" aria-hidden="true" tabindex="-1"></a>The implementation owner may create only:</span>
+<span id="cb4-448"><a href="#cb4-448" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-449"><a href="#cb4-449" aria-hidden="true" tabindex="-1"></a><span class="in">~~~text</span></span>
+<span id="cb4-450"><a href="#cb4-450" aria-hidden="true" tabindex="-1"></a><span class="in">toy-models/linear-gaussian-inference-ladder.py</span></span>
+<span id="cb4-451"><a href="#cb4-451" aria-hidden="true" tabindex="-1"></a><span class="in">toy-models/artifacts/linear-gaussian-inference-ladder/manifest.json</span></span>
+<span id="cb4-452"><a href="#cb4-452" aria-hidden="true" tabindex="-1"></a><span class="in">toy-models/artifacts/linear-gaussian-inference-ladder/metrics.csv</span></span>
+<span id="cb4-453"><a href="#cb4-453" aria-hidden="true" tabindex="-1"></a><span class="in">toy-models/artifacts/linear-gaussian-inference-ladder/diagnostics.json</span></span>
+<span id="cb4-454"><a href="#cb4-454" aria-hidden="true" tabindex="-1"></a><span class="in">toy-models/artifacts/linear-gaussian-inference-ladder/summary.png</span></span>
+<span id="cb4-455"><a href="#cb4-455" aria-hidden="true" tabindex="-1"></a><span class="in">~~~</span></span>
+<span id="cb4-456"><a href="#cb4-456" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-457"><a href="#cb4-457" aria-hidden="true" tabindex="-1"></a>The source script must regenerate every artifact from scratch. The manifest records equations, all seeds, split sizes, sequence lengths, parameter grid and tie rule, selected tuple, missing-block indices, stress definitions, runtime and package versions, numerical tolerances, generation command, verification command, and SHA-256 hashes. **metrics.csv** contains tidy labelled records, not hand-entered summaries. **diagnostics.json** contains oracle, leakage, covariance, reset, near-unit-root, informative-missingness-warning, and deterministic-rerun checks. The single PNG is derived from the same frozen arrays and metrics.</span>
+<span id="cb4-458"><a href="#cb4-458" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-459"><a href="#cb4-459" aria-hidden="true" tabindex="-1"></a>The required execution in the bundled runtime is:</span>
+<span id="cb4-460"><a href="#cb4-460" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-461"><a href="#cb4-461" aria-hidden="true" tabindex="-1"></a><span class="in">~~~bash</span></span>
+<span id="cb4-462"><a href="#cb4-462" aria-hidden="true" tabindex="-1"></a><span class="ex">/Users/bytedance/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3</span> toy-models/linear-gaussian-inference-ladder.py</span>
+<span id="cb4-463"><a href="#cb4-463" aria-hidden="true" tabindex="-1"></a><span class="in">~~~</span></span>
+<span id="cb4-464"><a href="#cb4-464" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-465"><a href="#cb4-465" aria-hidden="true" tabindex="-1"></a>By default the script generates the repository artifacts and verifies them, including a clean temporary regeneration and byte comparison. Explicit <span class="in">`--generate`</span> and <span class="in">`--verify`</span> modes are also available. JSON serialization order, float formatting, CSV row order, and PNG output are fixed so determinism is testable. No external data, network access, system package, or private resource is used at execution time.</span>
+<span id="cb4-466"><a href="#cb4-466" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-467"><a href="#cb4-467" aria-hidden="true" tabindex="-1"></a><span class="fu">### Evidence inspected</span></span>
+<span id="cb4-468"><a href="#cb4-468" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-469"><a href="#cb4-469" aria-hidden="true" tabindex="-1"></a>The following external evidence was actually retrieved and inspected for this design; repository Method summaries were used only as terminology anchors.</span>
+<span id="cb4-470"><a href="#cb4-470" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-471"><a href="#cb4-471" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Kalman (1960):** 12-page article PDF, bibliographic metadata and article-level text inspected. Equation-level inspection covered the “Optimal Estimates” distinction among smoothing, filtering, and prediction; the state-space Problem I; the recursive innovation/projection construction and Theorem 3; covariance recursion; examples; and conclusion. The appendix was not inspected line by line. Kalman's displayed observation formulation is historically broader/different in notation from the additive-noise scalar model used here, so Särkkä supplies the direct Bayesian additive-noise equations <span class="co">[</span><span class="ot">@Kalman1960</span><span class="co">]</span>.</span>
+<span id="cb4-472"><a href="#cb4-472" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Rauch, Tung, and Striebel (1965):** 14-page publisher-rendered PDF containing the six-page AIAA article plus appended citation material. Publication metadata, abstract, model/criterion setup, sections 3.1 and 3.2 at equation level, the numerical-example discussion, and section 5 conclusion were inspected. Appended citation lists and every continuous-time appendix equation were not inspected in detail <span class="co">[</span><span class="ot">@RauchTungStriebel1965</span><span class="co">]</span>.</span>
+<span id="cb4-473"><a href="#cb4-473" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Särkkä (2013):** author-hosted 252-page book PDF. Equation-level inspection covered sections 4.1--4.3 (state-space factorization, Bayesian filter, Kalman filter), 8.1--8.2 (fixed-interval Bayesian smoothing and RTS recursions), and 12.1--12.1.1 (unknown parameters and prediction-error/marginal-likelihood factorization). The full book was not read line by line <span class="co">[</span><span class="ot">@Sarkka2013</span><span class="co">]</span>.</span>
+<span id="cb4-474"><a href="#cb4-474" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-475"><a href="#cb4-475" aria-hidden="true" tabindex="-1"></a>The inspected sources support the fixed-parameter filtering/smoothing targets, recursions, and likelihood factorization. They do not supply the particular seeds, finite grid, stress magnitudes, or acceptance tolerances; those are predeclared LDG design choices.</span>
+<span id="cb4-476"><a href="#cb4-476" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-477"><a href="#cb4-477" aria-hidden="true" tabindex="-1"></a><span class="fu">### Integration and validation state</span></span>
+<span id="cb4-478"><a href="#cb4-478" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-479"><a href="#cb4-479" aria-hidden="true" tabindex="-1"></a>The scientific-design executor ran target structural and diff checks, the implementation owner ran deterministic script and artifact checks, and the parent orchestrator completed repository validation, tests, target/index/full-site renders, independent scientific and implementation focused review, and owner-authorized promotion under the recorded review decision. The executor did not review its own work.</span>
+<span id="cb4-480"><a href="#cb4-480" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-481"><a href="#cb4-481" aria-hidden="true" tabindex="-1"></a><span class="fu">## Maturity checklist</span></span>
+<span id="cb4-482"><a href="#cb4-482" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-483"><a href="#cb4-483" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> Complete Toy Model schema at **L1/stable** with generated empirical results distinguished from model-derived expectations.</span>
+<span id="cb4-484"><a href="#cb4-484" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> Generation, masking, parameter selection, inference, and scoring are separated.</span>
+<span id="cb4-485"><a href="#cb4-485" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> Ground truth, primary parameters, splits, seeds, boundaries, and missing block are predeclared.</span>
+<span id="cb4-486"><a href="#cb4-486" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> Known-parameter filtering, RTS smoothing, and direct batch conditioning have distinct information sets.</span>
+<span id="cb4-487"><a href="#cb4-487" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> Prediction, latent recovery, model-conditional uncertainty, and parameter uncertainty are distinguished.</span>
+<span id="cb4-488"><a href="#cb4-488" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> Finite-grid selection excludes test observations and all latent truth and is not called general ML estimation.</span>
+<span id="cb4-489"><a href="#cb4-489" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> Correct-model, wrong-<span class="sc">\(</span>q/r<span class="sc">\)</span>, missing-block, reset-boundary, near-unit-root, and informative-missingness conditions are bounded.</span>
+<span id="cb4-490"><a href="#cb4-490" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> Online versus retrospective non-implication limits are explicit.</span>
+<span id="cb4-491"><a href="#cb4-491" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> Artifact inventory, manifest fields, determinism, metrics schema, and numerical oracles match the backlog contract.</span>
+<span id="cb4-492"><a href="#cb4-492" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> External evidence scope is recorded without claiming complete inspection.</span>
+<span id="cb4-493"><a href="#cb4-493" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> Bounded implementation and artifacts generated and deterministically verified.</span>
+<span id="cb4-494"><a href="#cb4-494" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> Independent scientific review PASS after focused re-review of the near-unit-root horizon diagnostic.</span>
+<span id="cb4-495"><a href="#cb4-495" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> Independent implementation review PASS after focused re-review of seven bounded verification and consistency corrections.</span>
+<span id="cb4-496"><a href="#cb4-496" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> Target and repository validation PASS, including deterministic regeneration, 51-object structural validation, 31 unit tests, target/index/full-site renders, and diff checks.</span>
+<span id="cb4-497"><a href="#cb4-497" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> Stable promotion explicitly authorized by the owner under the recorded review decision.</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></div>
+</div></div></div></div></div>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

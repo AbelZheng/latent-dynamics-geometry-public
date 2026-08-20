@@ -1,0 +1,1492 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.10.18">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Discrete-Time Linear-Gaussian State-Space Model – Latent Dynamics &amp; Geometry</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-445b8638c3d06994fee0907d791121c4.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-chtml.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">Latent Dynamics &amp; Geometry</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../index.html"> 
+<span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../knowledge/concepts/index.html"> 
+<span class="menu-text">Concepts</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../knowledge/methods/index.html"> 
+<span class="menu-text">Methods</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../knowledge/math/index.html"> 
+<span class="menu-text">Math</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../knowledge/papers/index.html"> 
+<span class="menu-text">Papers</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../toy-models/index.html"> 
+<span class="menu-text">Toy Models</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../research-questions/index.html"> 
+<span class="menu-text">Research Questions</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../benchmarks/index.html"> 
+<span class="menu-text">Benchmarks</span></a>
+  </li>  
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/AbelZheng/latent-dynamics-geometry-public"> <i class="bi bi-github" role="img" aria-label="GitHub repository">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="https://github.com/AbelZheng/latent-dynamics-geometry-public/discussions"> 
+<span class="menu-text">Discussions</span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#discrete-time-linear-gaussian-state-space-model" id="toc-discrete-time-linear-gaussian-state-space-model" class="nav-link active" data-scroll-target="#discrete-time-linear-gaussian-state-space-model">Discrete-Time Linear-Gaussian State-Space Model</a>
+  <ul class="collapse">
+  <li><a href="#problem" id="toc-problem" class="nav-link" data-scroll-target="#problem">Problem</a></li>
+  <li><a href="#input" id="toc-input" class="nav-link" data-scroll-target="#input">Input</a></li>
+  <li><a href="#output" id="toc-output" class="nav-link" data-scroll-target="#output">Output</a></li>
+  <li><a href="#core-idea" id="toc-core-idea" class="nav-link" data-scroll-target="#core-idea">Core idea</a></li>
+  <li><a href="#generative-modeling-assumptions" id="toc-generative-modeling-assumptions" class="nav-link" data-scroll-target="#generative-modeling-assumptions">Generative / modeling assumptions</a></li>
+  <li><a href="#mathematical-formulation" id="toc-mathematical-formulation" class="nav-link" data-scroll-target="#mathematical-formulation">Mathematical formulation</a></li>
+  <li><a href="#what-is-learned" id="toc-what-is-learned" class="nav-link" data-scroll-target="#what-is-learned">What is learned?</a></li>
+  <li><a href="#what-is-fixed" id="toc-what-is-fixed" class="nav-link" data-scroll-target="#what-is-fixed">What is fixed?</a></li>
+  <li><a href="#temporal-assumptions" id="toc-temporal-assumptions" class="nav-link" data-scroll-target="#temporal-assumptions">Temporal assumptions</a></li>
+  <li><a href="#geometry-assumptions" id="toc-geometry-assumptions" class="nav-link" data-scroll-target="#geometry-assumptions">Geometry assumptions</a></li>
+  <li><a href="#supervision" id="toc-supervision" class="nav-link" data-scroll-target="#supervision">Supervision</a></li>
+  <li><a href="#optimization-inference" id="toc-optimization-inference" class="nav-link" data-scroll-target="#optimization-inference">Optimization / inference</a></li>
+  <li><a href="#strengths" id="toc-strengths" class="nav-link" data-scroll-target="#strengths">Strengths</a></li>
+  <li><a href="#failure-modes" id="toc-failure-modes" class="nav-link" data-scroll-target="#failure-modes">Failure modes</a></li>
+  <li><a href="#identifiability-issues" id="toc-identifiability-issues" class="nav-link" data-scroll-target="#identifiability-issues">Identifiability issues</a></li>
+  <li><a href="#comparison-with-simpler-methods" id="toc-comparison-with-simpler-methods" class="nav-link" data-scroll-target="#comparison-with-simpler-methods">Comparison with simpler methods</a></li>
+  <li><a href="#evaluation-criteria" id="toc-evaluation-criteria" class="nav-link" data-scroll-target="#evaluation-criteria">Evaluation criteria</a></li>
+  <li><a href="#minimal-toy-model" id="toc-minimal-toy-model" class="nav-link" data-scroll-target="#minimal-toy-model">Minimal toy model</a></li>
+  <li><a href="#relevance-to-ldg" id="toc-relevance-to-ldg" class="nav-link" data-scroll-target="#relevance-to-ldg">Relevance to LDG</a>
+  <ul class="collapse">
+  <li><a href="#mouse-trajectory" id="toc-mouse-trajectory" class="nav-link" data-scroll-target="#mouse-trajectory">Mouse trajectory</a></li>
+  <li><a href="#eye-movement" id="toc-eye-movement" class="nav-link" data-scroll-target="#eye-movement">Eye movement</a></li>
+  <li><a href="#eeg" id="toc-eeg" class="nav-link" data-scroll-target="#eeg">EEG</a></li>
+  <li><a href="#meg-neural-population-data" id="toc-meg-neural-population-data" class="nav-link" data-scroll-target="#meg-neural-population-data">MEG / neural population data</a></li>
+  </ul></li>
+  <li><a href="#primary-sources" id="toc-primary-sources" class="nav-link" data-scroll-target="#primary-sources">Primary sources</a></li>
+  <li><a href="#reviews-secondary-sources" id="toc-reviews-secondary-sources" class="nav-link" data-scroll-target="#reviews-secondary-sources">Reviews / secondary sources</a></li>
+  <li><a href="#open-methodological-questions" id="toc-open-methodological-questions" class="nav-link" data-scroll-target="#open-methodological-questions">Open methodological questions</a></li>
+  <li><a href="#maturity-checklist" id="toc-maturity-checklist" class="nav-link" data-scroll-target="#maturity-checklist">Maturity checklist</a></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<div class="quarto-title-block"><div><h1 class="title">Discrete-Time Linear-Gaussian State-Space Model</h1><button type="button" class="btn code-tools-button" id="quarto-code-tools-source"><i class="bi"></i> Code</button></div></div>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="discrete-time-linear-gaussian-state-space-model" class="level1">
+<h1>Discrete-Time Linear-Gaussian State-Space Model</h1>
+<section id="problem" class="level2">
+<h2 class="anchored" data-anchor-id="problem">Problem</h2>
+<p>A discrete-time linear-Gaussian state-space model (LGSSM) describes an ordered sequence of observations through an unobserved state that evolves linearly with Gaussian process noise and generates measurements linearly with Gaussian observation noise. It provides one joint probability model in which forecasting, state inference, sequence likelihood, and parameter learning can be defined without treating them as the same task <span class="citation" data-cites="GhahramaniHinton1996 Sarkka2013">(<a href="#ref-GhahramaniHinton1996" role="doc-biblioref">Ghahramani and Hinton 1996</a>; <a href="#ref-Sarkka2013" role="doc-biblioref">Särkkä 2013</a>)</span>.</p>
+<p>This object specifies the finite-dimensional, time-invariant, discrete-time model with a fixed or externally supplied <strong>open-loop known input path</strong>. It does not present the Kalman filtering or fixed-interval smoothing algorithms, which are later Method units. Time-varying, switching, nonlinear, non-Gaussian, continuous-time, unknown-input, feedback-policy, and control-design variants are outside the bounded core.</p>
+</section>
+<section id="input" class="level2">
+<h2 class="anchored" data-anchor-id="input">Input</h2>
+<p>For one sequence of length <span class="math inline">\(T\)</span>, let</p>
+<ul>
+<li><span class="math inline">\(x_t\in\mathbb R^p\)</span> be the observed vector;</li>
+<li><span class="math inline">\(u_t\in\mathbb R^r\)</span> be an optional known input or regressor; and</li>
+<li><span class="math inline">\(z_t\in\mathbb R^q\)</span> be the latent state.</li>
+</ul>
+<p>A reproducible analysis must declare:</p>
+<ul>
+<li>the observational unit, sequence boundaries, sampling interval, ordering, and whether matrices are assumed common across sequences;</li>
+<li>feature definitions, units, transformations, exclusions, and missing-data policy;</li>
+<li>which inputs are fixed or externally supplied at fitting and prediction time, and when each value becomes available;</li>
+<li>latent dimension <span class="math inline">\(q\)</span> and its selection protocol;</li>
+<li>whether parameters are fixed from external knowledge or learned from training sequences; and</li>
+<li>the exact target: forecasting, filtering, smoothing, marginal likelihood, parameter learning, or simulation.</li>
+</ul>
+<p>Sequences, subjects, sessions, or trials are not interchangeable replicates. Their dependence and parameter sharing must be stated.</p>
+</section>
+<section id="output" class="level2">
+<h2 class="anchored" data-anchor-id="output">Output</h2>
+<p>The model specification is a parameter tuple</p>
+<p><span class="math display">\[
+\theta=(m_1,P_1,A,B,C,D,Q,R),
+\]</span></p>
+<p>with dimensions conforming to the state, input, and observation spaces. Conditional on <span class="math inline">\(\theta\)</span>, it defines:</p>
+<ul>
+<li>the joint Gaussian law <span class="math inline">\(p_\theta(z_{1:T},x_{1:T}\mid u_{1:T})\)</span>;</li>
+<li>predictive distributions for future states and observations;</li>
+<li>filtering distributions conditioned only on observations available through the target time;</li>
+<li>smoothing distributions conditioned on a complete declared observation interval;</li>
+<li>the marginal sequence likelihood after integrating out <span class="math inline">\(z_{1:T}\)</span>; and</li>
+<li>model-conditional latent-state summaries with uncertainty.</li>
+</ul>
+<p>An implementation may additionally return fitted parameters, forecast means/covariances, filtered or smoothed state moments, innovations, and likelihood contributions. These outputs have different conditioning information and must be labeled accordingly.</p>
+</section>
+<section id="core-idea" class="level2">
+<h2 class="anchored" data-anchor-id="core-idea">Core idea</h2>
+<p>The state carries the information needed for the next-step transition, while observations are noisy linear views of that state. The Markov factorization converts one high-dimensional trajectory distribution into an initial-state law, local transition laws, and local observation laws. Gaussian closure makes the relevant conditional and marginal distributions Gaussian, permitting exact finite-horizon inference when parameters are known <span class="citation" data-cites="Sarkka2013">(<a href="#ref-Sarkka2013" role="doc-biblioref">Särkkä 2013</a>, chs.&nbsp;4, 8)</span>.</p>
+<p>The method’s value is not merely that its inferred mean trajectory looks smooth. It is that a declared stochastic temporal model yields testable predictive distributions and separates uncertainty introduced at the transition from uncertainty introduced at measurement.</p>
+</section>
+<section id="generative-modeling-assumptions" class="level2">
+<h2 class="anchored" data-anchor-id="generative-modeling-assumptions">Generative / modeling assumptions</h2>
+<p>The canonical input-driven model is</p>
+<p><span class="math display">\[
+z_1\sim\mathcal N(m_1,P_1),
+\]</span></p>
+<p><span class="math display">\[
+z_{t+1}=Az_t+Bu_t+w_t,
+\qquad
+w_t\sim\mathcal N(0,Q),
+\]</span></p>
+<p><span class="math display">\[
+x_t=Cz_t+Du_t+v_t,
+\qquad
+v_t\sim\mathcal N(0,R).
+\]</span></p>
+<p>The no-input core is recovered by omitting <span class="math inline">\(u_t\)</span>, <span class="math inline">\(B\)</span>, and <span class="math inline">\(D\)</span>. Unless explicitly generalized, the model assumes:</p>
+<ul>
+<li><span class="math inline">\(P_1,Q\succeq0\)</span> and <span class="math inline">\(R\succ0\)</span>;</li>
+<li><span class="math inline">\(z_1\)</span>, every <span class="math inline">\(w_t\)</span>, and every <span class="math inline">\(v_s\)</span> are mutually independent;</li>
+<li>process and observation noises are independent across time;</li>
+<li><span class="math inline">\(A,B,C,D,Q,R\)</span> are constant over the sequence;</li>
+<li>the latent transition is first-order Markov;</li>
+<li>observations are conditionally independent across time given the state path and inputs; and</li>
+<li>inputs are fixed in advance or externally supplied without depending on contemporaneous or future observations, so they are valid conditioning variables rather than unexplained stochastic causes.</li>
+</ul>
+<p>Gaussianity is stronger than specifying only means and covariances. Correlated process and observation noise, colored noise, heteroscedasticity, time-varying matrices, or history-dependent measurements require an explicit modified model rather than an informal reinterpretation of <span class="math inline">\(Q\)</span> or <span class="math inline">\(R\)</span>.</p>
+</section>
+<section id="mathematical-formulation" class="level2">
+<h2 class="anchored" data-anchor-id="mathematical-formulation">Mathematical formulation</h2>
+<p>For a fixed open-loop input path, the joint law factorizes as</p>
+<p><span class="math display">\[
+p_\theta(z_{1:T},x_{1:T}\mid u_{1:T})
+=p_\theta(z_1)
+\prod_{t=1}^{T-1}p_\theta(z_{t+1}\mid z_t,u_t)
+\prod_{t=1}^{T}p_\theta(x_t\mid z_t,u_t),
+\]</span></p>
+<p>where</p>
+<p><span class="math display">\[
+p_\theta(z_{t+1}\mid z_t,u_t)
+=\mathcal N(Az_t+Bu_t,Q),
+\]</span></p>
+<p><span class="math display">\[
+p_\theta(x_t\mid z_t,u_t)
+=\mathcal N(Cz_t+Du_t,R).
+\]</span></p>
+<p>This factorization defines several different conditional targets. The future input values appearing below must be known scenario values rather than controls that encode future observations:</p>
+<p><span class="math display">\[
+\text{forecasting:}\quad
+p(z_{t+h},x_{t+h}\mid x_{1:t},u_{1:t+h}),
+\]</span></p>
+<p><span class="math display">\[
+\text{filtering:}\quad
+p(z_t\mid x_{1:t},u_{1:t}),
+\]</span></p>
+<p><span class="math display">\[
+\text{smoothing:}\quad
+p(z_t\mid x_{1:T},u_{1:T}),\quad T&gt;t,
+\]</span></p>
+<p>or the full path posterior <span class="math inline">\(p(z_{1:T}\mid x_{1:T},u_{1:T})\)</span>. Kalman explicitly distinguishes smoothing, filtering, and prediction by whether the estimated state time is earlier than, equal to, or later than the final conditioning observation <span class="citation" data-cites="Kalman1960">(<a href="#ref-Kalman1960" role="doc-biblioref">Kalman 1960</a>)</span>. The exact recursions are deliberately deferred to separate filtering and smoothing Method Objects.</p>
+<p>The marginal likelihood is</p>
+<p><span class="math display">\[
+p_\theta(x_{1:T}\mid u_{1:T})
+=\int p_\theta(z_{1:T},x_{1:T}\mid u_{1:T})\,dz_{1:T}.
+\]</span></p>
+<p>It can be factorized into one-step predictive densities,</p>
+<p><span class="math display">\[
+p_\theta(x_{1:T}\mid u_{1:T})
+=\prod_{t=1}^{T}
+p_\theta(x_t\mid x_{1:t-1},u_{1:t}),
+\]</span></p>
+<p>which separates sequence scoring from state-point estimation <span class="citation" data-cites="Sarkka2013">(<a href="#ref-Sarkka2013" role="doc-biblioref">Särkkä 2013, sec. 12.1</a>)</span>.</p>
+<p>Feedback-controlled data require a separate timing and policy model. A valid control <span class="math inline">\(u_t\)</span> must be measurable from information available before the transition it drives and, when <span class="math inline">\(D\ne0\)</span>, before the contemporaneous observation <span class="math inline">\(x_t\)</span>; using <span class="math inline">\(x_t\)</span> itself in <span class="math inline">\(u_t\)</span> creates an algebraic loop. If future controls depend on future observations, conditioning on the realized <span class="math inline">\(u_{1:T}\)</span> can leak future information. Policy-aware likelihoods and forecasts must instead state the nonanticipating policy and integrate or simulate controls not yet known.</p>
+</section>
+<section id="what-is-learned" class="level2">
+<h2 class="anchored" data-anchor-id="what-is-learned">What is learned?</h2>
+<p>Depending on the protocol, parameter learning may estimate some or all of <span class="math inline">\(m_1,P_1,A,B,C,D,Q,R\)</span> and select <span class="math inline">\(q\)</span>. Given fitted parameters, state inference determines conditional distributions over latent states; it does not relearn the model parameters unless an explicitly joint or online-learning procedure is used.</p>
+<p>Maximum-likelihood learning targets the observable sequence distribution after integrating over latent states. EM instead alternates between model-conditional expectations of latent sufficient statistics and parameter updates that increase the same marginal likelihood under exact steps <span class="citation" data-cites="GhahramaniHinton1996">(<a href="#ref-GhahramaniHinton1996" role="doc-biblioref">Ghahramani and Hinton 1996</a>)</span>. The inferred state path is therefore an intermediate uncertain quantity, not observed training data.</p>
+</section>
+<section id="what-is-fixed" class="level2">
+<h2 class="anchored" data-anchor-id="what-is-fixed">What is fixed?</h2>
+<p>The analyst fixes the state dimension or its selection search, sequence boundaries, time step, input definition, matrix structure and parameter sharing, Gaussian and independence assumptions, covariance constraints, initial-state treatment, missing-data mechanism, learning criterion, regularization or priors, and evaluation target.</p>
+<p>When some matrices come from physical modeling, the fixed-versus-estimated partition must be explicit. Calling <span class="math inline">\(A\)</span> “the dynamics” does not establish that it is a physical law if <span class="math inline">\(C\)</span>, <span class="math inline">\(Q\)</span>, <span class="math inline">\(R\)</span>, state coordinates, or inputs are learned phenomenologically.</p>
+</section>
+<section id="temporal-assumptions" class="level2">
+<h2 class="anchored" data-anchor-id="temporal-assumptions">Temporal assumptions</h2>
+<p>Time is discrete and ordered. Permuting observations generally changes the likelihood. The first-order Markov assumption states that, conditional on <span class="math inline">\(z_t\)</span> and the known input, <span class="math inline">\(z_{t+1}\)</span> does not depend on earlier states. It does not imply that the observed sequence is first-order Markov.</p>
+<p><strong>Stability and stationarity are distinct.</strong> For the time-invariant no-input mean dynamics, <span class="math inline">\(\rho(A)&lt;1\)</span> is the usual Schur-stability condition under which deterministic perturbations decay. With zero mean, constant <span class="math inline">\(Q\)</span>, and suitable finite covariance, a stable <span class="math inline">\(A\)</span> supports a stationary state covariance <span class="math inline">\(\Sigma\)</span> satisfying</p>
+<p><span class="math display">\[
+\Sigma=A\Sigma A^\top+Q.
+\]</span></p>
+<p>The process is stationary only when its initialization and inputs are also compatible with the stationary law. A stable model initialized away from that law has a transient; a unit-root or unstable finite-horizon model can still define valid distributions without being stationary. Time-varying inputs can make means nonstationary even when <span class="math inline">\(A\)</span> is stable.</p>
+<p>Irregular sampling cannot be handled by silently treating every index gap as equal. It requires gap-dependent transitions, an underlying continuous-time model and discretization, or another explicit variant.</p>
+</section>
+<section id="geometry-assumptions" class="level2">
+<h2 class="anchored" data-anchor-id="geometry-assumptions">Geometry assumptions</h2>
+<p>The latent state is represented in a finite-dimensional vector space. <span class="math inline">\(A\)</span> is linear in the chosen state coordinates, while <span class="math inline">\(Q\)</span> and <span class="math inline">\(R\)</span> define coordinate-dependent Mahalanobis uncertainty. Euclidean distances between posterior state means have no invariant scientific meaning unless a metric and coordinate convention are justified.</p>
+<p>The model does not posit a nonlinear manifold or Riemannian geometry. A low-dimensional linear latent state is a modeling choice, not proof of intrinsic dimension or a unique state space.</p>
+</section>
+<section id="supervision" class="level2">
+<h2 class="anchored" data-anchor-id="supervision">Supervision</h2>
+<p>Likelihood-based fitting from observation sequences is unsupervised with respect to external labels. Fixed open-loop inputs condition the transition and observation laws; their presence is not automatically “supervision” in the prediction-label sense. Labels, outcomes, or interventions used to design states, constrain matrices, select hyperparameters, or score models introduce task dependence and must be declared.</p>
+<p>An observational input correlated with unmodeled disturbances is not automatically exogenous. Including <span class="math inline">\(u_t\)</span> does not identify the causal effect represented by <span class="math inline">\(B\)</span> or <span class="math inline">\(D\)</span>. Feedback-dependent inputs require the policy-aware extension delimited above rather than the open-loop conditional factorization used here.</p>
+</section>
+<section id="optimization-inference" class="level2">
+<h2 class="anchored" data-anchor-id="optimization-inference">Optimization / inference</h2>
+<p>For known parameters, finite-horizon linear-Gaussian forecasting, filtering, and smoothing are exact Gaussian conditioning problems. They differ only in target and information set, but require distinct computations. Filtering uses data through the current time; fixed-interval smoothing uses future observations within the declared interval <span class="citation" data-cites="Sarkka2013">(<a href="#ref-Sarkka2013" role="doc-biblioref">Särkkä 2013</a>, chs.&nbsp;4, 8)</span>.</p>
+<p>Parameter learning is a separate optimization or Bayesian inference problem. Direct maximum-likelihood optimization can use the predictive-density factorization. In EM, the E-step requires smoothed expectations such as <span class="math inline">\(\mathbb E[z_t]\)</span>, <span class="math inline">\(\mathbb E[z_tz_t^\top]\)</span>, and <span class="math inline">\(\mathbb E[z_tz_{t-1}^\top]\)</span> under the current parameters; the M-step updates model parameters from those expectations <span class="citation" data-cites="GhahramaniHinton1996">(<a href="#ref-GhahramaniHinton1996" role="doc-biblioref">Ghahramani and Hinton 1996</a>)</span>. Thus an EM implementation may internally call filtering and smoothing, but the learned model, filtering posterior, smoothing posterior, and optimizer are not interchangeable objects.</p>
+<p>The likelihood is generally nonconvex in a free latent parameterization. Initializations, covariance constraints, regularization, stopping criteria, multiple starts, and numerical factorizations must be reported. An increasing EM objective does not prove global optimality or scientific validity.</p>
+</section>
+<section id="strengths" class="level2">
+<h2 class="anchored" data-anchor-id="strengths">Strengths</h2>
+<ul>
+<li>It defines a coherent joint distribution over ordered latent and observed sequences.</li>
+<li>Process and observation uncertainty are represented separately through <span class="math inline">\(Q\)</span> and <span class="math inline">\(R\)</span>.</li>
+<li>Exact Gaussian forecasts and state posteriors are available when parameters are fixed.</li>
+<li>Marginal likelihood supports sequence-level predictive comparison and parameter learning.</li>
+<li>Inputs can be incorporated without abandoning linear-Gaussian tractability.</li>
+<li>It is a transparent temporal baseline before nonlinear or non-Gaussian latent models.</li>
+</ul>
+</section>
+<section id="failure-modes" class="level2">
+<h2 class="anchored" data-anchor-id="failure-modes">Failure modes</h2>
+<ul>
+<li><strong>Wrong latent dimension or structure:</strong> omitted modes leave temporal residual structure; redundant modes create weakly identified or unused states.</li>
+<li><strong>Noise tradeoff:</strong> short, weakly observed sequences may not distinguish process variation from observation variation, so <span class="math inline">\(Q\)</span>, <span class="math inline">\(R\)</span>, <span class="math inline">\(C\)</span>, and the state path can compensate for one another.</li>
+<li><strong>Unmodeled dependence:</strong> colored, correlated, heteroscedastic, or state-dependent noise invalidates the white independent Gaussian assumptions.</li>
+<li><strong>Nonlinearity or regime changes:</strong> one global <span class="math inline">\(A\)</span> and <span class="math inline">\(C\)</span> cannot represent switching, saturation, curved observation maps, or abrupt interventions.</li>
+<li><strong>Instability or near-unit roots:</strong> forecasts can diverge or become highly uncertain, and parameter estimates can be sensitive in short records.</li>
+<li><strong>Unobservable modes:</strong> latent directions that do not affect available observations cannot be recovered from those observations.</li>
+<li><strong>Weak excitation:</strong> inputs or process noise may fail to explore directions needed to estimate transition effects.</li>
+<li><strong>Missingness or censoring:</strong> treating informative missing observations as ignorable can bias learning and state inference.</li>
+<li><strong>Boundary covariance estimates:</strong> nearly singular <span class="math inline">\(Q\)</span>, <span class="math inline">\(R\)</span>, or <span class="math inline">\(P_1\)</span> can create numerical failure or degenerate likelihood behavior.</li>
+<li><strong>Local optimization:</strong> different initializations can converge to different representatives or local optima.</li>
+<li><strong>Leakage:</strong> smoothing future data into an online forecast, fitting preprocessing on test sequences, or splitting adjacent time points across train and test yields optimistic evaluation.</li>
+<li><strong>Mechanistic overreach:</strong> a predictive <span class="math inline">\(A\)</span> can summarize conditional evolution without identifying a biological mechanism or causal transition law.</li>
+</ul>
+</section>
+<section id="identifiability-issues" class="level2">
+<h2 class="anchored" data-anchor-id="identifiability-issues">Identifiability issues</h2>
+<p>For any invertible <span class="math inline">\(T\in\mathbb R^{q\times q}\)</span>, define <span class="math inline">\(z'_t=Tz_t\)</span>. The transformed parameters</p>
+<p><span class="math display">\[
+A'=TAT^{-1},\quad B'=TB,\quad C'=CT^{-1},
+\]</span></p>
+<p><span class="math display">\[
+m'_1=Tm_1,\quad P'_1=TP_1T^\top,\quad Q'=TQT^\top
+\]</span></p>
+<p>with unchanged <span class="math inline">\(D\)</span> and <span class="math inline">\(R\)</span> generate the same observation distribution. Sign changes, permutations, rotations, and state-coordinate scalings are special cases. Therefore individual latent axes and matrix entries are not identified without a coordinate convention; invariant predictions, transfer behavior under declared inputs, or similarity classes may be the defensible targets.</p>
+<p>Similarity transformation is not always the only ambiguity. Nonminimal realizations can contain unobservable or unreachable states; unknown <span class="math inline">\(C,Q,R,P_1\)</span>, restricted input coverage, singular covariances, or finite sequence length can create stronger structural or practical nonidentifiability. A good optimizer cannot recover a unique parameter outside what the observation design identifies.</p>
+<p>For deterministic pairs, observability of <span class="math inline">\((A,C)\)</span> asks whether states can in principle be distinguished from an output history, while controllability of <span class="math inline">\((A,B)\)</span> asks whether inputs can reach state directions. In stochastic estimation, excitation through <span class="math inline">\(Q\)</span> and detectability/stabilizability conditions introduce related but distinct boundaries. These properties are not automatic consequences of writing an LGSSM, and they do not by themselves prove causal or physical meaning.</p>
+</section>
+<section id="comparison-with-simpler-methods" class="level2">
+<h2 class="anchored" data-anchor-id="comparison-with-simpler-methods">Comparison with simpler methods</h2>
+<ul>
+<li><strong>Training mean or independent Gaussian:</strong> ignores both latent structure and temporal dependence. The LGSSM should improve held-out predictive likelihood or calibrated forecasts before its temporal complexity is credited.</li>
+<li><strong>PCA:</strong> a deterministic, static, order-blind linear representation. It provides no process/observation noise split or temporal likelihood.</li>
+<li><strong>Factor Analysis:</strong> a static probabilistic low-rank observation model. With independent factors at each time and no state persistence, it tests whether the transition layer is needed. FA remains the canonical static probabilistic comparison.</li>
+<li><strong>Observation-space autoregression or persistence:</strong> predicts measurements directly without a separate latent observation map. It is often a stronger temporal baseline than a static method and tests whether latent states add value.</li>
+<li><strong>Known-parameter model:</strong> separates state-inference performance from errors introduced by parameter learning. Simulation studies should report both known-parameter and learned-parameter cases.</li>
+</ul>
+</section>
+<section id="evaluation-criteria" class="level2">
+<h2 class="anchored" data-anchor-id="evaluation-criteria">Evaluation criteria</h2>
+<p>Evaluation must respect sequence order and the information set of the intended task:</p>
+<ol type="1">
+<li>split entire subjects, sessions, trials, or trajectories when dependence crosses adjacent time points;</li>
+<li>fit preprocessing, dimension selection, parameters, and regularization on training sequences only;</li>
+<li>for forecasting, report one- and multi-step predictive log likelihood, error, and interval calibration using no future observations beyond the forecast origin;</li>
+<li>for filtering, evaluate <span class="math inline">\(p(z_t\mid x_{1:t})\)</span> or observation predictions using only online information;</li>
+<li>for smoothing, label the task retrospective and permit <span class="math inline">\(x_{t+1:T}\)</span> only within that separately evaluated target;</li>
+<li>report held-out marginal sequence likelihood and compare with static and observation-space temporal baselines;</li>
+<li>inspect innovation means, covariance, autocorrelation, temporal residual structure, and sensitivity to state dimension and covariance constraints; and</li>
+<li>under synthetic known truth, assess state and parameter recovery only after an allowed similarity alignment, while separately scoring invariant predictions and observable covariance.</li>
+</ol>
+<p>Random point-wise train/test splits are generally invalid for sequence forecasting. Comparing a smoother with an online filter on the same target without acknowledging future information is also invalid. High likelihood or low state error under the assumed model does not establish that the latent coordinates are unique or mechanistic.</p>
+<p>Missing observations can be handled by evaluating each observation update on the observed components—equivalently selecting the relevant rows and covariance submatrices—provided the missingness mechanism is ignorable under the declared analysis. Informative missingness, censoring, unknown inputs, or observation-time selection require their own model. These variants do not change the need to keep future information out of online evaluation.</p>
+</section>
+<section id="minimal-toy-model" class="level2">
+<h2 class="anchored" data-anchor-id="minimal-toy-model">Minimal toy model</h2>
+<p>Consider the scalar no-input model</p>
+<p><span class="math display">\[
+z_{t+1}=az_t+w_t,
+\qquad
+x_t=z_t+v_t,
+\]</span></p>
+<p>with <span class="math inline">\(w_t\sim\mathcal N(0,q)\)</span> and <span class="math inline">\(v_t\sim\mathcal N(0,r)\)</span>. If <span class="math inline">\(|a|&lt;1\)</span> and</p>
+<p><span class="math display">\[
+z_1\sim\mathcal N\!\left(0,\frac{q}{1-a^2}\right),
+\]</span></p>
+<p>then the latent process is stationary with</p>
+<p><span class="math display">\[
+\operatorname{Var}(z_t)=\frac{q}{1-a^2},
+\qquad
+\operatorname{Cov}(x_t,x_{t+h})
+=a^h\frac{q}{1-a^2}\quad(h&gt;0),
+\]</span></p>
+<p>and <span class="math inline">\(\operatorname{Var}(x_t)=q/(1-a^2)+r\)</span>. This separates temporal persistence <span class="math inline">\(a\)</span>, process variation <span class="math inline">\(q\)</span>, and measurement variation <span class="math inline">\(r\)</span>. Setting <span class="math inline">\(a=0\)</span> produces temporally independent latent variables; setting <span class="math inline">\(a=1\)</span> removes the stationary covariance formula even though a finite-horizon random-walk model remains well defined.</p>
+<p>A future non-executable toy contract would generate multiple independent sequences with known <span class="math inline">\(a,q,r\)</span>; compare the training mean, static FA, observation-space AR(1), known-parameter LGSSM, and learned-parameter LGSSM; evaluate blocked predictive likelihood, multi-step calibration, innovation autocorrelation, filtered versus smoothed information sets, and similarity-aligned state recovery. Negative controls would include a unit root, correlated <span class="math inline">\(w_t\)</span> and <span class="math inline">\(v_t\)</span>, informative missingness, and an unobservable augmented state. No data, code, fitted result, or benchmark is produced in this Method Object.</p>
+</section>
+<section id="relevance-to-ldg" class="level2">
+<h2 class="anchored" data-anchor-id="relevance-to-ldg">Relevance to LDG</h2>
+<p>The discrete-time LGSSM is LDG’s canonical probabilistic temporal latent baseline. It connects a factor-analysis-style observation layer to an explicit stochastic transition while preserving clear distinctions among model structure, state inference, forecasting, and parameter learning. It is the prerequisite model class for later Kalman filtering and smoothing Methods.</p>
+<div class="callout callout-style-default callout-warning callout-titled" title="What this does NOT imply">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Warning</span>What this does NOT imply
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>A well-predicting LGSSM does not prove that latent coordinates are unique, that <span class="math inline">\(A\)</span> is a biological mechanism or causal law, that inferred trajectories are directly observed, or that data lie on a manifold with a discovered intrinsic dimension. Stability is not stationarity, smooth posterior means can be model-imposed, and exact inference is exact only conditional on the declared linear-Gaussian model and fixed parameters.</p>
+</div>
+</div>
+<section id="mouse-trajectory" class="level3">
+<h3 class="anchored" data-anchor-id="mouse-trajectory">Mouse trajectory</h3>
+<p>An LGSSM can model ordered kinematic observations and known task inputs, but alignment, variable sampling intervals, animal-level dependence, nonlinear biomechanics, and interventions must be declared. No modality-specific empirical result is retained here.</p>
+</section>
+<section id="eye-movement" class="level3">
+<h3 class="anchored" data-anchor-id="eye-movement">Eye movement</h3>
+<p>The model can separate a latent temporal state from measurement variability in declared gaze or oculomotor features. Saccades, censoring, event-dependent noise, and irregular samples can violate one global linear-Gaussian model. No modality-specific empirical result is retained here.</p>
+</section>
+<section id="eeg" class="level3">
+<h3 class="anchored" data-anchor-id="eeg">EEG</h3>
+<p>Sensor sequences may be modeled through latent linear dynamics, but rereferencing, spatial mixing, artifacts, colored noise, and nonstationarity challenge <span class="math inline">\(C\)</span>, <span class="math inline">\(Q\)</span>, and <span class="math inline">\(R\)</span>. Latent states are not automatically neural sources. No modality-specific empirical result is retained here.</p>
+</section>
+<section id="meg-neural-population-data" class="level3">
+<h3 class="anchored" data-anchor-id="meg-neural-population-data">MEG / neural population data</h3>
+<p>The method provides a baseline for population recordings with ordered trials or time bins. Unit scaling, condition averaging, trial dependence, input definitions, and observation distributions must be explicit. No modality-specific empirical result is retained here.</p>
+</section>
+</section>
+<section id="primary-sources" class="level2">
+<h2 class="anchored" data-anchor-id="primary-sources">Primary sources</h2>
+<ul>
+<li>Kalman develops the state-transition and random-excitation approach to linear filtering and prediction, and explicitly separates smoothing, filtering, and prediction by their conditioning time <span class="citation" data-cites="Kalman1960">(<a href="#ref-Kalman1960" role="doc-biblioref">Kalman 1960</a>)</span>. His inspected formulation is not used here as the sole source for the separate additive observation-noise equation.</li>
+<li>Ghahramani and Hinton specify the discrete-time linear-Gaussian transition, observation, initial-state, <span class="math inline">\(Q/R\)</span> covariance model and derive EM parameter updates from smoothed latent sufficient statistics <span class="citation" data-cites="GhahramaniHinton1996">(<a href="#ref-GhahramaniHinton1996" role="doc-biblioref">Ghahramani and Hinton 1996</a>)</span>.</li>
+</ul>
+</section>
+<section id="reviews-secondary-sources" class="level2">
+<h2 class="anchored" data-anchor-id="reviews-secondary-sources">Reviews / secondary sources</h2>
+<ul>
+<li>Särkkä gives an authoritative Bayesian treatment of probabilistic state-space models, linear-Gaussian filtering and smoothing targets, predictive-density likelihood factorization, and parameter estimation <span class="citation" data-cites="Sarkka2013">(<a href="#ref-Sarkka2013" role="doc-biblioref">Särkkä 2013</a>)</span>.</li>
+<li>Roweis and Ghahramani review factor analysis, PCA, and linear-Gaussian dynamic models in a common generative framework and distinguish static from ordered dynamic data <span class="citation" data-cites="RoweisGhahramani1999">(<a href="#ref-RoweisGhahramani1999" role="doc-biblioref">Roweis and Ghahramani 1999</a>)</span>.</li>
+</ul>
+</section>
+<section id="open-methodological-questions" class="level2">
+<h2 class="anchored" data-anchor-id="open-methodological-questions">Open methodological questions</h2>
+<ul>
+<li>Which state-dimension and covariance constraints remain reliable for short, dependent, high-dimensional LDG sequences?</li>
+<li>Which interventions or observation designs break scientifically important similarity and noise-allocation ambiguities?</li>
+<li>When is an observation-space autoregression sufficient, making a latent state unnecessary?</li>
+<li>How should irregular sampling, informative missingness, and correlated process/observation noise be introduced without obscuring the canonical baseline?</li>
+</ul>
+</section>
+<section id="maturity-checklist" class="level2">
+<h2 class="anchored" data-anchor-id="maturity-checklist">Maturity checklist</h2>
+<ul class="task-list">
+<li><label><input type="checkbox" checked="">Schema-complete Method Object at <code>L2/review</code>.</label></li>
+<li><label><input type="checkbox" checked="">Initial state, input-driven transition, observation law, Gaussian <span class="math inline">\(Q/R\)</span>, and independence assumptions specified.</label></li>
+<li><label><input type="checkbox" checked="">Model specification, forecasting, filtering, smoothing, marginal likelihood, and parameter learning distinguished.</label></li>
+<li><label><input type="checkbox" checked="">Filtering and smoothing algorithms deferred to later units.</label></li>
+<li><label><input type="checkbox" checked="">Ordered discrete time, stability/stationarity, observability/controllability, missingness, and input boundaries stated.</label></li>
+<li><label><input type="checkbox" checked="">Similarity-transform ambiguity and stronger nonidentifiability stated.</label></li>
+<li><label><input type="checkbox" checked="">Learned/fixed, geometry, supervision, failure modes, baselines, leakage-safe evaluation, and analytic/prose toy contract included.</label></li>
+<li><label><input type="checkbox" checked="">No causal, mechanism, manifold, or model-free intrinsic-dimension claim made.</label></li>
+<li><label><input type="checkbox" checked="">Four retained sources inspected; metadata and DOI or stable identifiers verified; no empirical result retained.</label></li>
+<li><label><input type="checkbox" checked="">Independent mixed review completed after one bounded correction round; focused re-review returned PASS.</label></li>
+<li><label><input type="checkbox" checked="">Stable promotion authorized by the human owner under the recorded review decision after published-site review.</label></li>
+</ul>
+
+
+<!-- -->
+
+
+</section>
+</section>
+
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography" id="quarto-bibliography"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body hanging-indent" role="list">
+<div id="ref-GhahramaniHinton1996" class="csl-entry" role="listitem">
+Ghahramani, Zoubin, and Geoffrey E. Hinton. 1996. <em>Parameter Estimation for Linear Dynamical Systems</em>. CRG-TR-96-2. Department of Computer Science, University of Toronto. <a href="https://www.cs.toronto.edu/~hinton/absps/tr-96-2.pdf">https://www.cs.toronto.edu/~hinton/absps/tr-96-2.pdf</a>.
+</div>
+<div id="ref-Kalman1960" class="csl-entry" role="listitem">
+Kalman, Rudolf E. 1960. <span>“A New Approach to Linear Filtering and Prediction Problems.”</span> <em>Journal of Basic Engineering</em> 82 (1): 35–45. <a href="https://doi.org/10.1115/1.3662552">https://doi.org/10.1115/1.3662552</a>.
+</div>
+<div id="ref-RoweisGhahramani1999" class="csl-entry" role="listitem">
+Roweis, Sam, and Zoubin Ghahramani. 1999. <span>“A Unifying Review of Linear Gaussian Models.”</span> <em>Neural Computation</em> 11 (2): 305–45. <a href="https://doi.org/10.1162/089976699300016674">https://doi.org/10.1162/089976699300016674</a>.
+</div>
+<div id="ref-Sarkka2013" class="csl-entry" role="listitem">
+Särkkä, Simo. 2013. <em>Bayesian Filtering and Smoothing</em>. Vol. 3. Institute of Mathematical Statistics Textbooks. Cambridge University Press. <a href="https://doi.org/10.1017/CBO9781139344203">https://doi.org/10.1017/CBO9781139344203</a>.
+</div>
+</div></section></div></main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+    const viewSource = window.document.getElementById('quarto-view-source') ||
+                       window.document.getElementById('quarto-code-tools-source');
+    if (viewSource) {
+      const sourceUrl = viewSource.getAttribute("data-quarto-source-url");
+      viewSource.addEventListener("click", function(e) {
+        if (sourceUrl) {
+          // rstudio viewer pane
+          if (/\bcapabilities=\b/.test(window.location)) {
+            window.open(sourceUrl);
+          } else {
+            window.location.href = sourceUrl;
+          }
+        } else {
+          const modal = new bootstrap.Modal(document.getElementById('quarto-embedded-source-code-modal'));
+          modal.show();
+        }
+        return false;
+      });
+    }
+    function toggleCodeHandler(show) {
+      return function(e) {
+        const cellDetails = window.document.querySelectorAll(".cell details.code-fold");
+        for (let i=0; i<cellDetails.length; i++) {
+          const details = cellDetails[i];
+          if (show) {
+            details.open = true;
+          } else {
+            details.removeAttribute("open");
+          }
+        }
+        const cellCodeDivs = window.document.querySelectorAll(".cell div.sourceCode.cell-code");
+        const fromCls = show ? "hidden" : "unhidden";
+        const toCls = show ? "unhidden" : "hidden";
+        for (let i=0; i<cellCodeDivs.length; i++) {
+          const codeDiv = cellCodeDivs[i];
+          if (codeDiv.classList.contains(fromCls)) {
+            codeDiv.classList.remove(fromCls);
+            codeDiv.classList.add(toCls);
+          } 
+        }
+        return false;
+      }
+    }
+    const hideAllCode = window.document.getElementById("quarto-hide-all-code");
+    if (hideAllCode) {
+      hideAllCode.addEventListener("click", toggleCodeHandler(false));
+    }
+    const showAllCode = window.document.getElementById("quarto-show-all-code");
+    if (showAllCode) {
+      showAllCode.addEventListener("click", toggleCodeHandler(true));
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/abelzheng\.github\.io\/latent-dynamics-geometry-public\/");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+            // target, if specified
+            link.setAttribute("target", "_blank");
+            if (link.getAttribute("rel") === null) {
+              link.setAttribute("rel", "noopener");
+            }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<input type="hidden" id="giscus-base-theme" value="preferred_color_scheme">
+<input type="hidden" id="giscus-alt-theme" value="preferred_color_scheme">
+<script>
+  function loadGiscus() {
+    // Function to get the theme based on body class
+    const getTheme = () => {
+      let baseTheme = document.getElementById('giscus-base-theme').value;
+      let altTheme = document.getElementById('giscus-alt-theme').value;
+      return document.body.classList.contains('quarto-dark') ? altTheme : baseTheme;
+    };
+    const script = document.createElement("script");
+    script.src = "https://giscus.app/client.js";
+    script.async = true;
+    script.dataset.repo = "AbelZheng/latent-dynamics-geometry-public";
+    script.dataset.repoId = "R_kgDOT-VBkw";
+    script.dataset.category = "Announcements";
+    script.dataset.categoryId = "DIC_kwDOT-VBk84DDyEz";
+    script.dataset.mapping = "pathname";
+    script.dataset.reactionsEnabled = "1";
+    script.dataset.emitMetadata = "0";
+    script.dataset.inputPosition = "bottom";
+    script.dataset.theme = getTheme();
+    script.dataset.lang = "en";
+    script.crossOrigin = "anonymous";
+    // Append the script to the desired div instead of at the end of the body
+    document.getElementById("quarto-content").appendChild(script);
+  }
+  loadGiscus();
+</script><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">Source Code</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1" data-shortcodes="false"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="an">title:</span><span class="co"> "Discrete-Time Linear-Gaussian State-Space Model"</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="an">object_type:</span><span class="co"> method</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="an">maturity:</span><span class="co"> L2</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="an">status:</span><span class="co"> stable</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="an">domain:</span><span class="co"> [latent-modeling, temporal-modeling, state-space-models, statistics]</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="an">tags:</span><span class="co"> [linear-gaussian, state-space-model, latent-dynamics, discrete-time]</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="an">prerequisites:</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="co">- knowledge/methods/factor-analysis.qmd</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="co">- knowledge/concepts/state-space-model.qmd</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="co">- knowledge/concepts/linear-dynamical-system.qmd</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="co">- knowledge/concepts/latent-trajectory.qmd</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="co">- knowledge/concepts/observation-model.qmd</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="co">- knowledge/concepts/process-noise.qmd</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="co">- knowledge/concepts/observation-noise.qmd</span></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="an">related:</span></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="co">- knowledge/methods/principal-component-analysis.qmd</span></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a><span class="co">- knowledge/concepts/latent-variable.qmd</span></span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a><span class="co">- knowledge/concepts/identifiability.qmd</span></span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a><span class="an">created:</span><span class="co"> 2026-08-19</span></span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a><span class="an">updated:</span><span class="co"> 2026-08-19</span></span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a><span class="fu"># Discrete-Time Linear-Gaussian State-Space Model</span></span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a><span class="fu">## Problem</span></span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>A discrete-time linear-Gaussian state-space model (LGSSM) describes an ordered sequence of observations through an unobserved state that evolves linearly with Gaussian process noise and generates measurements linearly with Gaussian observation noise. It provides one joint probability model in which forecasting, state inference, sequence likelihood, and parameter learning can be defined without treating them as the same task <span class="co">[</span><span class="ot">@GhahramaniHinton1996; @Sarkka2013</span><span class="co">]</span>.</span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>This object specifies the finite-dimensional, time-invariant, discrete-time model with a fixed or externally supplied **open-loop known input path**. It does not present the Kalman filtering or fixed-interval smoothing algorithms, which are later Method units. Time-varying, switching, nonlinear, non-Gaussian, continuous-time, unknown-input, feedback-policy, and control-design variants are outside the bounded core.</span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a><span class="fu">## Input</span></span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a>For one sequence of length $T$, let</span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>$x_t\in\mathbb R^p$ be the observed vector;</span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>$u_t\in\mathbb R^r$ be an optional known input or regressor; and</span>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>$z_t\in\mathbb R^q$ be the latent state.</span>
+<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a>A reproducible analysis must declare:</span>
+<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>the observational unit, sequence boundaries, sampling interval, ordering, and whether matrices are assumed common across sequences;</span>
+<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>feature definitions, units, transformations, exclusions, and missing-data policy;</span>
+<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>which inputs are fixed or externally supplied at fitting and prediction time, and when each value becomes available;</span>
+<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>latent dimension $q$ and its selection protocol;</span>
+<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>whether parameters are fixed from external knowledge or learned from training sequences; and</span>
+<span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>the exact target: forecasting, filtering, smoothing, marginal likelihood, parameter learning, or simulation.</span>
+<span id="cb1-48"><a href="#cb1-48" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a>Sequences, subjects, sessions, or trials are not interchangeable replicates. Their dependence and parameter sharing must be stated.</span>
+<span id="cb1-50"><a href="#cb1-50" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-51"><a href="#cb1-51" aria-hidden="true" tabindex="-1"></a><span class="fu">## Output</span></span>
+<span id="cb1-52"><a href="#cb1-52" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-53"><a href="#cb1-53" aria-hidden="true" tabindex="-1"></a>The model specification is a parameter tuple</span>
+<span id="cb1-54"><a href="#cb1-54" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-55"><a href="#cb1-55" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-56"><a href="#cb1-56" aria-hidden="true" tabindex="-1"></a>\theta=(m_1,P_1,A,B,C,D,Q,R),</span>
+<span id="cb1-57"><a href="#cb1-57" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-58"><a href="#cb1-58" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-59"><a href="#cb1-59" aria-hidden="true" tabindex="-1"></a>with dimensions conforming to the state, input, and observation spaces. Conditional on $\theta$, it defines:</span>
+<span id="cb1-60"><a href="#cb1-60" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-61"><a href="#cb1-61" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>the joint Gaussian law $p_\theta(z_{1:T},x_{1:T}\mid u_{1:T})$;</span>
+<span id="cb1-62"><a href="#cb1-62" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>predictive distributions for future states and observations;</span>
+<span id="cb1-63"><a href="#cb1-63" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>filtering distributions conditioned only on observations available through the target time;</span>
+<span id="cb1-64"><a href="#cb1-64" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>smoothing distributions conditioned on a complete declared observation interval;</span>
+<span id="cb1-65"><a href="#cb1-65" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>the marginal sequence likelihood after integrating out $z_{1:T}$; and</span>
+<span id="cb1-66"><a href="#cb1-66" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>model-conditional latent-state summaries with uncertainty.</span>
+<span id="cb1-67"><a href="#cb1-67" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-68"><a href="#cb1-68" aria-hidden="true" tabindex="-1"></a>An implementation may additionally return fitted parameters, forecast means/covariances, filtered or smoothed state moments, innovations, and likelihood contributions. These outputs have different conditioning information and must be labeled accordingly.</span>
+<span id="cb1-69"><a href="#cb1-69" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-70"><a href="#cb1-70" aria-hidden="true" tabindex="-1"></a><span class="fu">## Core idea</span></span>
+<span id="cb1-71"><a href="#cb1-71" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-72"><a href="#cb1-72" aria-hidden="true" tabindex="-1"></a>The state carries the information needed for the next-step transition, while observations are noisy linear views of that state. The Markov factorization converts one high-dimensional trajectory distribution into an initial-state law, local transition laws, and local observation laws. Gaussian closure makes the relevant conditional and marginal distributions Gaussian, permitting exact finite-horizon inference when parameters are known <span class="co">[</span><span class="ot">@Sarkka2013, chs. 4, 8</span><span class="co">]</span>.</span>
+<span id="cb1-73"><a href="#cb1-73" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-74"><a href="#cb1-74" aria-hidden="true" tabindex="-1"></a>The method's value is not merely that its inferred mean trajectory looks smooth. It is that a declared stochastic temporal model yields testable predictive distributions and separates uncertainty introduced at the transition from uncertainty introduced at measurement.</span>
+<span id="cb1-75"><a href="#cb1-75" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-76"><a href="#cb1-76" aria-hidden="true" tabindex="-1"></a><span class="fu">## Generative / modeling assumptions</span></span>
+<span id="cb1-77"><a href="#cb1-77" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-78"><a href="#cb1-78" aria-hidden="true" tabindex="-1"></a>The canonical input-driven model is</span>
+<span id="cb1-79"><a href="#cb1-79" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-80"><a href="#cb1-80" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-81"><a href="#cb1-81" aria-hidden="true" tabindex="-1"></a>z_1\sim\mathcal N(m_1,P_1),</span>
+<span id="cb1-82"><a href="#cb1-82" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-83"><a href="#cb1-83" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-84"><a href="#cb1-84" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-85"><a href="#cb1-85" aria-hidden="true" tabindex="-1"></a>z_{t+1}=Az_t+Bu_t+w_t,</span>
+<span id="cb1-86"><a href="#cb1-86" aria-hidden="true" tabindex="-1"></a>\qquad</span>
+<span id="cb1-87"><a href="#cb1-87" aria-hidden="true" tabindex="-1"></a>w_t\sim\mathcal N(0,Q),</span>
+<span id="cb1-88"><a href="#cb1-88" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-89"><a href="#cb1-89" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-90"><a href="#cb1-90" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-91"><a href="#cb1-91" aria-hidden="true" tabindex="-1"></a>x_t=Cz_t+Du_t+v_t,</span>
+<span id="cb1-92"><a href="#cb1-92" aria-hidden="true" tabindex="-1"></a>\qquad</span>
+<span id="cb1-93"><a href="#cb1-93" aria-hidden="true" tabindex="-1"></a>v_t\sim\mathcal N(0,R).</span>
+<span id="cb1-94"><a href="#cb1-94" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-95"><a href="#cb1-95" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-96"><a href="#cb1-96" aria-hidden="true" tabindex="-1"></a>The no-input core is recovered by omitting $u_t$, $B$, and $D$. Unless explicitly generalized, the model assumes:</span>
+<span id="cb1-97"><a href="#cb1-97" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-98"><a href="#cb1-98" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>$P_1,Q\succeq0$ and $R\succ0$;</span>
+<span id="cb1-99"><a href="#cb1-99" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>$z_1$, every $w_t$, and every $v_s$ are mutually independent;</span>
+<span id="cb1-100"><a href="#cb1-100" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>process and observation noises are independent across time;</span>
+<span id="cb1-101"><a href="#cb1-101" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>$A,B,C,D,Q,R$ are constant over the sequence;</span>
+<span id="cb1-102"><a href="#cb1-102" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>the latent transition is first-order Markov;</span>
+<span id="cb1-103"><a href="#cb1-103" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>observations are conditionally independent across time given the state path and inputs; and</span>
+<span id="cb1-104"><a href="#cb1-104" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>inputs are fixed in advance or externally supplied without depending on contemporaneous or future observations, so they are valid conditioning variables rather than unexplained stochastic causes.</span>
+<span id="cb1-105"><a href="#cb1-105" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-106"><a href="#cb1-106" aria-hidden="true" tabindex="-1"></a>Gaussianity is stronger than specifying only means and covariances. Correlated process and observation noise, colored noise, heteroscedasticity, time-varying matrices, or history-dependent measurements require an explicit modified model rather than an informal reinterpretation of $Q$ or $R$.</span>
+<span id="cb1-107"><a href="#cb1-107" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-108"><a href="#cb1-108" aria-hidden="true" tabindex="-1"></a><span class="fu">## Mathematical formulation</span></span>
+<span id="cb1-109"><a href="#cb1-109" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-110"><a href="#cb1-110" aria-hidden="true" tabindex="-1"></a>For a fixed open-loop input path, the joint law factorizes as</span>
+<span id="cb1-111"><a href="#cb1-111" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-112"><a href="#cb1-112" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-113"><a href="#cb1-113" aria-hidden="true" tabindex="-1"></a>p_\theta(z_{1:T},x_{1:T}\mid u_{1:T})</span>
+<span id="cb1-114"><a href="#cb1-114" aria-hidden="true" tabindex="-1"></a>=p_\theta(z_1)</span>
+<span id="cb1-115"><a href="#cb1-115" aria-hidden="true" tabindex="-1"></a>\prod_{t=1}^{T-1}p_\theta(z_{t+1}\mid z_t,u_t)</span>
+<span id="cb1-116"><a href="#cb1-116" aria-hidden="true" tabindex="-1"></a>\prod_{t=1}^{T}p_\theta(x_t\mid z_t,u_t),</span>
+<span id="cb1-117"><a href="#cb1-117" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-118"><a href="#cb1-118" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-119"><a href="#cb1-119" aria-hidden="true" tabindex="-1"></a>where</span>
+<span id="cb1-120"><a href="#cb1-120" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-121"><a href="#cb1-121" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-122"><a href="#cb1-122" aria-hidden="true" tabindex="-1"></a>p_\theta(z_{t+1}\mid z_t,u_t)</span>
+<span id="cb1-123"><a href="#cb1-123" aria-hidden="true" tabindex="-1"></a>=\mathcal N(Az_t+Bu_t,Q),</span>
+<span id="cb1-124"><a href="#cb1-124" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-125"><a href="#cb1-125" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-126"><a href="#cb1-126" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-127"><a href="#cb1-127" aria-hidden="true" tabindex="-1"></a>p_\theta(x_t\mid z_t,u_t)</span>
+<span id="cb1-128"><a href="#cb1-128" aria-hidden="true" tabindex="-1"></a>=\mathcal N(Cz_t+Du_t,R).</span>
+<span id="cb1-129"><a href="#cb1-129" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-130"><a href="#cb1-130" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-131"><a href="#cb1-131" aria-hidden="true" tabindex="-1"></a>This factorization defines several different conditional targets. The future input values appearing below must be known scenario values rather than controls that encode future observations:</span>
+<span id="cb1-132"><a href="#cb1-132" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-133"><a href="#cb1-133" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-134"><a href="#cb1-134" aria-hidden="true" tabindex="-1"></a>\text{forecasting:}\quad</span>
+<span id="cb1-135"><a href="#cb1-135" aria-hidden="true" tabindex="-1"></a>p(z_{t+h},x_{t+h}\mid x_{1:t},u_{1:t+h}),</span>
+<span id="cb1-136"><a href="#cb1-136" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-137"><a href="#cb1-137" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-138"><a href="#cb1-138" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-139"><a href="#cb1-139" aria-hidden="true" tabindex="-1"></a>\text{filtering:}\quad</span>
+<span id="cb1-140"><a href="#cb1-140" aria-hidden="true" tabindex="-1"></a>p(z_t\mid x_{1:t},u_{1:t}),</span>
+<span id="cb1-141"><a href="#cb1-141" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-142"><a href="#cb1-142" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-143"><a href="#cb1-143" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-144"><a href="#cb1-144" aria-hidden="true" tabindex="-1"></a>\text{smoothing:}\quad</span>
+<span id="cb1-145"><a href="#cb1-145" aria-hidden="true" tabindex="-1"></a>p(z_t\mid x_{1:T},u_{1:T}),\quad T&gt;t,</span>
+<span id="cb1-146"><a href="#cb1-146" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-147"><a href="#cb1-147" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-148"><a href="#cb1-148" aria-hidden="true" tabindex="-1"></a>or the full path posterior $p(z_{1:T}\mid x_{1:T},u_{1:T})$. Kalman explicitly distinguishes smoothing, filtering, and prediction by whether the estimated state time is earlier than, equal to, or later than the final conditioning observation <span class="co">[</span><span class="ot">@Kalman1960</span><span class="co">]</span>. The exact recursions are deliberately deferred to separate filtering and smoothing Method Objects.</span>
+<span id="cb1-149"><a href="#cb1-149" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-150"><a href="#cb1-150" aria-hidden="true" tabindex="-1"></a>The marginal likelihood is</span>
+<span id="cb1-151"><a href="#cb1-151" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-152"><a href="#cb1-152" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-153"><a href="#cb1-153" aria-hidden="true" tabindex="-1"></a>p_\theta(x_{1:T}\mid u_{1:T})</span>
+<span id="cb1-154"><a href="#cb1-154" aria-hidden="true" tabindex="-1"></a>=\int p_\theta(z_{1:T},x_{1:T}\mid u_{1:T})\,dz_{1:T}.</span>
+<span id="cb1-155"><a href="#cb1-155" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-156"><a href="#cb1-156" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-157"><a href="#cb1-157" aria-hidden="true" tabindex="-1"></a>It can be factorized into one-step predictive densities,</span>
+<span id="cb1-158"><a href="#cb1-158" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-159"><a href="#cb1-159" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-160"><a href="#cb1-160" aria-hidden="true" tabindex="-1"></a>p_\theta(x_{1:T}\mid u_{1:T})</span>
+<span id="cb1-161"><a href="#cb1-161" aria-hidden="true" tabindex="-1"></a>=\prod_{t=1}^{T}</span>
+<span id="cb1-162"><a href="#cb1-162" aria-hidden="true" tabindex="-1"></a>p_\theta(x_t\mid x_{1:t-1},u_{1:t}),</span>
+<span id="cb1-163"><a href="#cb1-163" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-164"><a href="#cb1-164" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-165"><a href="#cb1-165" aria-hidden="true" tabindex="-1"></a>which separates sequence scoring from state-point estimation <span class="co">[</span><span class="ot">@Sarkka2013, sec. 12.1</span><span class="co">]</span>.</span>
+<span id="cb1-166"><a href="#cb1-166" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-167"><a href="#cb1-167" aria-hidden="true" tabindex="-1"></a>Feedback-controlled data require a separate timing and policy model. A valid control $u_t$ must be measurable from information available before the transition it drives and, when $D\ne0$, before the contemporaneous observation $x_t$; using $x_t$ itself in $u_t$ creates an algebraic loop. If future controls depend on future observations, conditioning on the realized $u_{1:T}$ can leak future information. Policy-aware likelihoods and forecasts must instead state the nonanticipating policy and integrate or simulate controls not yet known.</span>
+<span id="cb1-168"><a href="#cb1-168" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-169"><a href="#cb1-169" aria-hidden="true" tabindex="-1"></a><span class="fu">## What is learned?</span></span>
+<span id="cb1-170"><a href="#cb1-170" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-171"><a href="#cb1-171" aria-hidden="true" tabindex="-1"></a>Depending on the protocol, parameter learning may estimate some or all of $m_1,P_1,A,B,C,D,Q,R$ and select $q$. Given fitted parameters, state inference determines conditional distributions over latent states; it does not relearn the model parameters unless an explicitly joint or online-learning procedure is used.</span>
+<span id="cb1-172"><a href="#cb1-172" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-173"><a href="#cb1-173" aria-hidden="true" tabindex="-1"></a>Maximum-likelihood learning targets the observable sequence distribution after integrating over latent states. EM instead alternates between model-conditional expectations of latent sufficient statistics and parameter updates that increase the same marginal likelihood under exact steps <span class="co">[</span><span class="ot">@GhahramaniHinton1996</span><span class="co">]</span>. The inferred state path is therefore an intermediate uncertain quantity, not observed training data.</span>
+<span id="cb1-174"><a href="#cb1-174" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-175"><a href="#cb1-175" aria-hidden="true" tabindex="-1"></a><span class="fu">## What is fixed?</span></span>
+<span id="cb1-176"><a href="#cb1-176" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-177"><a href="#cb1-177" aria-hidden="true" tabindex="-1"></a>The analyst fixes the state dimension or its selection search, sequence boundaries, time step, input definition, matrix structure and parameter sharing, Gaussian and independence assumptions, covariance constraints, initial-state treatment, missing-data mechanism, learning criterion, regularization or priors, and evaluation target.</span>
+<span id="cb1-178"><a href="#cb1-178" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-179"><a href="#cb1-179" aria-hidden="true" tabindex="-1"></a>When some matrices come from physical modeling, the fixed-versus-estimated partition must be explicit. Calling $A$ “the dynamics” does not establish that it is a physical law if $C$, $Q$, $R$, state coordinates, or inputs are learned phenomenologically.</span>
+<span id="cb1-180"><a href="#cb1-180" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-181"><a href="#cb1-181" aria-hidden="true" tabindex="-1"></a><span class="fu">## Temporal assumptions</span></span>
+<span id="cb1-182"><a href="#cb1-182" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-183"><a href="#cb1-183" aria-hidden="true" tabindex="-1"></a>Time is discrete and ordered. Permuting observations generally changes the likelihood. The first-order Markov assumption states that, conditional on $z_t$ and the known input, $z_{t+1}$ does not depend on earlier states. It does not imply that the observed sequence is first-order Markov.</span>
+<span id="cb1-184"><a href="#cb1-184" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-185"><a href="#cb1-185" aria-hidden="true" tabindex="-1"></a>**Stability and stationarity are distinct.** For the time-invariant no-input mean dynamics, $\rho(A)&lt;1$ is the usual Schur-stability condition under which deterministic perturbations decay. With zero mean, constant $Q$, and suitable finite covariance, a stable $A$ supports a stationary state covariance $\Sigma$ satisfying</span>
+<span id="cb1-186"><a href="#cb1-186" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-187"><a href="#cb1-187" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-188"><a href="#cb1-188" aria-hidden="true" tabindex="-1"></a>\Sigma=A\Sigma A^\top+Q.</span>
+<span id="cb1-189"><a href="#cb1-189" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-190"><a href="#cb1-190" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-191"><a href="#cb1-191" aria-hidden="true" tabindex="-1"></a>The process is stationary only when its initialization and inputs are also compatible with the stationary law. A stable model initialized away from that law has a transient; a unit-root or unstable finite-horizon model can still define valid distributions without being stationary. Time-varying inputs can make means nonstationary even when $A$ is stable.</span>
+<span id="cb1-192"><a href="#cb1-192" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-193"><a href="#cb1-193" aria-hidden="true" tabindex="-1"></a>Irregular sampling cannot be handled by silently treating every index gap as equal. It requires gap-dependent transitions, an underlying continuous-time model and discretization, or another explicit variant.</span>
+<span id="cb1-194"><a href="#cb1-194" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-195"><a href="#cb1-195" aria-hidden="true" tabindex="-1"></a><span class="fu">## Geometry assumptions</span></span>
+<span id="cb1-196"><a href="#cb1-196" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-197"><a href="#cb1-197" aria-hidden="true" tabindex="-1"></a>The latent state is represented in a finite-dimensional vector space. $A$ is linear in the chosen state coordinates, while $Q$ and $R$ define coordinate-dependent Mahalanobis uncertainty. Euclidean distances between posterior state means have no invariant scientific meaning unless a metric and coordinate convention are justified.</span>
+<span id="cb1-198"><a href="#cb1-198" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-199"><a href="#cb1-199" aria-hidden="true" tabindex="-1"></a>The model does not posit a nonlinear manifold or Riemannian geometry. A low-dimensional linear latent state is a modeling choice, not proof of intrinsic dimension or a unique state space.</span>
+<span id="cb1-200"><a href="#cb1-200" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-201"><a href="#cb1-201" aria-hidden="true" tabindex="-1"></a><span class="fu">## Supervision</span></span>
+<span id="cb1-202"><a href="#cb1-202" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-203"><a href="#cb1-203" aria-hidden="true" tabindex="-1"></a>Likelihood-based fitting from observation sequences is unsupervised with respect to external labels. Fixed open-loop inputs condition the transition and observation laws; their presence is not automatically “supervision” in the prediction-label sense. Labels, outcomes, or interventions used to design states, constrain matrices, select hyperparameters, or score models introduce task dependence and must be declared.</span>
+<span id="cb1-204"><a href="#cb1-204" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-205"><a href="#cb1-205" aria-hidden="true" tabindex="-1"></a>An observational input correlated with unmodeled disturbances is not automatically exogenous. Including $u_t$ does not identify the causal effect represented by $B$ or $D$. Feedback-dependent inputs require the policy-aware extension delimited above rather than the open-loop conditional factorization used here.</span>
+<span id="cb1-206"><a href="#cb1-206" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-207"><a href="#cb1-207" aria-hidden="true" tabindex="-1"></a><span class="fu">## Optimization / inference</span></span>
+<span id="cb1-208"><a href="#cb1-208" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-209"><a href="#cb1-209" aria-hidden="true" tabindex="-1"></a>For known parameters, finite-horizon linear-Gaussian forecasting, filtering, and smoothing are exact Gaussian conditioning problems. They differ only in target and information set, but require distinct computations. Filtering uses data through the current time; fixed-interval smoothing uses future observations within the declared interval <span class="co">[</span><span class="ot">@Sarkka2013, chs. 4, 8</span><span class="co">]</span>.</span>
+<span id="cb1-210"><a href="#cb1-210" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-211"><a href="#cb1-211" aria-hidden="true" tabindex="-1"></a>Parameter learning is a separate optimization or Bayesian inference problem. Direct maximum-likelihood optimization can use the predictive-density factorization. In EM, the E-step requires smoothed expectations such as $\mathbb E<span class="co">[</span><span class="ot">z_t</span><span class="co">]</span>$, $\mathbb E<span class="co">[</span><span class="ot">z_tz_t^\top</span><span class="co">]</span>$, and $\mathbb E<span class="co">[</span><span class="ot">z_tz_{t-1}^\top</span><span class="co">]</span>$ under the current parameters; the M-step updates model parameters from those expectations <span class="co">[</span><span class="ot">@GhahramaniHinton1996</span><span class="co">]</span>. Thus an EM implementation may internally call filtering and smoothing, but the learned model, filtering posterior, smoothing posterior, and optimizer are not interchangeable objects.</span>
+<span id="cb1-212"><a href="#cb1-212" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-213"><a href="#cb1-213" aria-hidden="true" tabindex="-1"></a>The likelihood is generally nonconvex in a free latent parameterization. Initializations, covariance constraints, regularization, stopping criteria, multiple starts, and numerical factorizations must be reported. An increasing EM objective does not prove global optimality or scientific validity.</span>
+<span id="cb1-214"><a href="#cb1-214" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-215"><a href="#cb1-215" aria-hidden="true" tabindex="-1"></a><span class="fu">## Strengths</span></span>
+<span id="cb1-216"><a href="#cb1-216" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-217"><a href="#cb1-217" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>It defines a coherent joint distribution over ordered latent and observed sequences.</span>
+<span id="cb1-218"><a href="#cb1-218" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Process and observation uncertainty are represented separately through $Q$ and $R$.</span>
+<span id="cb1-219"><a href="#cb1-219" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Exact Gaussian forecasts and state posteriors are available when parameters are fixed.</span>
+<span id="cb1-220"><a href="#cb1-220" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Marginal likelihood supports sequence-level predictive comparison and parameter learning.</span>
+<span id="cb1-221"><a href="#cb1-221" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Inputs can be incorporated without abandoning linear-Gaussian tractability.</span>
+<span id="cb1-222"><a href="#cb1-222" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>It is a transparent temporal baseline before nonlinear or non-Gaussian latent models.</span>
+<span id="cb1-223"><a href="#cb1-223" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-224"><a href="#cb1-224" aria-hidden="true" tabindex="-1"></a><span class="fu">## Failure modes</span></span>
+<span id="cb1-225"><a href="#cb1-225" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-226"><a href="#cb1-226" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Wrong latent dimension or structure:** omitted modes leave temporal residual structure; redundant modes create weakly identified or unused states.</span>
+<span id="cb1-227"><a href="#cb1-227" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Noise tradeoff:** short, weakly observed sequences may not distinguish process variation from observation variation, so $Q$, $R$, $C$, and the state path can compensate for one another.</span>
+<span id="cb1-228"><a href="#cb1-228" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Unmodeled dependence:** colored, correlated, heteroscedastic, or state-dependent noise invalidates the white independent Gaussian assumptions.</span>
+<span id="cb1-229"><a href="#cb1-229" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Nonlinearity or regime changes:** one global $A$ and $C$ cannot represent switching, saturation, curved observation maps, or abrupt interventions.</span>
+<span id="cb1-230"><a href="#cb1-230" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Instability or near-unit roots:** forecasts can diverge or become highly uncertain, and parameter estimates can be sensitive in short records.</span>
+<span id="cb1-231"><a href="#cb1-231" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Unobservable modes:** latent directions that do not affect available observations cannot be recovered from those observations.</span>
+<span id="cb1-232"><a href="#cb1-232" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Weak excitation:** inputs or process noise may fail to explore directions needed to estimate transition effects.</span>
+<span id="cb1-233"><a href="#cb1-233" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Missingness or censoring:** treating informative missing observations as ignorable can bias learning and state inference.</span>
+<span id="cb1-234"><a href="#cb1-234" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Boundary covariance estimates:** nearly singular $Q$, $R$, or $P_1$ can create numerical failure or degenerate likelihood behavior.</span>
+<span id="cb1-235"><a href="#cb1-235" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Local optimization:** different initializations can converge to different representatives or local optima.</span>
+<span id="cb1-236"><a href="#cb1-236" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Leakage:** smoothing future data into an online forecast, fitting preprocessing on test sequences, or splitting adjacent time points across train and test yields optimistic evaluation.</span>
+<span id="cb1-237"><a href="#cb1-237" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Mechanistic overreach:** a predictive $A$ can summarize conditional evolution without identifying a biological mechanism or causal transition law.</span>
+<span id="cb1-238"><a href="#cb1-238" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-239"><a href="#cb1-239" aria-hidden="true" tabindex="-1"></a><span class="fu">## Identifiability issues</span></span>
+<span id="cb1-240"><a href="#cb1-240" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-241"><a href="#cb1-241" aria-hidden="true" tabindex="-1"></a>For any invertible $T\in\mathbb R^{q\times q}$, define $z'_t=Tz_t$. The transformed parameters</span>
+<span id="cb1-242"><a href="#cb1-242" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-243"><a href="#cb1-243" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-244"><a href="#cb1-244" aria-hidden="true" tabindex="-1"></a>A'=TAT^{-1},\quad B'=TB,\quad C'=CT^{-1},</span>
+<span id="cb1-245"><a href="#cb1-245" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-246"><a href="#cb1-246" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-247"><a href="#cb1-247" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-248"><a href="#cb1-248" aria-hidden="true" tabindex="-1"></a>m'_1=Tm_1,\quad P'_1=TP_1T^\top,\quad Q'=TQT^\top</span>
+<span id="cb1-249"><a href="#cb1-249" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-250"><a href="#cb1-250" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-251"><a href="#cb1-251" aria-hidden="true" tabindex="-1"></a>with unchanged $D$ and $R$ generate the same observation distribution. Sign changes, permutations, rotations, and state-coordinate scalings are special cases. Therefore individual latent axes and matrix entries are not identified without a coordinate convention; invariant predictions, transfer behavior under declared inputs, or similarity classes may be the defensible targets.</span>
+<span id="cb1-252"><a href="#cb1-252" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-253"><a href="#cb1-253" aria-hidden="true" tabindex="-1"></a>Similarity transformation is not always the only ambiguity. Nonminimal realizations can contain unobservable or unreachable states; unknown $C,Q,R,P_1$, restricted input coverage, singular covariances, or finite sequence length can create stronger structural or practical nonidentifiability. A good optimizer cannot recover a unique parameter outside what the observation design identifies.</span>
+<span id="cb1-254"><a href="#cb1-254" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-255"><a href="#cb1-255" aria-hidden="true" tabindex="-1"></a>For deterministic pairs, observability of $(A,C)$ asks whether states can in principle be distinguished from an output history, while controllability of $(A,B)$ asks whether inputs can reach state directions. In stochastic estimation, excitation through $Q$ and detectability/stabilizability conditions introduce related but distinct boundaries. These properties are not automatic consequences of writing an LGSSM, and they do not by themselves prove causal or physical meaning.</span>
+<span id="cb1-256"><a href="#cb1-256" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-257"><a href="#cb1-257" aria-hidden="true" tabindex="-1"></a><span class="fu">## Comparison with simpler methods</span></span>
+<span id="cb1-258"><a href="#cb1-258" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-259"><a href="#cb1-259" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Training mean or independent Gaussian:** ignores both latent structure and temporal dependence. The LGSSM should improve held-out predictive likelihood or calibrated forecasts before its temporal complexity is credited.</span>
+<span id="cb1-260"><a href="#cb1-260" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**PCA:** a deterministic, static, order-blind linear representation. It provides no process/observation noise split or temporal likelihood.</span>
+<span id="cb1-261"><a href="#cb1-261" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Factor Analysis:** a static probabilistic low-rank observation model. With independent factors at each time and no state persistence, it tests whether the transition layer is needed. FA remains the canonical static probabilistic comparison.</span>
+<span id="cb1-262"><a href="#cb1-262" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Observation-space autoregression or persistence:** predicts measurements directly without a separate latent observation map. It is often a stronger temporal baseline than a static method and tests whether latent states add value.</span>
+<span id="cb1-263"><a href="#cb1-263" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Known-parameter model:** separates state-inference performance from errors introduced by parameter learning. Simulation studies should report both known-parameter and learned-parameter cases.</span>
+<span id="cb1-264"><a href="#cb1-264" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-265"><a href="#cb1-265" aria-hidden="true" tabindex="-1"></a><span class="fu">## Evaluation criteria</span></span>
+<span id="cb1-266"><a href="#cb1-266" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-267"><a href="#cb1-267" aria-hidden="true" tabindex="-1"></a>Evaluation must respect sequence order and the information set of the intended task:</span>
+<span id="cb1-268"><a href="#cb1-268" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-269"><a href="#cb1-269" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>split entire subjects, sessions, trials, or trajectories when dependence crosses adjacent time points;</span>
+<span id="cb1-270"><a href="#cb1-270" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>fit preprocessing, dimension selection, parameters, and regularization on training sequences only;</span>
+<span id="cb1-271"><a href="#cb1-271" aria-hidden="true" tabindex="-1"></a><span class="ss">3. </span>for forecasting, report one- and multi-step predictive log likelihood, error, and interval calibration using no future observations beyond the forecast origin;</span>
+<span id="cb1-272"><a href="#cb1-272" aria-hidden="true" tabindex="-1"></a><span class="ss">4. </span>for filtering, evaluate $p(z_t\mid x_{1:t})$ or observation predictions using only online information;</span>
+<span id="cb1-273"><a href="#cb1-273" aria-hidden="true" tabindex="-1"></a><span class="ss">5. </span>for smoothing, label the task retrospective and permit $x_{t+1:T}$ only within that separately evaluated target;</span>
+<span id="cb1-274"><a href="#cb1-274" aria-hidden="true" tabindex="-1"></a><span class="ss">6. </span>report held-out marginal sequence likelihood and compare with static and observation-space temporal baselines;</span>
+<span id="cb1-275"><a href="#cb1-275" aria-hidden="true" tabindex="-1"></a><span class="ss">7. </span>inspect innovation means, covariance, autocorrelation, temporal residual structure, and sensitivity to state dimension and covariance constraints; and</span>
+<span id="cb1-276"><a href="#cb1-276" aria-hidden="true" tabindex="-1"></a><span class="ss">8. </span>under synthetic known truth, assess state and parameter recovery only after an allowed similarity alignment, while separately scoring invariant predictions and observable covariance.</span>
+<span id="cb1-277"><a href="#cb1-277" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-278"><a href="#cb1-278" aria-hidden="true" tabindex="-1"></a>Random point-wise train/test splits are generally invalid for sequence forecasting. Comparing a smoother with an online filter on the same target without acknowledging future information is also invalid. High likelihood or low state error under the assumed model does not establish that the latent coordinates are unique or mechanistic.</span>
+<span id="cb1-279"><a href="#cb1-279" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-280"><a href="#cb1-280" aria-hidden="true" tabindex="-1"></a>Missing observations can be handled by evaluating each observation update on the observed components—equivalently selecting the relevant rows and covariance submatrices—provided the missingness mechanism is ignorable under the declared analysis. Informative missingness, censoring, unknown inputs, or observation-time selection require their own model. These variants do not change the need to keep future information out of online evaluation.</span>
+<span id="cb1-281"><a href="#cb1-281" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-282"><a href="#cb1-282" aria-hidden="true" tabindex="-1"></a><span class="fu">## Minimal toy model</span></span>
+<span id="cb1-283"><a href="#cb1-283" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-284"><a href="#cb1-284" aria-hidden="true" tabindex="-1"></a>Consider the scalar no-input model</span>
+<span id="cb1-285"><a href="#cb1-285" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-286"><a href="#cb1-286" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-287"><a href="#cb1-287" aria-hidden="true" tabindex="-1"></a>z_{t+1}=az_t+w_t,</span>
+<span id="cb1-288"><a href="#cb1-288" aria-hidden="true" tabindex="-1"></a>\qquad</span>
+<span id="cb1-289"><a href="#cb1-289" aria-hidden="true" tabindex="-1"></a>x_t=z_t+v_t,</span>
+<span id="cb1-290"><a href="#cb1-290" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-291"><a href="#cb1-291" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-292"><a href="#cb1-292" aria-hidden="true" tabindex="-1"></a>with $w_t\sim\mathcal N(0,q)$ and $v_t\sim\mathcal N(0,r)$. If $|a|&lt;1$ and</span>
+<span id="cb1-293"><a href="#cb1-293" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-294"><a href="#cb1-294" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-295"><a href="#cb1-295" aria-hidden="true" tabindex="-1"></a>z_1\sim\mathcal N<span class="sc">\!</span>\left(0,\frac{q}{1-a^2}\right),</span>
+<span id="cb1-296"><a href="#cb1-296" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-297"><a href="#cb1-297" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-298"><a href="#cb1-298" aria-hidden="true" tabindex="-1"></a>then the latent process is stationary with</span>
+<span id="cb1-299"><a href="#cb1-299" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-300"><a href="#cb1-300" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-301"><a href="#cb1-301" aria-hidden="true" tabindex="-1"></a>\operatorname{Var}(z_t)=\frac{q}{1-a^2},</span>
+<span id="cb1-302"><a href="#cb1-302" aria-hidden="true" tabindex="-1"></a>\qquad</span>
+<span id="cb1-303"><a href="#cb1-303" aria-hidden="true" tabindex="-1"></a>\operatorname{Cov}(x_t,x_{t+h})</span>
+<span id="cb1-304"><a href="#cb1-304" aria-hidden="true" tabindex="-1"></a>=a^h\frac{q}{1-a^2}\quad(h&gt;0),</span>
+<span id="cb1-305"><a href="#cb1-305" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-306"><a href="#cb1-306" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-307"><a href="#cb1-307" aria-hidden="true" tabindex="-1"></a>and $\operatorname{Var}(x_t)=q/(1-a^2)+r$. This separates temporal persistence $a$, process variation $q$, and measurement variation $r$. Setting $a=0$ produces temporally independent latent variables; setting $a=1$ removes the stationary covariance formula even though a finite-horizon random-walk model remains well defined.</span>
+<span id="cb1-308"><a href="#cb1-308" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-309"><a href="#cb1-309" aria-hidden="true" tabindex="-1"></a>A future non-executable toy contract would generate multiple independent sequences with known $a,q,r$; compare the training mean, static FA, observation-space AR(1), known-parameter LGSSM, and learned-parameter LGSSM; evaluate blocked predictive likelihood, multi-step calibration, innovation autocorrelation, filtered versus smoothed information sets, and similarity-aligned state recovery. Negative controls would include a unit root, correlated $w_t$ and $v_t$, informative missingness, and an unobservable augmented state. No data, code, fitted result, or benchmark is produced in this Method Object.</span>
+<span id="cb1-310"><a href="#cb1-310" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-311"><a href="#cb1-311" aria-hidden="true" tabindex="-1"></a><span class="fu">## Relevance to LDG</span></span>
+<span id="cb1-312"><a href="#cb1-312" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-313"><a href="#cb1-313" aria-hidden="true" tabindex="-1"></a>The discrete-time LGSSM is LDG's canonical probabilistic temporal latent baseline. It connects a factor-analysis-style observation layer to an explicit stochastic transition while preserving clear distinctions among model structure, state inference, forecasting, and parameter learning. It is the prerequisite model class for later Kalman filtering and smoothing Methods.</span>
+<span id="cb1-314"><a href="#cb1-314" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-315"><a href="#cb1-315" aria-hidden="true" tabindex="-1"></a>::: {.callout-warning title="What this does NOT imply"}</span>
+<span id="cb1-316"><a href="#cb1-316" aria-hidden="true" tabindex="-1"></a>A well-predicting LGSSM does not prove that latent coordinates are unique, that $A$ is a biological mechanism or causal law, that inferred trajectories are directly observed, or that data lie on a manifold with a discovered intrinsic dimension. Stability is not stationarity, smooth posterior means can be model-imposed, and exact inference is exact only conditional on the declared linear-Gaussian model and fixed parameters.</span>
+<span id="cb1-317"><a href="#cb1-317" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb1-318"><a href="#cb1-318" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-319"><a href="#cb1-319" aria-hidden="true" tabindex="-1"></a><span class="fu">### Mouse trajectory</span></span>
+<span id="cb1-320"><a href="#cb1-320" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-321"><a href="#cb1-321" aria-hidden="true" tabindex="-1"></a>An LGSSM can model ordered kinematic observations and known task inputs, but alignment, variable sampling intervals, animal-level dependence, nonlinear biomechanics, and interventions must be declared. No modality-specific empirical result is retained here.</span>
+<span id="cb1-322"><a href="#cb1-322" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-323"><a href="#cb1-323" aria-hidden="true" tabindex="-1"></a><span class="fu">### Eye movement</span></span>
+<span id="cb1-324"><a href="#cb1-324" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-325"><a href="#cb1-325" aria-hidden="true" tabindex="-1"></a>The model can separate a latent temporal state from measurement variability in declared gaze or oculomotor features. Saccades, censoring, event-dependent noise, and irregular samples can violate one global linear-Gaussian model. No modality-specific empirical result is retained here.</span>
+<span id="cb1-326"><a href="#cb1-326" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-327"><a href="#cb1-327" aria-hidden="true" tabindex="-1"></a><span class="fu">### EEG</span></span>
+<span id="cb1-328"><a href="#cb1-328" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-329"><a href="#cb1-329" aria-hidden="true" tabindex="-1"></a>Sensor sequences may be modeled through latent linear dynamics, but rereferencing, spatial mixing, artifacts, colored noise, and nonstationarity challenge $C$, $Q$, and $R$. Latent states are not automatically neural sources. No modality-specific empirical result is retained here.</span>
+<span id="cb1-330"><a href="#cb1-330" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-331"><a href="#cb1-331" aria-hidden="true" tabindex="-1"></a><span class="fu">### MEG / neural population data</span></span>
+<span id="cb1-332"><a href="#cb1-332" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-333"><a href="#cb1-333" aria-hidden="true" tabindex="-1"></a>The method provides a baseline for population recordings with ordered trials or time bins. Unit scaling, condition averaging, trial dependence, input definitions, and observation distributions must be explicit. No modality-specific empirical result is retained here.</span>
+<span id="cb1-334"><a href="#cb1-334" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-335"><a href="#cb1-335" aria-hidden="true" tabindex="-1"></a><span class="fu">## Primary sources</span></span>
+<span id="cb1-336"><a href="#cb1-336" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-337"><a href="#cb1-337" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Kalman develops the state-transition and random-excitation approach to linear filtering and prediction, and explicitly separates smoothing, filtering, and prediction by their conditioning time <span class="co">[</span><span class="ot">@Kalman1960</span><span class="co">]</span>. His inspected formulation is not used here as the sole source for the separate additive observation-noise equation.</span>
+<span id="cb1-338"><a href="#cb1-338" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Ghahramani and Hinton specify the discrete-time linear-Gaussian transition, observation, initial-state, $Q/R$ covariance model and derive EM parameter updates from smoothed latent sufficient statistics <span class="co">[</span><span class="ot">@GhahramaniHinton1996</span><span class="co">]</span>.</span>
+<span id="cb1-339"><a href="#cb1-339" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-340"><a href="#cb1-340" aria-hidden="true" tabindex="-1"></a><span class="fu">## Reviews / secondary sources</span></span>
+<span id="cb1-341"><a href="#cb1-341" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-342"><a href="#cb1-342" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Särkkä gives an authoritative Bayesian treatment of probabilistic state-space models, linear-Gaussian filtering and smoothing targets, predictive-density likelihood factorization, and parameter estimation <span class="co">[</span><span class="ot">@Sarkka2013</span><span class="co">]</span>.</span>
+<span id="cb1-343"><a href="#cb1-343" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Roweis and Ghahramani review factor analysis, PCA, and linear-Gaussian dynamic models in a common generative framework and distinguish static from ordered dynamic data <span class="co">[</span><span class="ot">@RoweisGhahramani1999</span><span class="co">]</span>.</span>
+<span id="cb1-344"><a href="#cb1-344" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-345"><a href="#cb1-345" aria-hidden="true" tabindex="-1"></a><span class="fu">## Open methodological questions</span></span>
+<span id="cb1-346"><a href="#cb1-346" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-347"><a href="#cb1-347" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Which state-dimension and covariance constraints remain reliable for short, dependent, high-dimensional LDG sequences?</span>
+<span id="cb1-348"><a href="#cb1-348" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Which interventions or observation designs break scientifically important similarity and noise-allocation ambiguities?</span>
+<span id="cb1-349"><a href="#cb1-349" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>When is an observation-space autoregression sufficient, making a latent state unnecessary?</span>
+<span id="cb1-350"><a href="#cb1-350" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>How should irregular sampling, informative missingness, and correlated process/observation noise be introduced without obscuring the canonical baseline?</span>
+<span id="cb1-351"><a href="#cb1-351" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-352"><a href="#cb1-352" aria-hidden="true" tabindex="-1"></a><span class="fu">## Maturity checklist</span></span>
+<span id="cb1-353"><a href="#cb1-353" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-354"><a href="#cb1-354" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> Schema-complete Method Object at <span class="in">`L2/review`</span>.</span>
+<span id="cb1-355"><a href="#cb1-355" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> Initial state, input-driven transition, observation law, Gaussian $Q/R$, and independence assumptions specified.</span>
+<span id="cb1-356"><a href="#cb1-356" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> Model specification, forecasting, filtering, smoothing, marginal likelihood, and parameter learning distinguished.</span>
+<span id="cb1-357"><a href="#cb1-357" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> Filtering and smoothing algorithms deferred to later units.</span>
+<span id="cb1-358"><a href="#cb1-358" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> Ordered discrete time, stability/stationarity, observability/controllability, missingness, and input boundaries stated.</span>
+<span id="cb1-359"><a href="#cb1-359" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> Similarity-transform ambiguity and stronger nonidentifiability stated.</span>
+<span id="cb1-360"><a href="#cb1-360" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> Learned/fixed, geometry, supervision, failure modes, baselines, leakage-safe evaluation, and analytic/prose toy contract included.</span>
+<span id="cb1-361"><a href="#cb1-361" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> No causal, mechanism, manifold, or model-free intrinsic-dimension claim made.</span>
+<span id="cb1-362"><a href="#cb1-362" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> Four retained sources inspected; metadata and DOI or stable identifiers verified; no empirical result retained.</span>
+<span id="cb1-363"><a href="#cb1-363" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> Independent mixed review completed after one bounded correction round;</span>
+<span id="cb1-364"><a href="#cb1-364" aria-hidden="true" tabindex="-1"></a>  focused re-review returned PASS.</span>
+<span id="cb1-365"><a href="#cb1-365" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> Stable promotion authorized by the human owner under the recorded review decision after published-site review.</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></div>
+</div></div></div></div></div>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

@@ -1,0 +1,1666 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.10.18">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Cross-Suite Robustness Synthesis – Latent Dynamics &amp; Geometry</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-445b8638c3d06994fee0907d791121c4.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-chtml.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../index.html">
+    <span class="navbar-title">Latent Dynamics &amp; Geometry</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../index.html"> 
+<span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../knowledge/concepts/index.html"> 
+<span class="menu-text">Concepts</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../knowledge/methods/index.html"> 
+<span class="menu-text">Methods</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../knowledge/math/index.html"> 
+<span class="menu-text">Math</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../knowledge/papers/index.html"> 
+<span class="menu-text">Papers</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../toy-models/index.html"> 
+<span class="menu-text">Toy Models</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../research-questions/index.html"> 
+<span class="menu-text">Research Questions</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../benchmarks/index.html"> 
+<span class="menu-text">Benchmarks</span></a>
+  </li>  
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/AbelZheng/latent-dynamics-geometry-public"> <i class="bi bi-github" role="img" aria-label="GitHub repository">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="https://github.com/AbelZheng/latent-dynamics-geometry-public/discussions"> 
+<span class="menu-text">Discussions</span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#cross-suite-robustness-synthesis" id="toc-cross-suite-robustness-synthesis" class="nav-link active" data-scroll-target="#cross-suite-robustness-synthesis">Cross-Suite Robustness Synthesis</a>
+  <ul class="collapse">
+  <li><a href="#scientific-question" id="toc-scientific-question" class="nav-link" data-scroll-target="#scientific-question">Scientific question</a></li>
+  <li><a href="#ground-truth" id="toc-ground-truth" class="nav-link" data-scroll-target="#ground-truth">Ground truth</a></li>
+  <li><a href="#generation" id="toc-generation" class="nav-link" data-scroll-target="#generation">Generation</a></li>
+  <li><a href="#scenario-grid" id="toc-scenario-grid" class="nav-link" data-scroll-target="#scenario-grid">Scenario grid</a></li>
+  <li><a href="#negative-controls-and-stress-cases" id="toc-negative-controls-and-stress-cases" class="nav-link" data-scroll-target="#negative-controls-and-stress-cases">Negative controls and stress cases</a></li>
+  <li><a href="#replicates-and-deterministic-seeds" id="toc-replicates-and-deterministic-seeds" class="nav-link" data-scroll-target="#replicates-and-deterministic-seeds">Replicates and deterministic seeds</a></li>
+  <li><a href="#split-discipline" id="toc-split-discipline" class="nav-link" data-scroll-target="#split-discipline">Split discipline</a></li>
+  <li><a href="#methods-and-information-sets" id="toc-methods-and-information-sets" class="nav-link" data-scroll-target="#methods-and-information-sets">Methods and information sets</a>
+  <ul class="collapse">
+  <li><a href="#explicit-method-metric-and-target-vocabularies" id="toc-explicit-method-metric-and-target-vocabularies" class="nav-link" data-scroll-target="#explicit-method-metric-and-target-vocabularies">Explicit method, metric and target vocabularies</a></li>
+  </ul></li>
+  <li><a href="#parameter-selection" id="toc-parameter-selection" class="nav-link" data-scroll-target="#parameter-selection">Parameter selection</a></li>
+  <li><a href="#inference" id="toc-inference" class="nav-link" data-scroll-target="#inference">Inference</a></li>
+  <li><a href="#scoring" id="toc-scoring" class="nav-link" data-scroll-target="#scoring">Scoring</a></li>
+  <li><a href="#failure-and-applicability-labels" id="toc-failure-and-applicability-labels" class="nav-link" data-scroll-target="#failure-and-applicability-labels">Failure and applicability labels</a></li>
+  <li><a href="#artifact-contract" id="toc-artifact-contract" class="nav-link" data-scroll-target="#artifact-contract">Artifact contract</a></li>
+  <li><a href="#results" id="toc-results" class="nav-link" data-scroll-target="#results">Results</a></li>
+  <li><a href="#interpretation-limits" id="toc-interpretation-limits" class="nav-link" data-scroll-target="#interpretation-limits">Interpretation limits</a></li>
+  <li><a href="#reproducibility" id="toc-reproducibility" class="nav-link" data-scroll-target="#reproducibility">Reproducibility</a></li>
+  <li><a href="#review-record" id="toc-review-record" class="nav-link" data-scroll-target="#review-record">Review record</a></li>
+  <li><a href="#maturity-checklist" id="toc-maturity-checklist" class="nav-link" data-scroll-target="#maturity-checklist">Maturity checklist</a></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<div class="quarto-title-block"><div><h1 class="title">Cross-Suite Robustness Synthesis</h1><button type="button" class="btn code-tools-button" id="quarto-code-tools-source"><i class="bi"></i> Code</button></div></div>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="cross-suite-robustness-synthesis" class="level1">
+<h1>Cross-Suite Robustness Synthesis</h1>
+<section id="scientific-question" class="level2">
+<h2 class="anchored" data-anchor-id="scientific-question">Scientific question</h2>
+<p>P4-U06 asks a deliberately non-comparative question: <strong>what task-specific coverage, applicability/failure patterns, and scenario-to-applicable-target mappings are present across the five stable Phase 4 synthetic Benchmark Objects?</strong></p>
+<p>This object is an inventory and reconciliation layer. It introduces no new generator, fitting procedure, parameter selection, inference, recovery, scoring metric, replicate, or scientific result. It does not copy source metric values into the synthesis artifacts. Unlike metrics are never normalized, averaged, pooled, or converted into ranks. No method winner, universal winner, mechanistic explanation, causal conclusion, or real-data claim is produced.</p>
+</section>
+<section id="ground-truth" class="level2">
+<h2 class="anchored" data-anchor-id="ground-truth">Ground truth</h2>
+<p>There is no new synthetic ground truth at P4-U06. Ground truth remains defined inside each stable source Benchmark Object and is not merged across tasks:</p>
+<ul>
+<li>scalar latent states and observations for linear-Gaussian inference;</li>
+<li>static rank-two common signal, loading and residual structure;</li>
+<li>temporal latent trajectories, observation layers and covariance priors;</li>
+<li>labelled demixing effects and declared rotational generators;</li>
+<li>curved reconstruction truth and finite graph/operator targets.</li>
+</ul>
+<p>These truth objects have different mathematical types. Counting their declared target families does not make them commensurate and does not create a common performance target.</p>
+</section>
+<section id="generation" class="level2">
+<h2 class="anchored" data-anchor-id="generation">Generation</h2>
+<p>P4-U06 performs <strong>no data generation and no source-method rerun</strong>. Its parsed scientific inputs are only <code>manifest.json</code>, <code>results.csv</code>, and <code>diagnostics.json</code> from each of the five stable Phase 4 source artifact trees. The source <code>summary.png</code> is an <strong>integrity-only attachment</strong>: its presence, byte count and declared hash are checked and recorded, but its pixels, labels and plotted values are not parsed or used as scientific input. Before synthesis the executable requires <code>maturity: L1</code>, <code>status: stable</code>, verifies the scientific input hashes, checks the source status vocabulary and reconciles diagnostics status counts against raw source rows.</p>
+<p>The verified stable inputs are:</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 23%">
+<col style="width: 30%">
+<col style="width: 23%">
+<col style="width: 23%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Source Benchmark</th>
+<th style="text-align: right;">Source rows</th>
+<th>Parsed scientific inputs</th>
+<th>Integrity-only attachment</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>P4-U01 Linear-Gaussian Robustness</td>
+<td style="text-align: right;">5,445</td>
+<td>manifest/results/diagnostics</td>
+<td>summary PNG</td>
+</tr>
+<tr class="even">
+<td>P4-U02 Static Linear Latent Recovery</td>
+<td style="text-align: right;">4,356</td>
+<td>manifest/results/diagnostics</td>
+<td>summary PNG</td>
+</tr>
+<tr class="odd">
+<td>P4-U03 Temporal Covariance and Inference</td>
+<td style="text-align: right;">3,960</td>
+<td>manifest/results/diagnostics</td>
+<td>summary PNG</td>
+</tr>
+<tr class="even">
+<td>P4-U04 Demixing and Rotational Projection</td>
+<td style="text-align: right;">2,712</td>
+<td>manifest/results/diagnostics</td>
+<td>summary PNG</td>
+</tr>
+<tr class="odd">
+<td>P4-U05 Nonlinear Reconstruction and Graph Geometry</td>
+<td style="text-align: right;">4,167</td>
+<td>manifest/results/diagnostics</td>
+<td>summary PNG</td>
+</tr>
+</tbody>
+</table>
+<p>Together these sources contain 20,640 raw source rows. That total is an inventory count, not a pooled sample size or denominator for cross-task method comparison. Source file digests and byte counts are frozen in the P4-U06 manifest so later source drift is machine-detectable.</p>
+</section>
+<section id="scenario-grid" class="level2">
+<h2 class="anchored" data-anchor-id="scenario-grid">Scenario grid</h2>
+<p>The synthesis inventory contains seven task records and 73 declared scenario records. It preserves source task boundaries rather than constructing a new cross-suite grid.</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 11%">
+<col style="width: 14%">
+<col style="width: 14%">
+<col style="width: 14%">
+<col style="width: 14%">
+<col style="width: 14%">
+<col style="width: 14%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Task</th>
+<th style="text-align: right;">Scenarios</th>
+<th style="text-align: right;">Replicates</th>
+<th style="text-align: right;">Methods</th>
+<th style="text-align: right;">Metrics</th>
+<th style="text-align: right;">Targets</th>
+<th style="text-align: right;">Source rows</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Linear-Gaussian inference</td>
+<td style="text-align: right;">11</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">11</td>
+<td style="text-align: right;">9</td>
+<td style="text-align: right;">7</td>
+<td style="text-align: right;">5,445</td>
+</tr>
+<tr class="even">
+<td>Static linear latent recovery</td>
+<td style="text-align: right;">11</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">9</td>
+<td style="text-align: right;">11</td>
+<td style="text-align: right;">13</td>
+<td style="text-align: right;">4,356</td>
+</tr>
+<tr class="odd">
+<td>Temporal covariance and inference</td>
+<td style="text-align: right;">12</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">11</td>
+<td style="text-align: right;">10</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">3,960</td>
+</tr>
+<tr class="even">
+<td>Demixing</td>
+<td style="text-align: right;">9</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">8</td>
+<td style="text-align: right;">7</td>
+<td style="text-align: right;">7</td>
+<td style="text-align: right;">1,512</td>
+</tr>
+<tr class="odd">
+<td>Rotation</td>
+<td style="text-align: right;">10</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">8</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">1,200</td>
+</tr>
+<tr class="even">
+<td>Nonlinear reconstruction</td>
+<td style="text-align: right;">7</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">7</td>
+<td style="text-align: right;">7</td>
+<td style="text-align: right;">735</td>
+</tr>
+<tr class="odd">
+<td>Graph geometry/operator recovery</td>
+<td style="text-align: right;">13</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">8</td>
+<td style="text-align: right;">11</td>
+<td style="text-align: right;">11</td>
+<td style="text-align: right;">3,432</td>
+</tr>
+</tbody>
+</table>
+<p>The apparent equality of some counts is incidental. A metric count in one task has no numerical or scientific equivalence to a metric count in another task.</p>
+</section>
+<section id="negative-controls-and-stress-cases" class="level2">
+<h2 class="anchored" data-anchor-id="negative-controls-and-stress-cases">Negative controls and stress cases</h2>
+<p>The synthesis emits one <code>scenario_target_coverage</code> row for each of the 73 source scenarios. Each row inventories the source-declared stress class and the <strong>applicable target families</strong> having at least one non-<code>inapplicable</code> source row in that scenario. This is coverage metadata only. It does not estimate sensitivity, effect magnitude, effect direction, robustness, significance or causal response.</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Task</th>
+<th>Declared stress classes retained</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Linear-Gaussian inference</td>
+<td>transition stability, noise ratio, sequence length, missing blocks, wrong parameters, reset-boundary failure, near-unit-root stress</td>
+</tr>
+<tr class="even">
+<td>Static linear latent recovery</td>
+<td>sample size, signal/eigenvalue separation, heterogeneous or near-zero uniqueness, correlated residuals, high nuisance, outliers, preprocessing leakage, reference</td>
+</tr>
+<tr class="odd">
+<td>Temporal covariance and inference</td>
+<td>timescale separation, trial count, channel/time masks, changepoints, correlated residuals, Poisson misspecification, equal kernels, alignment jitter, informative missingness</td>
+</tr>
+<tr class="even">
+<td>Demixing</td>
+<td>balanced reference, near-collinear subspaces, missing/unbalanced cells, label shuffle, pseudo-population, averaging mismatch, sample size</td>
+</tr>
+<tr class="odd">
+<td>Rotation</td>
+<td>clean rotation, symmetric decay, latency, common input, short arcs, time jitter, smoothing/subtraction, nonorthogonal metric, covariance control</td>
+</tr>
+<tr class="even">
+<td>Nonlinear reconstruction</td>
+<td>curvature, support family, sample/capacity, nuisance, support shift</td>
+</tr>
+<tr class="odd">
+<td>Graph geometry</td>
+<td>reference, gaps, shortcuts, density, connectivity, neighborhood size, bandwidth, metric scaling</td>
+</tr>
+</tbody>
+</table>
+<p>Negative controls remain named source scenarios or methods. P4-U06 does not retune them, reinterpret them as ordinary competitors, or remove observed failure and inapplicability labels.</p>
+</section>
+<section id="replicates-and-deterministic-seeds" class="level2">
+<h2 class="anchored" data-anchor-id="replicates-and-deterministic-seeds">Replicates and deterministic seeds</h2>
+<p>No new replicate or random seed is introduced. Replicate counts in the task inventory are inherited from the stable source artifacts: five for P4-U01, four for P4-U02, and three for each task in P4-U03–P4-U05. P4-U06 determinism comes from canonical parsing, stable lexical row ordering and byte-verifiable output, not from a new stochastic experiment.</p>
+<p>The synthesis must not treat source replicates from different tasks as one exchangeable sample. Source q10/median/q90 summaries are not imported.</p>
+</section>
+<section id="split-discipline" class="level2">
+<h2 class="anchored" data-anchor-id="split-discipline">Split discipline</h2>
+<p>Train, validation, test, diagnostic, online, retrospective and oracle boundaries remain source-local. P4-U06 reads completed source rows after their own split discipline has been verified; it receives no raw generated arrays and has no capability to refit a source method.</p>
+<p>The source provenance vocabularies are retained rather than collapsed. They include test, validation, fit/scenario/leakage/architecture diagnostics, training design, held-out test, test extension, train diagnostic, oracle diagnostic and training-selected control provenance. Similar words across suites do not imply identical data access.</p>
+</section>
+<section id="methods-and-information-sets" class="level2">
+<h2 class="anchored" data-anchor-id="methods-and-information-sets">Methods and information sets</h2>
+<p>P4-U06 adds no method. It inventories source methods task by task and preserves source-local information-set labels:</p>
+<ul>
+<li><strong>Linear-Gaussian inference:</strong> fixed references; several online histories; retrospective full interval; oracle retrospective full interval; and an explicitly invalid cross-sequence history.</li>
+<li><strong>Static linear recovery:</strong> fixed reference, train-only, train/validation, oracle-parameter and invalid test-preprocessing sets.</li>
+<li><strong>Temporal covariance:</strong> static observation, online, retrospective and oracle retrospective sets.</li>
+<li><strong>Demixing:</strong> design diagnostic, supervised train, supervised train/validation and permuted-label controls.</li>
+<li><strong>Rotation:</strong> fixed reference, train-fitted projection, known-input fit and selected permuted-condition control.</li>
+<li><strong>Reconstruction:</strong> train/validation fit followed by frozen test recovery.</li>
+<li><strong>Graph geometry:</strong> training-graph/operator diagnostics and frozen training graph with held-out extension.</li>
+</ul>
+<p>These labels are reconciled as an inventory, not mapped onto a single ordered scale of information access. In particular, online, retrospective, oracle, diagnostic and intentionally invalid controls cannot be ranked as if they solve one deployment task.</p>
+<section id="explicit-method-metric-and-target-vocabularies" class="level3">
+<h3 class="anchored" data-anchor-id="explicit-method-metric-and-target-vocabularies">Explicit method, metric and target vocabularies</h3>
+<p>The artifacts include one namespaced <code>method_member</code>, <code>metric_member</code> and <code>target_member</code> inventory row for every distinct task-local vocabulary member: <strong>60 method-member rows, 60 metric-member rows and 56 target-member rows</strong>. Names are not deduplicated across tasks because the same surface word can have a different role or contract.</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Task</th>
+<th>Methods</th>
+<th>Metrics</th>
+<th>Targets</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Linear-Gaussian inference</td>
+<td><code>stationary_mean</code>, <code>persistence</code>, <code>open_loop</code>, <code>known_kalman_filter</code>, <code>known_rts_smoother</code>, <code>batch_conditioning_oracle</code>, <code>selected_kalman_filter</code>, <code>selected_rts_smoother</code>, <code>misspecified_kalman_filter</code>, <code>misspecified_rts_smoother</code>, <code>false_continuation_filter</code></td>
+<td><code>latent_rmse</code>, <code>interval_95_coverage</code>, <code>mean_posterior_variance</code>, <code>predictive_nll</code>, <code>inside_missing_block_rmse</code>, <code>outside_missing_block_rmse</code>, <code>selection_parameter_l1</code>, <code>oracle_mean_discrepancy</code>, <code>reset_first_state_abs_difference</code></td>
+<td><code>point_state</code>, <code>online_state</code>, <code>retrospective_state</code>, <code>one_step_observation_prediction</code>, <code>selected_parameter_tuple</code>, <code>numerical_correctness_reference</code>, <code>boundary_reset_diagnostic</code></td>
+</tr>
+<tr class="even">
+<td>Static linear latent recovery</td>
+<td><code>mean</code>, <code>fixed_projection</code>, <code>random_projection</code>, <code>pca</code>, <code>ppca</code>, <code>fa_selected</code>, <code>proper_scaled_pca</code>, <code>leaked_scaled_pca_control</code>, <code>true_gaussian_reference</code></td>
+<td><code>heldout_reconstruction_mse</code>, <code>latent_signal_reconstruction_mse</code>, <code>heldout_gaussian_nll</code>, <code>covariance_relative_frobenius</code>, <code>principal_subspace_angle_max_degrees</code>, <code>loading_subspace_angle_max_degrees</code>, <code>uniqueness_rmse</code>, <code>selected_validation_nll</code>, <code>optimizer_iterations</code>, <code>identification_applicable</code>, <code>preprocessing_test_poison_parameter_change</code></td>
+<td><code>observed_coordinate_reconstruction</code>, <code>true_common_signal</code>, <code>observable_distribution</code>, <code>observable_covariance</code>, <code>population_principal_subspace</code>, <code>identified_true_common_loading_subspace</code>, <code>identified_diagonal_uniqueness</code>, <code>bounded_fa_selection</code>, <code>diagonal_fa_identification_applicability</code>, <code>contaminated_observed_coordinate_reconstruction</code>, <code>contaminated_observation_gaussian_score</code>, <code>nominal_clean_gaussian_covariance</code>, <code>preprocessing_leakage_diagnostic</code></td>
+</tr>
+<tr class="odd">
+<td>Temporal covariance and inference</td>
+<td><code>mean_diagonal</code>, <code>static_factor</code>, <code>two_stage_pca_smooth</code>, <code>independent_channel_gp</code>, <code>known_gpfa</code>, <code>selected_gpfa</code>, <code>wrong_timescale_gpfa</code>, <code>wrong_ar_gpfa</code>, <code>ar_kalman_filter</code>, <code>ar_rts_smoother</code>, <code>exact_gaussian_oracle</code></td>
+<td><code>marginal_nll_per_entry</code>, <code>masked_prediction_nll_per_entry</code>, <code>masked_prediction_rmse</code>, <code>latent_rmse</code>, <code>latent_90_coverage</code>, <code>loading_subspace_angle_degrees</code>, <code>timescale_l1</code>, <code>selected_combined_nll_per_entry</code>, <code>covariance_relative_frobenius</code>, <code>posterior_mean_oracle_max_abs</code></td>
+<td><code>observation_distribution</code>, <code>masked_observation_prediction</code>, <code>latent_trajectory</code>, <code>loading_subspace</code>, <code>timescale_selection</code>, <code>numerical_posterior_oracle</code></td>
+</tr>
+<tr class="even">
+<td>Demixing</td>
+<td><code>condition_mean</code>, <code>pca</code>, <code>marginal_pca</code>, <code>selected_dpca</code>, <code>ridge_decoder</code>, <code>shuffled_dpca_control</code>, <code>shuffled_decoder_control</code>, <code>factorial_design_diagnostic</code></td>
+<td><code>stimulus_marginal_nmse</code>, <code>decision_marginal_nmse</code>, <code>stimulus_subspace_angle_degrees</code>, <code>decision_subspace_angle_degrees</code>, <code>stimulus_decoding_accuracy</code>, <code>decision_decoding_accuracy</code>, <code>factorial_design_rank</code></td>
+<td><code>stimulus_marginal_reconstruction</code>, <code>decision_marginal_reconstruction</code>, <code>stimulus_marginal_subspace</code>, <code>decision_marginal_subspace</code>, <code>stimulus_label_decoding</code>, <code>decision_label_decoding</code>, <code>factorial_design_identification</code></td>
+</tr>
+<tr class="odd">
+<td>Rotation</td>
+<td>8 members covering PCA/fixed/random planes, unrestricted/skew/symmetric/input-aware fits and covariance control</td>
+<td><code>plane_angle_degrees</code>, <code>angular_rate_abs_error</code>, <code>derivative_rmse</code>, <code>tangential_velocity_ratio</code>, <code>covariance_similarity</code></td>
+<td><code>rotational_plane</code>, <code>angular_rate</code>, <code>heldout_derivative_prediction</code>, <code>plane_tangential_motion</code>, <code>condition_covariance_control</code></td>
+</tr>
+<tr class="even">
+<td>Nonlinear reconstruction</td>
+<td><code>mean</code>, <code>pca</code>, <code>linear_autoencoder</code>, <code>nonlinear_autoencoder</code>, <code>frozen_encoder</code></td>
+<td><code>observed_reconstruction_mse</code>, <code>noiseless_signal_mse</code>, <code>code_variance</code>, <code>code_abs_spearman_truth</code>, <code>code_collision_rate</code>, <code>selected_validation_mse</code>, <code>parameter_count</code></td>
+<td><code>observed_test_reconstruction</code>, <code>known_noiseless_test_signal</code>, <code>deterministic_test_code_activity</code>, <code>scoring_only_generator_parameter</code>, <code>scoring_only_generator_collision_diagnostic</code>, <code>validation_selection_diagnostic</code>, <code>architecture_diagnostic</code></td>
+</tr>
+<tr class="odd">
+<td>Graph geometry/operator recovery</td>
+<td><code>mean</code>, <code>pca</code>, <code>ambient_mds</code>, <code>isomap</code>, <code>graph_diagnostics</code>, <code>diffusion_maps</code>, <code>direct_operator</code>, <code>nystrom_extension</code></td>
+<td><code>component_count</code>, <code>infinite_pair_rate</code>, <code>material_shortcut_rate</code>, <code>graph_distance_relative_rmse</code>, <code>mds_negative_eigenmass</code>, <code>heldout_coordinate_rmse</code>, <code>diffusion_eigenspace_angle_max_degrees</code>, <code>diffusion_truncation_relative_rmse</code>, <code>operator_row_sum_max_abs</code>, <code>direct_spectral_distance_max_abs</code>, <code>heldout_extension_rmse</code></td>
+<td><code>finite_training_graph_connectivity_diagnostic</code>, <code>finite_training_graph_disconnection_diagnostic</code>, <code>known_hairpin_pairwise_arc_separation</code>, <code>known_hairpin_path_underestimation_diagnostic</code>, <code>classical_mds_euclideanity_diagnostic</code>, <code>scoring_aligned_known_hairpin_arc_length</code>, <code>l2_pi_cosine_sine_eigenspace_diagnostic</code>, <code>full_finite_operator_diffusion_distance</code>, <code>markov_operator_numerical_oracle</code>, <code>finite_operator_numerical_oracle</code>, <code>heldout_cosine_sine_extension_after_train_alignment</code></td>
+</tr>
+</tbody>
+</table>
+<p>The exact full strings are authoritative in the <code>inventory</code> rows of <code>results.csv</code>; the compact table above documents their task-local role without creating a cross-task vocabulary hierarchy.</p>
+</section>
+</section>
+<section id="parameter-selection" class="level2">
+<h2 class="anchored" data-anchor-id="parameter-selection">Parameter selection</h2>
+<p>There is no P4-U06 parameter selection. Source-selected hyperparameters and selection diagnostics remain in their stable source artifacts. The synthesis records method, task, scenario, status and declared vocabulary only; it neither selects among source methods nor searches for a cross-suite operating point.</p>
+</section>
+<section id="inference" class="level2">
+<h2 class="anchored" data-anchor-id="inference">Inference</h2>
+<p>There is no P4-U06 inference or recovery. Source posterior states, reconstructions, subspaces, derivatives, embeddings and extensions are not recomputed and their metric values are not copied. The executable constructs only inventory, applicability/failure-pattern and scenario-target coverage rows.</p>
+</section>
+<section id="scoring" class="level2">
+<h2 class="anchored" data-anchor-id="scoring">Scoring</h2>
+<p>P4-U06 has no common scientific score. Its four record types are:</p>
+<ol type="1">
+<li><code>inventory</code> — task-specific counts plus explicit method, metric, target, information-set and provenance vocabulary members;</li>
+<li><code>applicability_pattern</code> — task/scenario/method applicability over the raw Cartesian method × metric × replicate rows;</li>
+<li><code>failure_pattern</code> — two separately named failure-label fractions with exact denominators; and</li>
+<li><code>scenario_target_coverage</code> — scenario-level inventory of applicable target families, without source metric values or effects.</li>
+</ol>
+<p>For a fixed task/scenario/method group, define</p>
+<ul>
+<li><span class="math inline">\(N_{all}\)</span>: all raw Cartesian metric × replicate rows;</li>
+<li><span class="math inline">\(N_{app}=N_{ok}+N_{invalid}+N_{nonconvergence}\)</span>: rows whose status is not <code>inapplicable</code>; and</li>
+<li><span class="math inline">\(N_{fail}=N_{invalid}+N_{nonconvergence}\)</span>.</li>
+</ul>
+<p>The artifact reports:</p>
+<ul>
+<li>applicability rate <span class="math inline">\(N_{app}/N_{all}\)</span>;</li>
+<li><strong>raw Cartesian failure-label fraction</strong> <span class="math inline">\(N_{fail}/N_{all}\)</span>; and</li>
+<li><strong>conditional failure rate</strong> <span class="math inline">\(N_{fail}/N_{app}\)</span>.</li>
+</ul>
+<p>When <span class="math inline">\(N_{app}=0\)</span>, the conditional rate is mathematically undefined. The row is retained with <code>status: inapplicable</code>, blank serialized denominator/rate fields, and no fabricated zero. There are <strong>104</strong> such zero-applicable-denominator rows; the other <strong>539</strong> conditional-rate rows have explicit positive denominators. All 643 raw Cartesian failure-label-fraction rows retain their nonzero <span class="math inline">\(N_{all}\)</span> denominators.</p>
+<p>These fractions describe source labels and Cartesian design, not normalized method performance. They must not be compared as a leaderboard. A high <code>inapplicable</code> fraction can be the correct result of narrowly typed metrics.</p>
+</section>
+<section id="failure-and-applicability-labels" class="level2">
+<h2 class="anchored" data-anchor-id="failure-and-applicability-labels">Failure and applicability labels</h2>
+<p>The shared vocabulary is reconciled as follows:</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Label</th>
+<th>Cross-suite reading</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>ok</code></td>
+<td>The source row’s declared computation completed and was applicable; it does not mean scientifically correct in general.</td>
+</tr>
+<tr class="even">
+<td><code>inapplicable</code></td>
+<td>The method/metric/scenario target is not defined under the source contract; it is retained, not treated as missing or zero.</td>
+</tr>
+<tr class="odd">
+<td><code>invalid</code></td>
+<td>A declared design, information-set, identification or finite-value condition failed.</td>
+</tr>
+<tr class="even">
+<td><code>nonconvergence</code></td>
+<td>A bounded numerical/optimization procedure did not satisfy its source completion rule.</td>
+</tr>
+</tbody>
+</table>
+<p>Task-specific status compositions are:</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 13%">
+<col style="width: 17%">
+<col style="width: 17%">
+<col style="width: 17%">
+<col style="width: 17%">
+<col style="width: 17%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Task</th>
+<th style="text-align: right;"><code>ok</code></th>
+<th style="text-align: right;"><code>inapplicable</code></th>
+<th style="text-align: right;"><code>invalid</code></th>
+<th style="text-align: right;"><code>nonconvergence</code></th>
+<th style="text-align: right;">Denominator</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Linear-Gaussian inference</td>
+<td style="text-align: right;">1,515</td>
+<td style="text-align: right;">3,930</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">5,445</td>
+</tr>
+<tr class="even">
+<td>Static linear latent recovery</td>
+<td style="text-align: right;">1,260</td>
+<td style="text-align: right;">3,044</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">52</td>
+<td style="text-align: right;">4,356</td>
+</tr>
+<tr class="odd">
+<td>Temporal covariance and inference</td>
+<td style="text-align: right;">2,049</td>
+<td style="text-align: right;">1,911</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">3,960</td>
+</tr>
+<tr class="even">
+<td>Demixing</td>
+<td style="text-align: right;">567</td>
+<td style="text-align: right;">891</td>
+<td style="text-align: right;">54</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1,512</td>
+</tr>
+<tr class="odd">
+<td>Rotation</td>
+<td style="text-align: right;">474</td>
+<td style="text-align: right;">726</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1,200</td>
+</tr>
+<tr class="even">
+<td>Nonlinear reconstruction</td>
+<td style="text-align: right;">690</td>
+<td style="text-align: right;">45</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">735</td>
+</tr>
+<tr class="odd">
+<td>Graph geometry/operator recovery</td>
+<td style="text-align: right;">299</td>
+<td style="text-align: right;">3,133</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">3,432</td>
+</tr>
+</tbody>
+</table>
+<p>The only natural failure labels in the stable inputs are 52 bounded FA <code>nonconvergence</code> rows in static linear recovery and 54 missing-cell design-rank <code>invalid</code> rows in demixing. Their meanings remain source-specific. The absence of natural failures in another task is not evidence that the method family is universally robust; source verifiers separately exercise failure routing by fault injection.</p>
+</section>
+<section id="artifact-contract" class="level2">
+<h2 class="anchored" data-anchor-id="artifact-contract">Artifact contract</h2>
+<p>The synthesis artifact directory is limited to:</p>
+<pre class="text"><code>manifest.json
+results.csv
+diagnostics.json
+summary.png</code></pre>
+<p>The authoritative artifacts contain <strong>2,308</strong> complete canonical synthesis rows:</p>
+<ul>
+<li>306 <code>inventory</code> rows, including 60 method, 60 metric and 56 target members;</li>
+<li>643 <code>applicability_pattern</code> rows;</li>
+<li>1,286 <code>failure_pattern</code> rows: 643 raw Cartesian fractions and 643 conditional rates; and</li>
+<li>73 <code>scenario_target_coverage</code> rows.</li>
+</ul>
+<p>The manifest records the five stable source trees, all source content hashes and byte counts, the 17-field raw schema, lexical <code>row_key</code> ordering, runtime, commands and the explicit prohibitions on source method reruns, imported metric values, cross-task normalization/averaging, scores, ranks and winners.</p>
+</section>
+<section id="results" class="level2">
+<h2 class="anchored" data-anchor-id="results">Results</h2>
+<p>The synthesis confirms coverage across five stable Benchmark Objects and seven separate tasks. The task inventory spans 73 named scenarios and 20,640 source rows, while the synthesis itself contains 2,308 inventory/pattern/coverage rows. These are coverage counts only.</p>
+<p>The scenario-target coverage inventory shows that Phase 4 deliberately exercises different kinds of boundaries rather than one repeated benchmark template: temporal stability and resets; static identification and residual specification; covariance, missingness and observation-family misspecification; label/design and rotational controls; nonlinear support/capacity; and finite graph connectivity, shortcuts, bandwidth and metric dependence. The coverage rows state which target families are applicable in each scenario; they do not state an effect size, direction, sensitivity or robustness result.</p>
+<p>The task-specific status table also demonstrates why a pooled rate would be misleading. Graph geometry has many deliberately typed method-metric pairs and therefore many <code>inapplicable</code> rows, whereas reconstruction has a much denser applicability design. Demixing’s <code>invalid</code> rows encode a missing-cell design failure; static recovery’s <code>nonconvergence</code> rows encode bounded FA optimization. Those labels are not interchangeable losses.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="artifacts/cross-suite-robustness-synthesis/summary.png" class="img-fluid figure-img"></p>
+<figcaption>P4-U06 cross-suite coverage inventory</figcaption>
+</figure>
+</div>
+<p>The figure displays scenario/method/metric inventory counts and task-specific status compositions using each task’s own source-row denominator. It contains no source metric values, pooled score, normalized rank or winner.</p>
+</section>
+<section id="interpretation-limits" class="level2">
+<h2 class="anchored" data-anchor-id="interpretation-limits">Interpretation limits</h2>
+<ul>
+<li>Inventory volume is not evidence of scientific quality, maturity or method superiority.</li>
+<li>Scenario counts are not comparable measures of difficulty or evidential weight.</li>
+<li>Applicability and both failure-label fractions are conditional on each task’s method-metric-replicate Cartesian design and their explicitly named denominators.</li>
+<li>A scenario-target coverage entry records applicable target-family coverage, not sensitivity, effect magnitude, direction, significance or causal attribution.</li>
+<li><code>ok</code> is a computation/status label, not proof of model correctness, identifiability, mechanism, causality or real-data transfer.</li>
+<li><code>inapplicable</code>, <code>invalid</code> and <code>nonconvergence</code> have different meanings and are never combined into a universal penalty.</li>
+<li>No result supports a universal winner, a cross-task method rank, a common latent generator, manifold/topology recovery, biological validity or Phase 5 readiness.</li>
+<li>This synthesis does not replace reading the source Benchmark Object, its raw rows, artifacts, review record and interpretation limits.</li>
+</ul>
+</section>
+<section id="reproducibility" class="level2">
+<h2 class="anchored" data-anchor-id="reproducibility">Reproducibility</h2>
+<p>Run from the repository root with the manifest-recorded runtime:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">/Users/bytedance/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3</span> benchmarks/cross-suite-robustness-synthesis.py <span class="at">--generate</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="ex">/Users/bytedance/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3</span> benchmarks/cross-suite-robustness-synthesis.py <span class="at">--generate</span> <span class="at">--resume</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="ex">/Users/bytedance/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3</span> benchmarks/cross-suite-robustness-synthesis.py <span class="at">--verify</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>The verifier checks stable source status; source manifest/content hashes; source diagnostics/raw-row status reconciliation; the exact four-artifact inventory; 2,308 unique canonical rows; absence of source metric values and rank/score/winner fields; explicit denominators; byte-identical clean and reverse-order generation; valid partial resume; rejection of corrupted, duplicate, unknown and incomplete resume rows; source-content drift rejection; and rejection of a non-stable source manifest.</p>
+</section>
+<section id="review-record" class="level2">
+<h2 class="anchored" data-anchor-id="review-record">Review record</h2>
+<p>Independent scientific and implementation reviewers were read-only and independent of the executors. Their initial reviews returned <code>REVISE</code> on honest scenario-target coverage terminology, raw versus conditional failure denominators, namespaced method/metric/target inventories, and the scientific-input versus integrity-attachment boundary. The bounded correction pass addressed only those findings; focused scientific and implementation re-reviews both returned <code>PASS</code> with no unresolved finding.</p>
+<p>The accepted validation record includes 63-object structural validation, 33 repository tests, the synthesis verifier and adversarial source checks, target/index renders, workflow validation, and <code>git diff --check</code>. The recorded review decision then authorized the mechanical promotion to <code>L1/stable</code>. Stable status records bounded acceptance of this declared synthetic Benchmark Object; it does not expand its evidence, information-set, target, or interpretation boundaries.</p>
+</section>
+<section id="maturity-checklist" class="level2">
+<h2 class="anchored" data-anchor-id="maturity-checklist">Maturity checklist</h2>
+<ul class="task-list">
+<li><label><input type="checkbox" checked="">Reads only five verified <code>L1/stable</code> Phase 4 artifact trees.</label></li>
+<li><label><input type="checkbox" checked="">Introduces no new generator, replicate, selection, inference, recovery or scientific score.</label></li>
+<li><label><input type="checkbox" checked="">Preserves seven task boundaries and source-local information sets/provenance.</label></li>
+<li><label><input type="checkbox" checked="">Reconciles the four status labels without treating them as one loss.</label></li>
+<li><label><input type="checkbox" checked="">Records task/scenario/method/metric inventories with exact source-row denominators.</label></li>
+<li><label><input type="checkbox" checked="">Records 73 scenario-target coverage rows without implying sensitivity or importing effect sizes.</label></li>
+<li><label><input type="checkbox" checked="">Produces no metric normalization, cross-task aggregation, score, rank, winner or mechanistic inference.</label></li>
+<li><label><input type="checkbox" checked="">Limits output to four deterministic byte-verifiable artifacts.</label></li>
+<li><label><input type="checkbox" checked="">Focused scientific re-review passes.</label></li>
+<li><label><input type="checkbox" checked="">Focused implementation re-review passes.</label></li>
+<li><label><input type="checkbox" checked="">Mechanical <code>L1/stable</code> promotion occurs only after both reviews and validation pass.</label></li>
+</ul>
+
+
+<!-- -->
+
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+    const viewSource = window.document.getElementById('quarto-view-source') ||
+                       window.document.getElementById('quarto-code-tools-source');
+    if (viewSource) {
+      const sourceUrl = viewSource.getAttribute("data-quarto-source-url");
+      viewSource.addEventListener("click", function(e) {
+        if (sourceUrl) {
+          // rstudio viewer pane
+          if (/\bcapabilities=\b/.test(window.location)) {
+            window.open(sourceUrl);
+          } else {
+            window.location.href = sourceUrl;
+          }
+        } else {
+          const modal = new bootstrap.Modal(document.getElementById('quarto-embedded-source-code-modal'));
+          modal.show();
+        }
+        return false;
+      });
+    }
+    function toggleCodeHandler(show) {
+      return function(e) {
+        const cellDetails = window.document.querySelectorAll(".cell details.code-fold");
+        for (let i=0; i<cellDetails.length; i++) {
+          const details = cellDetails[i];
+          if (show) {
+            details.open = true;
+          } else {
+            details.removeAttribute("open");
+          }
+        }
+        const cellCodeDivs = window.document.querySelectorAll(".cell div.sourceCode.cell-code");
+        const fromCls = show ? "hidden" : "unhidden";
+        const toCls = show ? "unhidden" : "hidden";
+        for (let i=0; i<cellCodeDivs.length; i++) {
+          const codeDiv = cellCodeDivs[i];
+          if (codeDiv.classList.contains(fromCls)) {
+            codeDiv.classList.remove(fromCls);
+            codeDiv.classList.add(toCls);
+          } 
+        }
+        return false;
+      }
+    }
+    const hideAllCode = window.document.getElementById("quarto-hide-all-code");
+    if (hideAllCode) {
+      hideAllCode.addEventListener("click", toggleCodeHandler(false));
+    }
+    const showAllCode = window.document.getElementById("quarto-show-all-code");
+    if (showAllCode) {
+      showAllCode.addEventListener("click", toggleCodeHandler(true));
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/abelzheng\.github\.io\/latent-dynamics-geometry-public\/");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+            // target, if specified
+            link.setAttribute("target", "_blank");
+            if (link.getAttribute("rel") === null) {
+              link.setAttribute("rel", "noopener");
+            }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<input type="hidden" id="giscus-base-theme" value="preferred_color_scheme">
+<input type="hidden" id="giscus-alt-theme" value="preferred_color_scheme">
+<script>
+  function loadGiscus() {
+    // Function to get the theme based on body class
+    const getTheme = () => {
+      let baseTheme = document.getElementById('giscus-base-theme').value;
+      let altTheme = document.getElementById('giscus-alt-theme').value;
+      return document.body.classList.contains('quarto-dark') ? altTheme : baseTheme;
+    };
+    const script = document.createElement("script");
+    script.src = "https://giscus.app/client.js";
+    script.async = true;
+    script.dataset.repo = "AbelZheng/latent-dynamics-geometry-public";
+    script.dataset.repoId = "R_kgDOT-VBkw";
+    script.dataset.category = "Announcements";
+    script.dataset.categoryId = "DIC_kwDOT-VBk84DDyEz";
+    script.dataset.mapping = "pathname";
+    script.dataset.reactionsEnabled = "1";
+    script.dataset.emitMetadata = "0";
+    script.dataset.inputPosition = "bottom";
+    script.dataset.theme = getTheme();
+    script.dataset.lang = "en";
+    script.crossOrigin = "anonymous";
+    // Append the script to the desired div instead of at the end of the body
+    document.getElementById("quarto-content").appendChild(script);
+  }
+  loadGiscus();
+</script><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">Source Code</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3" data-shortcodes="false"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="an">title:</span><span class="co"> "Cross-Suite Robustness Synthesis"</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="an">object_type:</span><span class="co"> benchmark</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="an">maturity:</span><span class="co"> L1</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="an">status:</span><span class="co"> stable</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="an">domain:</span><span class="co"> [latent-dynamics, dimensionality-reduction, graph-methods, robustness]</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="an">tags:</span><span class="co"> [benchmark, synthesis, applicability, failure-boundaries, scenario-target-coverage]</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="an">prerequisites:</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="co">- benchmarks/linear-gaussian-robustness.qmd</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="co">- benchmarks/static-linear-latent-robustness.qmd</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a><span class="co">- benchmarks/temporal-covariance-inference.qmd</span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a><span class="co">- benchmarks/demixing-rotational-robustness.qmd</span></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a><span class="co">- benchmarks/nonlinear-graph-robustness.qmd</span></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a><span class="an">related:</span><span class="co"> []</span></span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a><span class="an">created:</span><span class="co"> 2026-08-20</span></span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a><span class="an">updated:</span><span class="co"> 2026-08-20</span></span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a><span class="fu"># Cross-Suite Robustness Synthesis</span></span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a><span class="fu">## Scientific question</span></span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a>P4-U06 asks a deliberately non-comparative question: **what task-specific</span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>coverage, applicability/failure patterns, and scenario-to-applicable-target mappings</span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a>are present across the five stable Phase 4 synthetic Benchmark Objects?**</span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a>This object is an inventory and reconciliation layer. It introduces no new</span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a>generator, fitting procedure, parameter selection, inference, recovery,</span>
+<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a>scoring metric, replicate, or scientific result. It does not copy source metric</span>
+<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a>values into the synthesis artifacts. Unlike metrics are never normalized,</span>
+<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a>averaged, pooled, or converted into ranks. No method winner, universal winner,</span>
+<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a>mechanistic explanation, causal conclusion, or real-data claim is produced.</span>
+<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a><span class="fu">## Ground truth</span></span>
+<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-36"><a href="#cb3-36" aria-hidden="true" tabindex="-1"></a>There is no new synthetic ground truth at P4-U06. Ground truth remains defined</span>
+<span id="cb3-37"><a href="#cb3-37" aria-hidden="true" tabindex="-1"></a>inside each stable source Benchmark Object and is not merged across tasks:</span>
+<span id="cb3-38"><a href="#cb3-38" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-39"><a href="#cb3-39" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>scalar latent states and observations for linear-Gaussian inference;</span>
+<span id="cb3-40"><a href="#cb3-40" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>static rank-two common signal, loading and residual structure;</span>
+<span id="cb3-41"><a href="#cb3-41" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>temporal latent trajectories, observation layers and covariance priors;</span>
+<span id="cb3-42"><a href="#cb3-42" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>labelled demixing effects and declared rotational generators;</span>
+<span id="cb3-43"><a href="#cb3-43" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>curved reconstruction truth and finite graph/operator targets.</span>
+<span id="cb3-44"><a href="#cb3-44" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-45"><a href="#cb3-45" aria-hidden="true" tabindex="-1"></a>These truth objects have different mathematical types. Counting their declared</span>
+<span id="cb3-46"><a href="#cb3-46" aria-hidden="true" tabindex="-1"></a>target families does not make them commensurate and does not create a common</span>
+<span id="cb3-47"><a href="#cb3-47" aria-hidden="true" tabindex="-1"></a>performance target.</span>
+<span id="cb3-48"><a href="#cb3-48" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-49"><a href="#cb3-49" aria-hidden="true" tabindex="-1"></a><span class="fu">## Generation</span></span>
+<span id="cb3-50"><a href="#cb3-50" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-51"><a href="#cb3-51" aria-hidden="true" tabindex="-1"></a>P4-U06 performs **no data generation and no source-method rerun**. Its parsed</span>
+<span id="cb3-52"><a href="#cb3-52" aria-hidden="true" tabindex="-1"></a>scientific inputs are only <span class="in">`manifest.json`</span>, <span class="in">`results.csv`</span>, and</span>
+<span id="cb3-53"><a href="#cb3-53" aria-hidden="true" tabindex="-1"></a><span class="in">`diagnostics.json`</span> from each of the five stable Phase 4 source artifact trees.</span>
+<span id="cb3-54"><a href="#cb3-54" aria-hidden="true" tabindex="-1"></a>The source <span class="in">`summary.png`</span> is an **integrity-only attachment**: its presence, byte</span>
+<span id="cb3-55"><a href="#cb3-55" aria-hidden="true" tabindex="-1"></a>count and declared hash are checked and recorded, but its pixels, labels and</span>
+<span id="cb3-56"><a href="#cb3-56" aria-hidden="true" tabindex="-1"></a>plotted values are not parsed or used as scientific input. Before synthesis the</span>
+<span id="cb3-57"><a href="#cb3-57" aria-hidden="true" tabindex="-1"></a>executable requires <span class="in">`maturity: L1`</span>, <span class="in">`status: stable`</span>, verifies the scientific</span>
+<span id="cb3-58"><a href="#cb3-58" aria-hidden="true" tabindex="-1"></a>input hashes, checks the source status vocabulary and reconciles diagnostics</span>
+<span id="cb3-59"><a href="#cb3-59" aria-hidden="true" tabindex="-1"></a>status counts against raw source rows.</span>
+<span id="cb3-60"><a href="#cb3-60" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-61"><a href="#cb3-61" aria-hidden="true" tabindex="-1"></a>The verified stable inputs are:</span>
+<span id="cb3-62"><a href="#cb3-62" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-63"><a href="#cb3-63" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Source Benchmark <span class="pp">|</span> Source rows <span class="pp">|</span> Parsed scientific inputs <span class="pp">|</span> Integrity-only attachment <span class="pp">|</span></span>
+<span id="cb3-64"><a href="#cb3-64" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---:|---|---|</span></span>
+<span id="cb3-65"><a href="#cb3-65" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> P4-U01 Linear-Gaussian Robustness <span class="pp">|</span> 5,445 <span class="pp">|</span> manifest/results/diagnostics <span class="pp">|</span> summary PNG <span class="pp">|</span></span>
+<span id="cb3-66"><a href="#cb3-66" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> P4-U02 Static Linear Latent Recovery <span class="pp">|</span> 4,356 <span class="pp">|</span> manifest/results/diagnostics <span class="pp">|</span> summary PNG <span class="pp">|</span></span>
+<span id="cb3-67"><a href="#cb3-67" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> P4-U03 Temporal Covariance and Inference <span class="pp">|</span> 3,960 <span class="pp">|</span> manifest/results/diagnostics <span class="pp">|</span> summary PNG <span class="pp">|</span></span>
+<span id="cb3-68"><a href="#cb3-68" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> P4-U04 Demixing and Rotational Projection <span class="pp">|</span> 2,712 <span class="pp">|</span> manifest/results/diagnostics <span class="pp">|</span> summary PNG <span class="pp">|</span></span>
+<span id="cb3-69"><a href="#cb3-69" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> P4-U05 Nonlinear Reconstruction and Graph Geometry <span class="pp">|</span> 4,167 <span class="pp">|</span> manifest/results/diagnostics <span class="pp">|</span> summary PNG <span class="pp">|</span></span>
+<span id="cb3-70"><a href="#cb3-70" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-71"><a href="#cb3-71" aria-hidden="true" tabindex="-1"></a>Together these sources contain 20,640 raw source rows. That total is an</span>
+<span id="cb3-72"><a href="#cb3-72" aria-hidden="true" tabindex="-1"></a>inventory count, not a pooled sample size or denominator for cross-task method</span>
+<span id="cb3-73"><a href="#cb3-73" aria-hidden="true" tabindex="-1"></a>comparison. Source file digests and byte counts are frozen in the P4-U06</span>
+<span id="cb3-74"><a href="#cb3-74" aria-hidden="true" tabindex="-1"></a>manifest so later source drift is machine-detectable.</span>
+<span id="cb3-75"><a href="#cb3-75" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-76"><a href="#cb3-76" aria-hidden="true" tabindex="-1"></a><span class="fu">## Scenario grid</span></span>
+<span id="cb3-77"><a href="#cb3-77" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-78"><a href="#cb3-78" aria-hidden="true" tabindex="-1"></a>The synthesis inventory contains seven task records and 73 declared scenario</span>
+<span id="cb3-79"><a href="#cb3-79" aria-hidden="true" tabindex="-1"></a>records. It preserves source task boundaries rather than constructing a new</span>
+<span id="cb3-80"><a href="#cb3-80" aria-hidden="true" tabindex="-1"></a>cross-suite grid.</span>
+<span id="cb3-81"><a href="#cb3-81" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-82"><a href="#cb3-82" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Task <span class="pp">|</span> Scenarios <span class="pp">|</span> Replicates <span class="pp">|</span> Methods <span class="pp">|</span> Metrics <span class="pp">|</span> Targets <span class="pp">|</span> Source rows <span class="pp">|</span></span>
+<span id="cb3-83"><a href="#cb3-83" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---:|---:|---:|---:|---:|---:|</span></span>
+<span id="cb3-84"><a href="#cb3-84" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Linear-Gaussian inference <span class="pp">|</span> 11 <span class="pp">|</span> 5 <span class="pp">|</span> 11 <span class="pp">|</span> 9 <span class="pp">|</span> 7 <span class="pp">|</span> 5,445 <span class="pp">|</span></span>
+<span id="cb3-85"><a href="#cb3-85" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Static linear latent recovery <span class="pp">|</span> 11 <span class="pp">|</span> 4 <span class="pp">|</span> 9 <span class="pp">|</span> 11 <span class="pp">|</span> 13 <span class="pp">|</span> 4,356 <span class="pp">|</span></span>
+<span id="cb3-86"><a href="#cb3-86" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Temporal covariance and inference <span class="pp">|</span> 12 <span class="pp">|</span> 3 <span class="pp">|</span> 11 <span class="pp">|</span> 10 <span class="pp">|</span> 6 <span class="pp">|</span> 3,960 <span class="pp">|</span></span>
+<span id="cb3-87"><a href="#cb3-87" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Demixing <span class="pp">|</span> 9 <span class="pp">|</span> 3 <span class="pp">|</span> 8 <span class="pp">|</span> 7 <span class="pp">|</span> 7 <span class="pp">|</span> 1,512 <span class="pp">|</span></span>
+<span id="cb3-88"><a href="#cb3-88" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Rotation <span class="pp">|</span> 10 <span class="pp">|</span> 3 <span class="pp">|</span> 8 <span class="pp">|</span> 5 <span class="pp">|</span> 5 <span class="pp">|</span> 1,200 <span class="pp">|</span></span>
+<span id="cb3-89"><a href="#cb3-89" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Nonlinear reconstruction <span class="pp">|</span> 7 <span class="pp">|</span> 3 <span class="pp">|</span> 5 <span class="pp">|</span> 7 <span class="pp">|</span> 7 <span class="pp">|</span> 735 <span class="pp">|</span></span>
+<span id="cb3-90"><a href="#cb3-90" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Graph geometry/operator recovery <span class="pp">|</span> 13 <span class="pp">|</span> 3 <span class="pp">|</span> 8 <span class="pp">|</span> 11 <span class="pp">|</span> 11 <span class="pp">|</span> 3,432 <span class="pp">|</span></span>
+<span id="cb3-91"><a href="#cb3-91" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-92"><a href="#cb3-92" aria-hidden="true" tabindex="-1"></a>The apparent equality of some counts is incidental. A metric count in one task</span>
+<span id="cb3-93"><a href="#cb3-93" aria-hidden="true" tabindex="-1"></a>has no numerical or scientific equivalence to a metric count in another task.</span>
+<span id="cb3-94"><a href="#cb3-94" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-95"><a href="#cb3-95" aria-hidden="true" tabindex="-1"></a><span class="fu">## Negative controls and stress cases</span></span>
+<span id="cb3-96"><a href="#cb3-96" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-97"><a href="#cb3-97" aria-hidden="true" tabindex="-1"></a>The synthesis emits one <span class="in">`scenario_target_coverage`</span> row for each of the 73</span>
+<span id="cb3-98"><a href="#cb3-98" aria-hidden="true" tabindex="-1"></a>source scenarios. Each row inventories the source-declared stress class and the</span>
+<span id="cb3-99"><a href="#cb3-99" aria-hidden="true" tabindex="-1"></a>**applicable target families** having at least one non-<span class="in">`inapplicable`</span> source</span>
+<span id="cb3-100"><a href="#cb3-100" aria-hidden="true" tabindex="-1"></a>row in that scenario. This is coverage metadata only. It does not estimate</span>
+<span id="cb3-101"><a href="#cb3-101" aria-hidden="true" tabindex="-1"></a>sensitivity, effect magnitude, effect direction, robustness, significance or</span>
+<span id="cb3-102"><a href="#cb3-102" aria-hidden="true" tabindex="-1"></a>causal response.</span>
+<span id="cb3-103"><a href="#cb3-103" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-104"><a href="#cb3-104" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Task <span class="pp">|</span> Declared stress classes retained <span class="pp">|</span></span>
+<span id="cb3-105"><a href="#cb3-105" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|</span></span>
+<span id="cb3-106"><a href="#cb3-106" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Linear-Gaussian inference <span class="pp">|</span> transition stability, noise ratio, sequence length, missing blocks, wrong parameters, reset-boundary failure, near-unit-root stress <span class="pp">|</span></span>
+<span id="cb3-107"><a href="#cb3-107" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Static linear latent recovery <span class="pp">|</span> sample size, signal/eigenvalue separation, heterogeneous or near-zero uniqueness, correlated residuals, high nuisance, outliers, preprocessing leakage, reference <span class="pp">|</span></span>
+<span id="cb3-108"><a href="#cb3-108" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Temporal covariance and inference <span class="pp">|</span> timescale separation, trial count, channel/time masks, changepoints, correlated residuals, Poisson misspecification, equal kernels, alignment jitter, informative missingness <span class="pp">|</span></span>
+<span id="cb3-109"><a href="#cb3-109" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Demixing <span class="pp">|</span> balanced reference, near-collinear subspaces, missing/unbalanced cells, label shuffle, pseudo-population, averaging mismatch, sample size <span class="pp">|</span></span>
+<span id="cb3-110"><a href="#cb3-110" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Rotation <span class="pp">|</span> clean rotation, symmetric decay, latency, common input, short arcs, time jitter, smoothing/subtraction, nonorthogonal metric, covariance control <span class="pp">|</span></span>
+<span id="cb3-111"><a href="#cb3-111" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Nonlinear reconstruction <span class="pp">|</span> curvature, support family, sample/capacity, nuisance, support shift <span class="pp">|</span></span>
+<span id="cb3-112"><a href="#cb3-112" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Graph geometry <span class="pp">|</span> reference, gaps, shortcuts, density, connectivity, neighborhood size, bandwidth, metric scaling <span class="pp">|</span></span>
+<span id="cb3-113"><a href="#cb3-113" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-114"><a href="#cb3-114" aria-hidden="true" tabindex="-1"></a>Negative controls remain named source scenarios or methods. P4-U06 does not</span>
+<span id="cb3-115"><a href="#cb3-115" aria-hidden="true" tabindex="-1"></a>retune them, reinterpret them as ordinary competitors, or remove observed</span>
+<span id="cb3-116"><a href="#cb3-116" aria-hidden="true" tabindex="-1"></a>failure and inapplicability labels.</span>
+<span id="cb3-117"><a href="#cb3-117" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-118"><a href="#cb3-118" aria-hidden="true" tabindex="-1"></a><span class="fu">## Replicates and deterministic seeds</span></span>
+<span id="cb3-119"><a href="#cb3-119" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-120"><a href="#cb3-120" aria-hidden="true" tabindex="-1"></a>No new replicate or random seed is introduced. Replicate counts in the task</span>
+<span id="cb3-121"><a href="#cb3-121" aria-hidden="true" tabindex="-1"></a>inventory are inherited from the stable source artifacts: five for P4-U01, four</span>
+<span id="cb3-122"><a href="#cb3-122" aria-hidden="true" tabindex="-1"></a>for P4-U02, and three for each task in P4-U03--P4-U05. P4-U06 determinism comes</span>
+<span id="cb3-123"><a href="#cb3-123" aria-hidden="true" tabindex="-1"></a>from canonical parsing, stable lexical row ordering and byte-verifiable output,</span>
+<span id="cb3-124"><a href="#cb3-124" aria-hidden="true" tabindex="-1"></a>not from a new stochastic experiment.</span>
+<span id="cb3-125"><a href="#cb3-125" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-126"><a href="#cb3-126" aria-hidden="true" tabindex="-1"></a>The synthesis must not treat source replicates from different tasks as one</span>
+<span id="cb3-127"><a href="#cb3-127" aria-hidden="true" tabindex="-1"></a>exchangeable sample. Source q10/median/q90 summaries are not imported.</span>
+<span id="cb3-128"><a href="#cb3-128" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-129"><a href="#cb3-129" aria-hidden="true" tabindex="-1"></a><span class="fu">## Split discipline</span></span>
+<span id="cb3-130"><a href="#cb3-130" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-131"><a href="#cb3-131" aria-hidden="true" tabindex="-1"></a>Train, validation, test, diagnostic, online, retrospective and oracle boundaries</span>
+<span id="cb3-132"><a href="#cb3-132" aria-hidden="true" tabindex="-1"></a>remain source-local. P4-U06 reads completed source rows after their own split</span>
+<span id="cb3-133"><a href="#cb3-133" aria-hidden="true" tabindex="-1"></a>discipline has been verified; it receives no raw generated arrays and has no</span>
+<span id="cb3-134"><a href="#cb3-134" aria-hidden="true" tabindex="-1"></a>capability to refit a source method.</span>
+<span id="cb3-135"><a href="#cb3-135" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-136"><a href="#cb3-136" aria-hidden="true" tabindex="-1"></a>The source provenance vocabularies are retained rather than collapsed. They</span>
+<span id="cb3-137"><a href="#cb3-137" aria-hidden="true" tabindex="-1"></a>include test, validation, fit/scenario/leakage/architecture diagnostics,</span>
+<span id="cb3-138"><a href="#cb3-138" aria-hidden="true" tabindex="-1"></a>training design, held-out test, test extension, train diagnostic, oracle</span>
+<span id="cb3-139"><a href="#cb3-139" aria-hidden="true" tabindex="-1"></a>diagnostic and training-selected control provenance. Similar words across</span>
+<span id="cb3-140"><a href="#cb3-140" aria-hidden="true" tabindex="-1"></a>suites do not imply identical data access.</span>
+<span id="cb3-141"><a href="#cb3-141" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-142"><a href="#cb3-142" aria-hidden="true" tabindex="-1"></a><span class="fu">## Methods and information sets</span></span>
+<span id="cb3-143"><a href="#cb3-143" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-144"><a href="#cb3-144" aria-hidden="true" tabindex="-1"></a>P4-U06 adds no method. It inventories source methods task by task and preserves</span>
+<span id="cb3-145"><a href="#cb3-145" aria-hidden="true" tabindex="-1"></a>source-local information-set labels:</span>
+<span id="cb3-146"><a href="#cb3-146" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-147"><a href="#cb3-147" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Linear-Gaussian inference:** fixed references; several online histories;</span>
+<span id="cb3-148"><a href="#cb3-148" aria-hidden="true" tabindex="-1"></a>  retrospective full interval; oracle retrospective full interval; and an</span>
+<span id="cb3-149"><a href="#cb3-149" aria-hidden="true" tabindex="-1"></a>  explicitly invalid cross-sequence history.</span>
+<span id="cb3-150"><a href="#cb3-150" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Static linear recovery:** fixed reference, train-only, train/validation,</span>
+<span id="cb3-151"><a href="#cb3-151" aria-hidden="true" tabindex="-1"></a>  oracle-parameter and invalid test-preprocessing sets.</span>
+<span id="cb3-152"><a href="#cb3-152" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Temporal covariance:** static observation, online, retrospective and oracle</span>
+<span id="cb3-153"><a href="#cb3-153" aria-hidden="true" tabindex="-1"></a>  retrospective sets.</span>
+<span id="cb3-154"><a href="#cb3-154" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Demixing:** design diagnostic, supervised train, supervised</span>
+<span id="cb3-155"><a href="#cb3-155" aria-hidden="true" tabindex="-1"></a>  train/validation and permuted-label controls.</span>
+<span id="cb3-156"><a href="#cb3-156" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Rotation:** fixed reference, train-fitted projection, known-input fit and</span>
+<span id="cb3-157"><a href="#cb3-157" aria-hidden="true" tabindex="-1"></a>  selected permuted-condition control.</span>
+<span id="cb3-158"><a href="#cb3-158" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Reconstruction:** train/validation fit followed by frozen test recovery.</span>
+<span id="cb3-159"><a href="#cb3-159" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Graph geometry:** training-graph/operator diagnostics and frozen training</span>
+<span id="cb3-160"><a href="#cb3-160" aria-hidden="true" tabindex="-1"></a>  graph with held-out extension.</span>
+<span id="cb3-161"><a href="#cb3-161" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-162"><a href="#cb3-162" aria-hidden="true" tabindex="-1"></a>These labels are reconciled as an inventory, not mapped onto a single ordered</span>
+<span id="cb3-163"><a href="#cb3-163" aria-hidden="true" tabindex="-1"></a>scale of information access. In particular, online, retrospective, oracle,</span>
+<span id="cb3-164"><a href="#cb3-164" aria-hidden="true" tabindex="-1"></a>diagnostic and intentionally invalid controls cannot be ranked as if they solve</span>
+<span id="cb3-165"><a href="#cb3-165" aria-hidden="true" tabindex="-1"></a>one deployment task.</span>
+<span id="cb3-166"><a href="#cb3-166" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-167"><a href="#cb3-167" aria-hidden="true" tabindex="-1"></a><span class="fu">### Explicit method, metric and target vocabularies</span></span>
+<span id="cb3-168"><a href="#cb3-168" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-169"><a href="#cb3-169" aria-hidden="true" tabindex="-1"></a>The artifacts include one namespaced <span class="in">`method_member`</span>, <span class="in">`metric_member`</span> and</span>
+<span id="cb3-170"><a href="#cb3-170" aria-hidden="true" tabindex="-1"></a><span class="in">`target_member`</span> inventory row for every distinct task-local vocabulary member:</span>
+<span id="cb3-171"><a href="#cb3-171" aria-hidden="true" tabindex="-1"></a>**60 method-member rows, 60 metric-member rows and 56 target-member rows**.</span>
+<span id="cb3-172"><a href="#cb3-172" aria-hidden="true" tabindex="-1"></a>Names are not deduplicated across tasks because the same surface word can have a</span>
+<span id="cb3-173"><a href="#cb3-173" aria-hidden="true" tabindex="-1"></a>different role or contract.</span>
+<span id="cb3-174"><a href="#cb3-174" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-175"><a href="#cb3-175" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Task <span class="pp">|</span> Methods <span class="pp">|</span> Metrics <span class="pp">|</span> Targets <span class="pp">|</span></span>
+<span id="cb3-176"><a href="#cb3-176" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|---|---|</span></span>
+<span id="cb3-177"><a href="#cb3-177" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Linear-Gaussian inference <span class="pp">|</span> <span class="in">`stationary_mean`</span>, <span class="in">`persistence`</span>, <span class="in">`open_loop`</span>, <span class="in">`known_kalman_filter`</span>, <span class="in">`known_rts_smoother`</span>, <span class="in">`batch_conditioning_oracle`</span>, <span class="in">`selected_kalman_filter`</span>, <span class="in">`selected_rts_smoother`</span>, <span class="in">`misspecified_kalman_filter`</span>, <span class="in">`misspecified_rts_smoother`</span>, <span class="in">`false_continuation_filter`</span> <span class="pp">|</span> <span class="in">`latent_rmse`</span>, <span class="in">`interval_95_coverage`</span>, <span class="in">`mean_posterior_variance`</span>, <span class="in">`predictive_nll`</span>, <span class="in">`inside_missing_block_rmse`</span>, <span class="in">`outside_missing_block_rmse`</span>, <span class="in">`selection_parameter_l1`</span>, <span class="in">`oracle_mean_discrepancy`</span>, <span class="in">`reset_first_state_abs_difference`</span> <span class="pp">|</span> <span class="in">`point_state`</span>, <span class="in">`online_state`</span>, <span class="in">`retrospective_state`</span>, <span class="in">`one_step_observation_prediction`</span>, <span class="in">`selected_parameter_tuple`</span>, <span class="in">`numerical_correctness_reference`</span>, <span class="in">`boundary_reset_diagnostic`</span> <span class="pp">|</span></span>
+<span id="cb3-178"><a href="#cb3-178" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Static linear latent recovery <span class="pp">|</span> <span class="in">`mean`</span>, <span class="in">`fixed_projection`</span>, <span class="in">`random_projection`</span>, <span class="in">`pca`</span>, <span class="in">`ppca`</span>, <span class="in">`fa_selected`</span>, <span class="in">`proper_scaled_pca`</span>, <span class="in">`leaked_scaled_pca_control`</span>, <span class="in">`true_gaussian_reference`</span> <span class="pp">|</span> <span class="in">`heldout_reconstruction_mse`</span>, <span class="in">`latent_signal_reconstruction_mse`</span>, <span class="in">`heldout_gaussian_nll`</span>, <span class="in">`covariance_relative_frobenius`</span>, <span class="in">`principal_subspace_angle_max_degrees`</span>, <span class="in">`loading_subspace_angle_max_degrees`</span>, <span class="in">`uniqueness_rmse`</span>, <span class="in">`selected_validation_nll`</span>, <span class="in">`optimizer_iterations`</span>, <span class="in">`identification_applicable`</span>, <span class="in">`preprocessing_test_poison_parameter_change`</span> <span class="pp">|</span> <span class="in">`observed_coordinate_reconstruction`</span>, <span class="in">`true_common_signal`</span>, <span class="in">`observable_distribution`</span>, <span class="in">`observable_covariance`</span>, <span class="in">`population_principal_subspace`</span>, <span class="in">`identified_true_common_loading_subspace`</span>, <span class="in">`identified_diagonal_uniqueness`</span>, <span class="in">`bounded_fa_selection`</span>, <span class="in">`diagonal_fa_identification_applicability`</span>, <span class="in">`contaminated_observed_coordinate_reconstruction`</span>, <span class="in">`contaminated_observation_gaussian_score`</span>, <span class="in">`nominal_clean_gaussian_covariance`</span>, <span class="in">`preprocessing_leakage_diagnostic`</span> <span class="pp">|</span></span>
+<span id="cb3-179"><a href="#cb3-179" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Temporal covariance and inference <span class="pp">|</span> <span class="in">`mean_diagonal`</span>, <span class="in">`static_factor`</span>, <span class="in">`two_stage_pca_smooth`</span>, <span class="in">`independent_channel_gp`</span>, <span class="in">`known_gpfa`</span>, <span class="in">`selected_gpfa`</span>, <span class="in">`wrong_timescale_gpfa`</span>, <span class="in">`wrong_ar_gpfa`</span>, <span class="in">`ar_kalman_filter`</span>, <span class="in">`ar_rts_smoother`</span>, <span class="in">`exact_gaussian_oracle`</span> <span class="pp">|</span> <span class="in">`marginal_nll_per_entry`</span>, <span class="in">`masked_prediction_nll_per_entry`</span>, <span class="in">`masked_prediction_rmse`</span>, <span class="in">`latent_rmse`</span>, <span class="in">`latent_90_coverage`</span>, <span class="in">`loading_subspace_angle_degrees`</span>, <span class="in">`timescale_l1`</span>, <span class="in">`selected_combined_nll_per_entry`</span>, <span class="in">`covariance_relative_frobenius`</span>, <span class="in">`posterior_mean_oracle_max_abs`</span> <span class="pp">|</span> <span class="in">`observation_distribution`</span>, <span class="in">`masked_observation_prediction`</span>, <span class="in">`latent_trajectory`</span>, <span class="in">`loading_subspace`</span>, <span class="in">`timescale_selection`</span>, <span class="in">`numerical_posterior_oracle`</span> <span class="pp">|</span></span>
+<span id="cb3-180"><a href="#cb3-180" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Demixing <span class="pp">|</span> <span class="in">`condition_mean`</span>, <span class="in">`pca`</span>, <span class="in">`marginal_pca`</span>, <span class="in">`selected_dpca`</span>, <span class="in">`ridge_decoder`</span>, <span class="in">`shuffled_dpca_control`</span>, <span class="in">`shuffled_decoder_control`</span>, <span class="in">`factorial_design_diagnostic`</span> <span class="pp">|</span> <span class="in">`stimulus_marginal_nmse`</span>, <span class="in">`decision_marginal_nmse`</span>, <span class="in">`stimulus_subspace_angle_degrees`</span>, <span class="in">`decision_subspace_angle_degrees`</span>, <span class="in">`stimulus_decoding_accuracy`</span>, <span class="in">`decision_decoding_accuracy`</span>, <span class="in">`factorial_design_rank`</span> <span class="pp">|</span> <span class="in">`stimulus_marginal_reconstruction`</span>, <span class="in">`decision_marginal_reconstruction`</span>, <span class="in">`stimulus_marginal_subspace`</span>, <span class="in">`decision_marginal_subspace`</span>, <span class="in">`stimulus_label_decoding`</span>, <span class="in">`decision_label_decoding`</span>, <span class="in">`factorial_design_identification`</span> <span class="pp">|</span></span>
+<span id="cb3-181"><a href="#cb3-181" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Rotation <span class="pp">|</span> 8 members covering PCA/fixed/random planes, unrestricted/skew/symmetric/input-aware fits and covariance control <span class="pp">|</span> <span class="in">`plane_angle_degrees`</span>, <span class="in">`angular_rate_abs_error`</span>, <span class="in">`derivative_rmse`</span>, <span class="in">`tangential_velocity_ratio`</span>, <span class="in">`covariance_similarity`</span> <span class="pp">|</span> <span class="in">`rotational_plane`</span>, <span class="in">`angular_rate`</span>, <span class="in">`heldout_derivative_prediction`</span>, <span class="in">`plane_tangential_motion`</span>, <span class="in">`condition_covariance_control`</span> <span class="pp">|</span></span>
+<span id="cb3-182"><a href="#cb3-182" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Nonlinear reconstruction <span class="pp">|</span> <span class="in">`mean`</span>, <span class="in">`pca`</span>, <span class="in">`linear_autoencoder`</span>, <span class="in">`nonlinear_autoencoder`</span>, <span class="in">`frozen_encoder`</span> <span class="pp">|</span> <span class="in">`observed_reconstruction_mse`</span>, <span class="in">`noiseless_signal_mse`</span>, <span class="in">`code_variance`</span>, <span class="in">`code_abs_spearman_truth`</span>, <span class="in">`code_collision_rate`</span>, <span class="in">`selected_validation_mse`</span>, <span class="in">`parameter_count`</span> <span class="pp">|</span> <span class="in">`observed_test_reconstruction`</span>, <span class="in">`known_noiseless_test_signal`</span>, <span class="in">`deterministic_test_code_activity`</span>, <span class="in">`scoring_only_generator_parameter`</span>, <span class="in">`scoring_only_generator_collision_diagnostic`</span>, <span class="in">`validation_selection_diagnostic`</span>, <span class="in">`architecture_diagnostic`</span> <span class="pp">|</span></span>
+<span id="cb3-183"><a href="#cb3-183" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Graph geometry/operator recovery <span class="pp">|</span> <span class="in">`mean`</span>, <span class="in">`pca`</span>, <span class="in">`ambient_mds`</span>, <span class="in">`isomap`</span>, <span class="in">`graph_diagnostics`</span>, <span class="in">`diffusion_maps`</span>, <span class="in">`direct_operator`</span>, <span class="in">`nystrom_extension`</span> <span class="pp">|</span> <span class="in">`component_count`</span>, <span class="in">`infinite_pair_rate`</span>, <span class="in">`material_shortcut_rate`</span>, <span class="in">`graph_distance_relative_rmse`</span>, <span class="in">`mds_negative_eigenmass`</span>, <span class="in">`heldout_coordinate_rmse`</span>, <span class="in">`diffusion_eigenspace_angle_max_degrees`</span>, <span class="in">`diffusion_truncation_relative_rmse`</span>, <span class="in">`operator_row_sum_max_abs`</span>, <span class="in">`direct_spectral_distance_max_abs`</span>, <span class="in">`heldout_extension_rmse`</span> <span class="pp">|</span> <span class="in">`finite_training_graph_connectivity_diagnostic`</span>, <span class="in">`finite_training_graph_disconnection_diagnostic`</span>, <span class="in">`known_hairpin_pairwise_arc_separation`</span>, <span class="in">`known_hairpin_path_underestimation_diagnostic`</span>, <span class="in">`classical_mds_euclideanity_diagnostic`</span>, <span class="in">`scoring_aligned_known_hairpin_arc_length`</span>, <span class="in">`l2_pi_cosine_sine_eigenspace_diagnostic`</span>, <span class="in">`full_finite_operator_diffusion_distance`</span>, <span class="in">`markov_operator_numerical_oracle`</span>, <span class="in">`finite_operator_numerical_oracle`</span>, <span class="in">`heldout_cosine_sine_extension_after_train_alignment`</span> <span class="pp">|</span></span>
+<span id="cb3-184"><a href="#cb3-184" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-185"><a href="#cb3-185" aria-hidden="true" tabindex="-1"></a>The exact full strings are authoritative in the <span class="in">`inventory`</span> rows of</span>
+<span id="cb3-186"><a href="#cb3-186" aria-hidden="true" tabindex="-1"></a><span class="in">`results.csv`</span>; the compact table above documents their task-local role without</span>
+<span id="cb3-187"><a href="#cb3-187" aria-hidden="true" tabindex="-1"></a>creating a cross-task vocabulary hierarchy.</span>
+<span id="cb3-188"><a href="#cb3-188" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-189"><a href="#cb3-189" aria-hidden="true" tabindex="-1"></a><span class="fu">## Parameter selection</span></span>
+<span id="cb3-190"><a href="#cb3-190" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-191"><a href="#cb3-191" aria-hidden="true" tabindex="-1"></a>There is no P4-U06 parameter selection. Source-selected hyperparameters and</span>
+<span id="cb3-192"><a href="#cb3-192" aria-hidden="true" tabindex="-1"></a>selection diagnostics remain in their stable source artifacts. The synthesis</span>
+<span id="cb3-193"><a href="#cb3-193" aria-hidden="true" tabindex="-1"></a>records method, task, scenario, status and declared vocabulary only; it neither</span>
+<span id="cb3-194"><a href="#cb3-194" aria-hidden="true" tabindex="-1"></a>selects among source methods nor searches for a cross-suite operating point.</span>
+<span id="cb3-195"><a href="#cb3-195" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-196"><a href="#cb3-196" aria-hidden="true" tabindex="-1"></a><span class="fu">## Inference</span></span>
+<span id="cb3-197"><a href="#cb3-197" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-198"><a href="#cb3-198" aria-hidden="true" tabindex="-1"></a>There is no P4-U06 inference or recovery. Source posterior states,</span>
+<span id="cb3-199"><a href="#cb3-199" aria-hidden="true" tabindex="-1"></a>reconstructions, subspaces, derivatives, embeddings and extensions are not</span>
+<span id="cb3-200"><a href="#cb3-200" aria-hidden="true" tabindex="-1"></a>recomputed and their metric values are not copied. The executable constructs</span>
+<span id="cb3-201"><a href="#cb3-201" aria-hidden="true" tabindex="-1"></a>only inventory, applicability/failure-pattern and scenario-target coverage rows.</span>
+<span id="cb3-202"><a href="#cb3-202" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-203"><a href="#cb3-203" aria-hidden="true" tabindex="-1"></a><span class="fu">## Scoring</span></span>
+<span id="cb3-204"><a href="#cb3-204" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-205"><a href="#cb3-205" aria-hidden="true" tabindex="-1"></a>P4-U06 has no common scientific score. Its four record types are:</span>
+<span id="cb3-206"><a href="#cb3-206" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-207"><a href="#cb3-207" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span><span class="in">`inventory`</span> — task-specific counts plus explicit method, metric, target,</span>
+<span id="cb3-208"><a href="#cb3-208" aria-hidden="true" tabindex="-1"></a>   information-set and provenance vocabulary members;</span>
+<span id="cb3-209"><a href="#cb3-209" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span><span class="in">`applicability_pattern`</span> — task/scenario/method applicability over the raw</span>
+<span id="cb3-210"><a href="#cb3-210" aria-hidden="true" tabindex="-1"></a>   Cartesian method × metric × replicate rows;</span>
+<span id="cb3-211"><a href="#cb3-211" aria-hidden="true" tabindex="-1"></a><span class="ss">3. </span><span class="in">`failure_pattern`</span> — two separately named failure-label fractions with exact</span>
+<span id="cb3-212"><a href="#cb3-212" aria-hidden="true" tabindex="-1"></a>   denominators; and</span>
+<span id="cb3-213"><a href="#cb3-213" aria-hidden="true" tabindex="-1"></a><span class="ss">4. </span><span class="in">`scenario_target_coverage`</span> — scenario-level inventory of applicable target</span>
+<span id="cb3-214"><a href="#cb3-214" aria-hidden="true" tabindex="-1"></a>   families, without source metric values or effects.</span>
+<span id="cb3-215"><a href="#cb3-215" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-216"><a href="#cb3-216" aria-hidden="true" tabindex="-1"></a>For a fixed task/scenario/method group, define</span>
+<span id="cb3-217"><a href="#cb3-217" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-218"><a href="#cb3-218" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>$N_{all}$: all raw Cartesian metric × replicate rows;</span>
+<span id="cb3-219"><a href="#cb3-219" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>$N_{app}=N_{ok}+N_{invalid}+N_{nonconvergence}$: rows whose status is not</span>
+<span id="cb3-220"><a href="#cb3-220" aria-hidden="true" tabindex="-1"></a>  <span class="in">`inapplicable`</span>; and</span>
+<span id="cb3-221"><a href="#cb3-221" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>$N_{fail}=N_{invalid}+N_{nonconvergence}$.</span>
+<span id="cb3-222"><a href="#cb3-222" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-223"><a href="#cb3-223" aria-hidden="true" tabindex="-1"></a>The artifact reports:</span>
+<span id="cb3-224"><a href="#cb3-224" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-225"><a href="#cb3-225" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>applicability rate $N_{app}/N_{all}$;</span>
+<span id="cb3-226"><a href="#cb3-226" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**raw Cartesian failure-label fraction** $N_{fail}/N_{all}$; and</span>
+<span id="cb3-227"><a href="#cb3-227" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**conditional failure rate** $N_{fail}/N_{app}$.</span>
+<span id="cb3-228"><a href="#cb3-228" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-229"><a href="#cb3-229" aria-hidden="true" tabindex="-1"></a>When $N_{app}=0$, the conditional rate is mathematically undefined. The row is</span>
+<span id="cb3-230"><a href="#cb3-230" aria-hidden="true" tabindex="-1"></a>retained with <span class="in">`status: inapplicable`</span>, blank serialized denominator/rate fields,</span>
+<span id="cb3-231"><a href="#cb3-231" aria-hidden="true" tabindex="-1"></a>and no fabricated zero. There are **104** such zero-applicable-denominator rows;</span>
+<span id="cb3-232"><a href="#cb3-232" aria-hidden="true" tabindex="-1"></a>the other **539** conditional-rate rows have explicit positive denominators.</span>
+<span id="cb3-233"><a href="#cb3-233" aria-hidden="true" tabindex="-1"></a>All 643 raw Cartesian failure-label-fraction rows retain their nonzero</span>
+<span id="cb3-234"><a href="#cb3-234" aria-hidden="true" tabindex="-1"></a>$N_{all}$ denominators.</span>
+<span id="cb3-235"><a href="#cb3-235" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-236"><a href="#cb3-236" aria-hidden="true" tabindex="-1"></a>These fractions describe source labels and Cartesian design, not normalized</span>
+<span id="cb3-237"><a href="#cb3-237" aria-hidden="true" tabindex="-1"></a>method performance. They must not be compared as a leaderboard. A high</span>
+<span id="cb3-238"><a href="#cb3-238" aria-hidden="true" tabindex="-1"></a><span class="in">`inapplicable`</span> fraction can be the correct result of narrowly typed metrics.</span>
+<span id="cb3-239"><a href="#cb3-239" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-240"><a href="#cb3-240" aria-hidden="true" tabindex="-1"></a><span class="fu">## Failure and applicability labels</span></span>
+<span id="cb3-241"><a href="#cb3-241" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-242"><a href="#cb3-242" aria-hidden="true" tabindex="-1"></a>The shared vocabulary is reconciled as follows:</span>
+<span id="cb3-243"><a href="#cb3-243" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-244"><a href="#cb3-244" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Label <span class="pp">|</span> Cross-suite reading <span class="pp">|</span></span>
+<span id="cb3-245"><a href="#cb3-245" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|</span></span>
+<span id="cb3-246"><a href="#cb3-246" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`ok`</span> <span class="pp">|</span> The source row's declared computation completed and was applicable; it does not mean scientifically correct in general. <span class="pp">|</span></span>
+<span id="cb3-247"><a href="#cb3-247" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`inapplicable`</span> <span class="pp">|</span> The method/metric/scenario target is not defined under the source contract; it is retained, not treated as missing or zero. <span class="pp">|</span></span>
+<span id="cb3-248"><a href="#cb3-248" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`invalid`</span> <span class="pp">|</span> A declared design, information-set, identification or finite-value condition failed. <span class="pp">|</span></span>
+<span id="cb3-249"><a href="#cb3-249" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`nonconvergence`</span> <span class="pp">|</span> A bounded numerical/optimization procedure did not satisfy its source completion rule. <span class="pp">|</span></span>
+<span id="cb3-250"><a href="#cb3-250" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-251"><a href="#cb3-251" aria-hidden="true" tabindex="-1"></a>Task-specific status compositions are:</span>
+<span id="cb3-252"><a href="#cb3-252" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-253"><a href="#cb3-253" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Task <span class="pp">|</span> <span class="in">`ok`</span> <span class="pp">|</span> <span class="in">`inapplicable`</span> <span class="pp">|</span> <span class="in">`invalid`</span> <span class="pp">|</span> <span class="in">`nonconvergence`</span> <span class="pp">|</span> Denominator <span class="pp">|</span></span>
+<span id="cb3-254"><a href="#cb3-254" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---:|---:|---:|---:|---:|</span></span>
+<span id="cb3-255"><a href="#cb3-255" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Linear-Gaussian inference <span class="pp">|</span> 1,515 <span class="pp">|</span> 3,930 <span class="pp">|</span> 0 <span class="pp">|</span> 0 <span class="pp">|</span> 5,445 <span class="pp">|</span></span>
+<span id="cb3-256"><a href="#cb3-256" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Static linear latent recovery <span class="pp">|</span> 1,260 <span class="pp">|</span> 3,044 <span class="pp">|</span> 0 <span class="pp">|</span> 52 <span class="pp">|</span> 4,356 <span class="pp">|</span></span>
+<span id="cb3-257"><a href="#cb3-257" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Temporal covariance and inference <span class="pp">|</span> 2,049 <span class="pp">|</span> 1,911 <span class="pp">|</span> 0 <span class="pp">|</span> 0 <span class="pp">|</span> 3,960 <span class="pp">|</span></span>
+<span id="cb3-258"><a href="#cb3-258" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Demixing <span class="pp">|</span> 567 <span class="pp">|</span> 891 <span class="pp">|</span> 54 <span class="pp">|</span> 0 <span class="pp">|</span> 1,512 <span class="pp">|</span></span>
+<span id="cb3-259"><a href="#cb3-259" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Rotation <span class="pp">|</span> 474 <span class="pp">|</span> 726 <span class="pp">|</span> 0 <span class="pp">|</span> 0 <span class="pp">|</span> 1,200 <span class="pp">|</span></span>
+<span id="cb3-260"><a href="#cb3-260" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Nonlinear reconstruction <span class="pp">|</span> 690 <span class="pp">|</span> 45 <span class="pp">|</span> 0 <span class="pp">|</span> 0 <span class="pp">|</span> 735 <span class="pp">|</span></span>
+<span id="cb3-261"><a href="#cb3-261" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Graph geometry/operator recovery <span class="pp">|</span> 299 <span class="pp">|</span> 3,133 <span class="pp">|</span> 0 <span class="pp">|</span> 0 <span class="pp">|</span> 3,432 <span class="pp">|</span></span>
+<span id="cb3-262"><a href="#cb3-262" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-263"><a href="#cb3-263" aria-hidden="true" tabindex="-1"></a>The only natural failure labels in the stable inputs are 52 bounded FA</span>
+<span id="cb3-264"><a href="#cb3-264" aria-hidden="true" tabindex="-1"></a><span class="in">`nonconvergence`</span> rows in static linear recovery and 54 missing-cell design-rank</span>
+<span id="cb3-265"><a href="#cb3-265" aria-hidden="true" tabindex="-1"></a><span class="in">`invalid`</span> rows in demixing. Their meanings remain source-specific. The absence</span>
+<span id="cb3-266"><a href="#cb3-266" aria-hidden="true" tabindex="-1"></a>of natural failures in another task is not evidence that the method family is</span>
+<span id="cb3-267"><a href="#cb3-267" aria-hidden="true" tabindex="-1"></a>universally robust; source verifiers separately exercise failure routing by</span>
+<span id="cb3-268"><a href="#cb3-268" aria-hidden="true" tabindex="-1"></a>fault injection.</span>
+<span id="cb3-269"><a href="#cb3-269" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-270"><a href="#cb3-270" aria-hidden="true" tabindex="-1"></a><span class="fu">## Artifact contract</span></span>
+<span id="cb3-271"><a href="#cb3-271" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-272"><a href="#cb3-272" aria-hidden="true" tabindex="-1"></a>The synthesis artifact directory is limited to:</span>
+<span id="cb3-273"><a href="#cb3-273" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-274"><a href="#cb3-274" aria-hidden="true" tabindex="-1"></a><span class="in">```text</span></span>
+<span id="cb3-275"><a href="#cb3-275" aria-hidden="true" tabindex="-1"></a><span class="in">manifest.json</span></span>
+<span id="cb3-276"><a href="#cb3-276" aria-hidden="true" tabindex="-1"></a><span class="in">results.csv</span></span>
+<span id="cb3-277"><a href="#cb3-277" aria-hidden="true" tabindex="-1"></a><span class="in">diagnostics.json</span></span>
+<span id="cb3-278"><a href="#cb3-278" aria-hidden="true" tabindex="-1"></a><span class="in">summary.png</span></span>
+<span id="cb3-279"><a href="#cb3-279" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb3-280"><a href="#cb3-280" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-281"><a href="#cb3-281" aria-hidden="true" tabindex="-1"></a>The authoritative artifacts contain **2,308** complete canonical synthesis rows:</span>
+<span id="cb3-282"><a href="#cb3-282" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-283"><a href="#cb3-283" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>306 <span class="in">`inventory`</span> rows, including 60 method, 60 metric and 56 target members;</span>
+<span id="cb3-284"><a href="#cb3-284" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>643 <span class="in">`applicability_pattern`</span> rows;</span>
+<span id="cb3-285"><a href="#cb3-285" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>1,286 <span class="in">`failure_pattern`</span> rows: 643 raw Cartesian fractions and 643</span>
+<span id="cb3-286"><a href="#cb3-286" aria-hidden="true" tabindex="-1"></a>  conditional rates; and</span>
+<span id="cb3-287"><a href="#cb3-287" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>73 <span class="in">`scenario_target_coverage`</span> rows.</span>
+<span id="cb3-288"><a href="#cb3-288" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-289"><a href="#cb3-289" aria-hidden="true" tabindex="-1"></a>The manifest records the five stable source trees, all source content hashes</span>
+<span id="cb3-290"><a href="#cb3-290" aria-hidden="true" tabindex="-1"></a>and byte counts, the 17-field raw schema, lexical <span class="in">`row_key`</span> ordering, runtime,</span>
+<span id="cb3-291"><a href="#cb3-291" aria-hidden="true" tabindex="-1"></a>commands and the explicit prohibitions on source method reruns, imported metric</span>
+<span id="cb3-292"><a href="#cb3-292" aria-hidden="true" tabindex="-1"></a>values, cross-task normalization/averaging, scores, ranks and winners.</span>
+<span id="cb3-293"><a href="#cb3-293" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-294"><a href="#cb3-294" aria-hidden="true" tabindex="-1"></a><span class="fu">## Results</span></span>
+<span id="cb3-295"><a href="#cb3-295" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-296"><a href="#cb3-296" aria-hidden="true" tabindex="-1"></a>The synthesis confirms coverage across five stable Benchmark Objects and seven</span>
+<span id="cb3-297"><a href="#cb3-297" aria-hidden="true" tabindex="-1"></a>separate tasks. The task inventory spans 73 named scenarios and 20,640 source</span>
+<span id="cb3-298"><a href="#cb3-298" aria-hidden="true" tabindex="-1"></a>rows, while the synthesis itself contains 2,308 inventory/pattern/coverage rows. These</span>
+<span id="cb3-299"><a href="#cb3-299" aria-hidden="true" tabindex="-1"></a>are coverage counts only.</span>
+<span id="cb3-300"><a href="#cb3-300" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-301"><a href="#cb3-301" aria-hidden="true" tabindex="-1"></a>The scenario-target coverage inventory shows that Phase 4 deliberately exercises different kinds</span>
+<span id="cb3-302"><a href="#cb3-302" aria-hidden="true" tabindex="-1"></a>of boundaries rather than one repeated benchmark template: temporal stability</span>
+<span id="cb3-303"><a href="#cb3-303" aria-hidden="true" tabindex="-1"></a>and resets; static identification and residual specification; covariance,</span>
+<span id="cb3-304"><a href="#cb3-304" aria-hidden="true" tabindex="-1"></a>missingness and observation-family misspecification; label/design and</span>
+<span id="cb3-305"><a href="#cb3-305" aria-hidden="true" tabindex="-1"></a>rotational controls; nonlinear support/capacity; and finite graph connectivity,</span>
+<span id="cb3-306"><a href="#cb3-306" aria-hidden="true" tabindex="-1"></a>shortcuts, bandwidth and metric dependence. The coverage rows state which target families are applicable in each scenario; they do not state an effect size, direction, sensitivity or robustness result.</span>
+<span id="cb3-307"><a href="#cb3-307" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-308"><a href="#cb3-308" aria-hidden="true" tabindex="-1"></a>The task-specific status table also demonstrates why a pooled rate would be</span>
+<span id="cb3-309"><a href="#cb3-309" aria-hidden="true" tabindex="-1"></a>misleading. Graph geometry has many deliberately typed method-metric pairs and</span>
+<span id="cb3-310"><a href="#cb3-310" aria-hidden="true" tabindex="-1"></a>therefore many <span class="in">`inapplicable`</span> rows, whereas reconstruction has a much denser</span>
+<span id="cb3-311"><a href="#cb3-311" aria-hidden="true" tabindex="-1"></a>applicability design. Demixing's <span class="in">`invalid`</span> rows encode a missing-cell design</span>
+<span id="cb3-312"><a href="#cb3-312" aria-hidden="true" tabindex="-1"></a>failure; static recovery's <span class="in">`nonconvergence`</span> rows encode bounded FA optimization.</span>
+<span id="cb3-313"><a href="#cb3-313" aria-hidden="true" tabindex="-1"></a>Those labels are not interchangeable losses.</span>
+<span id="cb3-314"><a href="#cb3-314" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-315"><a href="#cb3-315" aria-hidden="true" tabindex="-1"></a><span class="al">![P4-U06 cross-suite coverage inventory](artifacts/cross-suite-robustness-synthesis/summary.png)</span></span>
+<span id="cb3-316"><a href="#cb3-316" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-317"><a href="#cb3-317" aria-hidden="true" tabindex="-1"></a>The figure displays scenario/method/metric inventory counts and task-specific</span>
+<span id="cb3-318"><a href="#cb3-318" aria-hidden="true" tabindex="-1"></a>status compositions using each task's own source-row denominator. It contains</span>
+<span id="cb3-319"><a href="#cb3-319" aria-hidden="true" tabindex="-1"></a>no source metric values, pooled score, normalized rank or winner.</span>
+<span id="cb3-320"><a href="#cb3-320" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-321"><a href="#cb3-321" aria-hidden="true" tabindex="-1"></a><span class="fu">## Interpretation limits</span></span>
+<span id="cb3-322"><a href="#cb3-322" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-323"><a href="#cb3-323" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Inventory volume is not evidence of scientific quality, maturity or method</span>
+<span id="cb3-324"><a href="#cb3-324" aria-hidden="true" tabindex="-1"></a>  superiority.</span>
+<span id="cb3-325"><a href="#cb3-325" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Scenario counts are not comparable measures of difficulty or evidential</span>
+<span id="cb3-326"><a href="#cb3-326" aria-hidden="true" tabindex="-1"></a>  weight.</span>
+<span id="cb3-327"><a href="#cb3-327" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Applicability and both failure-label fractions are conditional on each task's method-metric-replicate Cartesian design and their explicitly named denominators.</span>
+<span id="cb3-328"><a href="#cb3-328" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>A scenario-target coverage entry records applicable target-family coverage, not sensitivity, effect magnitude, direction, significance or causal attribution.</span>
+<span id="cb3-329"><a href="#cb3-329" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`ok`</span> is a computation/status label, not proof of model correctness,</span>
+<span id="cb3-330"><a href="#cb3-330" aria-hidden="true" tabindex="-1"></a>  identifiability, mechanism, causality or real-data transfer.</span>
+<span id="cb3-331"><a href="#cb3-331" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`inapplicable`</span>, <span class="in">`invalid`</span> and <span class="in">`nonconvergence`</span> have different meanings and are</span>
+<span id="cb3-332"><a href="#cb3-332" aria-hidden="true" tabindex="-1"></a>  never combined into a universal penalty.</span>
+<span id="cb3-333"><a href="#cb3-333" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>No result supports a universal winner, a cross-task method rank, a common</span>
+<span id="cb3-334"><a href="#cb3-334" aria-hidden="true" tabindex="-1"></a>  latent generator, manifold/topology recovery, biological validity or Phase 5</span>
+<span id="cb3-335"><a href="#cb3-335" aria-hidden="true" tabindex="-1"></a>  readiness.</span>
+<span id="cb3-336"><a href="#cb3-336" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>This synthesis does not replace reading the source Benchmark Object, its raw</span>
+<span id="cb3-337"><a href="#cb3-337" aria-hidden="true" tabindex="-1"></a>  rows, artifacts, review record and interpretation limits.</span>
+<span id="cb3-338"><a href="#cb3-338" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-339"><a href="#cb3-339" aria-hidden="true" tabindex="-1"></a><span class="fu">## Reproducibility</span></span>
+<span id="cb3-340"><a href="#cb3-340" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-341"><a href="#cb3-341" aria-hidden="true" tabindex="-1"></a>Run from the repository root with the manifest-recorded runtime:</span>
+<span id="cb3-342"><a href="#cb3-342" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-343"><a href="#cb3-343" aria-hidden="true" tabindex="-1"></a><span class="in">```bash</span></span>
+<span id="cb3-344"><a href="#cb3-344" aria-hidden="true" tabindex="-1"></a><span class="ex">/Users/bytedance/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3</span> benchmarks/cross-suite-robustness-synthesis.py <span class="at">--generate</span></span>
+<span id="cb3-345"><a href="#cb3-345" aria-hidden="true" tabindex="-1"></a><span class="ex">/Users/bytedance/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3</span> benchmarks/cross-suite-robustness-synthesis.py <span class="at">--generate</span> <span class="at">--resume</span></span>
+<span id="cb3-346"><a href="#cb3-346" aria-hidden="true" tabindex="-1"></a><span class="ex">/Users/bytedance/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3</span> benchmarks/cross-suite-robustness-synthesis.py <span class="at">--verify</span></span>
+<span id="cb3-347"><a href="#cb3-347" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb3-348"><a href="#cb3-348" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-349"><a href="#cb3-349" aria-hidden="true" tabindex="-1"></a>The verifier checks stable source status; source manifest/content hashes;</span>
+<span id="cb3-350"><a href="#cb3-350" aria-hidden="true" tabindex="-1"></a>source diagnostics/raw-row status reconciliation; the exact four-artifact</span>
+<span id="cb3-351"><a href="#cb3-351" aria-hidden="true" tabindex="-1"></a>inventory; 2,308 unique canonical rows; absence of source metric values and</span>
+<span id="cb3-352"><a href="#cb3-352" aria-hidden="true" tabindex="-1"></a>rank/score/winner fields; explicit denominators; byte-identical clean and</span>
+<span id="cb3-353"><a href="#cb3-353" aria-hidden="true" tabindex="-1"></a>reverse-order generation; valid partial resume; rejection of corrupted,</span>
+<span id="cb3-354"><a href="#cb3-354" aria-hidden="true" tabindex="-1"></a>duplicate, unknown and incomplete resume rows; source-content drift rejection;</span>
+<span id="cb3-355"><a href="#cb3-355" aria-hidden="true" tabindex="-1"></a>and rejection of a non-stable source manifest.</span>
+<span id="cb3-356"><a href="#cb3-356" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-357"><a href="#cb3-357" aria-hidden="true" tabindex="-1"></a><span class="fu">## Review record</span></span>
+<span id="cb3-358"><a href="#cb3-358" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-359"><a href="#cb3-359" aria-hidden="true" tabindex="-1"></a>Independent scientific and implementation reviewers were read-only and independent of the executors. Their initial</span>
+<span id="cb3-360"><a href="#cb3-360" aria-hidden="true" tabindex="-1"></a>reviews returned <span class="in">`REVISE`</span> on honest scenario-target coverage terminology, raw versus conditional failure denominators, namespaced method/metric/target inventories, and the scientific-input versus integrity-attachment boundary. The bounded correction pass addressed only</span>
+<span id="cb3-361"><a href="#cb3-361" aria-hidden="true" tabindex="-1"></a>those findings; focused scientific and implementation re-reviews both returned</span>
+<span id="cb3-362"><a href="#cb3-362" aria-hidden="true" tabindex="-1"></a><span class="in">`PASS`</span> with no unresolved finding.</span>
+<span id="cb3-363"><a href="#cb3-363" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-364"><a href="#cb3-364" aria-hidden="true" tabindex="-1"></a>The accepted validation record includes 63-object structural validation, 33 repository tests, the synthesis verifier and adversarial source checks, target/index renders, workflow validation, and <span class="in">`git diff --check`</span>. The recorded review decision then authorized the</span>
+<span id="cb3-365"><a href="#cb3-365" aria-hidden="true" tabindex="-1"></a>mechanical promotion to <span class="in">`L1/stable`</span>. Stable status records bounded acceptance of</span>
+<span id="cb3-366"><a href="#cb3-366" aria-hidden="true" tabindex="-1"></a>this declared synthetic Benchmark Object; it does not expand its evidence,</span>
+<span id="cb3-367"><a href="#cb3-367" aria-hidden="true" tabindex="-1"></a>information-set, target, or interpretation boundaries.</span>
+<span id="cb3-368"><a href="#cb3-368" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-369"><a href="#cb3-369" aria-hidden="true" tabindex="-1"></a><span class="fu">## Maturity checklist</span></span>
+<span id="cb3-370"><a href="#cb3-370" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-371"><a href="#cb3-371" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> Reads only five verified <span class="in">`L1/stable`</span> Phase 4 artifact trees.</span>
+<span id="cb3-372"><a href="#cb3-372" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> Introduces no new generator, replicate, selection, inference, recovery or scientific score.</span>
+<span id="cb3-373"><a href="#cb3-373" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> Preserves seven task boundaries and source-local information sets/provenance.</span>
+<span id="cb3-374"><a href="#cb3-374" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> Reconciles the four status labels without treating them as one loss.</span>
+<span id="cb3-375"><a href="#cb3-375" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> Records task/scenario/method/metric inventories with exact source-row denominators.</span>
+<span id="cb3-376"><a href="#cb3-376" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> Records 73 scenario-target coverage rows without implying sensitivity or importing effect sizes.</span>
+<span id="cb3-377"><a href="#cb3-377" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> Produces no metric normalization, cross-task aggregation, score, rank, winner or mechanistic inference.</span>
+<span id="cb3-378"><a href="#cb3-378" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> Limits output to four deterministic byte-verifiable artifacts.</span>
+<span id="cb3-379"><a href="#cb3-379" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> Focused scientific re-review passes.</span>
+<span id="cb3-380"><a href="#cb3-380" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> Focused implementation re-review passes.</span>
+<span id="cb3-381"><a href="#cb3-381" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> Mechanical <span class="in">`L1/stable`</span> promotion occurs only after both reviews and validation pass.</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></div>
+</div></div></div></div></div>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

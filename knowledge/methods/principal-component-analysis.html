@@ -1,0 +1,1304 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.10.18">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Principal Component Analysis – Latent Dynamics &amp; Geometry</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-445b8638c3d06994fee0907d791121c4.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-chtml.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">Latent Dynamics &amp; Geometry</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../index.html"> 
+<span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../knowledge/concepts/index.html"> 
+<span class="menu-text">Concepts</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../knowledge/methods/index.html"> 
+<span class="menu-text">Methods</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../knowledge/math/index.html"> 
+<span class="menu-text">Math</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../knowledge/papers/index.html"> 
+<span class="menu-text">Papers</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../toy-models/index.html"> 
+<span class="menu-text">Toy Models</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../research-questions/index.html"> 
+<span class="menu-text">Research Questions</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../benchmarks/index.html"> 
+<span class="menu-text">Benchmarks</span></a>
+  </li>  
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/AbelZheng/latent-dynamics-geometry-public"> <i class="bi bi-github" role="img" aria-label="GitHub repository">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="https://github.com/AbelZheng/latent-dynamics-geometry-public/discussions"> 
+<span class="menu-text">Discussions</span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#principal-component-analysis" id="toc-principal-component-analysis" class="nav-link active" data-scroll-target="#principal-component-analysis">Principal Component Analysis</a>
+  <ul class="collapse">
+  <li><a href="#problem" id="toc-problem" class="nav-link" data-scroll-target="#problem">Problem</a></li>
+  <li><a href="#input" id="toc-input" class="nav-link" data-scroll-target="#input">Input</a></li>
+  <li><a href="#output" id="toc-output" class="nav-link" data-scroll-target="#output">Output</a></li>
+  <li><a href="#core-idea" id="toc-core-idea" class="nav-link" data-scroll-target="#core-idea">Core idea</a></li>
+  <li><a href="#generative-modeling-assumptions" id="toc-generative-modeling-assumptions" class="nav-link" data-scroll-target="#generative-modeling-assumptions">Generative / modeling assumptions</a></li>
+  <li><a href="#mathematical-formulation" id="toc-mathematical-formulation" class="nav-link" data-scroll-target="#mathematical-formulation">Mathematical formulation</a></li>
+  <li><a href="#what-is-learned" id="toc-what-is-learned" class="nav-link" data-scroll-target="#what-is-learned">What is learned?</a></li>
+  <li><a href="#what-is-fixed" id="toc-what-is-fixed" class="nav-link" data-scroll-target="#what-is-fixed">What is fixed?</a></li>
+  <li><a href="#temporal-assumptions" id="toc-temporal-assumptions" class="nav-link" data-scroll-target="#temporal-assumptions">Temporal assumptions</a></li>
+  <li><a href="#geometry-assumptions" id="toc-geometry-assumptions" class="nav-link" data-scroll-target="#geometry-assumptions">Geometry assumptions</a></li>
+  <li><a href="#supervision" id="toc-supervision" class="nav-link" data-scroll-target="#supervision">Supervision</a></li>
+  <li><a href="#optimization-inference" id="toc-optimization-inference" class="nav-link" data-scroll-target="#optimization-inference">Optimization / inference</a></li>
+  <li><a href="#strengths" id="toc-strengths" class="nav-link" data-scroll-target="#strengths">Strengths</a></li>
+  <li><a href="#failure-modes" id="toc-failure-modes" class="nav-link" data-scroll-target="#failure-modes">Failure modes</a></li>
+  <li><a href="#identifiability-issues" id="toc-identifiability-issues" class="nav-link" data-scroll-target="#identifiability-issues">Identifiability issues</a></li>
+  <li><a href="#comparison-with-simpler-methods" id="toc-comparison-with-simpler-methods" class="nav-link" data-scroll-target="#comparison-with-simpler-methods">Comparison with simpler methods</a></li>
+  <li><a href="#evaluation-criteria" id="toc-evaluation-criteria" class="nav-link" data-scroll-target="#evaluation-criteria">Evaluation criteria</a></li>
+  <li><a href="#minimal-toy-model" id="toc-minimal-toy-model" class="nav-link" data-scroll-target="#minimal-toy-model">Minimal toy model</a></li>
+  <li><a href="#relevance-to-ldg" id="toc-relevance-to-ldg" class="nav-link" data-scroll-target="#relevance-to-ldg">Relevance to LDG</a>
+  <ul class="collapse">
+  <li><a href="#mouse-trajectory" id="toc-mouse-trajectory" class="nav-link" data-scroll-target="#mouse-trajectory">Mouse trajectory</a></li>
+  <li><a href="#eye-movement" id="toc-eye-movement" class="nav-link" data-scroll-target="#eye-movement">Eye movement</a></li>
+  <li><a href="#eeg" id="toc-eeg" class="nav-link" data-scroll-target="#eeg">EEG</a></li>
+  <li><a href="#meg-neural-population-data" id="toc-meg-neural-population-data" class="nav-link" data-scroll-target="#meg-neural-population-data">MEG / neural population data</a></li>
+  </ul></li>
+  <li><a href="#primary-sources" id="toc-primary-sources" class="nav-link" data-scroll-target="#primary-sources">Primary sources</a></li>
+  <li><a href="#reviews-secondary-sources" id="toc-reviews-secondary-sources" class="nav-link" data-scroll-target="#reviews-secondary-sources">Reviews / secondary sources</a></li>
+  <li><a href="#open-methodological-questions" id="toc-open-methodological-questions" class="nav-link" data-scroll-target="#open-methodological-questions">Open methodological questions</a></li>
+  <li><a href="#maturity-checklist" id="toc-maturity-checklist" class="nav-link" data-scroll-target="#maturity-checklist">Maturity checklist</a></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<div class="quarto-title-block"><div><h1 class="title">Principal Component Analysis</h1><button type="button" class="btn code-tools-button" id="quarto-code-tools-source"><i class="bi"></i> Code</button></div></div>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="principal-component-analysis" class="level1">
+<h1>Principal Component Analysis</h1>
+<section id="problem" class="level2">
+<h2 class="anchored" data-anchor-id="problem">Problem</h2>
+<p>Principal component analysis (PCA) finds a low-dimensional linear subspace that summarizes variation in a declared data representation. In its ordinary centered, equal-sample-weight form, it solves two equivalent sample objectives: maximize variance retained by an orthogonal projection, or minimize squared Euclidean reconstruction error from that projection. The equivalence requires the same samples, centering, scaling, equal weighting, metric, rank, and orthogonal-projection constraint in both formulations <span class="citation" data-cites="Pearson1901 JolliffeCadima2016 EckartYoung1936">(<a href="#ref-Pearson1901" role="doc-biblioref">Pearson 1901</a>; <a href="#ref-JolliffeCadima2016" role="doc-biblioref">Jolliffe and Cadima 2016</a>; <a href="#ref-EckartYoung1936" role="doc-biblioref">Eckart and Young 1936</a>)</span>.</p>
+<p>PCA is primarily a static representation and approximation method. It is a useful baseline for asking whether a more structured latent, nonlinear, geometric, or dynamical method improves on a linear Euclidean summary.</p>
+</section>
+<section id="input" class="level2">
+<h2 class="anchored" data-anchor-id="input">Input</h2>
+<p>Let <span class="math inline">\(X\in\mathbb R^{n\times p}\)</span> contain <span class="math inline">\(n\)</span> selected observations as rows and <span class="math inline">\(p\)</span> selected features as columns. A reproducible PCA analysis must declare:</p>
+<ul>
+<li>which observations enter the fit and whether rows are independent units, trials, condition–time pairs, or another sampling unit;</li>
+<li>equal sample weighting, as used throughout this object; a nonuniformly weighted variant changes the fitted mean, covariance, and objective and is outside the present scope;</li>
+<li>sample-mean centering with <span class="math inline">\(\mu=n^{-1}\sum_i x_i\)</span>;</li>
+<li>feature scaling, such as no rescaling, division by declared scale factors, or standardization to a correlation-matrix PCA;</li>
+<li>exclusion rules and a complete analysis matrix; imputation or specialized missing-data PCA requires a separate method and validation argument; and</li>
+<li>the target rank <span class="math inline">\(k\leq\min(n-1,p)\)</span> for centered data, or the rule by which <span class="math inline">\(k\)</span> will be selected.</li>
+</ul>
+<p>Write <span class="math inline">\(D\)</span> for a fixed nonsingular diagonal scaling matrix and let the transformed row vectors be <span class="math inline">\(z_i=D^{-1}(x_i-\mu)\)</span>. The matrix <span class="math inline">\(Z\)</span> stacks the <span class="math inline">\(z_i^\top\)</span>. Changing samples, weighting policy, or <span class="math inline">\(D\)</span> changes the problem being solved. This object always uses sample-mean centering; uncentered, origin-constrained PCA is a different variant outside its scope. In particular, covariance PCA is sensitive to feature units, whereas standardizing each feature produces correlation-matrix PCA <span class="citation" data-cites="JolliffeCadima2016">(<a href="#ref-JolliffeCadima2016" role="doc-biblioref">Jolliffe and Cadima 2016</a>)</span>.</p>
+</section>
+<section id="output" class="level2">
+<h2 class="anchored" data-anchor-id="output">Output</h2>
+<p>For a chosen rank <span class="math inline">\(k\)</span>, ordinary PCA returns:</p>
+<ul>
+<li>a principal subspace <span class="math inline">\(\mathcal S_k\subseteq\mathbb R^p\)</span>;</li>
+<li>an orthonormal basis <span class="math inline">\(V_k=[v_1,\ldots,v_k]\)</span> for that subspace;</li>
+<li>ordered eigenvalues <span class="math inline">\(\lambda_1\geq\cdots\geq\lambda_p\geq0\)</span> measuring sample variance along the principal directions;</li>
+<li>scores <span class="math inline">\(T=ZV_k\)</span>, which are coordinates of the transformed observations in the chosen basis; and</li>
+<li>reconstructions <span class="math inline">\(\widehat Z=TV_k^\top=ZV_kV_k^\top\)</span>, mapped back to the original feature units by <span class="math inline">\(\widehat x_i=\mu+D\widehat z_i\)</span>.</li>
+</ul>
+<p>Terminology is not uniform. Here <strong>principal directions</strong>, <strong>basis vectors</strong>, and <strong>loading vectors</strong> refer to the columns of <span class="math inline">\(V_k\)</span>. If “loadings” instead means variable–component correlations or the scaled vectors <span class="math inline">\(v_j\sqrt{\lambda_j}\)</span>, that convention must be stated rather than silently mixed with <span class="math inline">\(V_k\)</span>.</p>
+</section>
+<section id="core-idea" class="level2">
+<h2 class="anchored" data-anchor-id="core-idea">Core idea</h2>
+<p>PCA rotates a centered and optionally scaled Euclidean coordinate system so that the first axis has the largest sample variance, each later axis has the largest remaining variance subject to orthogonality, and truncation keeps the first <span class="math inline">\(k\)</span> axes. Because orthogonal projection decomposes squared length into retained and residual parts, maximizing retained variance is the same as minimizing residual squared reconstruction error under the stated conditions. Pearson’s original formulation minimizes the sum of squared perpendicular Euclidean distances from equally weighted points to a closest-fit line or plane through their centroid; it does not provide a modern SVD or probabilistic interpretation <span class="citation" data-cites="Pearson1901">(<a href="#ref-Pearson1901" role="doc-biblioref">Pearson 1901</a>)</span>.</p>
+</section>
+<section id="generative-modeling-assumptions" class="level2">
+<h2 class="anchored" data-anchor-id="generative-modeling-assumptions">Generative / modeling assumptions</h2>
+<p>Ordinary PCA does <strong>not</strong> specify a probability distribution, latent prior, observation-noise model, or data-generating mechanism. Its operative assumptions are instead approximation choices:</p>
+<ul>
+<li>a single global affine subspace is an appropriate summary after the declared centering and scaling;</li>
+<li>Euclidean squared distance in the transformed coordinates is scientifically meaningful;</li>
+<li>directions with larger sample variance deserve priority; and</li>
+<li>an orthogonal rank-<span class="math inline">\(k\)</span> projection is the permitted reconstruction class.</li>
+</ul>
+<p>These choices can be poor when variance is dominated by units, artifacts, outliers, heteroscedastic noise, nuisance conditions, or scientifically irrelevant directions. Statistical uncertainty statements require additional sampling assumptions or resampling procedures; they do not follow from the PCA optimization alone.</p>
+</section>
+<section id="mathematical-formulation" class="level2">
+<h2 class="anchored" data-anchor-id="mathematical-formulation">Mathematical formulation</h2>
+<p>For the equal-weight sample, define the covariance matrix using divisor <span class="math inline">\(n\)</span> as</p>
+<p><span class="math display">\[
+S=\frac{1}{n}Z^\top Z.
+\]</span></p>
+<p>For <span class="math inline">\(V\in\mathbb R^{p\times k}\)</span> with <span class="math inline">\(V^\top V=I_k\)</span>, the retained variance is</p>
+<p><span class="math display">\[
+\operatorname{tr}(V^\top SV)
+=\frac{1}{n}\sum_{i=1}^n\lVert V^\top z_i\rVert_2^2.
+\]</span></p>
+<p>The PCA basis solves</p>
+<p><span class="math display">\[
+V_k\in\arg\max_{V^\top V=I_k}\operatorname{tr}(V^\top SV),
+\]</span></p>
+<p>so its columns can be chosen as eigenvectors of <span class="math inline">\(S\)</span> associated with the <span class="math inline">\(k\)</span> largest eigenvalues. For the same <span class="math inline">\(Z\)</span>, <span class="math inline">\(V\)</span>, Euclidean norm, rank <span class="math inline">\(k\)</span>, and orthogonal projection, the identity</p>
+<p><span class="math display">\[
+\frac{1}{n}\sum_i\lVert z_i-VV^\top z_i\rVert_2^2
+=\operatorname{tr}(S)-\operatorname{tr}(V^\top SV)
+\]</span></p>
+<p>shows that this also minimizes equal-weight least-squares reconstruction error. The more general truncated-SVD result gives a best rank-<span class="math inline">\(k\)</span> matrix approximation in Frobenius norm; the PCA reconstruction is its centered orthogonal-projection specialization <span class="citation" data-cites="EckartYoung1936">(<a href="#ref-EckartYoung1936" role="doc-biblioref">Eckart and Young 1936</a>)</span>. The equivalence need not survive a different loss, a non-Euclidean metric, unequal sample or entrywise weights, constraints such as sparsity or nonnegativity, or inconsistent preprocessing between objectives.</p>
+<p>The covariance and SVD forms are linked by</p>
+<p><span class="math display">\[
+Z=U\Sigma V^\top,
+\qquad
+S=V\frac{\Sigma^2}{n}V^\top.
+\]</span></p>
+<p>Thus the right singular vectors are covariance eigenvectors, <span class="math inline">\(\lambda_j=\sigma_j^2/n\)</span>, and the score matrix <span class="math inline">\(T=ZV_k=U_k\Sigma_k\)</span>. With the common covariance divisor <span class="math inline">\(n-1\)</span> instead of <span class="math inline">\(n\)</span>, all eigenvalues are multiplied by <span class="math inline">\(n/(n-1)\)</span> while eigenvectors and explained-variance ratios are unchanged. Jolliffe and Cadima give the centered-data eigenproblem and SVD relationship <span class="citation" data-cites="JolliffeCadima2016">(<a href="#ref-JolliffeCadima2016" role="doc-biblioref">Jolliffe and Cadima 2016</a>)</span>.</p>
+</section>
+<section id="what-is-learned" class="level2">
+<h2 class="anchored" data-anchor-id="what-is-learned">What is learned?</h2>
+<p>From the declared fitted sample, PCA learns the ordered principal subspaces, a representative orthonormal basis, eigenvalues, observation scores, and corresponding rank-<span class="math inline">\(k\)</span> reconstructions. It does not learn a transition law, process noise, observation model, causal graph, or probabilistic posterior.</p>
+<p>When eigenvalues are distinct, ordering gives one-dimensional principal subspaces, although each displayed eigenvector still has arbitrary sign. When eigenvalues repeat, the repeated-eigenvalue eigenspace is learned but no particular orthonormal basis within it is preferred.</p>
+</section>
+<section id="what-is-fixed" class="level2">
+<h2 class="anchored" data-anchor-id="what-is-fixed">What is fixed?</h2>
+<p>The analyst fixes the sample definition, feature representation, equal-weight policy, sample-mean-centering rule, scaling matrix, Euclidean metric, exclusion policy, and usually the rank-selection protocol. The orthonormality constraint and squared-error/variance criterion are part of ordinary PCA. If preprocessing parameters are estimated, they must be fitted using training data only during held-out evaluation.</p>
+</section>
+<section id="temporal-assumptions" class="level2">
+<h2 class="anchored" data-anchor-id="temporal-assumptions">Temporal assumptions</h2>
+<p>Ordinary PCA is order-blind: permuting the rows leaves <span class="math inline">\(S\)</span> unchanged. If rows are time points, PCA uses their collection but not their succession, lag, derivative, or transition structure. Time can be encoded into features, lagged windows, or condition–time samples, but then PCA analyzes that engineered representation; it still does not by itself estimate dynamics.</p>
+</section>
+<section id="geometry-assumptions" class="level2">
+<h2 class="anchored" data-anchor-id="geometry-assumptions">Geometry assumptions</h2>
+<p>PCA uses one global Euclidean inner product after declared scaling. Its reconstruction lies in an affine subspace <span class="math inline">\(\mu+D\mathcal S_k\)</span> in the original coordinates. This is a linear-geometric approximation, not evidence that observations lie on a manifold, that a Riemannian metric has been recovered, or that local topology is preserved.</p>
+</section>
+<section id="supervision" class="level2">
+<h2 class="anchored" data-anchor-id="supervision">Supervision</h2>
+<p>Ordinary PCA is unsupervised with respect to labels and outcomes: its objective uses only the transformed feature matrix. Choosing features, trials, conditions, or time windows using labels can nevertheless introduce supervision or leakage at the analysis-design level.</p>
+</section>
+<section id="optimization-inference" class="level2">
+<h2 class="anchored" data-anchor-id="optimization-inference">Optimization / inference</h2>
+<p>PCA is commonly computed by symmetric eigendecomposition of <span class="math inline">\(S\)</span> or by SVD of the centered and scaled data matrix. SVD avoids explicitly forming <span class="math inline">\(S\)</span> and directly exposes the best low-rank approximation. Iterative or randomized numerical algorithms may approximate leading components, but their approximation and convergence tolerances are additional computational choices, not changes to PCA’s scientific interpretation.</p>
+<p>There is no latent posterior in ordinary PCA. Projection computes deterministic scores for a given fitted mean, scaling, and basis.</p>
+</section>
+<section id="strengths" class="level2">
+<h2 class="anchored" data-anchor-id="strengths">Strengths</h2>
+<ul>
+<li>It gives a transparent global linear baseline with a closed-form spectral solution.</li>
+<li>Components are nested: the first <span class="math inline">\(k\)</span> directions solve the rank-<span class="math inline">\(k\)</span> variance objective for every <span class="math inline">\(k\)</span>.</li>
+<li>Scores, reconstruction, residual energy, and explained variance are easy to compute and audit.</li>
+<li>The covariance-eigenvector and SVD views connect statistical variance summaries to low-rank matrix approximation <span class="citation" data-cites="JolliffeCadima2016 EckartYoung1936">(<a href="#ref-JolliffeCadima2016" role="doc-biblioref">Jolliffe and Cadima 2016</a>; <a href="#ref-EckartYoung1936" role="doc-biblioref">Eckart and Young 1936</a>)</span>.</li>
+<li>It provides a demanding but interpretable baseline for methods claiming benefits from nonlinear geometry, probabilistic modeling, or temporal structure.</li>
+</ul>
+</section>
+<section id="failure-modes" class="level2">
+<h2 class="anchored" data-anchor-id="failure-modes">Failure modes</h2>
+<ul>
+<li><strong>Scale dependence:</strong> high-variance units can dominate covariance PCA; standardization solves a different problem rather than revealing a uniquely correct scale.</li>
+<li><strong>Outlier sensitivity:</strong> the mean and covariance can be strongly altered by a few observations.</li>
+<li><strong>Nuisance variance:</strong> large variance may reflect artifacts, trial imbalance, baseline shifts, or irrelevant behavior.</li>
+<li><strong>Global linearity:</strong> curved, clustered, or condition-specific structure can be poorly represented by one subspace.</li>
+<li><strong>Heterogeneous residuals:</strong> squared Euclidean loss gives all transformed coordinates the declared metric and does not model feature-specific noise.</li>
+<li><strong>Sampling instability:</strong> small samples, dependent rows, distribution shift, and close eigenvalues can make estimated directions unstable.</li>
+<li><strong>Leakage:</strong> fitting centering, scaling, rank, or basis on evaluation data makes held-out performance optimistic.</li>
+<li><strong>Interpretive overreach:</strong> compact reconstruction can be mistaken for intrinsic dimension, a manifold, dynamics, mechanism, or a unique latent generator.</li>
+</ul>
+</section>
+<section id="identifiability-issues" class="level2">
+<h2 class="anchored" data-anchor-id="identifiability-issues">Identifiability issues</h2>
+<p>For a simple eigenvalue, <span class="math inline">\(v_j\)</span> and <span class="math inline">\(-v_j\)</span> define the same axis; the corresponding score signs change together, leaving projection and reconstruction unchanged. For an eigenvalue of multiplicity greater than one, any orthonormal rotation within its eigenspace is equally valid. When <span class="math inline">\(k&lt;p\)</span>, if <span class="math inline">\(\lambda_k=\lambda_{k+1}\)</span>, even the selected rank-<span class="math inline">\(k\)</span> subspace is not unique because the truncation cuts through a repeated eigenspace; if <span class="math inline">\(\lambda_k&gt;\lambda_{k+1}\)</span>, the rank-<span class="math inline">\(k\)</span> subspace is unique, although its basis retains sign ambiguity and rotations within repeated eigenvalue blocks wholly contained in the subspace <span class="citation" data-cites="EckartYoung1936 JolliffeCadima2016">(<a href="#ref-EckartYoung1936" role="doc-biblioref">Eckart and Young 1936</a>; <a href="#ref-JolliffeCadima2016" role="doc-biblioref">Jolliffe and Cadima 2016</a>)</span>. When <span class="math inline">\(k=p\)</span> is permitted by the sample-rank bound, the selected subspace is the full ambient feature space, so no <span class="math inline">\(\lambda_{p+1}\)</span> boundary is defined; only the choice of basis remains ambiguous within repeated-eigenvalue blocks.</p>
+<p>These are mathematical ambiguities, not evidence for several biological mechanisms. More broadly, PCA scores are deterministic coordinates of a chosen projection, not uniquely identified latent causes.</p>
+</section>
+<section id="comparison-with-simpler-methods" class="level2">
+<h2 class="anchored" data-anchor-id="comparison-with-simpler-methods">Comparison with simpler methods</h2>
+<ul>
+<li><strong>Mean-only reference (<span class="math inline">\(k=0\)</span>):</strong> reconstruct every observation by the training mean. This is a nested algebraic sanity check, not discriminating evidence: for any centered observation, adding any nonzero orthogonal projection can only weakly reduce its reconstruction error in the same metric.</li>
+<li><strong>Fixed projection:</strong> use a prespecified scientifically meaningful orthonormal basis of the same rank. This tests whether data-adaptive variance ordering adds value.</li>
+<li><strong>Random projection:</strong> compare with one or a distribution of fixed random orthonormal rank-<span class="math inline">\(k\)</span> projections fitted without outcome information. This checks whether performance is specific to the learned PCA subspace rather than generic compression.</li>
+</ul>
+<p>Discriminating comparisons therefore use rank-matched fixed or random projections, nested rank selection, subspace stability across resamples or datasets, or separately declared scientific and predictive tests rather than mere improvement over <span class="math inline">\(k=0\)</span>.</p>
+<p>PCA is not interchangeable with Factor Analysis (FA) or probabilistic PCA (PPCA). Ordinary PCA is a deterministic variance/reconstruction criterion with no observation-noise distribution. FA is a probabilistic latent-variable model commonly using a diagonal feature-specific residual covariance. PPCA is a particular Gaussian latent-variable model with isotropic residual covariance whose maximum-likelihood solution recovers the principal subspace, while retaining a noise parameter and likelihood <span class="citation" data-cites="TippingBishop1999">(<a href="#ref-TippingBishop1999" role="doc-biblioref">Tipping and Bishop 1999</a>)</span>. A PCA score should therefore not be called a posterior latent state, and FA or PPCA assumptions should not be retroactively attributed to ordinary PCA.</p>
+</section>
+<section id="evaluation-criteria" class="level2">
+<h2 class="anchored" data-anchor-id="evaluation-criteria">Evaluation criteria</h2>
+<p>For reconstruction, fit <span class="math inline">\(\mu\)</span>, <span class="math inline">\(D\)</span>, <span class="math inline">\(V_k\)</span>, and any rank-selection rule on training observations, then reconstruct each held-out observation with the training preprocessing and report the transformed-coordinate loss</p>
+<p><span class="math display">\[
+\left\lVert D^{-1}(x-\widehat x)\right\rVert_2^2,
+\]</span></p>
+<p>equivalently the original-coordinate quadratic metric <span class="math inline">\((x-\widehat x)^\top D^{-\top}D^{-1}(x-\widehat x)\)</span>. Mean-only, fixed-projection, and random-projection references must use the same training-fitted centering, scaling, sample definition, and metric. Observation-level splits should hold out entire trials, conditions, subjects, sessions, trajectories, or time blocks as appropriate to the dependence structure. Holding out features, sensors, or recorded units is a different prediction problem requiring a separate observation-model or matrix-completion protocol.</p>
+<p>Training explained variance is</p>
+<p><span class="math display">\[
+\operatorname{EVR}_k=
+\frac{\sum_{j=1}^k\lambda_j}{\sum_{j=1}^p\lambda_j},
+\]</span></p>
+<p>but it is an in-sample descriptive ratio tied to the selected samples, features, scaling, equal-weight policy, and variance criterion. A held-out analogue can report projected energy relative to total held-out centered energy, but it is not a likelihood, can be unstable under distribution shift, and does not validate component interpretation. Reconstruction and variance metrics also favor the Euclidean loss PCA was designed to optimize; downstream prediction, stability, or scientific interpretability require separately declared tests. Explained-variance cutoffs are conventional and can be subjective rather than model-free discoveries <span class="citation" data-cites="JolliffeCadima2016">(<a href="#ref-JolliffeCadima2016" role="doc-biblioref">Jolliffe and Cadima 2016</a>)</span>.</p>
+<p>Neither a high explained-variance ratio nor an “elbow” supplies a model-free intrinsic dimension. Rank choice depends on tolerance, noise, sample size, task, preprocessing, and the comparison model.</p>
+</section>
+<section id="minimal-toy-model" class="level2">
+<h2 class="anchored" data-anchor-id="minimal-toy-model">Minimal toy model</h2>
+<p>Consider centered observations in <span class="math inline">\(\mathbb R^2\)</span> with covariance</p>
+<p><span class="math display">\[
+S=\begin{pmatrix}9&amp;0\\0&amp;1\end{pmatrix}.
+\]</span></p>
+<p>Rank-one PCA selects the horizontal axis, retains <span class="math inline">\(9/(9+1)=90\%\)</span> of the declared sample variance, and reconstructs each point by dropping its vertical coordinate. The vertical residual variance is <span class="math inline">\(1\)</span>, which is minimal among rank-one orthogonal projections.</p>
+<p>This example also exposes two boundaries. If the second feature is rescaled before fitting, the selected direction and variance ratio can change. If instead <span class="math inline">\(S=I_2\)</span>, every unit direction is a valid first component: the repeated eigenvalue identifies the full two-dimensional eigenspace but no unique rank-one axis.</p>
+</section>
+<section id="relevance-to-ldg" class="level2">
+<h2 class="anchored" data-anchor-id="relevance-to-ldg">Relevance to LDG</h2>
+<p>PCA is LDG’s canonical static linear Euclidean baseline. It separates the modest claim “these transformed observations are well approximated by a rank-<span class="math inline">\(k\)</span> affine subspace under this metric” from stronger claims about latent variables, intrinsic dimension, nonlinear geometry, temporal evolution, or mechanism.</p>
+<div class="callout callout-style-default callout-warning callout-titled" title="What this does NOT imply">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Warning</span>What this does NOT imply
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>A low-rank PCA summary does not prove a manifold, discover dynamics, identify a mechanism, establish model-free intrinsic dimension, or recover a unique latent generator. Low reconstruction error and compelling visualization remain approximation results under declared preprocessing and loss.</p>
+</div>
+</div>
+<section id="mouse-trajectory" class="level3">
+<h3 class="anchored" data-anchor-id="mouse-trajectory">Mouse trajectory</h3>
+<p>PCA can summarize aligned trajectory samples after coordinates, subjects, trials, time normalization, centering, scaling, and row dependence are declared. A low-dimensional score plot does not establish a low-dimensional behavioral state space or a movement law. Evaluation should keep entire trajectories or animals together when splitting data if within-trajectory or within-animal dependence is present.</p>
+</section>
+<section id="eye-movement" class="level3">
+<h3 class="anchored" data-anchor-id="eye-movement">Eye movement</h3>
+<p>For eye position, velocity, event, or engineered window features, PCA can provide a rank-matched linear compression baseline. Saccade alignment, binocular coordinate systems, angular units, sample exclusion, and temporal window construction determine the analyzed representation. Ordinary PCA does not infer oculomotor dynamics merely because successive samples trace a trajectory in score space.</p>
+</section>
+<section id="eeg" class="level3">
+<h3 class="anchored" data-anchor-id="eeg">EEG</h3>
+<p>PCA can reduce sensor, time-window, spectral, or trial-feature matrices, but rereferencing, channel scaling, artifact rejection, subject pooling, and row definition must be explicit. Components are variance directions in the selected representation, not automatically neural sources; source separation and observation modeling require additional assumptions.</p>
+</section>
+<section id="meg-neural-population-data" class="level3">
+<h3 class="anchored" data-anchor-id="meg-neural-population-data">MEG / neural population data</h3>
+<p>PCA can define a variance-dominant preprocessing subspace before a temporally structured analysis. In Churchland et al.’s reaching analysis, traditional PCA reduced a neuron-by-condition–time matrix to six dimensions before jPCA was applied to seek rotational structure; this supports PCA’s role there as preprocessing for strongly represented population patterns, not a claim that PCA itself discovered dynamics <span class="citation" data-cites="ChurchlandEtAl2012">(<a href="#ref-ChurchlandEtAl2012" role="doc-biblioref">Churchland et al. 2012</a>)</span>. For MEG or other population recordings, sensor/unit normalization, condition averaging, and trial dependence remain analysis-specific choices; observation-level evaluation may hold out trials, conditions, subjects, sessions, or time blocks, whereas feature, sensor, or unit holdout requires a separate observation-model or matrix-completion protocol.</p>
+</section>
+</section>
+<section id="primary-sources" class="level2">
+<h2 class="anchored" data-anchor-id="primary-sources">Primary sources</h2>
+<ul>
+<li>Pearson formulates equal-weight perpendicular Euclidean least-squares closest-fit lines and planes through the sample centroid and notes degenerate non-uniqueness boundaries <span class="citation" data-cites="Pearson1901">(<a href="#ref-Pearson1901" role="doc-biblioref">Pearson 1901</a>)</span>.</li>
+<li>Eckart and Young formulate and solve the least-squares best lower-rank matrix approximation problem that underlies the truncated-SVD reconstruction view <span class="citation" data-cites="EckartYoung1936">(<a href="#ref-EckartYoung1936" role="doc-biblioref">Eckart and Young 1936</a>)</span>.</li>
+<li>Tipping and Bishop define PPCA as a Gaussian latent-variable model, relate its maximum-likelihood solution to the principal subspace, and distinguish its isotropic noise model from ordinary factor analysis <span class="citation" data-cites="TippingBishop1999">(<a href="#ref-TippingBishop1999" role="doc-biblioref">Tipping and Bishop 1999</a>)</span>.</li>
+<li>Churchland et al.&nbsp;provide a narrow empirical example in which PCA is used as preprocessing before a distinct dynamical projection method <span class="citation" data-cites="ChurchlandEtAl2012">(<a href="#ref-ChurchlandEtAl2012" role="doc-biblioref">Churchland et al. 2012</a>)</span>.</li>
+</ul>
+</section>
+<section id="reviews-secondary-sources" class="level2">
+<h2 class="anchored" data-anchor-id="reviews-secondary-sources">Reviews / secondary sources</h2>
+<ul>
+<li>Jolliffe and Cadima review ordinary PCA’s variance criterion, covariance eigendecomposition, centered-data SVD formulation, covariance-versus-correlation choice, and explained-variance usage <span class="citation" data-cites="JolliffeCadima2016">(<a href="#ref-JolliffeCadima2016" role="doc-biblioref">Jolliffe and Cadima 2016</a>)</span>.</li>
+</ul>
+</section>
+<section id="open-methodological-questions" class="level2">
+<h2 class="anchored" data-anchor-id="open-methodological-questions">Open methodological questions</h2>
+<ul>
+<li>How stable is the fitted subspace across animals, sessions, conditions, and preprocessing choices?</li>
+<li>Which sample-splitting unit gives an honest held-out reconstruction test when rows are temporally or hierarchically dependent?</li>
+<li>Which metric or scaling expresses the scientific cost of errors rather than measurement units alone?</li>
+<li>When do task-aware, probabilistic, nonlinear, or dynamical methods outperform rank-matched PCA without relying on an evaluation criterion that simply restates their training objective?</li>
+<li>How should uncertainty be reported when leading eigenvalues are close or the sample covariance is poorly estimated?</li>
+</ul>
+</section>
+<section id="maturity-checklist" class="level2">
+<h2 class="anchored" data-anchor-id="maturity-checklist">Maturity checklist</h2>
+<ul class="task-list">
+<li><label><input type="checkbox" checked="">States the variance and least-squares objectives and the conditions for their equivalence.</label></li>
+<li><label><input type="checkbox" checked="">Connects covariance eigendecomposition to SVD with explicit normalization.</label></li>
+<li><label><input type="checkbox" checked="">Declares learned and fixed quantities, including centering, scale, equal weighting, samples, metric, and rank.</label></li>
+<li><label><input type="checkbox" checked="">States sign, repeated-eigenvalue, and truncation-boundary ambiguities.</label></li>
+<li><label><input type="checkbox" checked="">Separates ordinary PCA from FA, PPCA, nonlinear embedding, and temporal or dynamical methods.</label></li>
+<li><label><input type="checkbox" checked="">Includes mean-only and fixed/random projection baselines plus held-out evaluation limits.</label></li>
+<li><label><input type="checkbox" checked="">Restricts empirical claims to an inspected primary neural-population example.</label></li>
+<li><label><input type="checkbox" checked="">Independent mixed review completed after one bounded correction round and focused re-review PASS.</label></li>
+<li><label><input type="checkbox" checked="">Separate status authorization completed; promoted to <code>L2/stable</code>.</label></li>
+</ul>
+
+
+<!-- -->
+
+
+</section>
+</section>
+
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography" id="quarto-bibliography"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body hanging-indent" role="list">
+<div id="ref-ChurchlandEtAl2012" class="csl-entry" role="listitem">
+Churchland, Mark M., John P. Cunningham, Matthew T. Kaufman, et al. 2012. <span>“Neural Population Dynamics During Reaching.”</span> <em>Nature</em> 487 (7405): 51–56. <a href="https://doi.org/10.1038/nature11129">https://doi.org/10.1038/nature11129</a>.
+</div>
+<div id="ref-EckartYoung1936" class="csl-entry" role="listitem">
+Eckart, Carl, and Gale Young. 1936. <span>“The Approximation of One Matrix by Another of Lower Rank.”</span> <em>Psychometrika</em> 1 (3): 211–18. <a href="https://doi.org/10.1007/BF02288367">https://doi.org/10.1007/BF02288367</a>.
+</div>
+<div id="ref-JolliffeCadima2016" class="csl-entry" role="listitem">
+Jolliffe, Ian T., and Jorge Cadima. 2016. <span>“Principal Component Analysis: A Review and Recent Developments.”</span> <em>Philosophical Transactions of the Royal Society A: Mathematical, Physical and Engineering Sciences</em> 374 (2065): 20150202. <a href="https://doi.org/10.1098/rsta.2015.0202">https://doi.org/10.1098/rsta.2015.0202</a>.
+</div>
+<div id="ref-Pearson1901" class="csl-entry" role="listitem">
+Pearson, Karl. 1901. <span>“On Lines and Planes of Closest Fit to Systems of Points in Space.”</span> <em>The London, Edinburgh, and Dublin Philosophical Magazine and Journal of Science</em>, 6th series, vol. 2 (11): 559–72. <a href="https://doi.org/10.1080/14786440109462720">https://doi.org/10.1080/14786440109462720</a>.
+</div>
+<div id="ref-TippingBishop1999" class="csl-entry" role="listitem">
+Tipping, Michael E., and Christopher M. Bishop. 1999. <span>“Probabilistic Principal Component Analysis.”</span> <em>Journal of the Royal Statistical Society: Series B (Statistical Methodology)</em> 61 (3): 611–22. <a href="https://doi.org/10.1111/1467-9868.00196">https://doi.org/10.1111/1467-9868.00196</a>.
+</div>
+</div></section></div></main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+    const viewSource = window.document.getElementById('quarto-view-source') ||
+                       window.document.getElementById('quarto-code-tools-source');
+    if (viewSource) {
+      const sourceUrl = viewSource.getAttribute("data-quarto-source-url");
+      viewSource.addEventListener("click", function(e) {
+        if (sourceUrl) {
+          // rstudio viewer pane
+          if (/\bcapabilities=\b/.test(window.location)) {
+            window.open(sourceUrl);
+          } else {
+            window.location.href = sourceUrl;
+          }
+        } else {
+          const modal = new bootstrap.Modal(document.getElementById('quarto-embedded-source-code-modal'));
+          modal.show();
+        }
+        return false;
+      });
+    }
+    function toggleCodeHandler(show) {
+      return function(e) {
+        const cellDetails = window.document.querySelectorAll(".cell details.code-fold");
+        for (let i=0; i<cellDetails.length; i++) {
+          const details = cellDetails[i];
+          if (show) {
+            details.open = true;
+          } else {
+            details.removeAttribute("open");
+          }
+        }
+        const cellCodeDivs = window.document.querySelectorAll(".cell div.sourceCode.cell-code");
+        const fromCls = show ? "hidden" : "unhidden";
+        const toCls = show ? "unhidden" : "hidden";
+        for (let i=0; i<cellCodeDivs.length; i++) {
+          const codeDiv = cellCodeDivs[i];
+          if (codeDiv.classList.contains(fromCls)) {
+            codeDiv.classList.remove(fromCls);
+            codeDiv.classList.add(toCls);
+          } 
+        }
+        return false;
+      }
+    }
+    const hideAllCode = window.document.getElementById("quarto-hide-all-code");
+    if (hideAllCode) {
+      hideAllCode.addEventListener("click", toggleCodeHandler(false));
+    }
+    const showAllCode = window.document.getElementById("quarto-show-all-code");
+    if (showAllCode) {
+      showAllCode.addEventListener("click", toggleCodeHandler(true));
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/abelzheng\.github\.io\/latent-dynamics-geometry-public\/");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+            // target, if specified
+            link.setAttribute("target", "_blank");
+            if (link.getAttribute("rel") === null) {
+              link.setAttribute("rel", "noopener");
+            }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<input type="hidden" id="giscus-base-theme" value="preferred_color_scheme">
+<input type="hidden" id="giscus-alt-theme" value="preferred_color_scheme">
+<script>
+  function loadGiscus() {
+    // Function to get the theme based on body class
+    const getTheme = () => {
+      let baseTheme = document.getElementById('giscus-base-theme').value;
+      let altTheme = document.getElementById('giscus-alt-theme').value;
+      return document.body.classList.contains('quarto-dark') ? altTheme : baseTheme;
+    };
+    const script = document.createElement("script");
+    script.src = "https://giscus.app/client.js";
+    script.async = true;
+    script.dataset.repo = "AbelZheng/latent-dynamics-geometry-public";
+    script.dataset.repoId = "R_kgDOT-VBkw";
+    script.dataset.category = "Announcements";
+    script.dataset.categoryId = "DIC_kwDOT-VBk84DDyEz";
+    script.dataset.mapping = "pathname";
+    script.dataset.reactionsEnabled = "1";
+    script.dataset.emitMetadata = "0";
+    script.dataset.inputPosition = "bottom";
+    script.dataset.theme = getTheme();
+    script.dataset.lang = "en";
+    script.crossOrigin = "anonymous";
+    // Append the script to the desired div instead of at the end of the body
+    document.getElementById("quarto-content").appendChild(script);
+  }
+  loadGiscus();
+</script><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">Source Code</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1" data-shortcodes="false"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="an">title:</span><span class="co"> "Principal Component Analysis"</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="an">object_type:</span><span class="co"> method</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="an">maturity:</span><span class="co"> L2</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="an">status:</span><span class="co"> stable</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="an">domain:</span><span class="co"> [dimensionality-reduction, linear-algebra, statistics]</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="an">tags:</span><span class="co"> [pca, linear-subspace, variance, low-rank-approximation]</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="an">prerequisites:</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="co">- knowledge/concepts/ambient-dimension.qmd</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="co">- knowledge/concepts/linear-subspace.qmd</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="an">related:</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="co">- knowledge/concepts/intrinsic-dimension.qmd</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="co">- knowledge/concepts/embedding.qmd</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="co">- knowledge/concepts/latent-variable.qmd</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="co">- knowledge/concepts/identifiability.qmd</span></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="an">created:</span><span class="co"> 2026-08-19</span></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="an">updated:</span><span class="co"> 2026-08-19</span></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a><span class="fu"># Principal Component Analysis</span></span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a><span class="fu">## Problem</span></span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>Principal component analysis (PCA) finds a low-dimensional linear subspace that summarizes variation in a declared data representation. In its ordinary centered, equal-sample-weight form, it solves two equivalent sample objectives: maximize variance retained by an orthogonal projection, or minimize squared Euclidean reconstruction error from that projection. The equivalence requires the same samples, centering, scaling, equal weighting, metric, rank, and orthogonal-projection constraint in both formulations <span class="co">[</span><span class="ot">@Pearson1901; @JolliffeCadima2016; @EckartYoung1936</span><span class="co">]</span>.</span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>PCA is primarily a static representation and approximation method. It is a useful baseline for asking whether a more structured latent, nonlinear, geometric, or dynamical method improves on a linear Euclidean summary.</span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a><span class="fu">## Input</span></span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>Let $X\in\mathbb R^{n\times p}$ contain $n$ selected observations as rows and $p$ selected features as columns. A reproducible PCA analysis must declare:</span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>which observations enter the fit and whether rows are independent units, trials, condition--time pairs, or another sampling unit;</span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>equal sample weighting, as used throughout this object; a nonuniformly weighted variant changes the fitted mean, covariance, and objective and is outside the present scope;</span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>sample-mean centering with $\mu=n^{-1}\sum_i x_i$;</span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>feature scaling, such as no rescaling, division by declared scale factors, or standardization to a correlation-matrix PCA;</span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>exclusion rules and a complete analysis matrix; imputation or specialized missing-data PCA requires a separate method and validation argument; and</span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>the target rank $k\leq\min(n-1,p)$ for centered data, or the rule by which $k$ will be selected.</span>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a>Write $D$ for a fixed nonsingular diagonal scaling matrix and let the transformed row vectors be $z_i=D^{-1}(x_i-\mu)$. The matrix $Z$ stacks the $z_i^\top$. Changing samples, weighting policy, or $D$ changes the problem being solved. This object always uses sample-mean centering; uncentered, origin-constrained PCA is a different variant outside its scope. In particular, covariance PCA is sensitive to feature units, whereas standardizing each feature produces correlation-matrix PCA <span class="co">[</span><span class="ot">@JolliffeCadima2016</span><span class="co">]</span>.</span>
+<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a><span class="fu">## Output</span></span>
+<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a>For a chosen rank $k$, ordinary PCA returns:</span>
+<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>a principal subspace $\mathcal S_k\subseteq\mathbb R^p$;</span>
+<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>an orthonormal basis $V_k=<span class="co">[</span><span class="ot">v_1,\ldots,v_k</span><span class="co">]</span>$ for that subspace;</span>
+<span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>ordered eigenvalues $\lambda_1\geq\cdots\geq\lambda_p\geq0$ measuring sample variance along the principal directions;</span>
+<span id="cb1-48"><a href="#cb1-48" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>scores $T=ZV_k$, which are coordinates of the transformed observations in the chosen basis; and</span>
+<span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>reconstructions $\widehat Z=TV_k^\top=ZV_kV_k^\top$, mapped back to the original feature units by $\widehat x_i=\mu+D\widehat z_i$.</span>
+<span id="cb1-50"><a href="#cb1-50" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-51"><a href="#cb1-51" aria-hidden="true" tabindex="-1"></a>Terminology is not uniform. Here **principal directions**, **basis vectors**, and **loading vectors** refer to the columns of $V_k$. If “loadings” instead means variable--component correlations or the scaled vectors $v_j\sqrt{\lambda_j}$, that convention must be stated rather than silently mixed with $V_k$.</span>
+<span id="cb1-52"><a href="#cb1-52" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-53"><a href="#cb1-53" aria-hidden="true" tabindex="-1"></a><span class="fu">## Core idea</span></span>
+<span id="cb1-54"><a href="#cb1-54" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-55"><a href="#cb1-55" aria-hidden="true" tabindex="-1"></a>PCA rotates a centered and optionally scaled Euclidean coordinate system so that the first axis has the largest sample variance, each later axis has the largest remaining variance subject to orthogonality, and truncation keeps the first $k$ axes. Because orthogonal projection decomposes squared length into retained and residual parts, maximizing retained variance is the same as minimizing residual squared reconstruction error under the stated conditions. Pearson's original formulation minimizes the sum of squared perpendicular Euclidean distances from equally weighted points to a closest-fit line or plane through their centroid; it does not provide a modern SVD or probabilistic interpretation <span class="co">[</span><span class="ot">@Pearson1901</span><span class="co">]</span>.</span>
+<span id="cb1-56"><a href="#cb1-56" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-57"><a href="#cb1-57" aria-hidden="true" tabindex="-1"></a><span class="fu">## Generative / modeling assumptions</span></span>
+<span id="cb1-58"><a href="#cb1-58" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-59"><a href="#cb1-59" aria-hidden="true" tabindex="-1"></a>Ordinary PCA does **not** specify a probability distribution, latent prior, observation-noise model, or data-generating mechanism. Its operative assumptions are instead approximation choices:</span>
+<span id="cb1-60"><a href="#cb1-60" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-61"><a href="#cb1-61" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>a single global affine subspace is an appropriate summary after the declared centering and scaling;</span>
+<span id="cb1-62"><a href="#cb1-62" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Euclidean squared distance in the transformed coordinates is scientifically meaningful;</span>
+<span id="cb1-63"><a href="#cb1-63" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>directions with larger sample variance deserve priority; and</span>
+<span id="cb1-64"><a href="#cb1-64" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>an orthogonal rank-$k$ projection is the permitted reconstruction class.</span>
+<span id="cb1-65"><a href="#cb1-65" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-66"><a href="#cb1-66" aria-hidden="true" tabindex="-1"></a>These choices can be poor when variance is dominated by units, artifacts, outliers, heteroscedastic noise, nuisance conditions, or scientifically irrelevant directions. Statistical uncertainty statements require additional sampling assumptions or resampling procedures; they do not follow from the PCA optimization alone.</span>
+<span id="cb1-67"><a href="#cb1-67" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-68"><a href="#cb1-68" aria-hidden="true" tabindex="-1"></a><span class="fu">## Mathematical formulation</span></span>
+<span id="cb1-69"><a href="#cb1-69" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-70"><a href="#cb1-70" aria-hidden="true" tabindex="-1"></a>For the equal-weight sample, define the covariance matrix using divisor $n$ as</span>
+<span id="cb1-71"><a href="#cb1-71" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-72"><a href="#cb1-72" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-73"><a href="#cb1-73" aria-hidden="true" tabindex="-1"></a>S=\frac{1}{n}Z^\top Z.</span>
+<span id="cb1-74"><a href="#cb1-74" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-75"><a href="#cb1-75" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-76"><a href="#cb1-76" aria-hidden="true" tabindex="-1"></a>For $V\in\mathbb R^{p\times k}$ with $V^\top V=I_k$, the retained variance is</span>
+<span id="cb1-77"><a href="#cb1-77" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-78"><a href="#cb1-78" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-79"><a href="#cb1-79" aria-hidden="true" tabindex="-1"></a>\operatorname{tr}(V^\top SV)</span>
+<span id="cb1-80"><a href="#cb1-80" aria-hidden="true" tabindex="-1"></a>=\frac{1}{n}\sum_{i=1}^n\lVert V^\top z_i\rVert_2^2.</span>
+<span id="cb1-81"><a href="#cb1-81" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-82"><a href="#cb1-82" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-83"><a href="#cb1-83" aria-hidden="true" tabindex="-1"></a>The PCA basis solves</span>
+<span id="cb1-84"><a href="#cb1-84" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-85"><a href="#cb1-85" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-86"><a href="#cb1-86" aria-hidden="true" tabindex="-1"></a>V_k\in\arg\max_{V^\top V=I_k}\operatorname{tr}(V^\top SV),</span>
+<span id="cb1-87"><a href="#cb1-87" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-88"><a href="#cb1-88" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-89"><a href="#cb1-89" aria-hidden="true" tabindex="-1"></a>so its columns can be chosen as eigenvectors of $S$ associated with the $k$ largest eigenvalues. For the same $Z$, $V$, Euclidean norm, rank $k$, and orthogonal projection, the identity</span>
+<span id="cb1-90"><a href="#cb1-90" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-91"><a href="#cb1-91" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-92"><a href="#cb1-92" aria-hidden="true" tabindex="-1"></a>\frac{1}{n}\sum_i\lVert z_i-VV^\top z_i\rVert_2^2</span>
+<span id="cb1-93"><a href="#cb1-93" aria-hidden="true" tabindex="-1"></a>=\operatorname{tr}(S)-\operatorname{tr}(V^\top SV)</span>
+<span id="cb1-94"><a href="#cb1-94" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-95"><a href="#cb1-95" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-96"><a href="#cb1-96" aria-hidden="true" tabindex="-1"></a>shows that this also minimizes equal-weight least-squares reconstruction error. The more general truncated-SVD result gives a best rank-$k$ matrix approximation in Frobenius norm; the PCA reconstruction is its centered orthogonal-projection specialization <span class="co">[</span><span class="ot">@EckartYoung1936</span><span class="co">]</span>. The equivalence need not survive a different loss, a non-Euclidean metric, unequal sample or entrywise weights, constraints such as sparsity or nonnegativity, or inconsistent preprocessing between objectives.</span>
+<span id="cb1-97"><a href="#cb1-97" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-98"><a href="#cb1-98" aria-hidden="true" tabindex="-1"></a>The covariance and SVD forms are linked by</span>
+<span id="cb1-99"><a href="#cb1-99" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-100"><a href="#cb1-100" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-101"><a href="#cb1-101" aria-hidden="true" tabindex="-1"></a>Z=U\Sigma V^\top,</span>
+<span id="cb1-102"><a href="#cb1-102" aria-hidden="true" tabindex="-1"></a>\qquad</span>
+<span id="cb1-103"><a href="#cb1-103" aria-hidden="true" tabindex="-1"></a>S=V\frac{\Sigma^2}{n}V^\top.</span>
+<span id="cb1-104"><a href="#cb1-104" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-105"><a href="#cb1-105" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-106"><a href="#cb1-106" aria-hidden="true" tabindex="-1"></a>Thus the right singular vectors are covariance eigenvectors, $\lambda_j=\sigma_j^2/n$, and the score matrix $T=ZV_k=U_k\Sigma_k$. With the common covariance divisor $n-1$ instead of $n$, all eigenvalues are multiplied by $n/(n-1)$ while eigenvectors and explained-variance ratios are unchanged. Jolliffe and Cadima give the centered-data eigenproblem and SVD relationship <span class="co">[</span><span class="ot">@JolliffeCadima2016</span><span class="co">]</span>.</span>
+<span id="cb1-107"><a href="#cb1-107" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-108"><a href="#cb1-108" aria-hidden="true" tabindex="-1"></a><span class="fu">## What is learned?</span></span>
+<span id="cb1-109"><a href="#cb1-109" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-110"><a href="#cb1-110" aria-hidden="true" tabindex="-1"></a>From the declared fitted sample, PCA learns the ordered principal subspaces, a representative orthonormal basis, eigenvalues, observation scores, and corresponding rank-$k$ reconstructions. It does not learn a transition law, process noise, observation model, causal graph, or probabilistic posterior.</span>
+<span id="cb1-111"><a href="#cb1-111" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-112"><a href="#cb1-112" aria-hidden="true" tabindex="-1"></a>When eigenvalues are distinct, ordering gives one-dimensional principal subspaces, although each displayed eigenvector still has arbitrary sign. When eigenvalues repeat, the repeated-eigenvalue eigenspace is learned but no particular orthonormal basis within it is preferred.</span>
+<span id="cb1-113"><a href="#cb1-113" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-114"><a href="#cb1-114" aria-hidden="true" tabindex="-1"></a><span class="fu">## What is fixed?</span></span>
+<span id="cb1-115"><a href="#cb1-115" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-116"><a href="#cb1-116" aria-hidden="true" tabindex="-1"></a>The analyst fixes the sample definition, feature representation, equal-weight policy, sample-mean-centering rule, scaling matrix, Euclidean metric, exclusion policy, and usually the rank-selection protocol. The orthonormality constraint and squared-error/variance criterion are part of ordinary PCA. If preprocessing parameters are estimated, they must be fitted using training data only during held-out evaluation.</span>
+<span id="cb1-117"><a href="#cb1-117" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-118"><a href="#cb1-118" aria-hidden="true" tabindex="-1"></a><span class="fu">## Temporal assumptions</span></span>
+<span id="cb1-119"><a href="#cb1-119" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-120"><a href="#cb1-120" aria-hidden="true" tabindex="-1"></a>Ordinary PCA is order-blind: permuting the rows leaves $S$ unchanged. If rows are time points, PCA uses their collection but not their succession, lag, derivative, or transition structure. Time can be encoded into features, lagged windows, or condition--time samples, but then PCA analyzes that engineered representation; it still does not by itself estimate dynamics.</span>
+<span id="cb1-121"><a href="#cb1-121" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-122"><a href="#cb1-122" aria-hidden="true" tabindex="-1"></a><span class="fu">## Geometry assumptions</span></span>
+<span id="cb1-123"><a href="#cb1-123" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-124"><a href="#cb1-124" aria-hidden="true" tabindex="-1"></a>PCA uses one global Euclidean inner product after declared scaling. Its reconstruction lies in an affine subspace $\mu+D\mathcal S_k$ in the original coordinates. This is a linear-geometric approximation, not evidence that observations lie on a manifold, that a Riemannian metric has been recovered, or that local topology is preserved.</span>
+<span id="cb1-125"><a href="#cb1-125" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-126"><a href="#cb1-126" aria-hidden="true" tabindex="-1"></a><span class="fu">## Supervision</span></span>
+<span id="cb1-127"><a href="#cb1-127" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-128"><a href="#cb1-128" aria-hidden="true" tabindex="-1"></a>Ordinary PCA is unsupervised with respect to labels and outcomes: its objective uses only the transformed feature matrix. Choosing features, trials, conditions, or time windows using labels can nevertheless introduce supervision or leakage at the analysis-design level.</span>
+<span id="cb1-129"><a href="#cb1-129" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-130"><a href="#cb1-130" aria-hidden="true" tabindex="-1"></a><span class="fu">## Optimization / inference</span></span>
+<span id="cb1-131"><a href="#cb1-131" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-132"><a href="#cb1-132" aria-hidden="true" tabindex="-1"></a>PCA is commonly computed by symmetric eigendecomposition of $S$ or by SVD of the centered and scaled data matrix. SVD avoids explicitly forming $S$ and directly exposes the best low-rank approximation. Iterative or randomized numerical algorithms may approximate leading components, but their approximation and convergence tolerances are additional computational choices, not changes to PCA's scientific interpretation.</span>
+<span id="cb1-133"><a href="#cb1-133" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-134"><a href="#cb1-134" aria-hidden="true" tabindex="-1"></a>There is no latent posterior in ordinary PCA. Projection computes deterministic scores for a given fitted mean, scaling, and basis.</span>
+<span id="cb1-135"><a href="#cb1-135" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-136"><a href="#cb1-136" aria-hidden="true" tabindex="-1"></a><span class="fu">## Strengths</span></span>
+<span id="cb1-137"><a href="#cb1-137" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-138"><a href="#cb1-138" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>It gives a transparent global linear baseline with a closed-form spectral solution.</span>
+<span id="cb1-139"><a href="#cb1-139" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Components are nested: the first $k$ directions solve the rank-$k$ variance objective for every $k$.</span>
+<span id="cb1-140"><a href="#cb1-140" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Scores, reconstruction, residual energy, and explained variance are easy to compute and audit.</span>
+<span id="cb1-141"><a href="#cb1-141" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>The covariance-eigenvector and SVD views connect statistical variance summaries to low-rank matrix approximation <span class="co">[</span><span class="ot">@JolliffeCadima2016; @EckartYoung1936</span><span class="co">]</span>.</span>
+<span id="cb1-142"><a href="#cb1-142" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>It provides a demanding but interpretable baseline for methods claiming benefits from nonlinear geometry, probabilistic modeling, or temporal structure.</span>
+<span id="cb1-143"><a href="#cb1-143" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-144"><a href="#cb1-144" aria-hidden="true" tabindex="-1"></a><span class="fu">## Failure modes</span></span>
+<span id="cb1-145"><a href="#cb1-145" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-146"><a href="#cb1-146" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Scale dependence:** high-variance units can dominate covariance PCA; standardization solves a different problem rather than revealing a uniquely correct scale.</span>
+<span id="cb1-147"><a href="#cb1-147" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Outlier sensitivity:** the mean and covariance can be strongly altered by a few observations.</span>
+<span id="cb1-148"><a href="#cb1-148" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Nuisance variance:** large variance may reflect artifacts, trial imbalance, baseline shifts, or irrelevant behavior.</span>
+<span id="cb1-149"><a href="#cb1-149" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Global linearity:** curved, clustered, or condition-specific structure can be poorly represented by one subspace.</span>
+<span id="cb1-150"><a href="#cb1-150" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Heterogeneous residuals:** squared Euclidean loss gives all transformed coordinates the declared metric and does not model feature-specific noise.</span>
+<span id="cb1-151"><a href="#cb1-151" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Sampling instability:** small samples, dependent rows, distribution shift, and close eigenvalues can make estimated directions unstable.</span>
+<span id="cb1-152"><a href="#cb1-152" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Leakage:** fitting centering, scaling, rank, or basis on evaluation data makes held-out performance optimistic.</span>
+<span id="cb1-153"><a href="#cb1-153" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Interpretive overreach:** compact reconstruction can be mistaken for intrinsic dimension, a manifold, dynamics, mechanism, or a unique latent generator.</span>
+<span id="cb1-154"><a href="#cb1-154" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-155"><a href="#cb1-155" aria-hidden="true" tabindex="-1"></a><span class="fu">## Identifiability issues</span></span>
+<span id="cb1-156"><a href="#cb1-156" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-157"><a href="#cb1-157" aria-hidden="true" tabindex="-1"></a>For a simple eigenvalue, $v_j$ and $-v_j$ define the same axis; the corresponding score signs change together, leaving projection and reconstruction unchanged. For an eigenvalue of multiplicity greater than one, any orthonormal rotation within its eigenspace is equally valid. When $k&lt;p$, if $\lambda_k=\lambda_{k+1}$, even the selected rank-$k$ subspace is not unique because the truncation cuts through a repeated eigenspace; if $\lambda_k&gt;\lambda_{k+1}$, the rank-$k$ subspace is unique, although its basis retains sign ambiguity and rotations within repeated eigenvalue blocks wholly contained in the subspace <span class="co">[</span><span class="ot">@EckartYoung1936; @JolliffeCadima2016</span><span class="co">]</span>. When $k=p$ is permitted by the sample-rank bound, the selected subspace is the full ambient feature space, so no $\lambda_{p+1}$ boundary is defined; only the choice of basis remains ambiguous within repeated-eigenvalue blocks.</span>
+<span id="cb1-158"><a href="#cb1-158" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-159"><a href="#cb1-159" aria-hidden="true" tabindex="-1"></a>These are mathematical ambiguities, not evidence for several biological mechanisms. More broadly, PCA scores are deterministic coordinates of a chosen projection, not uniquely identified latent causes.</span>
+<span id="cb1-160"><a href="#cb1-160" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-161"><a href="#cb1-161" aria-hidden="true" tabindex="-1"></a><span class="fu">## Comparison with simpler methods</span></span>
+<span id="cb1-162"><a href="#cb1-162" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-163"><a href="#cb1-163" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Mean-only reference ($k=0$):** reconstruct every observation by the training mean. This is a nested algebraic sanity check, not discriminating evidence: for any centered observation, adding any nonzero orthogonal projection can only weakly reduce its reconstruction error in the same metric.</span>
+<span id="cb1-164"><a href="#cb1-164" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Fixed projection:** use a prespecified scientifically meaningful orthonormal basis of the same rank. This tests whether data-adaptive variance ordering adds value.</span>
+<span id="cb1-165"><a href="#cb1-165" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Random projection:** compare with one or a distribution of fixed random orthonormal rank-$k$ projections fitted without outcome information. This checks whether performance is specific to the learned PCA subspace rather than generic compression.</span>
+<span id="cb1-166"><a href="#cb1-166" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-167"><a href="#cb1-167" aria-hidden="true" tabindex="-1"></a>Discriminating comparisons therefore use rank-matched fixed or random projections, nested rank selection, subspace stability across resamples or datasets, or separately declared scientific and predictive tests rather than mere improvement over $k=0$.</span>
+<span id="cb1-168"><a href="#cb1-168" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-169"><a href="#cb1-169" aria-hidden="true" tabindex="-1"></a>PCA is not interchangeable with Factor Analysis (FA) or probabilistic PCA (PPCA). Ordinary PCA is a deterministic variance/reconstruction criterion with no observation-noise distribution. FA is a probabilistic latent-variable model commonly using a diagonal feature-specific residual covariance. PPCA is a particular Gaussian latent-variable model with isotropic residual covariance whose maximum-likelihood solution recovers the principal subspace, while retaining a noise parameter and likelihood <span class="co">[</span><span class="ot">@TippingBishop1999</span><span class="co">]</span>. A PCA score should therefore not be called a posterior latent state, and FA or PPCA assumptions should not be retroactively attributed to ordinary PCA.</span>
+<span id="cb1-170"><a href="#cb1-170" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-171"><a href="#cb1-171" aria-hidden="true" tabindex="-1"></a><span class="fu">## Evaluation criteria</span></span>
+<span id="cb1-172"><a href="#cb1-172" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-173"><a href="#cb1-173" aria-hidden="true" tabindex="-1"></a>For reconstruction, fit $\mu$, $D$, $V_k$, and any rank-selection rule on training observations, then reconstruct each held-out observation with the training preprocessing and report the transformed-coordinate loss</span>
+<span id="cb1-174"><a href="#cb1-174" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-175"><a href="#cb1-175" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-176"><a href="#cb1-176" aria-hidden="true" tabindex="-1"></a>\left\lVert D^{-1}(x-\widehat x)\right\rVert_2^2,</span>
+<span id="cb1-177"><a href="#cb1-177" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-178"><a href="#cb1-178" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-179"><a href="#cb1-179" aria-hidden="true" tabindex="-1"></a>equivalently the original-coordinate quadratic metric $(x-\widehat x)^\top D^{-\top}D^{-1}(x-\widehat x)$. Mean-only, fixed-projection, and random-projection references must use the same training-fitted centering, scaling, sample definition, and metric. Observation-level splits should hold out entire trials, conditions, subjects, sessions, trajectories, or time blocks as appropriate to the dependence structure. Holding out features, sensors, or recorded units is a different prediction problem requiring a separate observation-model or matrix-completion protocol.</span>
+<span id="cb1-180"><a href="#cb1-180" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-181"><a href="#cb1-181" aria-hidden="true" tabindex="-1"></a>Training explained variance is</span>
+<span id="cb1-182"><a href="#cb1-182" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-183"><a href="#cb1-183" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-184"><a href="#cb1-184" aria-hidden="true" tabindex="-1"></a>\operatorname{EVR}_k=</span>
+<span id="cb1-185"><a href="#cb1-185" aria-hidden="true" tabindex="-1"></a>\frac{\sum_{j=1}^k\lambda_j}{\sum_{j=1}^p\lambda_j},</span>
+<span id="cb1-186"><a href="#cb1-186" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-187"><a href="#cb1-187" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-188"><a href="#cb1-188" aria-hidden="true" tabindex="-1"></a>but it is an in-sample descriptive ratio tied to the selected samples, features, scaling, equal-weight policy, and variance criterion. A held-out analogue can report projected energy relative to total held-out centered energy, but it is not a likelihood, can be unstable under distribution shift, and does not validate component interpretation. Reconstruction and variance metrics also favor the Euclidean loss PCA was designed to optimize; downstream prediction, stability, or scientific interpretability require separately declared tests. Explained-variance cutoffs are conventional and can be subjective rather than model-free discoveries <span class="co">[</span><span class="ot">@JolliffeCadima2016</span><span class="co">]</span>.</span>
+<span id="cb1-189"><a href="#cb1-189" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-190"><a href="#cb1-190" aria-hidden="true" tabindex="-1"></a>Neither a high explained-variance ratio nor an “elbow” supplies a model-free intrinsic dimension. Rank choice depends on tolerance, noise, sample size, task, preprocessing, and the comparison model.</span>
+<span id="cb1-191"><a href="#cb1-191" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-192"><a href="#cb1-192" aria-hidden="true" tabindex="-1"></a><span class="fu">## Minimal toy model</span></span>
+<span id="cb1-193"><a href="#cb1-193" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-194"><a href="#cb1-194" aria-hidden="true" tabindex="-1"></a>Consider centered observations in $\mathbb R^2$ with covariance</span>
+<span id="cb1-195"><a href="#cb1-195" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-196"><a href="#cb1-196" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-197"><a href="#cb1-197" aria-hidden="true" tabindex="-1"></a>S=\begin{pmatrix}9&amp;0<span class="sc">\\</span>0&amp;1\end{pmatrix}.</span>
+<span id="cb1-198"><a href="#cb1-198" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-199"><a href="#cb1-199" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-200"><a href="#cb1-200" aria-hidden="true" tabindex="-1"></a>Rank-one PCA selects the horizontal axis, retains $9/(9+1)=90\%$ of the declared sample variance, and reconstructs each point by dropping its vertical coordinate. The vertical residual variance is $1$, which is minimal among rank-one orthogonal projections.</span>
+<span id="cb1-201"><a href="#cb1-201" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-202"><a href="#cb1-202" aria-hidden="true" tabindex="-1"></a>This example also exposes two boundaries. If the second feature is rescaled before fitting, the selected direction and variance ratio can change. If instead $S=I_2$, every unit direction is a valid first component: the repeated eigenvalue identifies the full two-dimensional eigenspace but no unique rank-one axis.</span>
+<span id="cb1-203"><a href="#cb1-203" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-204"><a href="#cb1-204" aria-hidden="true" tabindex="-1"></a><span class="fu">## Relevance to LDG</span></span>
+<span id="cb1-205"><a href="#cb1-205" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-206"><a href="#cb1-206" aria-hidden="true" tabindex="-1"></a>PCA is LDG's canonical static linear Euclidean baseline. It separates the modest claim “these transformed observations are well approximated by a rank-$k$ affine subspace under this metric” from stronger claims about latent variables, intrinsic dimension, nonlinear geometry, temporal evolution, or mechanism.</span>
+<span id="cb1-207"><a href="#cb1-207" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-208"><a href="#cb1-208" aria-hidden="true" tabindex="-1"></a>::: {.callout-warning title="What this does NOT imply"}</span>
+<span id="cb1-209"><a href="#cb1-209" aria-hidden="true" tabindex="-1"></a>A low-rank PCA summary does not prove a manifold, discover dynamics, identify a mechanism, establish model-free intrinsic dimension, or recover a unique latent generator. Low reconstruction error and compelling visualization remain approximation results under declared preprocessing and loss.</span>
+<span id="cb1-210"><a href="#cb1-210" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb1-211"><a href="#cb1-211" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-212"><a href="#cb1-212" aria-hidden="true" tabindex="-1"></a><span class="fu">### Mouse trajectory</span></span>
+<span id="cb1-213"><a href="#cb1-213" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-214"><a href="#cb1-214" aria-hidden="true" tabindex="-1"></a>PCA can summarize aligned trajectory samples after coordinates, subjects, trials, time normalization, centering, scaling, and row dependence are declared. A low-dimensional score plot does not establish a low-dimensional behavioral state space or a movement law. Evaluation should keep entire trajectories or animals together when splitting data if within-trajectory or within-animal dependence is present.</span>
+<span id="cb1-215"><a href="#cb1-215" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-216"><a href="#cb1-216" aria-hidden="true" tabindex="-1"></a><span class="fu">### Eye movement</span></span>
+<span id="cb1-217"><a href="#cb1-217" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-218"><a href="#cb1-218" aria-hidden="true" tabindex="-1"></a>For eye position, velocity, event, or engineered window features, PCA can provide a rank-matched linear compression baseline. Saccade alignment, binocular coordinate systems, angular units, sample exclusion, and temporal window construction determine the analyzed representation. Ordinary PCA does not infer oculomotor dynamics merely because successive samples trace a trajectory in score space.</span>
+<span id="cb1-219"><a href="#cb1-219" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-220"><a href="#cb1-220" aria-hidden="true" tabindex="-1"></a><span class="fu">### EEG</span></span>
+<span id="cb1-221"><a href="#cb1-221" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-222"><a href="#cb1-222" aria-hidden="true" tabindex="-1"></a>PCA can reduce sensor, time-window, spectral, or trial-feature matrices, but rereferencing, channel scaling, artifact rejection, subject pooling, and row definition must be explicit. Components are variance directions in the selected representation, not automatically neural sources; source separation and observation modeling require additional assumptions.</span>
+<span id="cb1-223"><a href="#cb1-223" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-224"><a href="#cb1-224" aria-hidden="true" tabindex="-1"></a><span class="fu">### MEG / neural population data</span></span>
+<span id="cb1-225"><a href="#cb1-225" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-226"><a href="#cb1-226" aria-hidden="true" tabindex="-1"></a>PCA can define a variance-dominant preprocessing subspace before a temporally structured analysis. In Churchland et al.'s reaching analysis, traditional PCA reduced a neuron-by-condition--time matrix to six dimensions before jPCA was applied to seek rotational structure; this supports PCA's role there as preprocessing for strongly represented population patterns, not a claim that PCA itself discovered dynamics <span class="co">[</span><span class="ot">@ChurchlandEtAl2012</span><span class="co">]</span>. For MEG or other population recordings, sensor/unit normalization, condition averaging, and trial dependence remain analysis-specific choices; observation-level evaluation may hold out trials, conditions, subjects, sessions, or time blocks, whereas feature, sensor, or unit holdout requires a separate observation-model or matrix-completion protocol.</span>
+<span id="cb1-227"><a href="#cb1-227" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-228"><a href="#cb1-228" aria-hidden="true" tabindex="-1"></a><span class="fu">## Primary sources</span></span>
+<span id="cb1-229"><a href="#cb1-229" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-230"><a href="#cb1-230" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Pearson formulates equal-weight perpendicular Euclidean least-squares closest-fit lines and planes through the sample centroid and notes degenerate non-uniqueness boundaries <span class="co">[</span><span class="ot">@Pearson1901</span><span class="co">]</span>.</span>
+<span id="cb1-231"><a href="#cb1-231" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Eckart and Young formulate and solve the least-squares best lower-rank matrix approximation problem that underlies the truncated-SVD reconstruction view <span class="co">[</span><span class="ot">@EckartYoung1936</span><span class="co">]</span>.</span>
+<span id="cb1-232"><a href="#cb1-232" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Tipping and Bishop define PPCA as a Gaussian latent-variable model, relate its maximum-likelihood solution to the principal subspace, and distinguish its isotropic noise model from ordinary factor analysis <span class="co">[</span><span class="ot">@TippingBishop1999</span><span class="co">]</span>.</span>
+<span id="cb1-233"><a href="#cb1-233" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Churchland et al. provide a narrow empirical example in which PCA is used as preprocessing before a distinct dynamical projection method <span class="co">[</span><span class="ot">@ChurchlandEtAl2012</span><span class="co">]</span>.</span>
+<span id="cb1-234"><a href="#cb1-234" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-235"><a href="#cb1-235" aria-hidden="true" tabindex="-1"></a><span class="fu">## Reviews / secondary sources</span></span>
+<span id="cb1-236"><a href="#cb1-236" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-237"><a href="#cb1-237" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Jolliffe and Cadima review ordinary PCA's variance criterion, covariance eigendecomposition, centered-data SVD formulation, covariance-versus-correlation choice, and explained-variance usage <span class="co">[</span><span class="ot">@JolliffeCadima2016</span><span class="co">]</span>.</span>
+<span id="cb1-238"><a href="#cb1-238" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-239"><a href="#cb1-239" aria-hidden="true" tabindex="-1"></a><span class="fu">## Open methodological questions</span></span>
+<span id="cb1-240"><a href="#cb1-240" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-241"><a href="#cb1-241" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>How stable is the fitted subspace across animals, sessions, conditions, and preprocessing choices?</span>
+<span id="cb1-242"><a href="#cb1-242" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Which sample-splitting unit gives an honest held-out reconstruction test when rows are temporally or hierarchically dependent?</span>
+<span id="cb1-243"><a href="#cb1-243" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Which metric or scaling expresses the scientific cost of errors rather than measurement units alone?</span>
+<span id="cb1-244"><a href="#cb1-244" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>When do task-aware, probabilistic, nonlinear, or dynamical methods outperform rank-matched PCA without relying on an evaluation criterion that simply restates their training objective?</span>
+<span id="cb1-245"><a href="#cb1-245" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>How should uncertainty be reported when leading eigenvalues are close or the sample covariance is poorly estimated?</span>
+<span id="cb1-246"><a href="#cb1-246" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-247"><a href="#cb1-247" aria-hidden="true" tabindex="-1"></a><span class="fu">## Maturity checklist</span></span>
+<span id="cb1-248"><a href="#cb1-248" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-249"><a href="#cb1-249" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> States the variance and least-squares objectives and the conditions for their equivalence.</span>
+<span id="cb1-250"><a href="#cb1-250" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> Connects covariance eigendecomposition to SVD with explicit normalization.</span>
+<span id="cb1-251"><a href="#cb1-251" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> Declares learned and fixed quantities, including centering, scale, equal weighting, samples, metric, and rank.</span>
+<span id="cb1-252"><a href="#cb1-252" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> States sign, repeated-eigenvalue, and truncation-boundary ambiguities.</span>
+<span id="cb1-253"><a href="#cb1-253" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> Separates ordinary PCA from FA, PPCA, nonlinear embedding, and temporal or dynamical methods.</span>
+<span id="cb1-254"><a href="#cb1-254" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> Includes mean-only and fixed/random projection baselines plus held-out evaluation limits.</span>
+<span id="cb1-255"><a href="#cb1-255" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> Restricts empirical claims to an inspected primary neural-population example.</span>
+<span id="cb1-256"><a href="#cb1-256" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> Independent mixed review completed after one bounded correction round and focused re-review PASS.</span>
+<span id="cb1-257"><a href="#cb1-257" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> Separate status authorization completed; promoted to <span class="in">`L2/stable`</span>.</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></div>
+</div></div></div></div></div>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

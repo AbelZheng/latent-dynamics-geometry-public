@@ -1,0 +1,1792 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.10.18">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>P4-U03 — Temporal Covariance and Inference Benchmark – Latent Dynamics &amp; Geometry</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-445b8638c3d06994fee0907d791121c4.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-chtml.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../index.html">
+    <span class="navbar-title">Latent Dynamics &amp; Geometry</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../index.html"> 
+<span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../knowledge/concepts/index.html"> 
+<span class="menu-text">Concepts</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../knowledge/methods/index.html"> 
+<span class="menu-text">Methods</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../knowledge/math/index.html"> 
+<span class="menu-text">Math</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../knowledge/papers/index.html"> 
+<span class="menu-text">Papers</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../toy-models/index.html"> 
+<span class="menu-text">Toy Models</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../research-questions/index.html"> 
+<span class="menu-text">Research Questions</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../benchmarks/index.html"> 
+<span class="menu-text">Benchmarks</span></a>
+  </li>  
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/AbelZheng/latent-dynamics-geometry-public"> <i class="bi bi-github" role="img" aria-label="GitHub repository">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="https://github.com/AbelZheng/latent-dynamics-geometry-public/discussions"> 
+<span class="menu-text">Discussions</span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#p4-u03-temporal-covariance-and-inference-benchmark" id="toc-p4-u03-temporal-covariance-and-inference-benchmark" class="nav-link active" data-scroll-target="#p4-u03-temporal-covariance-and-inference-benchmark">P4-U03 — Temporal Covariance and Inference Benchmark</a>
+  <ul class="collapse">
+  <li><a href="#scientific-question" id="toc-scientific-question" class="nav-link" data-scroll-target="#scientific-question">Scientific question</a></li>
+  <li><a href="#ground-truth" id="toc-ground-truth" class="nav-link" data-scroll-target="#ground-truth">Ground truth</a></li>
+  <li><a href="#generation" id="toc-generation" class="nav-link" data-scroll-target="#generation">Generation</a></li>
+  <li><a href="#scenario-grid" id="toc-scenario-grid" class="nav-link" data-scroll-target="#scenario-grid">Scenario grid</a></li>
+  <li><a href="#negative-controls-and-stress-cases" id="toc-negative-controls-and-stress-cases" class="nav-link" data-scroll-target="#negative-controls-and-stress-cases">Negative controls and stress cases</a></li>
+  <li><a href="#replicates-and-deterministic-seeds" id="toc-replicates-and-deterministic-seeds" class="nav-link" data-scroll-target="#replicates-and-deterministic-seeds">Replicates and deterministic seeds</a></li>
+  <li><a href="#split-discipline" id="toc-split-discipline" class="nav-link" data-scroll-target="#split-discipline">Split discipline</a></li>
+  <li><a href="#methods-and-information-sets" id="toc-methods-and-information-sets" class="nav-link" data-scroll-target="#methods-and-information-sets">Methods and information sets</a></li>
+  <li><a href="#parameter-selection" id="toc-parameter-selection" class="nav-link" data-scroll-target="#parameter-selection">Parameter selection</a></li>
+  <li><a href="#inference" id="toc-inference" class="nav-link" data-scroll-target="#inference">Inference</a></li>
+  <li><a href="#scoring" id="toc-scoring" class="nav-link" data-scroll-target="#scoring">Scoring</a></li>
+  <li><a href="#failure-and-applicability-labels" id="toc-failure-and-applicability-labels" class="nav-link" data-scroll-target="#failure-and-applicability-labels">Failure and applicability labels</a></li>
+  <li><a href="#artifact-contract" id="toc-artifact-contract" class="nav-link" data-scroll-target="#artifact-contract">Artifact contract</a></li>
+  <li><a href="#results" id="toc-results" class="nav-link" data-scroll-target="#results">Results</a></li>
+  <li><a href="#interpretation-limits" id="toc-interpretation-limits" class="nav-link" data-scroll-target="#interpretation-limits">Interpretation limits</a></li>
+  <li><a href="#reproducibility" id="toc-reproducibility" class="nav-link" data-scroll-target="#reproducibility">Reproducibility</a></li>
+  <li><a href="#review-record" id="toc-review-record" class="nav-link" data-scroll-target="#review-record">Review record</a></li>
+  <li><a href="#maturity-checklist" id="toc-maturity-checklist" class="nav-link" data-scroll-target="#maturity-checklist">Maturity checklist</a></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<div class="quarto-title-block"><div><h1 class="title">P4-U03 — Temporal Covariance and Inference Benchmark</h1><button type="button" class="btn code-tools-button" id="quarto-code-tools-source"><i class="bi"></i> Code</button></div></div>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="p4-u03-temporal-covariance-and-inference-benchmark" class="level1">
+<h1>P4-U03 — Temporal Covariance and Inference Benchmark</h1>
+<section id="scientific-question" class="level2">
+<h2 class="anchored" data-anchor-id="scientific-question">Scientific question</h2>
+<p>Across a bounded collection of two-latent, six-channel synthetic trajectory problems, where are static references, two-stage smoothing, known and validation-selected Gaussian-process factor analysis (GPFA), deliberately wrong temporal covariances, one-lag-matched linear-Gaussian state-space inference, and exact finite-Gaussian oracles applicable, robust, or observably misspecified under their declared information sets?</p>
+<p>The benchmark separates observation likelihood, masked observation prediction, latent-path scoring, loading-subspace recovery, timescale selection, covariance fit, posterior calibration, and numerical-oracle agreement. It does not combine them into a total score. A smooth posterior mean is a conditional estimate under a covariance prior and observation model; it is not a learned transition law, vector field, physical trajectory, causal mechanism, or proof of dynamics.</p>
+</section>
+<section id="ground-truth" class="level2">
+<h2 class="anchored" data-anchor-id="ground-truth">Ground truth</h2>
+<p>Every trial has <span class="math inline">\(T=16\)</span> points on an equally spaced grid in <span class="math inline">\([0,1]\)</span>, latent dimension <span class="math inline">\(q=2\)</span>, and observed dimension <span class="math inline">\(p=6\)</span>. Under the nominal Gaussian family, the time-major latent vector has zero mean and block-diagonal coordinate covariance. For coordinate <span class="math inline">\(j\)</span>,</p>
+<p><span class="math display">\[
+k_j(t,t')=(1-0.02)\exp\left[-\frac{(t-t')^2}{2\tau_j^2}\right]
++0.02\,\mathbf 1[t=t'].
+\]</span></p>
+<p>The nominal distinct-timescale pair is <span class="math inline">\((\tau_1,\tau_2)=(0.10,0.32)\)</span>. The observation layer is</p>
+<p><span class="math display">\[
+y_t=Cz_t+d+\epsilon_t,
+\qquad \epsilon_t\sim\mathcal N(0,R),
+\]</span></p>
+<p>with the stable Covariance-Prior Trajectories loading matrix, offset, and diagonal residual covariance:</p>
+<p><span class="math display">\[
+C=
+\begin{pmatrix}
+1.00&amp;0.25\\
+0.70&amp;-0.45\\
+0.30&amp;0.90\\
+-0.65&amp;0.40\\
+0.80&amp;0.55\\
+-0.25&amp;-0.75
+\end{pmatrix},
+\quad
+d=(0.30,-0.20,0.15,0.05,-0.10,0.25)^\top,
+\]</span></p>
+<p><span class="math display">\[
+R=\operatorname{diag}(0.10,0.16,0.22,0.30,0.38,0.48).
+\]</span></p>
+<p>Whole trials are independent. No latent prior, filtering state, smoother state, or fitted statistic crosses a trial boundary. Latent paths and complete hidden observations are retained in a scoring-only payload. The stable <code>toy-models/covariance-prior-trajectories.py</code> object supplies scientific and design provenance for this benchmark, and its SHA-256 digest is recorded and verified. The benchmark does not import or call that executable source; its generator, fitting, conditioning, filtering, smoothing, scoring, artifact, and verification routines are benchmark-local. It does not edit the stable Phase 3 source or promote its illustrative results into general claims.</p>
+<p>The stress generators alter specific parts of this truth:</p>
+<ul>
+<li><code>latent_changepoint</code> sets cross-covariance between the first and second halves of each latent coordinate to zero, creating two independent Gaussian temporal segments; the exact oracle knows this block covariance, while nominal GPFA does not;</li>
+<li><code>correlated_residuals</code> retains the nominal residual variances and gives every off-diagonal pair residual correlation <span class="math inline">\(0.12\)</span>;</li>
+<li><code>low_rate_poisson</code> draws raw counts with <span class="math inline">\(\lambda_{tj}=\exp[-2+0.35(Cz_t+d)_j]\)</span> and then applies the bounded Gaussian analysis without pretending that the Gaussian observation law is correct;</li>
+<li><code>alignment_jitter</code> shifts each sampled latent path by <span class="math inline">\(-1\)</span>, <span class="math inline">\(0\)</span>, or <span class="math inline">\(1\)</span> bin, fills the exposed edge with the nearest retained value, and still analyzes the nominal grid; scoring uses the shifted retained path, so this is a bounded prior/alignment perturbation rather than a recovery claim about an unobserved event-relative path; and</li>
+<li><code>informative_missingness</code> hides entries above each test trial’s empirical 72nd percentile. The ordinary inference paths ignore information in the mask.</li>
+</ul>
+</section>
+<section id="generation" class="level2">
+<h2 class="anchored" data-anchor-id="generation">Generation</h2>
+<p>Generation receives only scenario, replicate, split, trial index, and a deterministic seed stream. It draws latent paths, applies the scenario-specific observation family, and returns separate train, validation, and test trial collections. Mask construction is a later stage and never changes the frozen complete realization.</p>
+<p>The nominal, close-timescale, sample-size, changepoint, correlated-residual, Poisson, equal-kernel, and jitter scenarios use a mixed masked-prediction design unless a mask is named explicitly: alternating test trials hide either one complete channel or all channels over the middle third of the sequence. The <code>channel_mask</code> scenario hides one complete channel in every test trial; the <code>time_block_mask</code> scenario hides every channel at indices 5–9; and <code>informative_missingness</code> uses the value-dependent rule above.</p>
+</section>
+<section id="scenario-grid" class="level2">
+<h2 class="anchored" data-anchor-id="scenario-grid">Scenario grid</h2>
+<p>The core-plus-stress grid has 12 predeclared scenarios and three independent replicates per scenario. Split sizes are numbers of independent trials and are written as train/validation/test.</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 23%">
+<col style="width: 23%">
+<col style="width: 30%">
+<col style="width: 23%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Scenario</th>
+<th>Class</th>
+<th style="text-align: right;">Split sizes</th>
+<th>Declared change</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>reference_distinct</code></td>
+<td>timescale separation</td>
+<td style="text-align: right;">5/3/3</td>
+<td>squared-exponential <span class="math inline">\((0.10,0.32)\)</span></td>
+</tr>
+<tr class="even">
+<td><code>close_timescales</code></td>
+<td>timescale separation</td>
+<td style="text-align: right;">5/3/3</td>
+<td><span class="math inline">\((0.18,0.24)\)</span></td>
+</tr>
+<tr class="odd">
+<td><code>low_trial_count</code></td>
+<td>trial/sample size</td>
+<td style="text-align: right;">2/1/2</td>
+<td>fewer independent trials</td>
+</tr>
+<tr class="even">
+<td><code>high_trial_count</code></td>
+<td>trial/sample size</td>
+<td style="text-align: right;">8/4/4</td>
+<td>more independent trials</td>
+</tr>
+<tr class="odd">
+<td><code>channel_mask</code></td>
+<td>missing channels</td>
+<td style="text-align: right;">5/3/3</td>
+<td>one complete channel hidden per test trial</td>
+</tr>
+<tr class="even">
+<td><code>time_block_mask</code></td>
+<td>missing time block</td>
+<td style="text-align: right;">5/3/3</td>
+<td>all channels hidden at indices 5–9</td>
+</tr>
+<tr class="odd">
+<td><code>latent_changepoint</code></td>
+<td>temporal nonstationarity</td>
+<td style="text-align: right;">5/3/3</td>
+<td>independent pre/post Gaussian covariance blocks</td>
+</tr>
+<tr class="even">
+<td><code>correlated_residuals</code></td>
+<td>observation covariance</td>
+<td style="text-align: right;">5/3/3</td>
+<td>non-diagonal Gaussian residual covariance</td>
+</tr>
+<tr class="odd">
+<td><code>low_rate_poisson</code></td>
+<td>observation-family misspecification</td>
+<td style="text-align: right;">5/3/3</td>
+<td>raw low-rate Poisson counts</td>
+</tr>
+<tr class="even">
+<td><code>equal_kernels</code></td>
+<td>temporal identifiability</td>
+<td style="text-align: right;">5/3/3</td>
+<td><span class="math inline">\((0.20,0.20)\)</span></td>
+</tr>
+<tr class="odd">
+<td><code>alignment_jitter</code></td>
+<td>alignment stress</td>
+<td style="text-align: right;">5/3/3</td>
+<td>seed-derived <span class="math inline">\(-1/0/1\)</span>-bin shift and edge fill</td>
+</tr>
+<tr class="even">
+<td><code>informative_missingness</code></td>
+<td>non-ignorable mask</td>
+<td style="text-align: right;">5/3/3</td>
+<td>hide upper-tail observed values</td>
+</tr>
+</tbody>
+</table>
+<p>This is not a factorial design. Changes in timescale, split size, observation law, residual covariance, and mask geometry are scenario-level interventions; differences between scenario summaries do not isolate causal effects of one factor.</p>
+</section>
+<section id="negative-controls-and-stress-cases" class="level2">
+<h2 class="anchored" data-anchor-id="negative-controls-and-stress-cases">Negative controls and stress cases</h2>
+<p>Two covariance misspecifications are retained in every scenario:</p>
+<ol type="1">
+<li><code>wrong_timescale_gpfa</code> fixes a common squared-exponential pair <span class="math inline">\((0.06,0.06)\)</span>; and</li>
+<li><code>wrong_ar_gpfa</code> replaces the squared-exponential family with an AR(1) covariance whose one-lag coefficient is derived from each declared timescale.</li>
+</ol>
+<p>The same AR family supplies the online Kalman filter and retrospective RTS smoother. Matching a one-lag covariance does not make its longer-lag decay equal to a squared-exponential kernel. The changepoint, correlated-residual, Poisson, equal-kernel, jitter, and informative-mask scenarios are also retained as structured assumption failures. None is tuned away after results are seen.</p>
+<p>The exact Gaussian oracle is emitted only when the scenario has a finite Gaussian observation law, no jitter construction, and an ignorable mask. It uses the true correlated residual or changepoint covariance where applicable. It is absent—not assigned a fabricated score—for Poisson, jitter, and informative-missingness scenarios.</p>
+</section>
+<section id="replicates-and-deterministic-seeds" class="level2">
+<h2 class="anchored" data-anchor-id="replicates-and-deterministic-seeds">Replicates and deterministic seeds</h2>
+<p>Each scenario has three independent replicates. Trial draws are independent within and across train, validation, and test. Random streams use <code>PCG64(SeedSequence(...))</code> with the master seed <code>20260820</code>, a SHA-256-derived scenario code, replicate, stage, split code, and trial index. The mapping is independent of traversal order.</p>
+<p>Three replicates support only bounded descriptive summaries. The reported q10 and q90 are interpolated quantiles of three replicate-level values, not confidence intervals, uncertainty bands, or stable tail estimates.</p>
+</section>
+<section id="split-discipline" class="level2">
+<h2 class="anchored" data-anchor-id="split-discipline">Split discipline</h2>
+<p>The lawful fitting interface accepts only tuples of train and validation observations. Training observations fit the static factor/PCA state and channel means and variances. Every predeclared timescale candidate is scored by the <strong>combined total train plus validation marginal NLL</strong>; the validation-only component is also retained as a diagnostic. The selection and fitting interface has no test or latent-truth argument.</p>
+<p>A second interface receives frozen states plus test observations and masks. It performs test-time filtering, smoothing, conditioning, or deterministic recovery without access to train/validation arrays or truth. Only the scoring stage joins latent paths, complete hidden observations, scenario covariance, or loading truth. Poison checks require excluded test observations and latent truth to leave fitted states and fixed-observation recoveries unchanged, while an allowed training perturbation must change the fitted state.</p>
+</section>
+<section id="methods-and-information-sets" class="level2">
+<h2 class="anchored" data-anchor-id="methods-and-information-sets">Methods and information sets</h2>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Method</th>
+<th>Role</th>
+<th>Parameters</th>
+<th>Information set</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>mean_diagonal</code></td>
+<td>independent observation reference</td>
+<td>train mean/variance</td>
+<td>static observation</td>
+</tr>
+<tr class="even">
+<td><code>static_factor</code></td>
+<td>pooled-bin rank-two PCA/factor reference</td>
+<td>train</td>
+<td>static observation</td>
+</tr>
+<tr class="odd">
+<td><code>two_stage_pca_smooth</code></td>
+<td>static PCA scores followed by coordinate-wise GP smoothing</td>
+<td>train state plus selected timescales</td>
+<td>retrospective</td>
+</tr>
+<tr class="even">
+<td><code>independent_channel_gp</code></td>
+<td>channel-wise temporal interpolation with no cross-channel borrowing</td>
+<td>train mean/variance plus mean selected timescale</td>
+<td>retrospective</td>
+</tr>
+<tr class="odd">
+<td><code>known_gpfa</code></td>
+<td>nominal GPFA with declared scenario timescales but nominal <span class="math inline">\(C,d,R\)</span></td>
+<td>known nominal</td>
+<td>retrospective</td>
+</tr>
+<tr class="even">
+<td><code>selected_gpfa</code></td>
+<td>GPFA with known nominal <span class="math inline">\(C,d,R\)</span> and finite-grid selected timescales</td>
+<td>train/validation</td>
+<td>retrospective</td>
+</tr>
+<tr class="odd">
+<td><code>wrong_timescale_gpfa</code></td>
+<td>common short-timescale squared-exponential control</td>
+<td>fixed wrong</td>
+<td>retrospective</td>
+</tr>
+<tr class="even">
+<td><code>wrong_ar_gpfa</code></td>
+<td>batch Gaussian conditioning under the one-lag-matched AR covariance</td>
+<td>fixed wrong family</td>
+<td>retrospective</td>
+</tr>
+<tr class="odd">
+<td><code>ar_kalman_filter</code></td>
+<td>recursive AR-state estimate</td>
+<td>known nominal AR approximation</td>
+<td>online</td>
+</tr>
+<tr class="even">
+<td><code>ar_rts_smoother</code></td>
+<td>fixed-interval smoother under the same AR approximation</td>
+<td>known nominal AR approximation</td>
+<td>retrospective</td>
+</tr>
+<tr class="odd">
+<td><code>exact_gaussian_oracle</code></td>
+<td>direct true-scenario finite-Gaussian reference</td>
+<td>true scenario</td>
+<td>oracle retrospective</td>
+</tr>
+</tbody>
+</table>
+<p>Online, retrospective, static, and oracle information sets remain separate. In particular, the RTS smoother and all GP path posteriors use future observations within the retained trial and are not online competitors to the Kalman filter. <code>wrong_ar_gpfa</code> and <code>ar_rts_smoother</code> share the same AR covariance target but use batch and recursive computations respectively; their agreement is an implementation relationship, not evidence that the AR family generated the data.</p>
+<p>The known and selected GPFA variants hold the observation loading, offset, and nominal diagonal residual covariance fixed. Thus they test temporal covariance and inference, not full GPFA parameter learning. Under correlated residuals and changepoints, <code>known_gpfa</code> means known <strong>nominal</strong> parameters, whereas <code>exact_gaussian_oracle</code> contains the true scenario covariance.</p>
+</section>
+<section id="parameter-selection" class="level2">
+<h2 class="anchored" data-anchor-id="parameter-selection">Parameter selection</h2>
+<p>The selected GPFA chooses from seven ordered pairs:</p>
+<p><span class="math display">\[
+(0.07,0.22), (0.07,0.32), (0.10,0.22), (0.10,0.32),
+(0.10,0.45), (0.16,0.32), (0.16,0.45).
+\]</span></p>
+<p>Each candidate is scored by total train plus validation marginal Gaussian NLL; ties are broken by the ordered pair. The selected state and its validation NLL are frozen before test inference. The grid includes the nominal distinct pair but not every scenario truth: for example, neither <span class="math inline">\((0.18,0.24)\)</span> nor <span class="math inline">\((0.20,0.20)\)</span> is available. <code>timescale_l1</code> is the unnormalized diagnostic <span class="math inline">\(|\hat\tau_1-\tau_1|+|\hat\tau_2-\tau_2|\)</span> under the externally fixed loading coordinate convention. It is not a biological timescale error, an optimizer consistency claim, or a coordinate-identification result under equal kernels.</p>
+</section>
+<section id="inference" class="level2">
+<h2 class="anchored" data-anchor-id="inference">Inference</h2>
+<p>For masked observation prediction, <code>static_factor</code> treats time bins as independent and conditions the training-fitted rank-two Gaussian observation model on the visible channels at each bin. It can borrow same-bin cross-channel covariance but has no cross-time interpolation. Its latent output is likewise an independent-bin factor posterior mean computed from visible channels only; it does not use hidden targets and is not a temporally smoothed path posterior.</p>
+<p>The two-stage method fills masked entries with the training mean, projects to two static scores, and smooths each score with the selected squared-exponential covariance. Its hidden-observation predictive variance is the diagonal of the training-fitted static residual covariance, frozen before test scoring. The independent-channel method conditions each channel only on its own visible times, so it cannot borrow other channels to recover a fully hidden channel.</p>
+<p>GPFA-like methods use finite dense Gaussian conditioning. The AR filter uses observations only through the current time, while RTS and batch AR conditioning use the full declared interval. Every trial starts from its own prior; no state is carried across trials.</p>
+<p>For <code>static_factor</code> and <code>two_stage_pca_smooth</code>, one orthogonal scoring rotation is fitted from all training-trial estimates and training latent truth within each scenario replicate. That replicate-level rotation is then frozen and applied unchanged to every test trial. It is never refitted on test truth. Known-layer GPFA and AR methods retain their declared coordinates and receive no fitted rotation. This scoring convention handles the broader coordinate ambiguity of the learned static/two-stage estimates but is not available to inference and does not establish unique latent coordinates. Reported pointwise coverage uses the plug-in marginal variances supplied by the original model; it omits parameter-selection uncertainty and is only a bounded diagnostic, especially under equal kernels or misspecification.</p>
+</section>
+<section id="scoring" class="level2">
+<h2 class="anchored" data-anchor-id="scoring">Scoring</h2>
+<p>Every raw row has metric-specific <code>provenance</code> and <code>target</code> metadata. The artifact emits exactly the following ten metrics:</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Metric</th>
+<th>Provenance</th>
+<th>Target and definition</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>marginal_nll_per_entry</code></td>
+<td><code>test</code></td>
+<td>held-out observation distribution. Joint Gaussian methods score complete test trials; the online AR filter uses sequential visible-entry innovation NLL. These different information/protocol rows are not pooled into one rank</td>
+</tr>
+<tr class="even">
+<td><code>masked_prediction_rmse</code></td>
+<td><code>test</code></td>
+<td>RMSE on the complete observations hidden from inference by the declared mask</td>
+</tr>
+<tr class="odd">
+<td><code>masked_prediction_nll_per_entry</code></td>
+<td><code>test</code></td>
+<td>Gaussian score on hidden observations when the method supplies a conditional scale. The two-stage method uses the diagonal training-fitted static residual covariance, frozen before test; it does not estimate its scale from hidden test residuals</td>
+</tr>
+<tr class="even">
+<td><code>latent_rmse</code></td>
+<td><code>test</code></td>
+<td>RMSE of scoring-only orthogonally aligned posterior/score means against retained latent paths</td>
+</tr>
+<tr class="odd">
+<td><code>latent_90_coverage</code></td>
+<td><code>test</code></td>
+<td>pointwise marginal 90% plug-in interval coverage for methods with declared posterior variance</td>
+</tr>
+<tr class="even">
+<td><code>loading_subspace_angle_degrees</code></td>
+<td><code>fit_diagnostic</code></td>
+<td>maximum principal angle between the training-fitted static/two-stage rank-two basis and <span class="math inline">\(\operatorname{col}(C)\)</span>; known-layer methods do not receive zero-valued recovery rows</td>
+</tr>
+<tr class="odd">
+<td><code>timescale_l1</code></td>
+<td><code>fit_diagnostic</code></td>
+<td>selected-pair L1 discrepancy under the fixed coordinate convention</td>
+</tr>
+<tr class="even">
+<td><code>selected_combined_nll_per_entry</code></td>
+<td><code>fit_diagnostic</code></td>
+<td>combined train-plus-validation Gaussian NLL per entry of the selected timescale candidate; this is the actual selection criterion, not a validation-only score</td>
+</tr>
+<tr class="odd">
+<td><code>covariance_relative_frobenius</code></td>
+<td><code>fit_diagnostic</code></td>
+<td>candidate finite observation covariance versus the declared finite-Gaussian scenario covariance. It is inapplicable to Poisson and jitter scenarios rather than compared to an invented covariance truth</td>
+</tr>
+<tr class="even">
+<td><code>posterior_mean_oracle_max_abs</code></td>
+<td><code>oracle_diagnostic</code></td>
+<td>maximum known-GPFA covariance-form versus precision-form posterior-mean discrepancy, only where nominal known GPFA is the exact scenario model</td>
+</tr>
+</tbody>
+</table>
+<p>For each scenario-replicate-method-metric key, the relevant held-out trials, hidden entries, time points, or fitted diagnostic are first combined into one replicate-level value. <code>diagnostics.json</code> then reports median, q10, q90, <code>ok</code> rate, failure rate, and applicability rate across the three independent replicates for each scenario <span class="math inline">\(\times\)</span> method <span class="math inline">\(\times\)</span> metric group. Trials, time bins, channels, and hidden entries are not treated as independent replicates. Unlike metrics and unlike information sets are not normalized, averaged, or ranked together.</p>
+</section>
+<section id="failure-and-applicability-labels" class="level2">
+<h2 class="anchored" data-anchor-id="failure-and-applicability-labels">Failure and applicability labels</h2>
+<p><code>results.csv</code> retains the full Cartesian product of 12 scenarios, three replicates, 11 methods, and ten metrics: 3,960 canonical rows. Applicability is resolved before inference or scoring failure. Every row has exactly one status:</p>
+<ul>
+<li><code>ok</code>: applicable and finite under the declared computation;</li>
+<li><code>nonconvergence</code>: a linear-algebra or bounded numerical procedure failed;</li>
+<li><code>invalid</code>: malformed, missing, non-finite, or otherwise invalid output;</li>
+<li><code>inapplicable</code>: the method or scenario does not define the target.</li>
+</ul>
+<p>Every non-<code>ok</code> row has a machine-readable reason and no numeric value. Natural execution produced 2,049 <code>ok</code>, 1,911 <code>inapplicable</code>, zero <code>nonconvergence</code>, and zero <code>invalid</code> rows. This absence is not evidence that numerical failure is impossible; the verifier separately fault-injects linear-algebra and non-finite failures and checks their labels.</p>
+<p>Examples of principled inapplicability include no latent trajectory for the mean or independent-channel reference, no latent coverage for deterministic static/two-stage estimates, no learned-loading target for known-layer methods, no exact Gaussian oracle for Poisson/jitter/informative masks, and no finite Gaussian covariance target for Poisson or jitter.</p>
+</section>
+<section id="artifact-contract" class="level2">
+<h2 class="anchored" data-anchor-id="artifact-contract">Artifact contract</h2>
+<p><code>benchmarks/artifacts/temporal-covariance-inference/</code> contains exactly:</p>
+<pre class="text"><code>manifest.json
+results.csv
+diagnostics.json
+summary.png</code></pre>
+<p>The manifest freezes the generator, scenarios, methods, metrics, split sizes, seed mapping, selection grid, capability boundaries, status vocabulary, canonical row ordering, strict resume semantics, commands, runtime, Phase 3 source digest, and SHA-256 hashes. The figure is a target-separated diagnostic view, not acceptance evidence or a leaderboard.</p>
+</section>
+<section id="results" class="level2">
+<h2 class="anchored" data-anchor-id="results">Results</h2>
+<p>The following are bounded q10/median/q90 summaries across three replicates. They describe this simulator and cannot establish general method order.</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 16%">
+<col style="width: 16%">
+<col style="width: 22%">
+<col style="width: 22%">
+<col style="width: 22%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Scenario and target</th>
+<th>Method</th>
+<th style="text-align: right;">q10</th>
+<th style="text-align: right;">Median</th>
+<th style="text-align: right;">q90</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Reference masked-observation RMSE</td>
+<td>mean diagonal</td>
+<td style="text-align: right;">0.7530</td>
+<td style="text-align: right;">0.8646</td>
+<td style="text-align: right;">0.9850</td>
+</tr>
+<tr class="even">
+<td>Reference masked-observation RMSE</td>
+<td>static factor</td>
+<td style="text-align: right;">0.6091</td>
+<td style="text-align: right;">0.6261</td>
+<td style="text-align: right;">0.7862</td>
+</tr>
+<tr class="odd">
+<td>Reference masked-observation RMSE</td>
+<td>known GPFA</td>
+<td style="text-align: right;">0.5058</td>
+<td style="text-align: right;">0.5226</td>
+<td style="text-align: right;">0.5577</td>
+</tr>
+<tr class="even">
+<td>Reference masked-observation RMSE</td>
+<td>selected GPFA</td>
+<td style="text-align: right;">0.5058</td>
+<td style="text-align: right;">0.5226</td>
+<td style="text-align: right;">0.5577</td>
+</tr>
+<tr class="odd">
+<td>Reference masked-observation RMSE</td>
+<td>wrong common timescale</td>
+<td style="text-align: right;">0.5754</td>
+<td style="text-align: right;">0.5868</td>
+<td style="text-align: right;">0.6102</td>
+</tr>
+<tr class="even">
+<td>Reference masked-observation RMSE</td>
+<td>wrong AR covariance</td>
+<td style="text-align: right;">0.5161</td>
+<td style="text-align: right;">0.5666</td>
+<td style="text-align: right;">0.5795</td>
+</tr>
+<tr class="odd">
+<td>Reference latent RMSE, retrospective</td>
+<td>known GPFA</td>
+<td style="text-align: right;">0.2338</td>
+<td style="text-align: right;">0.2572</td>
+<td style="text-align: right;">0.2711</td>
+</tr>
+<tr class="even">
+<td>Reference latent RMSE, retrospective</td>
+<td>RTS smoother</td>
+<td style="text-align: right;">0.2580</td>
+<td style="text-align: right;">0.2741</td>
+<td style="text-align: right;">0.2796</td>
+</tr>
+<tr class="odd">
+<td>Reference latent RMSE, retrospective</td>
+<td>two-stage PCA + smoothing</td>
+<td style="text-align: right;">0.5243</td>
+<td style="text-align: right;">0.5455</td>
+<td style="text-align: right;">0.6454</td>
+</tr>
+<tr class="even">
+<td>Reference latent RMSE, online</td>
+<td>AR Kalman filter</td>
+<td style="text-align: right;">0.3289</td>
+<td style="text-align: right;">0.3359</td>
+<td style="text-align: right;">0.4239</td>
+</tr>
+</tbody>
+</table>
+<p>Online and retrospective rows are shown with explicit labels and are not one rank. In the reference scenario, all three selected-GPFA replicates chose the nominal pair <span class="math inline">\((0.10,0.32)\)</span>, so selected and known results coincide. This is one finite-grid outcome, not general hyperparameter recovery.</p>
+<p>The mask-specific boundaries remain visible. For a completely hidden channel, known-GPFA median prediction RMSE is 0.4768, while the no-cross-channel independent GP median is 0.9267. For the fully hidden time block, known GPFA is 0.6892 and the retrospective AR smoother is 0.7597. These differences are conditional on their covariance families and the declared masks.</p>
+<p>Selection becomes less exact under other grids: median <code>timescale_l1</code> is 0.10 for close timescales, 0.10 with low trial count, 0.00 with high trial count, and 0.16 for equal kernels. The equal-kernel value mainly records mismatch between the fixed candidate grid and <span class="math inline">\((0.20,0.20)\)</span>; it does not identify ordered latent axes.</p>
+<p>The stress scenarios distinguish nominal from scenario-aware references. Under the covariance changepoint, nominal known-GPFA median latent RMSE is 0.3814, while the true block-covariance Gaussian oracle is 0.3189. Under correlated residuals, nominal known-GPFA median held-out Gaussian NLL is 0.9550 per entry, versus 0.9364 for the true residual-covariance oracle. These are scenario-specific misspecification diagnostics.</p>
+<p>Raw low-rate Poisson counts are a more severe observation-family violation: nominal known-GPFA median latent RMSE is 1.0815 and its nominal pointwise 90% coverage is 0.3750. These Gaussian numbers are approximation diagnostics, not a calibrated count-model evaluation. Under informative missingness, known-GPFA median hidden-observation RMSE is 0.7129 and independent-channel GP is 1.3320; the mask is non-ignorable, so neither value validates ordinary missing-at-random conditioning.</p>
+<p>The largest applicable known-GPFA covariance-form versus precision-form posterior-mean discrepancy is approximately <span class="math inline">\(3.12\times10^{-10}\)</span>. Independent AR recursion-versus-batch checks are below <span class="math inline">\(1.0\times10^{-10}\)</span> for means and <span class="math inline">\(4.0\times10^{-11}\)</span> for marginal variances. These are implementation checks, not scientific performance scores.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="artifacts/temporal-covariance-inference/summary.png" class="img-fluid figure-img"></p>
+<figcaption>Target-specific temporal covariance summaries</figcaption>
+</figure>
+</div>
+<p>The figure has six separate panels: static-information-set reference masked prediction; retrospective reference masked prediction; online reference latent RMSE; retrospective reference latent RMSE; oracle-retrospective reference masked prediction; and the close-timescale selection diagnostic. It does not display informative missingness, combine online with retrospective methods, or construct a pooled total score.</p>
+</section>
+<section id="interpretation-limits" class="level2">
+<h2 class="anchored" data-anchor-id="interpretation-limits">Interpretation limits</h2>
+<p>This benchmark establishes only scenario-, target-, information-set-, metric-, and implementation-conditional behavior.</p>
+<ul>
+<li>A smooth GPFA or RTS posterior mean is not a learned transition equation, vector field, flow, or measured mechanism.</li>
+<li>GPFA covariance kernels and AR/LGSSM transitions can generate visually similar estimates while making different temporal assumptions.</li>
+<li>The online filter cannot be ranked as if it had the smoother’s future observations; the exact oracle cannot be treated as deployable.</li>
+<li>Known/selected GPFA hold the observation layer fixed and therefore do not test general full-parameter GPFA learning.</li>
+<li>A replicate-level Procrustes rotation fitted once on training truth and frozen for test scoring does not identify latent coordinates. Equal kernels preserve an especially important rotational ambiguity.</li>
+<li>Plug-in intervals omit parameter and model-selection uncertainty. Coverage under Poisson, residual-correlation, changepoint, jitter, or informative-mask misspecification is descriptive, not a calibration guarantee.</li>
+<li>Gaussian NLL on raw Poisson counts is not a count likelihood. Ordinary conditioning under informative missingness does not model the missingness process.</li>
+<li>Lower prediction or latent error does not prove representation, mechanism, causality, intrinsic dimension, manifold structure, biological validity, or real-data transfer.</li>
+</ul>
+<p>No result authorizes a cross-task total score, universal winner, P4-U04 work, Phase 5 work, or real-data claims.</p>
+</section>
+<section id="reproducibility" class="level2">
+<h2 class="anchored" data-anchor-id="reproducibility">Reproducibility</h2>
+<p>Generate and verify with the bundled workspace Python runtime:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">/Users/bytedance/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3</span> benchmarks/temporal-covariance-inference.py <span class="at">--generate</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="ex">/Users/bytedance/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3</span> benchmarks/temporal-covariance-inference.py <span class="at">--verify</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>The verifier checks:</p>
+<ul>
+<li>the exact four-file artifact inventory and SHA-256 hashes;</li>
+<li>all 3,960 expected unique rows, canonical ordering, and recomputed summaries;</li>
+<li>byte-identical clean regeneration and reversed scenario/replicate traversal;</li>
+<li>byte-identical valid partial resume and rejection of corrupted, stale, duplicate, unknown-key, or incomplete partial rows;</li>
+<li>fitting/selection and frozen-inference capability boundaries;</li>
+<li>test-observation and latent-truth poison invariance;</li>
+<li>covariance-form versus precision-form GP posterior agreement;</li>
+<li>recursive RTS versus direct AR batch agreement and true-scenario oracle covariance wiring; and</li>
+<li>explicit <code>invalid</code>/<code>nonconvergence</code> labels under non-finite and linear-algebra fault injection.</li>
+</ul>
+<p>The system <code>python3</code> is not the recorded numerical runtime; reproducibility commands intentionally use the bundled executable written in <code>manifest.json</code>.</p>
+</section>
+<section id="review-record" class="level2">
+<h2 class="anchored" data-anchor-id="review-record">Review record</h2>
+<p>Independent scientific and implementation reviewers were read-only and independent of the executors. Their initial reviews returned <code>REVISE</code> on static-factor hidden-mask fairness, artifact reconciliation, frozen training alignment, selection semantics, source provenance, expanded scenario oracles, and real-path fault routing. The bounded correction pass addressed only those findings; focused scientific and implementation re-reviews both returned <code>PASS</code> with no unresolved finding.</p>
+<p>The accepted validation record includes 60-object structural validation, 33 repository tests, the full artifact verifier, target/index renders, workflow validation, and <code>git diff --check</code>. The recorded review decision then authorized the mechanical promotion to <code>L1/stable</code>. Stable status records bounded acceptance of this declared synthetic Benchmark Object; it does not expand its evidence, information-set, target, or interpretation boundaries.</p>
+</section>
+<section id="maturity-checklist" class="level2">
+<h2 class="anchored" data-anchor-id="maturity-checklist">Maturity checklist</h2>
+<ul class="task-list">
+<li><label><input type="checkbox" checked="">The temporal generator and all 12 scenarios are bounded and explicit.</label></li>
+<li><label><input type="checkbox" checked="">Gaussian, correlated-Gaussian, and raw Poisson observation families are distinguished.</label></li>
+<li><label><input type="checkbox" checked="">Train, validation, test, static, online, retrospective, and oracle information sets are labelled.</label></li>
+<li><label><input type="checkbox" checked="">Known, selected, nominal-wrong, wrong-family, and true-scenario parameters are distinguished.</label></li>
+<li><label><input type="checkbox" checked="">Generation, fitting/selection, inference, masking, and scoring have separate capability contracts.</label></li>
+<li><label><input type="checkbox" checked="">Metric-specific provenance, targets, applicability, and two-level summaries are declared without a pooled score.</label></li>
+<li><label><input type="checkbox" checked="">All 3,960 raw rows and exactly four byte-verifiable artifacts are retained.</label></li>
+<li><label><input type="checkbox" checked="">Full artifact verification passes.</label></li>
+<li><label><input type="checkbox" checked="">Verified bounded results and interpretation limits are recorded.</label></li>
+<li><label><input type="checkbox" checked="">Focused scientific re-review PASS is recorded.</label></li>
+<li><label><input type="checkbox" checked="">Independent implementation review PASS is recorded.</label></li>
+<li><label><input type="checkbox" checked="">review-authorized mechanical promotion to <code>L1/stable</code> is complete.</label></li>
+</ul>
+
+
+<!-- -->
+
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+    const viewSource = window.document.getElementById('quarto-view-source') ||
+                       window.document.getElementById('quarto-code-tools-source');
+    if (viewSource) {
+      const sourceUrl = viewSource.getAttribute("data-quarto-source-url");
+      viewSource.addEventListener("click", function(e) {
+        if (sourceUrl) {
+          // rstudio viewer pane
+          if (/\bcapabilities=\b/.test(window.location)) {
+            window.open(sourceUrl);
+          } else {
+            window.location.href = sourceUrl;
+          }
+        } else {
+          const modal = new bootstrap.Modal(document.getElementById('quarto-embedded-source-code-modal'));
+          modal.show();
+        }
+        return false;
+      });
+    }
+    function toggleCodeHandler(show) {
+      return function(e) {
+        const cellDetails = window.document.querySelectorAll(".cell details.code-fold");
+        for (let i=0; i<cellDetails.length; i++) {
+          const details = cellDetails[i];
+          if (show) {
+            details.open = true;
+          } else {
+            details.removeAttribute("open");
+          }
+        }
+        const cellCodeDivs = window.document.querySelectorAll(".cell div.sourceCode.cell-code");
+        const fromCls = show ? "hidden" : "unhidden";
+        const toCls = show ? "unhidden" : "hidden";
+        for (let i=0; i<cellCodeDivs.length; i++) {
+          const codeDiv = cellCodeDivs[i];
+          if (codeDiv.classList.contains(fromCls)) {
+            codeDiv.classList.remove(fromCls);
+            codeDiv.classList.add(toCls);
+          } 
+        }
+        return false;
+      }
+    }
+    const hideAllCode = window.document.getElementById("quarto-hide-all-code");
+    if (hideAllCode) {
+      hideAllCode.addEventListener("click", toggleCodeHandler(false));
+    }
+    const showAllCode = window.document.getElementById("quarto-show-all-code");
+    if (showAllCode) {
+      showAllCode.addEventListener("click", toggleCodeHandler(true));
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/abelzheng\.github\.io\/latent-dynamics-geometry-public\/");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+            // target, if specified
+            link.setAttribute("target", "_blank");
+            if (link.getAttribute("rel") === null) {
+              link.setAttribute("rel", "noopener");
+            }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<input type="hidden" id="giscus-base-theme" value="preferred_color_scheme">
+<input type="hidden" id="giscus-alt-theme" value="preferred_color_scheme">
+<script>
+  function loadGiscus() {
+    // Function to get the theme based on body class
+    const getTheme = () => {
+      let baseTheme = document.getElementById('giscus-base-theme').value;
+      let altTheme = document.getElementById('giscus-alt-theme').value;
+      return document.body.classList.contains('quarto-dark') ? altTheme : baseTheme;
+    };
+    const script = document.createElement("script");
+    script.src = "https://giscus.app/client.js";
+    script.async = true;
+    script.dataset.repo = "AbelZheng/latent-dynamics-geometry-public";
+    script.dataset.repoId = "R_kgDOT-VBkw";
+    script.dataset.category = "Announcements";
+    script.dataset.categoryId = "DIC_kwDOT-VBk84DDyEz";
+    script.dataset.mapping = "pathname";
+    script.dataset.reactionsEnabled = "1";
+    script.dataset.emitMetadata = "0";
+    script.dataset.inputPosition = "bottom";
+    script.dataset.theme = getTheme();
+    script.dataset.lang = "en";
+    script.crossOrigin = "anonymous";
+    // Append the script to the desired div instead of at the end of the body
+    document.getElementById("quarto-content").appendChild(script);
+  }
+  loadGiscus();
+</script><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">Source Code</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3" data-shortcodes="false"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="an">title:</span><span class="co"> "P4-U03 — Temporal Covariance and Inference Benchmark"</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="an">object_type:</span><span class="co"> benchmark</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="an">maturity:</span><span class="co"> L1</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="an">status:</span><span class="co"> stable</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="an">domain:</span><span class="co"> [latent-modeling, temporal-modeling, gaussian-processes, state-space-models, benchmarking]</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="an">tags:</span><span class="co"> [gpfa, temporal-covariance, kalman-filter, rts-smoother, missing-data, misspecification, synthetic-ground-truth]</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="an">prerequisites:</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="co">- knowledge/methods/gaussian-process-factor-analysis.qmd</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="co">- knowledge/methods/linear-gaussian-state-space-model.qmd</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a><span class="co">- knowledge/methods/kalman-filtering.qmd</span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a><span class="co">- knowledge/methods/kalman-smoothing.qmd</span></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a><span class="co">- toy-models/covariance-prior-trajectories.qmd</span></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a><span class="an">related:</span></span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a><span class="co">- benchmarks/linear-gaussian-robustness.qmd</span></span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a><span class="co">- benchmarks/static-linear-latent-robustness.qmd</span></span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a><span class="an">created:</span><span class="co"> 2026-08-20</span></span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a><span class="an">updated:</span><span class="co"> 2026-08-20</span></span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a><span class="fu"># P4-U03 — Temporal Covariance and Inference Benchmark</span></span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a><span class="fu">## Scientific question</span></span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a>Across a bounded collection of two-latent, six-channel synthetic trajectory</span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a>problems, where are static references, two-stage smoothing, known and</span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a>validation-selected Gaussian-process factor analysis (GPFA), deliberately</span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a>wrong temporal covariances, one-lag-matched linear-Gaussian state-space</span>
+<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a>inference, and exact finite-Gaussian oracles applicable, robust, or observably</span>
+<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a>misspecified under their declared information sets?</span>
+<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a>The benchmark separates observation likelihood, masked observation prediction,</span>
+<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a>latent-path scoring, loading-subspace recovery, timescale selection, covariance</span>
+<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a>fit, posterior calibration, and numerical-oracle agreement. It does not combine</span>
+<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a>them into a total score. A smooth posterior mean is a conditional estimate under</span>
+<span id="cb3-36"><a href="#cb3-36" aria-hidden="true" tabindex="-1"></a>a covariance prior and observation model; it is not a learned transition law,</span>
+<span id="cb3-37"><a href="#cb3-37" aria-hidden="true" tabindex="-1"></a>vector field, physical trajectory, causal mechanism, or proof of dynamics.</span>
+<span id="cb3-38"><a href="#cb3-38" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-39"><a href="#cb3-39" aria-hidden="true" tabindex="-1"></a><span class="fu">## Ground truth</span></span>
+<span id="cb3-40"><a href="#cb3-40" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-41"><a href="#cb3-41" aria-hidden="true" tabindex="-1"></a>Every trial has $T=16$ points on an equally spaced grid in $<span class="co">[</span><span class="ot">0,1</span><span class="co">]</span>$, latent</span>
+<span id="cb3-42"><a href="#cb3-42" aria-hidden="true" tabindex="-1"></a>dimension $q=2$, and observed dimension $p=6$. Under the nominal Gaussian</span>
+<span id="cb3-43"><a href="#cb3-43" aria-hidden="true" tabindex="-1"></a>family, the time-major latent vector has zero mean and block-diagonal</span>
+<span id="cb3-44"><a href="#cb3-44" aria-hidden="true" tabindex="-1"></a>coordinate covariance. For coordinate $j$,</span>
+<span id="cb3-45"><a href="#cb3-45" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-46"><a href="#cb3-46" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb3-47"><a href="#cb3-47" aria-hidden="true" tabindex="-1"></a>k_j(t,t')=(1-0.02)\exp\left<span class="co">[</span><span class="ot">-\frac{(t-t')^2}{2\tau_j^2}\right</span><span class="co">]</span></span>
+<span id="cb3-48"><a href="#cb3-48" aria-hidden="true" tabindex="-1"></a>+0.02\,\mathbf 1<span class="co">[</span><span class="ot">t=t'</span><span class="co">]</span>.</span>
+<span id="cb3-49"><a href="#cb3-49" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb3-50"><a href="#cb3-50" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-51"><a href="#cb3-51" aria-hidden="true" tabindex="-1"></a>The nominal distinct-timescale pair is $(\tau_1,\tau_2)=(0.10,0.32)$. The</span>
+<span id="cb3-52"><a href="#cb3-52" aria-hidden="true" tabindex="-1"></a>observation layer is</span>
+<span id="cb3-53"><a href="#cb3-53" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-54"><a href="#cb3-54" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb3-55"><a href="#cb3-55" aria-hidden="true" tabindex="-1"></a>y_t=Cz_t+d+\epsilon_t,</span>
+<span id="cb3-56"><a href="#cb3-56" aria-hidden="true" tabindex="-1"></a>\qquad \epsilon_t\sim\mathcal N(0,R),</span>
+<span id="cb3-57"><a href="#cb3-57" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb3-58"><a href="#cb3-58" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-59"><a href="#cb3-59" aria-hidden="true" tabindex="-1"></a>with the stable Covariance-Prior Trajectories loading matrix, offset, and</span>
+<span id="cb3-60"><a href="#cb3-60" aria-hidden="true" tabindex="-1"></a>diagonal residual covariance:</span>
+<span id="cb3-61"><a href="#cb3-61" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-62"><a href="#cb3-62" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb3-63"><a href="#cb3-63" aria-hidden="true" tabindex="-1"></a>C=</span>
+<span id="cb3-64"><a href="#cb3-64" aria-hidden="true" tabindex="-1"></a>\begin{pmatrix}</span>
+<span id="cb3-65"><a href="#cb3-65" aria-hidden="true" tabindex="-1"></a>1.00&amp;0.25<span class="sc">\\</span></span>
+<span id="cb3-66"><a href="#cb3-66" aria-hidden="true" tabindex="-1"></a>0.70&amp;-0.45<span class="sc">\\</span></span>
+<span id="cb3-67"><a href="#cb3-67" aria-hidden="true" tabindex="-1"></a>0.30&amp;0.90<span class="sc">\\</span></span>
+<span id="cb3-68"><a href="#cb3-68" aria-hidden="true" tabindex="-1"></a>-0.65&amp;0.40<span class="sc">\\</span></span>
+<span id="cb3-69"><a href="#cb3-69" aria-hidden="true" tabindex="-1"></a>0.80&amp;0.55<span class="sc">\\</span></span>
+<span id="cb3-70"><a href="#cb3-70" aria-hidden="true" tabindex="-1"></a>-0.25&amp;-0.75</span>
+<span id="cb3-71"><a href="#cb3-71" aria-hidden="true" tabindex="-1"></a>\end{pmatrix},</span>
+<span id="cb3-72"><a href="#cb3-72" aria-hidden="true" tabindex="-1"></a>\quad</span>
+<span id="cb3-73"><a href="#cb3-73" aria-hidden="true" tabindex="-1"></a>d=(0.30,-0.20,0.15,0.05,-0.10,0.25)^\top,</span>
+<span id="cb3-74"><a href="#cb3-74" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb3-75"><a href="#cb3-75" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-76"><a href="#cb3-76" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb3-77"><a href="#cb3-77" aria-hidden="true" tabindex="-1"></a>R=\operatorname{diag}(0.10,0.16,0.22,0.30,0.38,0.48).</span>
+<span id="cb3-78"><a href="#cb3-78" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb3-79"><a href="#cb3-79" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-80"><a href="#cb3-80" aria-hidden="true" tabindex="-1"></a>Whole trials are independent. No latent prior, filtering state, smoother state,</span>
+<span id="cb3-81"><a href="#cb3-81" aria-hidden="true" tabindex="-1"></a>or fitted statistic crosses a trial boundary. Latent paths and complete hidden</span>
+<span id="cb3-82"><a href="#cb3-82" aria-hidden="true" tabindex="-1"></a>observations are retained in a scoring-only payload. The stable</span>
+<span id="cb3-83"><a href="#cb3-83" aria-hidden="true" tabindex="-1"></a><span class="in">`toy-models/covariance-prior-trajectories.py`</span> object supplies scientific and</span>
+<span id="cb3-84"><a href="#cb3-84" aria-hidden="true" tabindex="-1"></a>design provenance for this benchmark, and its SHA-256 digest is recorded and</span>
+<span id="cb3-85"><a href="#cb3-85" aria-hidden="true" tabindex="-1"></a>verified. The benchmark does not import or call that executable source; its</span>
+<span id="cb3-86"><a href="#cb3-86" aria-hidden="true" tabindex="-1"></a>generator, fitting, conditioning, filtering, smoothing, scoring, artifact, and</span>
+<span id="cb3-87"><a href="#cb3-87" aria-hidden="true" tabindex="-1"></a>verification routines are benchmark-local. It does not edit the stable Phase 3</span>
+<span id="cb3-88"><a href="#cb3-88" aria-hidden="true" tabindex="-1"></a>source or promote its illustrative results into general claims.</span>
+<span id="cb3-89"><a href="#cb3-89" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-90"><a href="#cb3-90" aria-hidden="true" tabindex="-1"></a>The stress generators alter specific parts of this truth:</span>
+<span id="cb3-91"><a href="#cb3-91" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-92"><a href="#cb3-92" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`latent_changepoint`</span> sets cross-covariance between the first and second halves</span>
+<span id="cb3-93"><a href="#cb3-93" aria-hidden="true" tabindex="-1"></a>  of each latent coordinate to zero, creating two independent Gaussian temporal</span>
+<span id="cb3-94"><a href="#cb3-94" aria-hidden="true" tabindex="-1"></a>  segments; the exact oracle knows this block covariance, while nominal GPFA</span>
+<span id="cb3-95"><a href="#cb3-95" aria-hidden="true" tabindex="-1"></a>  does not;</span>
+<span id="cb3-96"><a href="#cb3-96" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`correlated_residuals`</span> retains the nominal residual variances and gives every</span>
+<span id="cb3-97"><a href="#cb3-97" aria-hidden="true" tabindex="-1"></a>  off-diagonal pair residual correlation $0.12$;</span>
+<span id="cb3-98"><a href="#cb3-98" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`low_rate_poisson`</span> draws raw counts with</span>
+<span id="cb3-99"><a href="#cb3-99" aria-hidden="true" tabindex="-1"></a>  $\lambda_{tj}=\exp<span class="co">[</span><span class="ot">-2+0.35(Cz_t+d)_j</span><span class="co">]</span>$ and then applies the bounded Gaussian</span>
+<span id="cb3-100"><a href="#cb3-100" aria-hidden="true" tabindex="-1"></a>  analysis without pretending that the Gaussian observation law is correct;</span>
+<span id="cb3-101"><a href="#cb3-101" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`alignment_jitter`</span> shifts each sampled latent path by $-1$, $0$, or $1$ bin,</span>
+<span id="cb3-102"><a href="#cb3-102" aria-hidden="true" tabindex="-1"></a>  fills the exposed edge with the nearest retained value, and still analyzes</span>
+<span id="cb3-103"><a href="#cb3-103" aria-hidden="true" tabindex="-1"></a>  the nominal grid; scoring uses the shifted retained path, so this is a bounded</span>
+<span id="cb3-104"><a href="#cb3-104" aria-hidden="true" tabindex="-1"></a>  prior/alignment perturbation rather than a recovery claim about an unobserved</span>
+<span id="cb3-105"><a href="#cb3-105" aria-hidden="true" tabindex="-1"></a>  event-relative path; and</span>
+<span id="cb3-106"><a href="#cb3-106" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`informative_missingness`</span> hides entries above each test trial's empirical</span>
+<span id="cb3-107"><a href="#cb3-107" aria-hidden="true" tabindex="-1"></a>  72nd percentile. The ordinary inference paths ignore information in the mask.</span>
+<span id="cb3-108"><a href="#cb3-108" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-109"><a href="#cb3-109" aria-hidden="true" tabindex="-1"></a><span class="fu">## Generation</span></span>
+<span id="cb3-110"><a href="#cb3-110" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-111"><a href="#cb3-111" aria-hidden="true" tabindex="-1"></a>Generation receives only scenario, replicate, split, trial index, and a</span>
+<span id="cb3-112"><a href="#cb3-112" aria-hidden="true" tabindex="-1"></a>deterministic seed stream. It draws latent paths, applies the scenario-specific</span>
+<span id="cb3-113"><a href="#cb3-113" aria-hidden="true" tabindex="-1"></a>observation family, and returns separate train, validation, and test trial</span>
+<span id="cb3-114"><a href="#cb3-114" aria-hidden="true" tabindex="-1"></a>collections. Mask construction is a later stage and never changes the frozen</span>
+<span id="cb3-115"><a href="#cb3-115" aria-hidden="true" tabindex="-1"></a>complete realization.</span>
+<span id="cb3-116"><a href="#cb3-116" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-117"><a href="#cb3-117" aria-hidden="true" tabindex="-1"></a>The nominal, close-timescale, sample-size, changepoint, correlated-residual,</span>
+<span id="cb3-118"><a href="#cb3-118" aria-hidden="true" tabindex="-1"></a>Poisson, equal-kernel, and jitter scenarios use a mixed masked-prediction design</span>
+<span id="cb3-119"><a href="#cb3-119" aria-hidden="true" tabindex="-1"></a>unless a mask is named explicitly: alternating test trials hide either one</span>
+<span id="cb3-120"><a href="#cb3-120" aria-hidden="true" tabindex="-1"></a>complete channel or all channels over the middle third of the sequence. The</span>
+<span id="cb3-121"><a href="#cb3-121" aria-hidden="true" tabindex="-1"></a><span class="in">`channel_mask`</span> scenario hides one complete channel in every test trial; the</span>
+<span id="cb3-122"><a href="#cb3-122" aria-hidden="true" tabindex="-1"></a><span class="in">`time_block_mask`</span> scenario hides every channel at indices 5--9; and</span>
+<span id="cb3-123"><a href="#cb3-123" aria-hidden="true" tabindex="-1"></a><span class="in">`informative_missingness`</span> uses the value-dependent rule above.</span>
+<span id="cb3-124"><a href="#cb3-124" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-125"><a href="#cb3-125" aria-hidden="true" tabindex="-1"></a><span class="fu">## Scenario grid</span></span>
+<span id="cb3-126"><a href="#cb3-126" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-127"><a href="#cb3-127" aria-hidden="true" tabindex="-1"></a>The core-plus-stress grid has 12 predeclared scenarios and three independent</span>
+<span id="cb3-128"><a href="#cb3-128" aria-hidden="true" tabindex="-1"></a>replicates per scenario. Split sizes are numbers of independent trials and are</span>
+<span id="cb3-129"><a href="#cb3-129" aria-hidden="true" tabindex="-1"></a>written as train/validation/test.</span>
+<span id="cb3-130"><a href="#cb3-130" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-131"><a href="#cb3-131" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Scenario <span class="pp">|</span> Class <span class="pp">|</span> Split sizes <span class="pp">|</span> Declared change <span class="pp">|</span></span>
+<span id="cb3-132"><a href="#cb3-132" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|---:|---|</span></span>
+<span id="cb3-133"><a href="#cb3-133" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`reference_distinct`</span> <span class="pp">|</span> timescale separation <span class="pp">|</span> 5/3/3 <span class="pp">|</span> squared-exponential $(0.10,0.32)$ <span class="pp">|</span></span>
+<span id="cb3-134"><a href="#cb3-134" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`close_timescales`</span> <span class="pp">|</span> timescale separation <span class="pp">|</span> 5/3/3 <span class="pp">|</span> $(0.18,0.24)$ <span class="pp">|</span></span>
+<span id="cb3-135"><a href="#cb3-135" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`low_trial_count`</span> <span class="pp">|</span> trial/sample size <span class="pp">|</span> 2/1/2 <span class="pp">|</span> fewer independent trials <span class="pp">|</span></span>
+<span id="cb3-136"><a href="#cb3-136" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`high_trial_count`</span> <span class="pp">|</span> trial/sample size <span class="pp">|</span> 8/4/4 <span class="pp">|</span> more independent trials <span class="pp">|</span></span>
+<span id="cb3-137"><a href="#cb3-137" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`channel_mask`</span> <span class="pp">|</span> missing channels <span class="pp">|</span> 5/3/3 <span class="pp">|</span> one complete channel hidden per test trial <span class="pp">|</span></span>
+<span id="cb3-138"><a href="#cb3-138" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`time_block_mask`</span> <span class="pp">|</span> missing time block <span class="pp">|</span> 5/3/3 <span class="pp">|</span> all channels hidden at indices 5--9 <span class="pp">|</span></span>
+<span id="cb3-139"><a href="#cb3-139" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`latent_changepoint`</span> <span class="pp">|</span> temporal nonstationarity <span class="pp">|</span> 5/3/3 <span class="pp">|</span> independent pre/post Gaussian covariance blocks <span class="pp">|</span></span>
+<span id="cb3-140"><a href="#cb3-140" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`correlated_residuals`</span> <span class="pp">|</span> observation covariance <span class="pp">|</span> 5/3/3 <span class="pp">|</span> non-diagonal Gaussian residual covariance <span class="pp">|</span></span>
+<span id="cb3-141"><a href="#cb3-141" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`low_rate_poisson`</span> <span class="pp">|</span> observation-family misspecification <span class="pp">|</span> 5/3/3 <span class="pp">|</span> raw low-rate Poisson counts <span class="pp">|</span></span>
+<span id="cb3-142"><a href="#cb3-142" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`equal_kernels`</span> <span class="pp">|</span> temporal identifiability <span class="pp">|</span> 5/3/3 <span class="pp">|</span> $(0.20,0.20)$ <span class="pp">|</span></span>
+<span id="cb3-143"><a href="#cb3-143" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`alignment_jitter`</span> <span class="pp">|</span> alignment stress <span class="pp">|</span> 5/3/3 <span class="pp">|</span> seed-derived $-1/0/1$-bin shift and edge fill <span class="pp">|</span></span>
+<span id="cb3-144"><a href="#cb3-144" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`informative_missingness`</span> <span class="pp">|</span> non-ignorable mask <span class="pp">|</span> 5/3/3 <span class="pp">|</span> hide upper-tail observed values <span class="pp">|</span></span>
+<span id="cb3-145"><a href="#cb3-145" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-146"><a href="#cb3-146" aria-hidden="true" tabindex="-1"></a>This is not a factorial design. Changes in timescale, split size, observation</span>
+<span id="cb3-147"><a href="#cb3-147" aria-hidden="true" tabindex="-1"></a>law, residual covariance, and mask geometry are scenario-level interventions;</span>
+<span id="cb3-148"><a href="#cb3-148" aria-hidden="true" tabindex="-1"></a>differences between scenario summaries do not isolate causal effects of one</span>
+<span id="cb3-149"><a href="#cb3-149" aria-hidden="true" tabindex="-1"></a>factor.</span>
+<span id="cb3-150"><a href="#cb3-150" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-151"><a href="#cb3-151" aria-hidden="true" tabindex="-1"></a><span class="fu">## Negative controls and stress cases</span></span>
+<span id="cb3-152"><a href="#cb3-152" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-153"><a href="#cb3-153" aria-hidden="true" tabindex="-1"></a>Two covariance misspecifications are retained in every scenario:</span>
+<span id="cb3-154"><a href="#cb3-154" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-155"><a href="#cb3-155" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span><span class="in">`wrong_timescale_gpfa`</span> fixes a common squared-exponential pair</span>
+<span id="cb3-156"><a href="#cb3-156" aria-hidden="true" tabindex="-1"></a>   $(0.06,0.06)$; and</span>
+<span id="cb3-157"><a href="#cb3-157" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span><span class="in">`wrong_ar_gpfa`</span> replaces the squared-exponential family with an AR(1)</span>
+<span id="cb3-158"><a href="#cb3-158" aria-hidden="true" tabindex="-1"></a>   covariance whose one-lag coefficient is derived from each declared</span>
+<span id="cb3-159"><a href="#cb3-159" aria-hidden="true" tabindex="-1"></a>   timescale.</span>
+<span id="cb3-160"><a href="#cb3-160" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-161"><a href="#cb3-161" aria-hidden="true" tabindex="-1"></a>The same AR family supplies the online Kalman filter and retrospective RTS</span>
+<span id="cb3-162"><a href="#cb3-162" aria-hidden="true" tabindex="-1"></a>smoother. Matching a one-lag covariance does not make its longer-lag decay equal</span>
+<span id="cb3-163"><a href="#cb3-163" aria-hidden="true" tabindex="-1"></a>to a squared-exponential kernel. The changepoint, correlated-residual, Poisson,</span>
+<span id="cb3-164"><a href="#cb3-164" aria-hidden="true" tabindex="-1"></a>equal-kernel, jitter, and informative-mask scenarios are also retained as</span>
+<span id="cb3-165"><a href="#cb3-165" aria-hidden="true" tabindex="-1"></a>structured assumption failures. None is tuned away after results are seen.</span>
+<span id="cb3-166"><a href="#cb3-166" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-167"><a href="#cb3-167" aria-hidden="true" tabindex="-1"></a>The exact Gaussian oracle is emitted only when the scenario has a finite</span>
+<span id="cb3-168"><a href="#cb3-168" aria-hidden="true" tabindex="-1"></a>Gaussian observation law, no jitter construction, and an ignorable mask. It</span>
+<span id="cb3-169"><a href="#cb3-169" aria-hidden="true" tabindex="-1"></a>uses the true correlated residual or changepoint covariance where applicable.</span>
+<span id="cb3-170"><a href="#cb3-170" aria-hidden="true" tabindex="-1"></a>It is absent—not assigned a fabricated score—for Poisson, jitter, and</span>
+<span id="cb3-171"><a href="#cb3-171" aria-hidden="true" tabindex="-1"></a>informative-missingness scenarios.</span>
+<span id="cb3-172"><a href="#cb3-172" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-173"><a href="#cb3-173" aria-hidden="true" tabindex="-1"></a><span class="fu">## Replicates and deterministic seeds</span></span>
+<span id="cb3-174"><a href="#cb3-174" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-175"><a href="#cb3-175" aria-hidden="true" tabindex="-1"></a>Each scenario has three independent replicates. Trial draws are independent</span>
+<span id="cb3-176"><a href="#cb3-176" aria-hidden="true" tabindex="-1"></a>within and across train, validation, and test. Random streams use</span>
+<span id="cb3-177"><a href="#cb3-177" aria-hidden="true" tabindex="-1"></a><span class="in">`PCG64(SeedSequence(...))`</span> with the master seed <span class="in">`20260820`</span>, a SHA-256-derived</span>
+<span id="cb3-178"><a href="#cb3-178" aria-hidden="true" tabindex="-1"></a>scenario code, replicate, stage, split code, and trial index. The mapping is</span>
+<span id="cb3-179"><a href="#cb3-179" aria-hidden="true" tabindex="-1"></a>independent of traversal order.</span>
+<span id="cb3-180"><a href="#cb3-180" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-181"><a href="#cb3-181" aria-hidden="true" tabindex="-1"></a>Three replicates support only bounded descriptive summaries. The reported q10</span>
+<span id="cb3-182"><a href="#cb3-182" aria-hidden="true" tabindex="-1"></a>and q90 are interpolated quantiles of three replicate-level values, not</span>
+<span id="cb3-183"><a href="#cb3-183" aria-hidden="true" tabindex="-1"></a>confidence intervals, uncertainty bands, or stable tail estimates.</span>
+<span id="cb3-184"><a href="#cb3-184" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-185"><a href="#cb3-185" aria-hidden="true" tabindex="-1"></a><span class="fu">## Split discipline</span></span>
+<span id="cb3-186"><a href="#cb3-186" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-187"><a href="#cb3-187" aria-hidden="true" tabindex="-1"></a>The lawful fitting interface accepts only tuples of train and validation</span>
+<span id="cb3-188"><a href="#cb3-188" aria-hidden="true" tabindex="-1"></a>observations. Training observations fit the static factor/PCA state and channel</span>
+<span id="cb3-189"><a href="#cb3-189" aria-hidden="true" tabindex="-1"></a>means and variances. Every predeclared timescale candidate is scored by the</span>
+<span id="cb3-190"><a href="#cb3-190" aria-hidden="true" tabindex="-1"></a>**combined total train plus validation marginal NLL**; the validation-only</span>
+<span id="cb3-191"><a href="#cb3-191" aria-hidden="true" tabindex="-1"></a>component is also retained as a diagnostic. The selection and fitting interface</span>
+<span id="cb3-192"><a href="#cb3-192" aria-hidden="true" tabindex="-1"></a>has no test or latent-truth argument.</span>
+<span id="cb3-193"><a href="#cb3-193" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-194"><a href="#cb3-194" aria-hidden="true" tabindex="-1"></a>A second interface receives frozen states plus test observations and masks. It</span>
+<span id="cb3-195"><a href="#cb3-195" aria-hidden="true" tabindex="-1"></a>performs test-time filtering, smoothing, conditioning, or deterministic</span>
+<span id="cb3-196"><a href="#cb3-196" aria-hidden="true" tabindex="-1"></a>recovery without access to train/validation arrays or truth. Only the scoring</span>
+<span id="cb3-197"><a href="#cb3-197" aria-hidden="true" tabindex="-1"></a>stage joins latent paths, complete hidden observations, scenario covariance,</span>
+<span id="cb3-198"><a href="#cb3-198" aria-hidden="true" tabindex="-1"></a>or loading truth. Poison checks require excluded test observations and latent</span>
+<span id="cb3-199"><a href="#cb3-199" aria-hidden="true" tabindex="-1"></a>truth to leave fitted states and fixed-observation recoveries unchanged, while</span>
+<span id="cb3-200"><a href="#cb3-200" aria-hidden="true" tabindex="-1"></a>an allowed training perturbation must change the fitted state.</span>
+<span id="cb3-201"><a href="#cb3-201" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-202"><a href="#cb3-202" aria-hidden="true" tabindex="-1"></a><span class="fu">## Methods and information sets</span></span>
+<span id="cb3-203"><a href="#cb3-203" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-204"><a href="#cb3-204" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Method <span class="pp">|</span> Role <span class="pp">|</span> Parameters <span class="pp">|</span> Information set <span class="pp">|</span></span>
+<span id="cb3-205"><a href="#cb3-205" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|---|---|</span></span>
+<span id="cb3-206"><a href="#cb3-206" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`mean_diagonal`</span> <span class="pp">|</span> independent observation reference <span class="pp">|</span> train mean/variance <span class="pp">|</span> static observation <span class="pp">|</span></span>
+<span id="cb3-207"><a href="#cb3-207" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`static_factor`</span> <span class="pp">|</span> pooled-bin rank-two PCA/factor reference <span class="pp">|</span> train <span class="pp">|</span> static observation <span class="pp">|</span></span>
+<span id="cb3-208"><a href="#cb3-208" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`two_stage_pca_smooth`</span> <span class="pp">|</span> static PCA scores followed by coordinate-wise GP smoothing <span class="pp">|</span> train state plus selected timescales <span class="pp">|</span> retrospective <span class="pp">|</span></span>
+<span id="cb3-209"><a href="#cb3-209" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`independent_channel_gp`</span> <span class="pp">|</span> channel-wise temporal interpolation with no cross-channel borrowing <span class="pp">|</span> train mean/variance plus mean selected timescale <span class="pp">|</span> retrospective <span class="pp">|</span></span>
+<span id="cb3-210"><a href="#cb3-210" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`known_gpfa`</span> <span class="pp">|</span> nominal GPFA with declared scenario timescales but nominal $C,d,R$ <span class="pp">|</span> known nominal <span class="pp">|</span> retrospective <span class="pp">|</span></span>
+<span id="cb3-211"><a href="#cb3-211" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`selected_gpfa`</span> <span class="pp">|</span> GPFA with known nominal $C,d,R$ and finite-grid selected timescales <span class="pp">|</span> train/validation <span class="pp">|</span> retrospective <span class="pp">|</span></span>
+<span id="cb3-212"><a href="#cb3-212" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`wrong_timescale_gpfa`</span> <span class="pp">|</span> common short-timescale squared-exponential control <span class="pp">|</span> fixed wrong <span class="pp">|</span> retrospective <span class="pp">|</span></span>
+<span id="cb3-213"><a href="#cb3-213" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`wrong_ar_gpfa`</span> <span class="pp">|</span> batch Gaussian conditioning under the one-lag-matched AR covariance <span class="pp">|</span> fixed wrong family <span class="pp">|</span> retrospective <span class="pp">|</span></span>
+<span id="cb3-214"><a href="#cb3-214" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`ar_kalman_filter`</span> <span class="pp">|</span> recursive AR-state estimate <span class="pp">|</span> known nominal AR approximation <span class="pp">|</span> online <span class="pp">|</span></span>
+<span id="cb3-215"><a href="#cb3-215" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`ar_rts_smoother`</span> <span class="pp">|</span> fixed-interval smoother under the same AR approximation <span class="pp">|</span> known nominal AR approximation <span class="pp">|</span> retrospective <span class="pp">|</span></span>
+<span id="cb3-216"><a href="#cb3-216" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`exact_gaussian_oracle`</span> <span class="pp">|</span> direct true-scenario finite-Gaussian reference <span class="pp">|</span> true scenario <span class="pp">|</span> oracle retrospective <span class="pp">|</span></span>
+<span id="cb3-217"><a href="#cb3-217" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-218"><a href="#cb3-218" aria-hidden="true" tabindex="-1"></a>Online, retrospective, static, and oracle information sets remain separate. In</span>
+<span id="cb3-219"><a href="#cb3-219" aria-hidden="true" tabindex="-1"></a>particular, the RTS smoother and all GP path posteriors use future observations</span>
+<span id="cb3-220"><a href="#cb3-220" aria-hidden="true" tabindex="-1"></a>within the retained trial and are not online competitors to the Kalman filter.</span>
+<span id="cb3-221"><a href="#cb3-221" aria-hidden="true" tabindex="-1"></a><span class="in">`wrong_ar_gpfa`</span> and <span class="in">`ar_rts_smoother`</span> share the same AR covariance target but use</span>
+<span id="cb3-222"><a href="#cb3-222" aria-hidden="true" tabindex="-1"></a>batch and recursive computations respectively; their agreement is an</span>
+<span id="cb3-223"><a href="#cb3-223" aria-hidden="true" tabindex="-1"></a>implementation relationship, not evidence that the AR family generated the</span>
+<span id="cb3-224"><a href="#cb3-224" aria-hidden="true" tabindex="-1"></a>data.</span>
+<span id="cb3-225"><a href="#cb3-225" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-226"><a href="#cb3-226" aria-hidden="true" tabindex="-1"></a>The known and selected GPFA variants hold the observation loading, offset, and</span>
+<span id="cb3-227"><a href="#cb3-227" aria-hidden="true" tabindex="-1"></a>nominal diagonal residual covariance fixed. Thus they test temporal covariance</span>
+<span id="cb3-228"><a href="#cb3-228" aria-hidden="true" tabindex="-1"></a>and inference, not full GPFA parameter learning. Under correlated residuals and</span>
+<span id="cb3-229"><a href="#cb3-229" aria-hidden="true" tabindex="-1"></a>changepoints, <span class="in">`known_gpfa`</span> means known **nominal** parameters, whereas</span>
+<span id="cb3-230"><a href="#cb3-230" aria-hidden="true" tabindex="-1"></a><span class="in">`exact_gaussian_oracle`</span> contains the true scenario covariance.</span>
+<span id="cb3-231"><a href="#cb3-231" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-232"><a href="#cb3-232" aria-hidden="true" tabindex="-1"></a><span class="fu">## Parameter selection</span></span>
+<span id="cb3-233"><a href="#cb3-233" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-234"><a href="#cb3-234" aria-hidden="true" tabindex="-1"></a>The selected GPFA chooses from seven ordered pairs:</span>
+<span id="cb3-235"><a href="#cb3-235" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-236"><a href="#cb3-236" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb3-237"><a href="#cb3-237" aria-hidden="true" tabindex="-1"></a>(0.07,0.22), (0.07,0.32), (0.10,0.22), (0.10,0.32),</span>
+<span id="cb3-238"><a href="#cb3-238" aria-hidden="true" tabindex="-1"></a>(0.10,0.45), (0.16,0.32), (0.16,0.45).</span>
+<span id="cb3-239"><a href="#cb3-239" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb3-240"><a href="#cb3-240" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-241"><a href="#cb3-241" aria-hidden="true" tabindex="-1"></a>Each candidate is scored by total train plus validation marginal Gaussian NLL;</span>
+<span id="cb3-242"><a href="#cb3-242" aria-hidden="true" tabindex="-1"></a>ties are broken by the ordered pair. The selected state and its validation NLL</span>
+<span id="cb3-243"><a href="#cb3-243" aria-hidden="true" tabindex="-1"></a>are frozen before test inference. The grid includes the nominal distinct pair</span>
+<span id="cb3-244"><a href="#cb3-244" aria-hidden="true" tabindex="-1"></a>but not every scenario truth: for example, neither $(0.18,0.24)$ nor</span>
+<span id="cb3-245"><a href="#cb3-245" aria-hidden="true" tabindex="-1"></a>$(0.20,0.20)$ is available. <span class="in">`timescale_l1`</span> is the unnormalized diagnostic</span>
+<span id="cb3-246"><a href="#cb3-246" aria-hidden="true" tabindex="-1"></a>$|\hat\tau_1-\tau_1|+|\hat\tau_2-\tau_2|$ under the externally fixed loading</span>
+<span id="cb3-247"><a href="#cb3-247" aria-hidden="true" tabindex="-1"></a>coordinate convention. It is not a biological timescale error, an optimizer</span>
+<span id="cb3-248"><a href="#cb3-248" aria-hidden="true" tabindex="-1"></a>consistency claim, or a coordinate-identification result under equal kernels.</span>
+<span id="cb3-249"><a href="#cb3-249" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-250"><a href="#cb3-250" aria-hidden="true" tabindex="-1"></a><span class="fu">## Inference</span></span>
+<span id="cb3-251"><a href="#cb3-251" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-252"><a href="#cb3-252" aria-hidden="true" tabindex="-1"></a>For masked observation prediction, <span class="in">`static_factor`</span> treats time bins as</span>
+<span id="cb3-253"><a href="#cb3-253" aria-hidden="true" tabindex="-1"></a>independent and conditions the training-fitted rank-two Gaussian observation</span>
+<span id="cb3-254"><a href="#cb3-254" aria-hidden="true" tabindex="-1"></a>model on the visible channels at each bin. It can borrow same-bin</span>
+<span id="cb3-255"><a href="#cb3-255" aria-hidden="true" tabindex="-1"></a>cross-channel covariance but has no cross-time interpolation. Its latent output</span>
+<span id="cb3-256"><a href="#cb3-256" aria-hidden="true" tabindex="-1"></a>is likewise an independent-bin factor posterior mean computed from visible</span>
+<span id="cb3-257"><a href="#cb3-257" aria-hidden="true" tabindex="-1"></a>channels only; it does not use hidden targets and is not a temporally smoothed</span>
+<span id="cb3-258"><a href="#cb3-258" aria-hidden="true" tabindex="-1"></a>path posterior.</span>
+<span id="cb3-259"><a href="#cb3-259" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-260"><a href="#cb3-260" aria-hidden="true" tabindex="-1"></a>The two-stage method fills masked entries with the training mean, projects to</span>
+<span id="cb3-261"><a href="#cb3-261" aria-hidden="true" tabindex="-1"></a>two static scores, and smooths each score with the selected squared-exponential</span>
+<span id="cb3-262"><a href="#cb3-262" aria-hidden="true" tabindex="-1"></a>covariance. Its hidden-observation predictive variance is the diagonal of the</span>
+<span id="cb3-263"><a href="#cb3-263" aria-hidden="true" tabindex="-1"></a>training-fitted static residual covariance, frozen before test scoring. The</span>
+<span id="cb3-264"><a href="#cb3-264" aria-hidden="true" tabindex="-1"></a>independent-channel method conditions each channel only on its own visible</span>
+<span id="cb3-265"><a href="#cb3-265" aria-hidden="true" tabindex="-1"></a>times, so it cannot borrow other channels to recover a fully hidden channel.</span>
+<span id="cb3-266"><a href="#cb3-266" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-267"><a href="#cb3-267" aria-hidden="true" tabindex="-1"></a>GPFA-like methods use finite dense Gaussian conditioning. The AR filter uses</span>
+<span id="cb3-268"><a href="#cb3-268" aria-hidden="true" tabindex="-1"></a>observations only through the current time, while RTS and batch AR conditioning</span>
+<span id="cb3-269"><a href="#cb3-269" aria-hidden="true" tabindex="-1"></a>use the full declared interval. Every trial starts from its own prior; no state</span>
+<span id="cb3-270"><a href="#cb3-270" aria-hidden="true" tabindex="-1"></a>is carried across trials.</span>
+<span id="cb3-271"><a href="#cb3-271" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-272"><a href="#cb3-272" aria-hidden="true" tabindex="-1"></a>For <span class="in">`static_factor`</span> and <span class="in">`two_stage_pca_smooth`</span>, one orthogonal scoring rotation</span>
+<span id="cb3-273"><a href="#cb3-273" aria-hidden="true" tabindex="-1"></a>is fitted from all training-trial estimates and training latent truth within</span>
+<span id="cb3-274"><a href="#cb3-274" aria-hidden="true" tabindex="-1"></a>each scenario replicate. That replicate-level rotation is then frozen and</span>
+<span id="cb3-275"><a href="#cb3-275" aria-hidden="true" tabindex="-1"></a>applied unchanged to every test trial. It is never refitted on test truth.</span>
+<span id="cb3-276"><a href="#cb3-276" aria-hidden="true" tabindex="-1"></a>Known-layer GPFA and AR methods retain their declared coordinates and receive</span>
+<span id="cb3-277"><a href="#cb3-277" aria-hidden="true" tabindex="-1"></a>no fitted rotation. This scoring convention handles the broader coordinate</span>
+<span id="cb3-278"><a href="#cb3-278" aria-hidden="true" tabindex="-1"></a>ambiguity of the learned static/two-stage estimates but is not available to</span>
+<span id="cb3-279"><a href="#cb3-279" aria-hidden="true" tabindex="-1"></a>inference and does not establish unique latent coordinates. Reported pointwise</span>
+<span id="cb3-280"><a href="#cb3-280" aria-hidden="true" tabindex="-1"></a>coverage uses the plug-in marginal variances supplied by the original model;</span>
+<span id="cb3-281"><a href="#cb3-281" aria-hidden="true" tabindex="-1"></a>it omits parameter-selection uncertainty and is only a bounded diagnostic,</span>
+<span id="cb3-282"><a href="#cb3-282" aria-hidden="true" tabindex="-1"></a>especially under equal kernels or misspecification.</span>
+<span id="cb3-283"><a href="#cb3-283" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-284"><a href="#cb3-284" aria-hidden="true" tabindex="-1"></a><span class="fu">## Scoring</span></span>
+<span id="cb3-285"><a href="#cb3-285" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-286"><a href="#cb3-286" aria-hidden="true" tabindex="-1"></a>Every raw row has metric-specific <span class="in">`provenance`</span> and <span class="in">`target`</span> metadata. The</span>
+<span id="cb3-287"><a href="#cb3-287" aria-hidden="true" tabindex="-1"></a>artifact emits exactly the following ten metrics:</span>
+<span id="cb3-288"><a href="#cb3-288" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-289"><a href="#cb3-289" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Metric <span class="pp">|</span> Provenance <span class="pp">|</span> Target and definition <span class="pp">|</span></span>
+<span id="cb3-290"><a href="#cb3-290" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|---|</span></span>
+<span id="cb3-291"><a href="#cb3-291" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`marginal_nll_per_entry`</span> <span class="pp">|</span> <span class="in">`test`</span> <span class="pp">|</span> held-out observation distribution. Joint Gaussian methods score complete test trials; the online AR filter uses sequential visible-entry innovation NLL. These different information/protocol rows are not pooled into one rank <span class="pp">|</span></span>
+<span id="cb3-292"><a href="#cb3-292" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`masked_prediction_rmse`</span> <span class="pp">|</span> <span class="in">`test`</span> <span class="pp">|</span> RMSE on the complete observations hidden from inference by the declared mask <span class="pp">|</span></span>
+<span id="cb3-293"><a href="#cb3-293" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`masked_prediction_nll_per_entry`</span> <span class="pp">|</span> <span class="in">`test`</span> <span class="pp">|</span> Gaussian score on hidden observations when the method supplies a conditional scale. The two-stage method uses the diagonal training-fitted static residual covariance, frozen before test; it does not estimate its scale from hidden test residuals <span class="pp">|</span></span>
+<span id="cb3-294"><a href="#cb3-294" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`latent_rmse`</span> <span class="pp">|</span> <span class="in">`test`</span> <span class="pp">|</span> RMSE of scoring-only orthogonally aligned posterior/score means against retained latent paths <span class="pp">|</span></span>
+<span id="cb3-295"><a href="#cb3-295" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`latent_90_coverage`</span> <span class="pp">|</span> <span class="in">`test`</span> <span class="pp">|</span> pointwise marginal 90% plug-in interval coverage for methods with declared posterior variance <span class="pp">|</span></span>
+<span id="cb3-296"><a href="#cb3-296" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`loading_subspace_angle_degrees`</span> <span class="pp">|</span> <span class="in">`fit_diagnostic`</span> <span class="pp">|</span> maximum principal angle between the training-fitted static/two-stage rank-two basis and $\operatorname{col}(C)$; known-layer methods do not receive zero-valued recovery rows <span class="pp">|</span></span>
+<span id="cb3-297"><a href="#cb3-297" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`timescale_l1`</span> <span class="pp">|</span> <span class="in">`fit_diagnostic`</span> <span class="pp">|</span> selected-pair L1 discrepancy under the fixed coordinate convention <span class="pp">|</span></span>
+<span id="cb3-298"><a href="#cb3-298" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`selected_combined_nll_per_entry`</span> <span class="pp">|</span> <span class="in">`fit_diagnostic`</span> <span class="pp">|</span> combined train-plus-validation Gaussian NLL per entry of the selected timescale candidate; this is the actual selection criterion, not a validation-only score <span class="pp">|</span></span>
+<span id="cb3-299"><a href="#cb3-299" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`covariance_relative_frobenius`</span> <span class="pp">|</span> <span class="in">`fit_diagnostic`</span> <span class="pp">|</span> candidate finite observation covariance versus the declared finite-Gaussian scenario covariance. It is inapplicable to Poisson and jitter scenarios rather than compared to an invented covariance truth <span class="pp">|</span></span>
+<span id="cb3-300"><a href="#cb3-300" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`posterior_mean_oracle_max_abs`</span> <span class="pp">|</span> <span class="in">`oracle_diagnostic`</span> <span class="pp">|</span> maximum known-GPFA covariance-form versus precision-form posterior-mean discrepancy, only where nominal known GPFA is the exact scenario model <span class="pp">|</span></span>
+<span id="cb3-301"><a href="#cb3-301" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-302"><a href="#cb3-302" aria-hidden="true" tabindex="-1"></a>For each scenario-replicate-method-metric key, the relevant held-out trials,</span>
+<span id="cb3-303"><a href="#cb3-303" aria-hidden="true" tabindex="-1"></a>hidden entries, time points, or fitted diagnostic are first combined into one</span>
+<span id="cb3-304"><a href="#cb3-304" aria-hidden="true" tabindex="-1"></a>replicate-level value. <span class="in">`diagnostics.json`</span> then reports median, q10, q90,</span>
+<span id="cb3-305"><a href="#cb3-305" aria-hidden="true" tabindex="-1"></a><span class="in">`ok`</span> rate, failure rate, and applicability rate across the three independent</span>
+<span id="cb3-306"><a href="#cb3-306" aria-hidden="true" tabindex="-1"></a>replicates for each scenario $\times$ method $\times$ metric group. Trials,</span>
+<span id="cb3-307"><a href="#cb3-307" aria-hidden="true" tabindex="-1"></a>time bins, channels, and hidden entries are not treated as independent</span>
+<span id="cb3-308"><a href="#cb3-308" aria-hidden="true" tabindex="-1"></a>replicates. Unlike metrics and unlike information sets are not normalized,</span>
+<span id="cb3-309"><a href="#cb3-309" aria-hidden="true" tabindex="-1"></a>averaged, or ranked together.</span>
+<span id="cb3-310"><a href="#cb3-310" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-311"><a href="#cb3-311" aria-hidden="true" tabindex="-1"></a><span class="fu">## Failure and applicability labels</span></span>
+<span id="cb3-312"><a href="#cb3-312" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-313"><a href="#cb3-313" aria-hidden="true" tabindex="-1"></a><span class="in">`results.csv`</span> retains the full Cartesian product of 12 scenarios, three</span>
+<span id="cb3-314"><a href="#cb3-314" aria-hidden="true" tabindex="-1"></a>replicates, 11 methods, and ten metrics: 3,960 canonical rows. Applicability is</span>
+<span id="cb3-315"><a href="#cb3-315" aria-hidden="true" tabindex="-1"></a>resolved before inference or scoring failure. Every row has exactly one status:</span>
+<span id="cb3-316"><a href="#cb3-316" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-317"><a href="#cb3-317" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`ok`</span>: applicable and finite under the declared computation;</span>
+<span id="cb3-318"><a href="#cb3-318" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`nonconvergence`</span>: a linear-algebra or bounded numerical procedure failed;</span>
+<span id="cb3-319"><a href="#cb3-319" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`invalid`</span>: malformed, missing, non-finite, or otherwise invalid output;</span>
+<span id="cb3-320"><a href="#cb3-320" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`inapplicable`</span>: the method or scenario does not define the target.</span>
+<span id="cb3-321"><a href="#cb3-321" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-322"><a href="#cb3-322" aria-hidden="true" tabindex="-1"></a>Every non-<span class="in">`ok`</span> row has a machine-readable reason and no numeric value. Natural</span>
+<span id="cb3-323"><a href="#cb3-323" aria-hidden="true" tabindex="-1"></a>execution produced 2,049 <span class="in">`ok`</span>, 1,911 <span class="in">`inapplicable`</span>, zero <span class="in">`nonconvergence`</span>, and</span>
+<span id="cb3-324"><a href="#cb3-324" aria-hidden="true" tabindex="-1"></a>zero <span class="in">`invalid`</span> rows. This absence is not evidence that numerical failure is</span>
+<span id="cb3-325"><a href="#cb3-325" aria-hidden="true" tabindex="-1"></a>impossible; the verifier separately fault-injects linear-algebra and non-finite</span>
+<span id="cb3-326"><a href="#cb3-326" aria-hidden="true" tabindex="-1"></a>failures and checks their labels.</span>
+<span id="cb3-327"><a href="#cb3-327" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-328"><a href="#cb3-328" aria-hidden="true" tabindex="-1"></a>Examples of principled inapplicability include no latent trajectory for the</span>
+<span id="cb3-329"><a href="#cb3-329" aria-hidden="true" tabindex="-1"></a>mean or independent-channel reference, no latent coverage for deterministic</span>
+<span id="cb3-330"><a href="#cb3-330" aria-hidden="true" tabindex="-1"></a>static/two-stage estimates, no learned-loading target for known-layer methods,</span>
+<span id="cb3-331"><a href="#cb3-331" aria-hidden="true" tabindex="-1"></a>no exact Gaussian oracle for Poisson/jitter/informative masks, and no finite</span>
+<span id="cb3-332"><a href="#cb3-332" aria-hidden="true" tabindex="-1"></a>Gaussian covariance target for Poisson or jitter.</span>
+<span id="cb3-333"><a href="#cb3-333" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-334"><a href="#cb3-334" aria-hidden="true" tabindex="-1"></a><span class="fu">## Artifact contract</span></span>
+<span id="cb3-335"><a href="#cb3-335" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-336"><a href="#cb3-336" aria-hidden="true" tabindex="-1"></a><span class="in">`benchmarks/artifacts/temporal-covariance-inference/`</span> contains exactly:</span>
+<span id="cb3-337"><a href="#cb3-337" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-338"><a href="#cb3-338" aria-hidden="true" tabindex="-1"></a><span class="in">```text</span></span>
+<span id="cb3-339"><a href="#cb3-339" aria-hidden="true" tabindex="-1"></a><span class="in">manifest.json</span></span>
+<span id="cb3-340"><a href="#cb3-340" aria-hidden="true" tabindex="-1"></a><span class="in">results.csv</span></span>
+<span id="cb3-341"><a href="#cb3-341" aria-hidden="true" tabindex="-1"></a><span class="in">diagnostics.json</span></span>
+<span id="cb3-342"><a href="#cb3-342" aria-hidden="true" tabindex="-1"></a><span class="in">summary.png</span></span>
+<span id="cb3-343"><a href="#cb3-343" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb3-344"><a href="#cb3-344" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-345"><a href="#cb3-345" aria-hidden="true" tabindex="-1"></a>The manifest freezes the generator, scenarios, methods, metrics, split sizes,</span>
+<span id="cb3-346"><a href="#cb3-346" aria-hidden="true" tabindex="-1"></a>seed mapping, selection grid, capability boundaries, status vocabulary,</span>
+<span id="cb3-347"><a href="#cb3-347" aria-hidden="true" tabindex="-1"></a>canonical row ordering, strict resume semantics, commands, runtime, Phase 3</span>
+<span id="cb3-348"><a href="#cb3-348" aria-hidden="true" tabindex="-1"></a>source digest, and SHA-256 hashes. The figure is a target-separated diagnostic</span>
+<span id="cb3-349"><a href="#cb3-349" aria-hidden="true" tabindex="-1"></a>view, not acceptance evidence or a leaderboard.</span>
+<span id="cb3-350"><a href="#cb3-350" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-351"><a href="#cb3-351" aria-hidden="true" tabindex="-1"></a><span class="fu">## Results</span></span>
+<span id="cb3-352"><a href="#cb3-352" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-353"><a href="#cb3-353" aria-hidden="true" tabindex="-1"></a>The following are bounded q10/median/q90 summaries across three replicates.</span>
+<span id="cb3-354"><a href="#cb3-354" aria-hidden="true" tabindex="-1"></a>They describe this simulator and cannot establish general method order.</span>
+<span id="cb3-355"><a href="#cb3-355" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-356"><a href="#cb3-356" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Scenario and target <span class="pp">|</span> Method <span class="pp">|</span> q10 <span class="pp">|</span> Median <span class="pp">|</span> q90 <span class="pp">|</span></span>
+<span id="cb3-357"><a href="#cb3-357" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|---:|---:|---:|</span></span>
+<span id="cb3-358"><a href="#cb3-358" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Reference masked-observation RMSE <span class="pp">|</span> mean diagonal <span class="pp">|</span> 0.7530 <span class="pp">|</span> 0.8646 <span class="pp">|</span> 0.9850 <span class="pp">|</span></span>
+<span id="cb3-359"><a href="#cb3-359" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Reference masked-observation RMSE <span class="pp">|</span> static factor <span class="pp">|</span> 0.6091 <span class="pp">|</span> 0.6261 <span class="pp">|</span> 0.7862 <span class="pp">|</span></span>
+<span id="cb3-360"><a href="#cb3-360" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Reference masked-observation RMSE <span class="pp">|</span> known GPFA <span class="pp">|</span> 0.5058 <span class="pp">|</span> 0.5226 <span class="pp">|</span> 0.5577 <span class="pp">|</span></span>
+<span id="cb3-361"><a href="#cb3-361" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Reference masked-observation RMSE <span class="pp">|</span> selected GPFA <span class="pp">|</span> 0.5058 <span class="pp">|</span> 0.5226 <span class="pp">|</span> 0.5577 <span class="pp">|</span></span>
+<span id="cb3-362"><a href="#cb3-362" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Reference masked-observation RMSE <span class="pp">|</span> wrong common timescale <span class="pp">|</span> 0.5754 <span class="pp">|</span> 0.5868 <span class="pp">|</span> 0.6102 <span class="pp">|</span></span>
+<span id="cb3-363"><a href="#cb3-363" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Reference masked-observation RMSE <span class="pp">|</span> wrong AR covariance <span class="pp">|</span> 0.5161 <span class="pp">|</span> 0.5666 <span class="pp">|</span> 0.5795 <span class="pp">|</span></span>
+<span id="cb3-364"><a href="#cb3-364" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Reference latent RMSE, retrospective <span class="pp">|</span> known GPFA <span class="pp">|</span> 0.2338 <span class="pp">|</span> 0.2572 <span class="pp">|</span> 0.2711 <span class="pp">|</span></span>
+<span id="cb3-365"><a href="#cb3-365" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Reference latent RMSE, retrospective <span class="pp">|</span> RTS smoother <span class="pp">|</span> 0.2580 <span class="pp">|</span> 0.2741 <span class="pp">|</span> 0.2796 <span class="pp">|</span></span>
+<span id="cb3-366"><a href="#cb3-366" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Reference latent RMSE, retrospective <span class="pp">|</span> two-stage PCA + smoothing <span class="pp">|</span> 0.5243 <span class="pp">|</span> 0.5455 <span class="pp">|</span> 0.6454 <span class="pp">|</span></span>
+<span id="cb3-367"><a href="#cb3-367" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Reference latent RMSE, online <span class="pp">|</span> AR Kalman filter <span class="pp">|</span> 0.3289 <span class="pp">|</span> 0.3359 <span class="pp">|</span> 0.4239 <span class="pp">|</span></span>
+<span id="cb3-368"><a href="#cb3-368" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-369"><a href="#cb3-369" aria-hidden="true" tabindex="-1"></a>Online and retrospective rows are shown with explicit labels and are not one</span>
+<span id="cb3-370"><a href="#cb3-370" aria-hidden="true" tabindex="-1"></a>rank. In the reference scenario, all three selected-GPFA replicates chose the</span>
+<span id="cb3-371"><a href="#cb3-371" aria-hidden="true" tabindex="-1"></a>nominal pair $(0.10,0.32)$, so selected and known results coincide. This is one</span>
+<span id="cb3-372"><a href="#cb3-372" aria-hidden="true" tabindex="-1"></a>finite-grid outcome, not general hyperparameter recovery.</span>
+<span id="cb3-373"><a href="#cb3-373" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-374"><a href="#cb3-374" aria-hidden="true" tabindex="-1"></a>The mask-specific boundaries remain visible. For a completely hidden channel,</span>
+<span id="cb3-375"><a href="#cb3-375" aria-hidden="true" tabindex="-1"></a>known-GPFA median prediction RMSE is 0.4768, while the no-cross-channel</span>
+<span id="cb3-376"><a href="#cb3-376" aria-hidden="true" tabindex="-1"></a>independent GP median is 0.9267. For the fully hidden time block, known GPFA is</span>
+<span id="cb3-377"><a href="#cb3-377" aria-hidden="true" tabindex="-1"></a>0.6892 and the retrospective AR smoother is 0.7597. These differences are</span>
+<span id="cb3-378"><a href="#cb3-378" aria-hidden="true" tabindex="-1"></a>conditional on their covariance families and the declared masks.</span>
+<span id="cb3-379"><a href="#cb3-379" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-380"><a href="#cb3-380" aria-hidden="true" tabindex="-1"></a>Selection becomes less exact under other grids: median <span class="in">`timescale_l1`</span> is 0.10</span>
+<span id="cb3-381"><a href="#cb3-381" aria-hidden="true" tabindex="-1"></a>for close timescales, 0.10 with low trial count, 0.00 with high trial count, and</span>
+<span id="cb3-382"><a href="#cb3-382" aria-hidden="true" tabindex="-1"></a>0.16 for equal kernels. The equal-kernel value mainly records mismatch between</span>
+<span id="cb3-383"><a href="#cb3-383" aria-hidden="true" tabindex="-1"></a>the fixed candidate grid and $(0.20,0.20)$; it does not identify ordered latent</span>
+<span id="cb3-384"><a href="#cb3-384" aria-hidden="true" tabindex="-1"></a>axes.</span>
+<span id="cb3-385"><a href="#cb3-385" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-386"><a href="#cb3-386" aria-hidden="true" tabindex="-1"></a>The stress scenarios distinguish nominal from scenario-aware references. Under</span>
+<span id="cb3-387"><a href="#cb3-387" aria-hidden="true" tabindex="-1"></a>the covariance changepoint, nominal known-GPFA median latent RMSE is 0.3814,</span>
+<span id="cb3-388"><a href="#cb3-388" aria-hidden="true" tabindex="-1"></a>while the true block-covariance Gaussian oracle is 0.3189. Under correlated</span>
+<span id="cb3-389"><a href="#cb3-389" aria-hidden="true" tabindex="-1"></a>residuals, nominal known-GPFA median held-out Gaussian NLL is 0.9550 per entry,</span>
+<span id="cb3-390"><a href="#cb3-390" aria-hidden="true" tabindex="-1"></a>versus 0.9364 for the true residual-covariance oracle. These are</span>
+<span id="cb3-391"><a href="#cb3-391" aria-hidden="true" tabindex="-1"></a>scenario-specific misspecification diagnostics.</span>
+<span id="cb3-392"><a href="#cb3-392" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-393"><a href="#cb3-393" aria-hidden="true" tabindex="-1"></a>Raw low-rate Poisson counts are a more severe observation-family violation:</span>
+<span id="cb3-394"><a href="#cb3-394" aria-hidden="true" tabindex="-1"></a>nominal known-GPFA median latent RMSE is 1.0815 and its nominal pointwise 90%</span>
+<span id="cb3-395"><a href="#cb3-395" aria-hidden="true" tabindex="-1"></a>coverage is 0.3750. These Gaussian numbers are approximation diagnostics, not a</span>
+<span id="cb3-396"><a href="#cb3-396" aria-hidden="true" tabindex="-1"></a>calibrated count-model evaluation. Under informative missingness, known-GPFA</span>
+<span id="cb3-397"><a href="#cb3-397" aria-hidden="true" tabindex="-1"></a>median hidden-observation RMSE is 0.7129 and independent-channel GP is 1.3320;</span>
+<span id="cb3-398"><a href="#cb3-398" aria-hidden="true" tabindex="-1"></a>the mask is non-ignorable, so neither value validates ordinary missing-at-random</span>
+<span id="cb3-399"><a href="#cb3-399" aria-hidden="true" tabindex="-1"></a>conditioning.</span>
+<span id="cb3-400"><a href="#cb3-400" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-401"><a href="#cb3-401" aria-hidden="true" tabindex="-1"></a>The largest applicable known-GPFA covariance-form versus precision-form</span>
+<span id="cb3-402"><a href="#cb3-402" aria-hidden="true" tabindex="-1"></a>posterior-mean discrepancy is approximately $3.12\times10^{-10}$. Independent</span>
+<span id="cb3-403"><a href="#cb3-403" aria-hidden="true" tabindex="-1"></a>AR recursion-versus-batch checks are below $1.0\times10^{-10}$ for means and</span>
+<span id="cb3-404"><a href="#cb3-404" aria-hidden="true" tabindex="-1"></a>$4.0\times10^{-11}$ for marginal variances. These are implementation checks,</span>
+<span id="cb3-405"><a href="#cb3-405" aria-hidden="true" tabindex="-1"></a>not scientific performance scores.</span>
+<span id="cb3-406"><a href="#cb3-406" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-407"><a href="#cb3-407" aria-hidden="true" tabindex="-1"></a><span class="al">![Target-specific temporal covariance summaries](artifacts/temporal-covariance-inference/summary.png)</span></span>
+<span id="cb3-408"><a href="#cb3-408" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-409"><a href="#cb3-409" aria-hidden="true" tabindex="-1"></a>The figure has six separate panels: static-information-set reference masked</span>
+<span id="cb3-410"><a href="#cb3-410" aria-hidden="true" tabindex="-1"></a>prediction; retrospective reference masked prediction; online reference latent</span>
+<span id="cb3-411"><a href="#cb3-411" aria-hidden="true" tabindex="-1"></a>RMSE; retrospective reference latent RMSE; oracle-retrospective reference</span>
+<span id="cb3-412"><a href="#cb3-412" aria-hidden="true" tabindex="-1"></a>masked prediction; and the close-timescale selection diagnostic. It does not</span>
+<span id="cb3-413"><a href="#cb3-413" aria-hidden="true" tabindex="-1"></a>display informative missingness, combine online with retrospective methods, or</span>
+<span id="cb3-414"><a href="#cb3-414" aria-hidden="true" tabindex="-1"></a>construct a pooled total score.</span>
+<span id="cb3-415"><a href="#cb3-415" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-416"><a href="#cb3-416" aria-hidden="true" tabindex="-1"></a><span class="fu">## Interpretation limits</span></span>
+<span id="cb3-417"><a href="#cb3-417" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-418"><a href="#cb3-418" aria-hidden="true" tabindex="-1"></a>This benchmark establishes only scenario-, target-, information-set-, metric-,</span>
+<span id="cb3-419"><a href="#cb3-419" aria-hidden="true" tabindex="-1"></a>and implementation-conditional behavior.</span>
+<span id="cb3-420"><a href="#cb3-420" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-421"><a href="#cb3-421" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>A smooth GPFA or RTS posterior mean is not a learned transition equation,</span>
+<span id="cb3-422"><a href="#cb3-422" aria-hidden="true" tabindex="-1"></a>  vector field, flow, or measured mechanism.</span>
+<span id="cb3-423"><a href="#cb3-423" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>GPFA covariance kernels and AR/LGSSM transitions can generate visually similar</span>
+<span id="cb3-424"><a href="#cb3-424" aria-hidden="true" tabindex="-1"></a>  estimates while making different temporal assumptions.</span>
+<span id="cb3-425"><a href="#cb3-425" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>The online filter cannot be ranked as if it had the smoother's future</span>
+<span id="cb3-426"><a href="#cb3-426" aria-hidden="true" tabindex="-1"></a>  observations; the exact oracle cannot be treated as deployable.</span>
+<span id="cb3-427"><a href="#cb3-427" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Known/selected GPFA hold the observation layer fixed and therefore do not test</span>
+<span id="cb3-428"><a href="#cb3-428" aria-hidden="true" tabindex="-1"></a>  general full-parameter GPFA learning.</span>
+<span id="cb3-429"><a href="#cb3-429" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>A replicate-level Procrustes rotation fitted once on training truth and</span>
+<span id="cb3-430"><a href="#cb3-430" aria-hidden="true" tabindex="-1"></a>  frozen for test scoring does not identify latent coordinates. Equal kernels</span>
+<span id="cb3-431"><a href="#cb3-431" aria-hidden="true" tabindex="-1"></a>  preserve an especially important rotational ambiguity.</span>
+<span id="cb3-432"><a href="#cb3-432" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Plug-in intervals omit parameter and model-selection uncertainty. Coverage</span>
+<span id="cb3-433"><a href="#cb3-433" aria-hidden="true" tabindex="-1"></a>  under Poisson, residual-correlation, changepoint, jitter, or informative-mask</span>
+<span id="cb3-434"><a href="#cb3-434" aria-hidden="true" tabindex="-1"></a>  misspecification is descriptive, not a calibration guarantee.</span>
+<span id="cb3-435"><a href="#cb3-435" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Gaussian NLL on raw Poisson counts is not a count likelihood. Ordinary</span>
+<span id="cb3-436"><a href="#cb3-436" aria-hidden="true" tabindex="-1"></a>  conditioning under informative missingness does not model the missingness</span>
+<span id="cb3-437"><a href="#cb3-437" aria-hidden="true" tabindex="-1"></a>  process.</span>
+<span id="cb3-438"><a href="#cb3-438" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Lower prediction or latent error does not prove representation, mechanism,</span>
+<span id="cb3-439"><a href="#cb3-439" aria-hidden="true" tabindex="-1"></a>  causality, intrinsic dimension, manifold structure, biological validity, or</span>
+<span id="cb3-440"><a href="#cb3-440" aria-hidden="true" tabindex="-1"></a>  real-data transfer.</span>
+<span id="cb3-441"><a href="#cb3-441" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-442"><a href="#cb3-442" aria-hidden="true" tabindex="-1"></a>No result authorizes a cross-task total score, universal winner, P4-U04 work,</span>
+<span id="cb3-443"><a href="#cb3-443" aria-hidden="true" tabindex="-1"></a>Phase 5 work, or real-data claims.</span>
+<span id="cb3-444"><a href="#cb3-444" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-445"><a href="#cb3-445" aria-hidden="true" tabindex="-1"></a><span class="fu">## Reproducibility</span></span>
+<span id="cb3-446"><a href="#cb3-446" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-447"><a href="#cb3-447" aria-hidden="true" tabindex="-1"></a>Generate and verify with the bundled workspace Python runtime:</span>
+<span id="cb3-448"><a href="#cb3-448" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-449"><a href="#cb3-449" aria-hidden="true" tabindex="-1"></a><span class="in">```bash</span></span>
+<span id="cb3-450"><a href="#cb3-450" aria-hidden="true" tabindex="-1"></a><span class="ex">/Users/bytedance/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3</span> benchmarks/temporal-covariance-inference.py <span class="at">--generate</span></span>
+<span id="cb3-451"><a href="#cb3-451" aria-hidden="true" tabindex="-1"></a><span class="ex">/Users/bytedance/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3</span> benchmarks/temporal-covariance-inference.py <span class="at">--verify</span></span>
+<span id="cb3-452"><a href="#cb3-452" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb3-453"><a href="#cb3-453" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-454"><a href="#cb3-454" aria-hidden="true" tabindex="-1"></a>The verifier checks:</span>
+<span id="cb3-455"><a href="#cb3-455" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-456"><a href="#cb3-456" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>the exact four-file artifact inventory and SHA-256 hashes;</span>
+<span id="cb3-457"><a href="#cb3-457" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>all 3,960 expected unique rows, canonical ordering, and recomputed summaries;</span>
+<span id="cb3-458"><a href="#cb3-458" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>byte-identical clean regeneration and reversed scenario/replicate traversal;</span>
+<span id="cb3-459"><a href="#cb3-459" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>byte-identical valid partial resume and rejection of corrupted, stale,</span>
+<span id="cb3-460"><a href="#cb3-460" aria-hidden="true" tabindex="-1"></a>  duplicate, unknown-key, or incomplete partial rows;</span>
+<span id="cb3-461"><a href="#cb3-461" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>fitting/selection and frozen-inference capability boundaries;</span>
+<span id="cb3-462"><a href="#cb3-462" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>test-observation and latent-truth poison invariance;</span>
+<span id="cb3-463"><a href="#cb3-463" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>covariance-form versus precision-form GP posterior agreement;</span>
+<span id="cb3-464"><a href="#cb3-464" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>recursive RTS versus direct AR batch agreement and true-scenario oracle</span>
+<span id="cb3-465"><a href="#cb3-465" aria-hidden="true" tabindex="-1"></a>  covariance wiring; and</span>
+<span id="cb3-466"><a href="#cb3-466" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>explicit <span class="in">`invalid`</span>/<span class="in">`nonconvergence`</span> labels under non-finite and</span>
+<span id="cb3-467"><a href="#cb3-467" aria-hidden="true" tabindex="-1"></a>  linear-algebra fault injection.</span>
+<span id="cb3-468"><a href="#cb3-468" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-469"><a href="#cb3-469" aria-hidden="true" tabindex="-1"></a>The system <span class="in">`python3`</span> is not the recorded numerical runtime; reproducibility</span>
+<span id="cb3-470"><a href="#cb3-470" aria-hidden="true" tabindex="-1"></a>commands intentionally use the bundled executable written in <span class="in">`manifest.json`</span>.</span>
+<span id="cb3-471"><a href="#cb3-471" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-472"><a href="#cb3-472" aria-hidden="true" tabindex="-1"></a><span class="fu">## Review record</span></span>
+<span id="cb3-473"><a href="#cb3-473" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-474"><a href="#cb3-474" aria-hidden="true" tabindex="-1"></a>Independent scientific and implementation reviewers were read-only and independent of the executors. Their initial</span>
+<span id="cb3-475"><a href="#cb3-475" aria-hidden="true" tabindex="-1"></a>reviews returned <span class="in">`REVISE`</span> on static-factor hidden-mask fairness, artifact reconciliation, frozen training alignment, selection semantics, source provenance, expanded scenario oracles, and real-path fault routing. The bounded correction pass addressed only</span>
+<span id="cb3-476"><a href="#cb3-476" aria-hidden="true" tabindex="-1"></a>those findings; focused scientific and implementation re-reviews both returned</span>
+<span id="cb3-477"><a href="#cb3-477" aria-hidden="true" tabindex="-1"></a><span class="in">`PASS`</span> with no unresolved finding.</span>
+<span id="cb3-478"><a href="#cb3-478" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-479"><a href="#cb3-479" aria-hidden="true" tabindex="-1"></a>The accepted validation record includes 60-object structural validation, 33 repository tests, the full artifact verifier, target/index renders, workflow validation, and <span class="in">`git diff --check`</span>. The recorded review decision then authorized the</span>
+<span id="cb3-480"><a href="#cb3-480" aria-hidden="true" tabindex="-1"></a>mechanical promotion to <span class="in">`L1/stable`</span>. Stable status records bounded acceptance of</span>
+<span id="cb3-481"><a href="#cb3-481" aria-hidden="true" tabindex="-1"></a>this declared synthetic Benchmark Object; it does not expand its evidence,</span>
+<span id="cb3-482"><a href="#cb3-482" aria-hidden="true" tabindex="-1"></a>information-set, target, or interpretation boundaries.</span>
+<span id="cb3-483"><a href="#cb3-483" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-484"><a href="#cb3-484" aria-hidden="true" tabindex="-1"></a><span class="fu">## Maturity checklist</span></span>
+<span id="cb3-485"><a href="#cb3-485" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-486"><a href="#cb3-486" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> The temporal generator and all 12 scenarios are bounded and explicit.</span>
+<span id="cb3-487"><a href="#cb3-487" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> Gaussian, correlated-Gaussian, and raw Poisson observation families are</span>
+<span id="cb3-488"><a href="#cb3-488" aria-hidden="true" tabindex="-1"></a>  distinguished.</span>
+<span id="cb3-489"><a href="#cb3-489" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> Train, validation, test, static, online, retrospective, and oracle</span>
+<span id="cb3-490"><a href="#cb3-490" aria-hidden="true" tabindex="-1"></a>  information sets are labelled.</span>
+<span id="cb3-491"><a href="#cb3-491" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> Known, selected, nominal-wrong, wrong-family, and true-scenario parameters</span>
+<span id="cb3-492"><a href="#cb3-492" aria-hidden="true" tabindex="-1"></a>  are distinguished.</span>
+<span id="cb3-493"><a href="#cb3-493" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> Generation, fitting/selection, inference, masking, and scoring have</span>
+<span id="cb3-494"><a href="#cb3-494" aria-hidden="true" tabindex="-1"></a>  separate capability contracts.</span>
+<span id="cb3-495"><a href="#cb3-495" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> Metric-specific provenance, targets, applicability, and two-level</span>
+<span id="cb3-496"><a href="#cb3-496" aria-hidden="true" tabindex="-1"></a>  summaries are declared without a pooled score.</span>
+<span id="cb3-497"><a href="#cb3-497" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> All 3,960 raw rows and exactly four byte-verifiable artifacts are retained.</span>
+<span id="cb3-498"><a href="#cb3-498" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> Full artifact verification passes.</span>
+<span id="cb3-499"><a href="#cb3-499" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> Verified bounded results and interpretation limits are recorded.</span>
+<span id="cb3-500"><a href="#cb3-500" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> Focused scientific re-review PASS is recorded.</span>
+<span id="cb3-501"><a href="#cb3-501" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> Independent implementation review PASS is recorded.</span>
+<span id="cb3-502"><a href="#cb3-502" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> review-authorized mechanical promotion to <span class="in">`L1/stable`</span> is complete.</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></div>
+</div></div></div></div></div>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

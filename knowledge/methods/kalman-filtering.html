@@ -1,0 +1,1680 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.10.18">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Kalman Filtering – Latent Dynamics &amp; Geometry</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-445b8638c3d06994fee0907d791121c4.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-chtml.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">Latent Dynamics &amp; Geometry</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../index.html"> 
+<span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../knowledge/concepts/index.html"> 
+<span class="menu-text">Concepts</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../knowledge/methods/index.html"> 
+<span class="menu-text">Methods</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../knowledge/math/index.html"> 
+<span class="menu-text">Math</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../knowledge/papers/index.html"> 
+<span class="menu-text">Papers</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../toy-models/index.html"> 
+<span class="menu-text">Toy Models</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../research-questions/index.html"> 
+<span class="menu-text">Research Questions</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../benchmarks/index.html"> 
+<span class="menu-text">Benchmarks</span></a>
+  </li>  
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/AbelZheng/latent-dynamics-geometry-public"> <i class="bi bi-github" role="img" aria-label="GitHub repository">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="https://github.com/AbelZheng/latent-dynamics-geometry-public/discussions"> 
+<span class="menu-text">Discussions</span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#kalman-filtering" id="toc-kalman-filtering" class="nav-link active" data-scroll-target="#kalman-filtering">Kalman Filtering</a>
+  <ul class="collapse">
+  <li><a href="#problem" id="toc-problem" class="nav-link" data-scroll-target="#problem">Problem</a></li>
+  <li><a href="#input" id="toc-input" class="nav-link" data-scroll-target="#input">Input</a></li>
+  <li><a href="#output" id="toc-output" class="nav-link" data-scroll-target="#output">Output</a></li>
+  <li><a href="#core-idea" id="toc-core-idea" class="nav-link" data-scroll-target="#core-idea">Core idea</a></li>
+  <li><a href="#generative-modeling-assumptions" id="toc-generative-modeling-assumptions" class="nav-link" data-scroll-target="#generative-modeling-assumptions">Generative / modeling assumptions</a></li>
+  <li><a href="#mathematical-formulation" id="toc-mathematical-formulation" class="nav-link" data-scroll-target="#mathematical-formulation">Mathematical formulation</a>
+  <ul class="collapse">
+  <li><a href="#initialization" id="toc-initialization" class="nav-link" data-scroll-target="#initialization">Initialization</a></li>
+  <li><a href="#prediction" id="toc-prediction" class="nav-link" data-scroll-target="#prediction">Prediction</a></li>
+  <li><a href="#innovation-and-update" id="toc-innovation-and-update" class="nav-link" data-scroll-target="#innovation-and-update">Innovation and update</a></li>
+  <li><a href="#covariance-update-forms-and-numerical-boundary" id="toc-covariance-update-forms-and-numerical-boundary" class="nav-link" data-scroll-target="#covariance-update-forms-and-numerical-boundary">Covariance-update forms and numerical boundary</a></li>
+  <li><a href="#partially-missing-observations" id="toc-partially-missing-observations" class="nav-link" data-scroll-target="#partially-missing-observations">Partially missing observations</a></li>
+  <li><a href="#singular-or-ill-conditioned-innovation-covariance" id="toc-singular-or-ill-conditioned-innovation-covariance" class="nav-link" data-scroll-target="#singular-or-ill-conditioned-innovation-covariance">Singular or ill-conditioned innovation covariance</a></li>
+  <li><a href="#likelihood-contribution" id="toc-likelihood-contribution" class="nav-link" data-scroll-target="#likelihood-contribution">Likelihood contribution</a></li>
+  </ul></li>
+  <li><a href="#what-is-learned" id="toc-what-is-learned" class="nav-link" data-scroll-target="#what-is-learned">What is learned?</a></li>
+  <li><a href="#what-is-fixed" id="toc-what-is-fixed" class="nav-link" data-scroll-target="#what-is-fixed">What is fixed?</a></li>
+  <li><a href="#temporal-assumptions" id="toc-temporal-assumptions" class="nav-link" data-scroll-target="#temporal-assumptions">Temporal assumptions</a></li>
+  <li><a href="#geometry-assumptions" id="toc-geometry-assumptions" class="nav-link" data-scroll-target="#geometry-assumptions">Geometry assumptions</a></li>
+  <li><a href="#supervision" id="toc-supervision" class="nav-link" data-scroll-target="#supervision">Supervision</a></li>
+  <li><a href="#optimization-inference" id="toc-optimization-inference" class="nav-link" data-scroll-target="#optimization-inference">Optimization / inference</a></li>
+  <li><a href="#strengths" id="toc-strengths" class="nav-link" data-scroll-target="#strengths">Strengths</a></li>
+  <li><a href="#failure-modes" id="toc-failure-modes" class="nav-link" data-scroll-target="#failure-modes">Failure modes</a></li>
+  <li><a href="#identifiability-issues" id="toc-identifiability-issues" class="nav-link" data-scroll-target="#identifiability-issues">Identifiability issues</a></li>
+  <li><a href="#comparison-with-simpler-methods" id="toc-comparison-with-simpler-methods" class="nav-link" data-scroll-target="#comparison-with-simpler-methods">Comparison with simpler methods</a></li>
+  <li><a href="#evaluation-criteria" id="toc-evaluation-criteria" class="nav-link" data-scroll-target="#evaluation-criteria">Evaluation criteria</a></li>
+  <li><a href="#minimal-toy-model" id="toc-minimal-toy-model" class="nav-link" data-scroll-target="#minimal-toy-model">Minimal toy model</a></li>
+  <li><a href="#relevance-to-ldg" id="toc-relevance-to-ldg" class="nav-link" data-scroll-target="#relevance-to-ldg">Relevance to LDG</a>
+  <ul class="collapse">
+  <li><a href="#mouse-trajectory" id="toc-mouse-trajectory" class="nav-link" data-scroll-target="#mouse-trajectory">Mouse trajectory</a></li>
+  <li><a href="#eye-movement" id="toc-eye-movement" class="nav-link" data-scroll-target="#eye-movement">Eye movement</a></li>
+  <li><a href="#eeg" id="toc-eeg" class="nav-link" data-scroll-target="#eeg">EEG</a></li>
+  <li><a href="#meg-neural-population-data" id="toc-meg-neural-population-data" class="nav-link" data-scroll-target="#meg-neural-population-data">MEG / neural population data</a></li>
+  </ul></li>
+  <li><a href="#primary-sources" id="toc-primary-sources" class="nav-link" data-scroll-target="#primary-sources">Primary sources</a></li>
+  <li><a href="#reviews-secondary-sources" id="toc-reviews-secondary-sources" class="nav-link" data-scroll-target="#reviews-secondary-sources">Reviews / secondary sources</a></li>
+  <li><a href="#open-methodological-questions" id="toc-open-methodological-questions" class="nav-link" data-scroll-target="#open-methodological-questions">Open methodological questions</a></li>
+  <li><a href="#maturity-checklist" id="toc-maturity-checklist" class="nav-link" data-scroll-target="#maturity-checklist">Maturity checklist</a></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<div class="quarto-title-block"><div><h1 class="title">Kalman Filtering</h1><button type="button" class="btn code-tools-button" id="quarto-code-tools-source"><i class="bi"></i> Code</button></div></div>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="kalman-filtering" class="level1">
+<h1>Kalman Filtering</h1>
+<section id="problem" class="level2">
+<h2 class="anchored" data-anchor-id="problem">Problem</h2>
+<p>Kalman filtering sequentially computes the current latent-state distribution in a declared linear-Gaussian state-space model (LGSSM), using only observations available through the current time. Its target at time <span class="math inline">\(t\)</span> is</p>
+<p><span class="math display">\[
+p(z_t\mid x_{1:t},u_{1:t}),
+\]</span></p>
+<p>not a retrospective distribution that uses <span class="math inline">\(x_{t+1:T}\)</span>. The recursion alternates between a <strong>prediction</strong> based on the previous filtering distribution and the transition model, and an <strong>update</strong> based on the current observation <span class="citation" data-cites="Kalman1960 Sarkka2013">(<a href="#ref-Kalman1960" role="doc-biblioref">Kalman 1960</a>; <a href="#ref-Sarkka2013" role="doc-biblioref">Särkkä 2013</a>, ch.&nbsp;4)</span>.</p>
+<p>This object treats the model matrices and covariance parameters as fixed and known during filtering. Specifying or learning an LGSSM, filtering its state, forecasting future observations, and smoothing past states are distinct tasks. Fixed-interval Kalman smoothing is deferred to P2-U10.</p>
+</section>
+<section id="input" class="level2">
+<h2 class="anchored" data-anchor-id="input">Input</h2>
+<p>Use the time-invariant, input-driven LGSSM defined in the prerequisite Method:</p>
+<p><span class="math display">\[
+z_1\sim\mathcal N(m_1,P_1),
+\]</span></p>
+<p><span class="math display">\[
+z_{t+1}=Az_t+Bu_t+w_t,
+\qquad
+w_t\sim\mathcal N(0,Q),
+\]</span></p>
+<p><span class="math display">\[
+x_t=Cz_t+Du_t+v_t,
+\qquad
+v_t\sim\mathcal N(0,R).
+\]</span></p>
+<p>Here <span class="math inline">\(z_t\in\mathbb R^q\)</span>, <span class="math inline">\(x_t\in\mathbb R^p\)</span>, and the optional known input is <span class="math inline">\(u_t\in\mathbb R^r\)</span>. The canonical assumptions are <span class="math inline">\(P_1,Q\succeq0\)</span>, <span class="math inline">\(R\succ0\)</span>, mutual independence of the initial state and all process and observation noises, temporal independence of the noises, and a fixed or externally supplied open-loop input path.</p>
+<p>A reproducible filtering problem must declare:</p>
+<ul>
+<li>the fixed parameter tuple <span class="math inline">\((m_1,P_1,A,B,C,D,Q,R)\)</span> and its provenance;</li>
+<li>state, observation, and input units and coordinate conventions;</li>
+<li>sequence boundaries, sampling interval, and treatment of resets between sequences;</li>
+<li>exactly when each input becomes available;</li>
+<li>initialization at the first observation;</li>
+<li>which observation components are available at each time and why;</li>
+<li>numerical linear-algebra method, precision, and covariance representation; and</li>
+<li>whether the goal is current-state inference, one-step predictive scoring, online monitoring, or an input to a separate learning procedure.</li>
+</ul>
+<p>For the transition from <span class="math inline">\(t\)</span> to <span class="math inline">\(t+1\)</span>, <span class="math inline">\(u_t\)</span> must be known before that transition is evaluated. If <span class="math inline">\(D\ne0\)</span>, the direct-feedthrough input <span class="math inline">\(u_t\)</span> used in the measurement mean must be available before <span class="math inline">\(x_t\)</span> is assimilated. A control constructed from <span class="math inline">\(x_t\)</span> itself creates a contemporaneous algebraic loop unless a separate within-step timing model is supplied. Future inputs that depend on future observations are not known conditioning variables.</p>
+</section>
+<section id="output" class="level2">
+<h2 class="anchored" data-anchor-id="output">Output</h2>
+<p>At each time <span class="math inline">\(t\)</span>, the filter returns or defines:</p>
+<ul>
+<li>the predicted state distribution <span class="math display">\[
+p(z_t\mid x_{1:t-1},u_{1:t})
+=\mathcal N(m_{t\mid t-1},P_{t\mid t-1});
+\]</span></li>
+<li>the one-step predictive observation distribution <span class="math display">\[
+p(x_t\mid x_{1:t-1},u_{1:t})
+=\mathcal N(\widehat x_{t\mid t-1},S_t);
+\]</span></li>
+<li>the innovation <span class="math inline">\(\nu_t=x_t-\widehat x_{t\mid t-1}\)</span> and innovation covariance <span class="math inline">\(S_t\)</span>; and</li>
+<li>the filtering distribution <span class="math display">\[
+p(z_t\mid x_{1:t},u_{1:t})
+=\mathcal N(m_{t\mid t},P_{t\mid t}).
+\]</span></li>
+</ul>
+<p>The filtering mean is a model-conditional posterior mean, not an observed state. Its covariance describes uncertainty under the fixed model and conditioning information; it does not include uncertainty about learned parameters unless that uncertainty is modeled separately.</p>
+</section>
+<section id="core-idea" class="level2">
+<h2 class="anchored" data-anchor-id="core-idea">Core idea</h2>
+<p>The previous filtering distribution summarizes the information in past observations needed for the next recursive step. Linear propagation plus Gaussian process noise preserves Gaussianity. The current linear-Gaussian measurement then yields a Gaussian conditional distribution. Consequently, means and covariances are sufficient for exact finite-dimensional filtering under the declared model <span class="citation" data-cites="Sarkka2013">(<a href="#ref-Sarkka2013" role="doc-biblioref">Särkkä 2013, secs. 4.2–4.3</a>)</span>.</p>
+<p>The innovation is the part of the current observation not predicted from prior observations and known inputs. Its covariance combines predicted state uncertainty projected into observation coordinates with observation noise. The Kalman gain maps this observation-space discrepancy into a state-space correction.</p>
+</section>
+<section id="generative-modeling-assumptions" class="level2">
+<h2 class="anchored" data-anchor-id="generative-modeling-assumptions">Generative / modeling assumptions</h2>
+<p>The recursion inherits every assumption of the LGSSM. In particular:</p>
+<ul>
+<li>state evolution and observation are linear in the chosen coordinates;</li>
+<li>the prior and noises are Gaussian;</li>
+<li>process and observation noises are white, mutually independent, and independent of the initial state;</li>
+<li>the Markov state and conditional-observation structure is correctly specified;</li>
+<li>matrices and covariance parameters used by the filter are fixed during the recursion;</li>
+<li>the input path is nonanticipating under the declared within-step timing; and</li>
+<li>any missing-observation pattern is treated as observed/fixed and non-informative unless a missingness model is added.</li>
+</ul>
+<p>Under these conditions and exact arithmetic, the recursion gives the exact Gaussian filtering distributions. Kalman’s original state-space treatment derives optimal linear estimates through orthogonal projection and explicitly distinguishes filtering, prediction, and smoothing by the estimated time relative to the latest conditioning observation <span class="citation" data-cites="Kalman1960">(<a href="#ref-Kalman1960" role="doc-biblioref">Kalman 1960</a>)</span>. This object uses the narrower Bayesian linear-Gaussian interpretation: exactness is conditional on the stated probability model, not evidence that the model generated the scientific system.</p>
+</section>
+<section id="mathematical-formulation" class="level2">
+<h2 class="anchored" data-anchor-id="mathematical-formulation">Mathematical formulation</h2>
+<p>Write <span class="math inline">\(\mathcal I_t=\sigma(x_{1:t},u_{1:t})\)</span> for the information available after assimilating <span class="math inline">\(x_t\)</span>. Define</p>
+<p><span class="math display">\[
+m_{t\mid s}=\mathbb E[z_t\mid\mathcal I_s],
+\qquad
+P_{t\mid s}=\operatorname{Cov}(z_t\mid\mathcal I_s).
+\]</span></p>
+<p>No quantity below conditions on <span class="math inline">\(x_{t+1}\)</span> or any later observation.</p>
+<section id="initialization" class="level3">
+<h3 class="anchored" data-anchor-id="initialization">Initialization</h3>
+<p>Before the first observation,</p>
+<p><span class="math display">\[
+m_{1\mid0}=m_1,
+\qquad
+P_{1\mid0}=P_1.
+\]</span></p>
+<p>This prior is part of the model. An informative external initialization must be justified independently. Replacing an unknown initial distribution by an arbitrarily huge covariance is not automatically an exact diffuse initialization and can be numerically harmful; exact diffuse variants are outside this bounded Method.</p>
+</section>
+<section id="prediction" class="level3">
+<h3 class="anchored" data-anchor-id="prediction">Prediction</h3>
+<p>For <span class="math inline">\(t\ge2\)</span>, after filtering time <span class="math inline">\(t-1\)</span>,</p>
+<p><span class="math display">\[
+m_{t\mid t-1}=A m_{t-1\mid t-1}+B u_{t-1},
+\]</span></p>
+<p><span class="math display">\[
+P_{t\mid t-1}=A P_{t-1\mid t-1}A^\top+Q.
+\]</span></p>
+<p>Thus</p>
+<p><span class="math display">\[
+p(z_t\mid x_{1:t-1},u_{1:t})
+=\mathcal N(m_{t\mid t-1},P_{t\mid t-1}).
+\]</span></p>
+<p>The transition input is <span class="math inline">\(u_{t-1}\)</span> because it drives <span class="math inline">\(z_{t-1}\mapsto z_t\)</span>. The conditioning notation includes <span class="math inline">\(u_t\)</span> because the contemporaneous observation mean may use <span class="math inline">\(D u_t\)</span>; <span class="math inline">\(u_t\)</span> does not retroactively drive the preceding transition.</p>
+</section>
+<section id="innovation-and-update" class="level3">
+<h3 class="anchored" data-anchor-id="innovation-and-update">Innovation and update</h3>
+<p>The predicted observation mean, innovation, and innovation covariance are</p>
+<p><span class="math display">\[
+\widehat x_{t\mid t-1}=C m_{t\mid t-1}+D u_t,
+\]</span></p>
+<p><span class="math display">\[
+\nu_t=x_t-\widehat x_{t\mid t-1},
+\]</span></p>
+<p><span class="math display">\[
+S_t=C P_{t\mid t-1}C^\top+R.
+\]</span></p>
+<p>The predictive observation law is</p>
+<p><span class="math display">\[
+p(x_t\mid x_{1:t-1},u_{1:t})
+=\mathcal N(\widehat x_{t\mid t-1},S_t).
+\]</span></p>
+<p>The Kalman gain is</p>
+<p><span class="math display">\[
+K_t=P_{t\mid t-1}C^\top S_t^{-1},
+\]</span></p>
+<p>and the filtering moments are</p>
+<p><span class="math display">\[
+m_{t\mid t}=m_{t\mid t-1}+K_t\nu_t,
+\]</span></p>
+<p><span class="math display">\[
+P_{t\mid t}=P_{t\mid t-1}-K_tS_tK_t^\top.
+\]</span></p>
+<p>These are the closed-form Gaussian conditioning equations <span class="citation" data-cites="Sarkka2013">(<a href="#ref-Sarkka2013" role="doc-biblioref">Särkkä 2013</a>, theorem 4.2)</span>. Implementations should solve linear systems involving <span class="math inline">\(S_t\)</span> rather than explicitly forming <span class="math inline">\(S_t^{-1}\)</span>.</p>
+</section>
+<section id="covariance-update-forms-and-numerical-boundary" class="level3">
+<h3 class="anchored" data-anchor-id="covariance-update-forms-and-numerical-boundary">Covariance-update forms and numerical boundary</h3>
+<p>In exact arithmetic, the previous covariance update is equivalent to</p>
+<p><span class="math display">\[
+P_{t\mid t}=(I-K_tC)P_{t\mid t-1}.
+\]</span></p>
+<p>The short form can lose symmetry or positive-semidefinite structure through floating-point cancellation. The Joseph form</p>
+<p><span class="math display">\[
+P_{t\mid t}
+=(I-K_tC)P_{t\mid t-1}(I-K_tC)^\top
++K_t R K_t^\top
+\]</span></p>
+<p>is algebraically equivalent when <span class="math inline">\(K_t\)</span> is the Kalman gain and expresses the covariance as a sum of positive-semidefinite terms. Asada’s inspected implementation notes specifically use this form to reduce asymmetric covariance caused by round-off and discuss factorized covariance representations as a further safeguard <span class="citation" data-cites="Asada2006Lecture8">(<a href="#ref-Asada2006Lecture8" role="doc-biblioref">Asada 2006, sec. 4.10</a>)</span>.</p>
+<p>The Joseph form is not a universal numerical cure. Stable implementations should also use symmetric factorizations and solves, monitor symmetry and definiteness, and avoid explicit matrix inverses. Square-root or factorized filters propagate covariance factors and can be preferable for severe scaling or conditioning problems; they are computational realizations of the same declared filtering target, not different scientific models <span class="citation" data-cites="Sarkka2013 Asada2006Lecture8">(<a href="#ref-Sarkka2013" role="doc-biblioref">Särkkä 2013, sec. 4.3</a>; <a href="#ref-Asada2006Lecture8" role="doc-biblioref">Asada 2006, sec. 4.10</a>)</span>. Detailed square-root algorithms are outside scope.</p>
+</section>
+<section id="partially-missing-observations" class="level3">
+<h3 class="anchored" data-anchor-id="partially-missing-observations">Partially missing observations</h3>
+<p>Let <span class="math inline">\(M_t\)</span> be a row-selection matrix that retains only the components observed at time <span class="math inline">\(t\)</span>. Define</p>
+<p><span class="math display">\[
+x_t^{(o)}=M_t x_t,
+\quad
+C_t=M_tC,
+\quad
+D_t=M_tD,
+\quad
+R_t=M_tRM_t^\top.
+\]</span></p>
+<p>Apply the ordinary update using <span class="math inline">\(x_t^{(o)},C_t,D_t,R_t\)</span>. This preserves correlations among the retained measurement errors. If no component is observed, skip the measurement update:</p>
+<p><span class="math display">\[
+m_{t\mid t}=m_{t\mid t-1},
+\qquad
+P_{t\mid t}=P_{t\mid t-1}.
+\]</span></p>
+<p>This row-selection rule is exact only when the missingness indicator contributes no additional information about <span class="math inline">\(z_t\)</span> beyond the modeled observations and covariates. Informative dropout, threshold censoring, saturation, or state-dependent sensor failure requires an explicit observation/missingness model.</p>
+</section>
+<section id="singular-or-ill-conditioned-innovation-covariance" class="level3">
+<h3 class="anchored" data-anchor-id="singular-or-ill-conditioned-innovation-covariance">Singular or ill-conditioned innovation covariance</h3>
+<p>Under the canonical assumptions <span class="math inline">\(P_{t\mid t-1}\succeq0\)</span> and <span class="math inline">\(R\succ0\)</span>, the innovation covariance <span class="math inline">\(S_t\)</span> is positive definite. After row selection, <span class="math inline">\(R_t\succ0\)</span> for a nonempty set of distinct retained coordinates, so a Cholesky-based solve is available in exact arithmetic.</p>
+<p>A singular <span class="math inline">\(S_t\)</span> indicates that the implementation has left this regular model class—for example, by using zero-noise exact constraints, duplicated deterministic measurement rows, or a semidefinite <span class="math inline">\(R\)</span>. The ordinary density and inverse formula then do not apply unchanged. Redundant rows may be removed, or a separately justified degenerate-Gaussian/constraint formulation may use support-aware generalized inverses. Adding arbitrary diagonal “jitter” changes the observation model and must not be presented as a neutral mathematical fix.</p>
+<p>If <span class="math inline">\(S_t\)</span> is theoretically positive definite but ill-conditioned, rescale variables, use Cholesky or another rank-revealing factorization, avoid explicit inversion, and inspect the model for nearly redundant sensors or extreme covariance scales. A failed factorization is a diagnostic, not permission to silently discard uncertainty.</p>
+</section>
+<section id="likelihood-contribution" class="level3">
+<h3 class="anchored" data-anchor-id="likelihood-contribution">Likelihood contribution</h3>
+<p>For a complete <span class="math inline">\(p\)</span>-dimensional observation and nonsingular <span class="math inline">\(S_t\)</span>, the innovation gives the one-step log predictive density</p>
+<p><span class="math display">\[
+\ell_t
+=-\frac12\left[
+p\log(2\pi)+\log|S_t|+\nu_t^\top S_t^{-1}\nu_t
+\right].
+\]</span></p>
+<p>With partial observation, replace <span class="math inline">\(p,\nu_t,S_t\)</span> by the retained dimension and selected quantities. Summing <span class="math inline">\(\ell_t\)</span> gives the fixed-parameter marginal sequence log likelihood. Using this likelihood inside parameter estimation does not turn the filtering recursion itself into a parameter-learning algorithm.</p>
+</section>
+</section>
+<section id="what-is-learned" class="level2">
+<h2 class="anchored" data-anchor-id="what-is-learned">What is learned?</h2>
+<p>With parameters fixed, the filter learns no model parameter. It computes successive conditional distributions over <span class="math inline">\(z_t\)</span> and one-step predictive distributions over <span class="math inline">\(x_t\)</span> from incoming observations.</p>
+<p>The model parameters may have been set from physics, estimated on separate training sequences, or updated by a distinct algorithm. EM and likelihood optimization can call a filter internally, but the outer parameter-learning criterion and updates remain separate. Treating the filtered means as error-free observations for an unqualified second-stage fit discards posterior uncertainty and can create circular conclusions.</p>
+</section>
+<section id="what-is-fixed" class="level2">
+<h2 class="anchored" data-anchor-id="what-is-fixed">What is fixed?</h2>
+<p>The analyst fixes the LGSSM structure, state dimension, parameter tuple, coordinate systems, sequence/reset policy, input timing, missingness assumptions, initialization, numerical precision, covariance representation, and any diagnostic thresholds. If parameters are estimated, the training split, estimator, constraints, and model-selection rule are fixed outside the filtering operation.</p>
+<p>The filter does not choose <span class="math inline">\(Q\)</span> and <span class="math inline">\(R\)</span> by deciding how much to trust dynamics versus measurements. Those covariances are model parameters whose values require external specification or a declared estimation procedure.</p>
+</section>
+<section id="temporal-assumptions" class="level2">
+<h2 class="anchored" data-anchor-id="temporal-assumptions">Temporal assumptions</h2>
+<p>Filtering is causal with respect to the declared information order: <span class="math inline">\(m_{t\mid t}\)</span> and <span class="math inline">\(P_{t\mid t}\)</span> depend on <span class="math inline">\(x_{1:t}\)</span> but not <span class="math inline">\(x_{t+1:T}\)</span>. Late-arriving or revised observations require a separately declared replay, out-of-sequence update, or smoothing procedure.</p>
+<p>The algorithm assumes the discrete sampling and sequence boundaries of the LGSSM. Unequal time gaps require gap-specific transitions and process covariances; incrementing the index as if every gap were equal changes the temporal model. Filtering does not by itself make the inferred mean trajectory dynamical evidence: its temporal structure is inherited from <span class="math inline">\(A,Q\)</span>, the initialization, and the observations.</p>
+</section>
+<section id="geometry-assumptions" class="level2">
+<h2 class="anchored" data-anchor-id="geometry-assumptions">Geometry assumptions</h2>
+<p>The state occupies a finite-dimensional vector space. Prediction and update use affine maps and covariance ellipsoids in declared coordinates. <span class="math inline">\(P_{t\mid s}\)</span> and <span class="math inline">\(S_t\)</span> define coordinate-dependent Mahalanobis geometries for uncertainty and innovations.</p>
+<p>Under an invertible state-coordinate change <span class="math inline">\(z'_t=Tz_t\)</span>, the moments and model matrices must transform consistently, including</p>
+<p><span class="math display">\[
+m'_{t\mid s}=Tm_{t\mid s},
+\qquad
+P'_{t\mid s}=TP_{t\mid s}T^\top,
+\qquad
+C'=CT^{-1}.
+\]</span></p>
+<p>The observable predictive law can remain unchanged while latent axes and gain entries change. Euclidean distance between filtering means, visual smoothness, or covariance ellipsoids do not establish a manifold, Riemannian geometry, intrinsic dimension, or privileged biological coordinates.</p>
+</section>
+<section id="supervision" class="level2">
+<h2 class="anchored" data-anchor-id="supervision">Supervision</h2>
+<p>No external outcome label is required. The current measurement is evidence in a probabilistic observation model, not a supervised target in the ordinary prediction-label sense. Known inputs condition the model; they do not become labels merely by being supplied.</p>
+<p>External labels or outcomes used to choose state dimension, matrices, covariance parameters, preprocessing, or diagnostic thresholds introduce task dependence. Such selection must occur within training/validation boundaries and be reported separately from online filtering.</p>
+</section>
+<section id="optimization-inference" class="level2">
+<h2 class="anchored" data-anchor-id="optimization-inference">Optimization / inference</h2>
+<p>For fixed parameters, filtering is recursive Gaussian inference rather than nonconvex optimization. Each step uses matrix multiplication, addition, and a solve in the innovation covariance. Computational cost and conditioning depend on state and observed dimensions and on the selected factorization.</p>
+<p>There is no guarantee that an arbitrary software implementation reproduces the mathematical recursion. Tests should compare covariance forms, preserve symmetry, check positive-semidefinite tolerances, and verify small problems against direct joint-Gaussian conditioning. Computing a finite output without an exception is not evidence of numerical correctness.</p>
+</section>
+<section id="strengths" class="level2">
+<h2 class="anchored" data-anchor-id="strengths">Strengths</h2>
+<ul>
+<li>Exact finite-horizon filtering moments under the fixed linear-Gaussian model.</li>
+<li>Sequential processing with a fixed-size state summary rather than repeated conditioning on the entire history.</li>
+<li>Explicit propagation of process and observation uncertainty.</li>
+<li>One-step predictive densities and innovations suitable for scoring and diagnostics.</li>
+<li>Natural handling of irregularly absent measurement components through declared row selection.</li>
+<li>A transparent baseline for later smoothing and for approximate nonlinear or non-Gaussian filters.</li>
+</ul>
+</section>
+<section id="failure-modes" class="level2">
+<h2 class="anchored" data-anchor-id="failure-modes">Failure modes</h2>
+<ul>
+<li><strong>Model misspecification:</strong> nonlinear transitions, non-Gaussian tails, colored noise, correlated process/observation noise, time-varying parameters, or omitted inputs make the declared recursion model-mismatched.</li>
+<li><strong>Wrong <span class="math inline">\(Q/R\)</span> balance:</strong> underestimated process noise can make the filter overconfident in propagation; underestimated observation noise can make it chase measurements.</li>
+<li><strong>Bad initialization:</strong> a poorly chosen mean or covariance can dominate short sequences or interact with weak observability.</li>
+<li><strong>Unobservable or weakly observed directions:</strong> uncertainty can remain large or become practically ill-conditioned even when some observed coordinates fit well.</li>
+<li><strong>Anticipating inputs:</strong> controls or regressors containing contemporaneous/future observation information leak evidence into prediction.</li>
+<li><strong>Sequence leakage:</strong> carrying a posterior across independent subjects, sessions, or trials invents a transition unless continuity is part of the model.</li>
+<li><strong>Missingness misspecification:</strong> skipping state-dependent dropout as though it were uninformative can bias inference.</li>
+<li><strong>Numerical loss of symmetry or definiteness:</strong> subtraction updates, explicit inverses, poor scaling, and round-off can corrupt covariances <span class="citation" data-cites="Asada2006Lecture8">(<a href="#ref-Asada2006Lecture8" role="doc-biblioref">Asada 2006, sec. 4.10</a>)</span>.</li>
+<li><strong>Singular innovation covariance:</strong> deterministic or redundant measurements can invalidate the ordinary inverse-density update.</li>
+<li><strong>Outliers:</strong> a Gaussian likelihood can give atypical observations excessive influence; ad hoc clipping changes the method.</li>
+<li><strong>Parameter plug-in certainty:</strong> conditioning on estimated parameters as though known understates total uncertainty.</li>
+<li><strong>Interpretive overreach:</strong> a smooth or predictive filtered path can be mistaken for a validated mechanism or unique latent trajectory.</li>
+</ul>
+</section>
+<section id="identifiability-issues" class="level2">
+<h2 class="anchored" data-anchor-id="identifiability-issues">Identifiability issues</h2>
+<p>Filtering does not repair non-identifiability of the LGSSM. If two parameter/state-coordinate specifications induce the same observable law, their filtering distributions transform within the corresponding equivalence while the observed predictive distribution can agree. Similarity transformations can change latent axes, transition entries, observation loadings, gains, and posterior means without selecting a unique scientific coordinate frame.</p>
+<p>Observability and identifiability are related but distinct. Weak observation of a state direction can make its current conditional uncertainty large under one fixed model. Structural identifiability asks whether different model specifications induce the same observable distribution. Neither property follows from a small filtering covariance computed under assumed parameters.</p>
+</section>
+<section id="comparison-with-simpler-methods" class="level2">
+<h2 class="anchored" data-anchor-id="comparison-with-simpler-methods">Comparison with simpler methods</h2>
+<ul>
+<li><strong>Open-loop prediction:</strong> propagate <span class="math inline">\(m\)</span> and <span class="math inline">\(P\)</span> without measurement updates. Filtering should improve declared current-state or one-step predictive criteria when measurements contain model-consistent information.</li>
+<li><strong>Measurement-only estimate:</strong> where a state component is directly observed, use the current measurement or a calibrated static linear transform. This tests whether temporal propagation contributes beyond sensor smoothing.</li>
+<li><strong>Persistence / last observation:</strong> carry forward the most recent usable observation or state proxy. This is a minimal sequential baseline.</li>
+<li><strong>Static Factor Analysis:</strong> infer a latent factor independently at each time under a static observation model. It separates the contribution of the temporal transition from a probabilistic observation layer.</li>
+<li><strong>Direct batch Gaussian conditioning:</strong> for a short sequence, condition the full joint Gaussian distribution at once. Its current-time marginal should match the recursive filter and is an implementation oracle, not a cheaper deployment baseline.</li>
+</ul>
+<p>A fixed-gain or steady-state filter is not automatically a simpler version of the finite-horizon filter: it requires conditions under which covariance/gain convergence and the chosen initialization are appropriate.</p>
+</section>
+<section id="evaluation-criteria" class="level2">
+<h2 class="anchored" data-anchor-id="evaluation-criteria">Evaluation criteria</h2>
+<p>Evaluation must match the intended use and separate model fit from implementation correctness:</p>
+<ol type="1">
+<li><strong>One-step predictive log likelihood:</strong> evaluate held-out sequences through innovation densities, with parameters and preprocessing fit only on training data.</li>
+<li><strong>Innovation calibration:</strong> inspect mean, variance, cross-correlation, and temporal autocorrelation of standardized innovations. Apparent whiteness is a model check, not proof of correct latent states.</li>
+<li><strong>State error when truth exists:</strong> in simulation or a genuinely observed-state benchmark, report time-resolved RMSE or Mahalanobis error and interval coverage. A proxy state must be labeled as a proxy.</li>
+<li><strong>Uncertainty calibration:</strong> under repeated data from a known simulator, compare nominal posterior coverage with empirical coverage. Plug-in parameter uncertainty must be distinguished.</li>
+<li><strong>Baselines:</strong> compare open-loop prediction, measurement-only, persistence, and static FA under identical splits and available information.</li>
+<li><strong>Missingness stress tests:</strong> evaluate declared missing-channel patterns and distinguish random masking from state-dependent dropout.</li>
+<li><strong>Numerical checks:</strong> compare recursive output with batch conditioning on small problems; monitor covariance symmetry, factorization failures, and sensitivity to scaling and precision.</li>
+<li><strong>Distribution shift:</strong> separate held-out time within a sequence from held-out trials, subjects, sessions, conditions, or acquisition systems.</li>
+</ol>
+<p>Do not select parameters on the test sequences and then report the same innovations as out-of-sample evidence. Lower state RMSE or predictive loss under one simulator supports that declared criterion; it does not validate a biological mechanism.</p>
+</section>
+<section id="minimal-toy-model" class="level2">
+<h2 class="anchored" data-anchor-id="minimal-toy-model">Minimal toy model</h2>
+<p>Consider the scalar random-walk model</p>
+<p><span class="math display">\[
+z_1\sim\mathcal N(m_1,p_1),
+\qquad
+z_{t+1}=z_t+w_t,
+\quad w_t\sim\mathcal N(0,q),
+\]</span></p>
+<p><span class="math display">\[
+x_t=z_t+v_t,
+\quad v_t\sim\mathcal N(0,r),
+\]</span></p>
+<p>with <span class="math inline">\(q\ge0\)</span> and <span class="math inline">\(r&gt;0\)</span>. At the first observation,</p>
+<p><span class="math display">\[
+s_1=p_1+r,
+\qquad
+k_1=\frac{p_1}{p_1+r},
+\]</span></p>
+<p><span class="math display">\[
+m_{1\mid1}=m_1+k_1(x_1-m_1),
+\qquad
+p_{1\mid1}=\frac{p_1r}{p_1+r}.
+\]</span></p>
+<p>The next prediction is</p>
+<p><span class="math display">\[
+m_{2\mid1}=m_{1\mid1},
+\qquad
+p_{2\mid1}=p_{1\mid1}+q.
+\]</span></p>
+<p>This example makes the uncertainty tradeoff explicit: <span class="math inline">\(r\to\infty\)</span> makes the update approach the prediction, whereas <span class="math inline">\(r\to0\)</span> makes a nondegenerate direct measurement dominate. These limits describe the model, not how <span class="math inline">\(q\)</span> or <span class="math inline">\(r\)</span> should be chosen from data.</p>
+<p>A future non-executable toy contract should generate independent scalar sequences with retained latent truth, compare Kalman filtering with open-loop, measurement-only, persistence, static FA where meaningful, and direct batch conditioning, and score held-out predictive density, state RMSE, and interval coverage. Required stress cases are every-third-step missing observations, misspecified <span class="math inline">\(q/r\)</span>, a wrong initial prior, an outlier, and nearly duplicate measurement rows with very different scaling. The exercise should compare the short and Joseph covariance forms against a factorized implementation in finite precision, but no code, data, figures, or result claims are created here.</p>
+</section>
+<section id="relevance-to-ldg" class="level2">
+<h2 class="anchored" data-anchor-id="relevance-to-ldg">Relevance to LDG</h2>
+<p>Kalman filtering is LDG’s canonical online latent-state inference baseline for a discrete-time LGSSM. It operationalizes the distinction between a model, a current filtering distribution, a future prediction, and a later full-interval smoothing distribution.</p>
+<div class="callout callout-style-default callout-warning callout-titled" title="What this does NOT imply">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Warning</span>What this does NOT imply
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Exact Kalman filtering under a declared LGSSM does not show that the model is correct, that the filtered mean is the true state, that latent coordinates are identifiable, that dynamics are mechanistic, or that future observations were legitimately available. Smoothness, low posterior variance, innovation fit, or predictive success alone do not establish a manifold, intrinsic dimension, causal structure, or biological mechanism.</p>
+</div>
+</div>
+<section id="mouse-trajectory" class="level3">
+<h3 class="anchored" data-anchor-id="mouse-trajectory">Mouse trajectory</h3>
+<p>No modality-specific empirical claim is retained. Filtering could be applied to a declared movement-state model, but inferred position, velocity, intention, and control variables require different observation and transition assumptions.</p>
+</section>
+<section id="eye-movement" class="level3">
+<h3 class="anchored" data-anchor-id="eye-movement">Eye movement</h3>
+<p>No modality-specific empirical claim is retained. Missing samples, blinks, saturation, event segmentation, and irregular timing can violate simple row-selection and equal-step assumptions.</p>
+</section>
+<section id="eeg" class="level3">
+<h3 class="anchored" data-anchor-id="eeg">EEG</h3>
+<p>No modality-specific empirical claim is retained. Sensor mixing, rereferencing, artifacts, spatial correlation, and nonstationarity must be represented or treated as model mismatch; a filtered latent coordinate is not automatically a neural source.</p>
+</section>
+<section id="meg-neural-population-data" class="level3">
+<h3 class="anchored" data-anchor-id="meg-neural-population-data">MEG / neural population data</h3>
+<p>No modality-specific empirical claim is retained. Trial boundaries, unit/channel missingness, observation-noise correlations, parameter sharing, and input timing determine the filtering problem. A smooth posterior mean does not establish neural population dynamics or mechanism.</p>
+</section>
+</section>
+<section id="primary-sources" class="level2">
+<h2 class="anchored" data-anchor-id="primary-sources">Primary sources</h2>
+<ul>
+<li>Kalman introduces the state-transition approach to linear filtering and prediction, defines filtering relative to observations through the current time, derives recursive state estimation and error-covariance equations, and treats model construction as a separate problem <span class="citation" data-cites="Kalman1960">(<a href="#ref-Kalman1960" role="doc-biblioref">Kalman 1960</a>)</span>.</li>
+</ul>
+</section>
+<section id="reviews-secondary-sources" class="level2">
+<h2 class="anchored" data-anchor-id="reviews-secondary-sources">Reviews / secondary sources</h2>
+<ul>
+<li>Särkkä gives the inspected Bayesian prediction/update derivation, Gaussian filtering distributions, innovation covariance, Kalman gain, covariance recursion, and the boundary between filtering and later smoothing <span class="citation" data-cites="Sarkka2013">(<a href="#ref-Sarkka2013" role="doc-biblioref">Särkkä 2013</a>, ch.&nbsp;4)</span>.</li>
+<li>Asada’s inspected graduate implementation notes document round-off-driven covariance asymmetry, the Joseph stabilized covariance form, and factorized covariance representations as numerical safeguards <span class="citation" data-cites="Asada2006Lecture8">(<a href="#ref-Asada2006Lecture8" role="doc-biblioref">Asada 2006, sec. 4.10</a>)</span>.</li>
+</ul>
+</section>
+<section id="open-methodological-questions" class="level2">
+<h2 class="anchored" data-anchor-id="open-methodological-questions">Open methodological questions</h2>
+<ul>
+<li>How should uncertainty from parameter estimation be propagated into online state uncertainty without changing the bounded fixed-parameter target?</li>
+<li>Which innovation diagnostics are most informative under dependent missingness or deliberate experimental inputs?</li>
+<li>When should a factorized or square-root implementation be mandatory rather than optional?</li>
+<li>How should filters be compared when state coordinates differ by observationally equivalent transformations?</li>
+<li>Which sequence split best tests the intended use: future time, new trials, new sessions, new subjects, or new acquisition systems?</li>
+<li>When do robust or constrained filters solve a scientifically different problem rather than merely a numerical one?</li>
+</ul>
+</section>
+<section id="maturity-checklist" class="level2">
+<h2 class="anchored" data-anchor-id="maturity-checklist">Maturity checklist</h2>
+<ul class="task-list">
+<li><label><input type="checkbox" checked="">Uses the complete Method schema and the existing discrete-time LGSSM notation.</label></li>
+<li><label><input type="checkbox" checked="">Distinguishes prior, prediction, innovation, update, and filtering distributions.</label></li>
+<li><label><input type="checkbox" checked="">Conditions only on observations available through the current time.</label></li>
+<li><label><input type="checkbox" checked="">States Kalman gain, innovation covariance, likelihood contribution, and Joseph covariance update.</label></li>
+<li><label><input type="checkbox" checked="">Declares initialization, input timing, partial-observation row selection, and missingness limits.</label></li>
+<li><label><input type="checkbox" checked="">Covers singular and ill-conditioned innovation covariance and factorized numerical boundaries.</label></li>
+<li><label><input type="checkbox" checked="">Separates fixed-parameter filtering from model specification, learning, forecasting, and smoothing.</label></li>
+<li><label><input type="checkbox" checked="">States learned/fixed quantities, temporal order, geometry, supervision, and inherited identifiability.</label></li>
+<li><label><input type="checkbox" checked="">Includes failure modes, baselines, evaluation criteria, and a non-executable analytic toy contract.</label></li>
+<li><label><input type="checkbox" checked="">Retains no modality-specific empirical claim.</label></li>
+<li><label><input type="checkbox" checked="">Foundational, authoritative Bayesian, and numerical-stability sources were inspected and verified.</label></li>
+<li><label><input type="checkbox" checked="">Independent mixed review returned PASS with no correction round required.</label></li>
+<li><label><input type="checkbox" checked="">Stable promotion authorized under the recorded review decision after object-specific PASS and validation.</label></li>
+</ul>
+
+
+<!-- -->
+
+
+</section>
+</section>
+
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography" id="quarto-bibliography"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body hanging-indent" role="list">
+<div id="ref-Asada2006Lecture8" class="csl-entry" role="listitem">
+Asada, Harry. 2006. <em>2.160 System Identification, Estimation, and Learning: Lecture Notes No. 8</em>. Massachusetts Institute of Technology OpenCourseWare. <a href="https://ocw.mit.edu/courses/2-160-identification-estimation-and-learning-spring-2006/resources/lecture_8/">https://ocw.mit.edu/courses/2-160-identification-estimation-and-learning-spring-2006/resources/lecture_8/</a>.
+</div>
+<div id="ref-Kalman1960" class="csl-entry" role="listitem">
+Kalman, Rudolf E. 1960. <span>“A New Approach to Linear Filtering and Prediction Problems.”</span> <em>Journal of Basic Engineering</em> 82 (1): 35–45. <a href="https://doi.org/10.1115/1.3662552">https://doi.org/10.1115/1.3662552</a>.
+</div>
+<div id="ref-Sarkka2013" class="csl-entry" role="listitem">
+Särkkä, Simo. 2013. <em>Bayesian Filtering and Smoothing</em>. Vol. 3. Institute of Mathematical Statistics Textbooks. Cambridge University Press. <a href="https://doi.org/10.1017/CBO9781139344203">https://doi.org/10.1017/CBO9781139344203</a>.
+</div>
+</div></section></div></main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+    const viewSource = window.document.getElementById('quarto-view-source') ||
+                       window.document.getElementById('quarto-code-tools-source');
+    if (viewSource) {
+      const sourceUrl = viewSource.getAttribute("data-quarto-source-url");
+      viewSource.addEventListener("click", function(e) {
+        if (sourceUrl) {
+          // rstudio viewer pane
+          if (/\bcapabilities=\b/.test(window.location)) {
+            window.open(sourceUrl);
+          } else {
+            window.location.href = sourceUrl;
+          }
+        } else {
+          const modal = new bootstrap.Modal(document.getElementById('quarto-embedded-source-code-modal'));
+          modal.show();
+        }
+        return false;
+      });
+    }
+    function toggleCodeHandler(show) {
+      return function(e) {
+        const cellDetails = window.document.querySelectorAll(".cell details.code-fold");
+        for (let i=0; i<cellDetails.length; i++) {
+          const details = cellDetails[i];
+          if (show) {
+            details.open = true;
+          } else {
+            details.removeAttribute("open");
+          }
+        }
+        const cellCodeDivs = window.document.querySelectorAll(".cell div.sourceCode.cell-code");
+        const fromCls = show ? "hidden" : "unhidden";
+        const toCls = show ? "unhidden" : "hidden";
+        for (let i=0; i<cellCodeDivs.length; i++) {
+          const codeDiv = cellCodeDivs[i];
+          if (codeDiv.classList.contains(fromCls)) {
+            codeDiv.classList.remove(fromCls);
+            codeDiv.classList.add(toCls);
+          } 
+        }
+        return false;
+      }
+    }
+    const hideAllCode = window.document.getElementById("quarto-hide-all-code");
+    if (hideAllCode) {
+      hideAllCode.addEventListener("click", toggleCodeHandler(false));
+    }
+    const showAllCode = window.document.getElementById("quarto-show-all-code");
+    if (showAllCode) {
+      showAllCode.addEventListener("click", toggleCodeHandler(true));
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/abelzheng\.github\.io\/latent-dynamics-geometry-public\/");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+            // target, if specified
+            link.setAttribute("target", "_blank");
+            if (link.getAttribute("rel") === null) {
+              link.setAttribute("rel", "noopener");
+            }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<input type="hidden" id="giscus-base-theme" value="preferred_color_scheme">
+<input type="hidden" id="giscus-alt-theme" value="preferred_color_scheme">
+<script>
+  function loadGiscus() {
+    // Function to get the theme based on body class
+    const getTheme = () => {
+      let baseTheme = document.getElementById('giscus-base-theme').value;
+      let altTheme = document.getElementById('giscus-alt-theme').value;
+      return document.body.classList.contains('quarto-dark') ? altTheme : baseTheme;
+    };
+    const script = document.createElement("script");
+    script.src = "https://giscus.app/client.js";
+    script.async = true;
+    script.dataset.repo = "AbelZheng/latent-dynamics-geometry-public";
+    script.dataset.repoId = "R_kgDOT-VBkw";
+    script.dataset.category = "Announcements";
+    script.dataset.categoryId = "DIC_kwDOT-VBk84DDyEz";
+    script.dataset.mapping = "pathname";
+    script.dataset.reactionsEnabled = "1";
+    script.dataset.emitMetadata = "0";
+    script.dataset.inputPosition = "bottom";
+    script.dataset.theme = getTheme();
+    script.dataset.lang = "en";
+    script.crossOrigin = "anonymous";
+    // Append the script to the desired div instead of at the end of the body
+    document.getElementById("quarto-content").appendChild(script);
+  }
+  loadGiscus();
+</script><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">Source Code</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1" data-shortcodes="false"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="an">title:</span><span class="co"> "Kalman Filtering"</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="an">object_type:</span><span class="co"> method</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="an">maturity:</span><span class="co"> L2</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="an">status:</span><span class="co"> stable</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="an">domain:</span><span class="co"> [latent-modeling, temporal-modeling, state-estimation, statistics]</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="an">tags:</span><span class="co"> [kalman-filter, linear-gaussian, sequential-inference, innovation]</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="an">prerequisites:</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="co">- knowledge/methods/linear-gaussian-state-space-model.qmd</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="co">- knowledge/concepts/latent-trajectory.qmd</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="co">- knowledge/concepts/observation-model.qmd</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="co">- knowledge/concepts/process-noise.qmd</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="co">- knowledge/concepts/observation-noise.qmd</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="an">related:</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="co">- knowledge/methods/factor-analysis.qmd</span></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="co">- knowledge/concepts/identifiability.qmd</span></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="an">created:</span><span class="co"> 2026-08-19</span></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a><span class="an">updated:</span><span class="co"> 2026-08-19</span></span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a><span class="fu"># Kalman Filtering</span></span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a><span class="fu">## Problem</span></span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>Kalman filtering sequentially computes the current latent-state distribution in a declared linear-Gaussian state-space model (LGSSM), using only observations available through the current time. Its target at time $t$ is</span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>p(z_t\mid x_{1:t},u_{1:t}),</span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>not a retrospective distribution that uses $x_{t+1:T}$. The recursion alternates between a **prediction** based on the previous filtering distribution and the transition model, and an **update** based on the current observation <span class="co">[</span><span class="ot">@Kalman1960; @Sarkka2013, ch. 4</span><span class="co">]</span>.</span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a>This object treats the model matrices and covariance parameters as fixed and known during filtering. Specifying or learning an LGSSM, filtering its state, forecasting future observations, and smoothing past states are distinct tasks. Fixed-interval Kalman smoothing is deferred to P2-U10.</span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a><span class="fu">## Input</span></span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a>Use the time-invariant, input-driven LGSSM defined in the prerequisite Method:</span>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a>z_1\sim\mathcal N(m_1,P_1),</span>
+<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a>z_{t+1}=Az_t+Bu_t+w_t,</span>
+<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a>\qquad</span>
+<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a>w_t\sim\mathcal N(0,Q),</span>
+<span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-48"><a href="#cb1-48" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-50"><a href="#cb1-50" aria-hidden="true" tabindex="-1"></a>x_t=Cz_t+Du_t+v_t,</span>
+<span id="cb1-51"><a href="#cb1-51" aria-hidden="true" tabindex="-1"></a>\qquad</span>
+<span id="cb1-52"><a href="#cb1-52" aria-hidden="true" tabindex="-1"></a>v_t\sim\mathcal N(0,R).</span>
+<span id="cb1-53"><a href="#cb1-53" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-54"><a href="#cb1-54" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-55"><a href="#cb1-55" aria-hidden="true" tabindex="-1"></a>Here $z_t\in\mathbb R^q$, $x_t\in\mathbb R^p$, and the optional known input is $u_t\in\mathbb R^r$. The canonical assumptions are $P_1,Q\succeq0$, $R\succ0$, mutual independence of the initial state and all process and observation noises, temporal independence of the noises, and a fixed or externally supplied open-loop input path.</span>
+<span id="cb1-56"><a href="#cb1-56" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-57"><a href="#cb1-57" aria-hidden="true" tabindex="-1"></a>A reproducible filtering problem must declare:</span>
+<span id="cb1-58"><a href="#cb1-58" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-59"><a href="#cb1-59" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>the fixed parameter tuple $(m_1,P_1,A,B,C,D,Q,R)$ and its provenance;</span>
+<span id="cb1-60"><a href="#cb1-60" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>state, observation, and input units and coordinate conventions;</span>
+<span id="cb1-61"><a href="#cb1-61" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>sequence boundaries, sampling interval, and treatment of resets between sequences;</span>
+<span id="cb1-62"><a href="#cb1-62" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>exactly when each input becomes available;</span>
+<span id="cb1-63"><a href="#cb1-63" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>initialization at the first observation;</span>
+<span id="cb1-64"><a href="#cb1-64" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>which observation components are available at each time and why;</span>
+<span id="cb1-65"><a href="#cb1-65" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>numerical linear-algebra method, precision, and covariance representation; and</span>
+<span id="cb1-66"><a href="#cb1-66" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>whether the goal is current-state inference, one-step predictive scoring, online monitoring, or an input to a separate learning procedure.</span>
+<span id="cb1-67"><a href="#cb1-67" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-68"><a href="#cb1-68" aria-hidden="true" tabindex="-1"></a>For the transition from $t$ to $t+1$, $u_t$ must be known before that transition is evaluated. If $D\ne0$, the direct-feedthrough input $u_t$ used in the measurement mean must be available before $x_t$ is assimilated. A control constructed from $x_t$ itself creates a contemporaneous algebraic loop unless a separate within-step timing model is supplied. Future inputs that depend on future observations are not known conditioning variables.</span>
+<span id="cb1-69"><a href="#cb1-69" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-70"><a href="#cb1-70" aria-hidden="true" tabindex="-1"></a><span class="fu">## Output</span></span>
+<span id="cb1-71"><a href="#cb1-71" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-72"><a href="#cb1-72" aria-hidden="true" tabindex="-1"></a>At each time $t$, the filter returns or defines:</span>
+<span id="cb1-73"><a href="#cb1-73" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-74"><a href="#cb1-74" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>the predicted state distribution</span>
+<span id="cb1-75"><a href="#cb1-75" aria-hidden="true" tabindex="-1"></a>  $$</span>
+<span id="cb1-76"><a href="#cb1-76" aria-hidden="true" tabindex="-1"></a>  p(z_t\mid x_{1:t-1},u_{1:t})</span>
+<span id="cb1-77"><a href="#cb1-77" aria-hidden="true" tabindex="-1"></a>  =\mathcal N(m_{t\mid t-1},P_{t\mid t-1});</span>
+<span id="cb1-78"><a href="#cb1-78" aria-hidden="true" tabindex="-1"></a>  $$</span>
+<span id="cb1-79"><a href="#cb1-79" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>the one-step predictive observation distribution</span>
+<span id="cb1-80"><a href="#cb1-80" aria-hidden="true" tabindex="-1"></a>  $$</span>
+<span id="cb1-81"><a href="#cb1-81" aria-hidden="true" tabindex="-1"></a>  p(x_t\mid x_{1:t-1},u_{1:t})</span>
+<span id="cb1-82"><a href="#cb1-82" aria-hidden="true" tabindex="-1"></a>  =\mathcal N(\widehat x_{t\mid t-1},S_t);</span>
+<span id="cb1-83"><a href="#cb1-83" aria-hidden="true" tabindex="-1"></a>  $$</span>
+<span id="cb1-84"><a href="#cb1-84" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>the innovation $\nu_t=x_t-\widehat x_{t\mid t-1}$ and innovation covariance $S_t$; and</span>
+<span id="cb1-85"><a href="#cb1-85" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>the filtering distribution</span>
+<span id="cb1-86"><a href="#cb1-86" aria-hidden="true" tabindex="-1"></a>  $$</span>
+<span id="cb1-87"><a href="#cb1-87" aria-hidden="true" tabindex="-1"></a>  p(z_t\mid x_{1:t},u_{1:t})</span>
+<span id="cb1-88"><a href="#cb1-88" aria-hidden="true" tabindex="-1"></a>  =\mathcal N(m_{t\mid t},P_{t\mid t}).</span>
+<span id="cb1-89"><a href="#cb1-89" aria-hidden="true" tabindex="-1"></a>  $$</span>
+<span id="cb1-90"><a href="#cb1-90" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-91"><a href="#cb1-91" aria-hidden="true" tabindex="-1"></a>The filtering mean is a model-conditional posterior mean, not an observed state. Its covariance describes uncertainty under the fixed model and conditioning information; it does not include uncertainty about learned parameters unless that uncertainty is modeled separately.</span>
+<span id="cb1-92"><a href="#cb1-92" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-93"><a href="#cb1-93" aria-hidden="true" tabindex="-1"></a><span class="fu">## Core idea</span></span>
+<span id="cb1-94"><a href="#cb1-94" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-95"><a href="#cb1-95" aria-hidden="true" tabindex="-1"></a>The previous filtering distribution summarizes the information in past observations needed for the next recursive step. Linear propagation plus Gaussian process noise preserves Gaussianity. The current linear-Gaussian measurement then yields a Gaussian conditional distribution. Consequently, means and covariances are sufficient for exact finite-dimensional filtering under the declared model <span class="co">[</span><span class="ot">@Sarkka2013, secs. 4.2--4.3</span><span class="co">]</span>.</span>
+<span id="cb1-96"><a href="#cb1-96" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-97"><a href="#cb1-97" aria-hidden="true" tabindex="-1"></a>The innovation is the part of the current observation not predicted from prior observations and known inputs. Its covariance combines predicted state uncertainty projected into observation coordinates with observation noise. The Kalman gain maps this observation-space discrepancy into a state-space correction.</span>
+<span id="cb1-98"><a href="#cb1-98" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-99"><a href="#cb1-99" aria-hidden="true" tabindex="-1"></a><span class="fu">## Generative / modeling assumptions</span></span>
+<span id="cb1-100"><a href="#cb1-100" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-101"><a href="#cb1-101" aria-hidden="true" tabindex="-1"></a>The recursion inherits every assumption of the LGSSM. In particular:</span>
+<span id="cb1-102"><a href="#cb1-102" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-103"><a href="#cb1-103" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>state evolution and observation are linear in the chosen coordinates;</span>
+<span id="cb1-104"><a href="#cb1-104" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>the prior and noises are Gaussian;</span>
+<span id="cb1-105"><a href="#cb1-105" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>process and observation noises are white, mutually independent, and independent of the initial state;</span>
+<span id="cb1-106"><a href="#cb1-106" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>the Markov state and conditional-observation structure is correctly specified;</span>
+<span id="cb1-107"><a href="#cb1-107" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>matrices and covariance parameters used by the filter are fixed during the recursion;</span>
+<span id="cb1-108"><a href="#cb1-108" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>the input path is nonanticipating under the declared within-step timing; and</span>
+<span id="cb1-109"><a href="#cb1-109" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>any missing-observation pattern is treated as observed/fixed and non-informative unless a missingness model is added.</span>
+<span id="cb1-110"><a href="#cb1-110" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-111"><a href="#cb1-111" aria-hidden="true" tabindex="-1"></a>Under these conditions and exact arithmetic, the recursion gives the exact Gaussian filtering distributions. Kalman's original state-space treatment derives optimal linear estimates through orthogonal projection and explicitly distinguishes filtering, prediction, and smoothing by the estimated time relative to the latest conditioning observation <span class="co">[</span><span class="ot">@Kalman1960</span><span class="co">]</span>. This object uses the narrower Bayesian linear-Gaussian interpretation: exactness is conditional on the stated probability model, not evidence that the model generated the scientific system.</span>
+<span id="cb1-112"><a href="#cb1-112" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-113"><a href="#cb1-113" aria-hidden="true" tabindex="-1"></a><span class="fu">## Mathematical formulation</span></span>
+<span id="cb1-114"><a href="#cb1-114" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-115"><a href="#cb1-115" aria-hidden="true" tabindex="-1"></a>Write $\mathcal I_t=\sigma(x_{1:t},u_{1:t})$ for the information available after assimilating $x_t$. Define</span>
+<span id="cb1-116"><a href="#cb1-116" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-117"><a href="#cb1-117" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-118"><a href="#cb1-118" aria-hidden="true" tabindex="-1"></a>m_{t\mid s}=\mathbb E<span class="co">[</span><span class="ot">z_t\mid\mathcal I_s</span><span class="co">]</span>,</span>
+<span id="cb1-119"><a href="#cb1-119" aria-hidden="true" tabindex="-1"></a>\qquad</span>
+<span id="cb1-120"><a href="#cb1-120" aria-hidden="true" tabindex="-1"></a>P_{t\mid s}=\operatorname{Cov}(z_t\mid\mathcal I_s).</span>
+<span id="cb1-121"><a href="#cb1-121" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-122"><a href="#cb1-122" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-123"><a href="#cb1-123" aria-hidden="true" tabindex="-1"></a>No quantity below conditions on $x_{t+1}$ or any later observation.</span>
+<span id="cb1-124"><a href="#cb1-124" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-125"><a href="#cb1-125" aria-hidden="true" tabindex="-1"></a><span class="fu">### Initialization</span></span>
+<span id="cb1-126"><a href="#cb1-126" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-127"><a href="#cb1-127" aria-hidden="true" tabindex="-1"></a>Before the first observation,</span>
+<span id="cb1-128"><a href="#cb1-128" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-129"><a href="#cb1-129" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-130"><a href="#cb1-130" aria-hidden="true" tabindex="-1"></a>m_{1\mid0}=m_1,</span>
+<span id="cb1-131"><a href="#cb1-131" aria-hidden="true" tabindex="-1"></a>\qquad</span>
+<span id="cb1-132"><a href="#cb1-132" aria-hidden="true" tabindex="-1"></a>P_{1\mid0}=P_1.</span>
+<span id="cb1-133"><a href="#cb1-133" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-134"><a href="#cb1-134" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-135"><a href="#cb1-135" aria-hidden="true" tabindex="-1"></a>This prior is part of the model. An informative external initialization must be justified independently. Replacing an unknown initial distribution by an arbitrarily huge covariance is not automatically an exact diffuse initialization and can be numerically harmful; exact diffuse variants are outside this bounded Method.</span>
+<span id="cb1-136"><a href="#cb1-136" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-137"><a href="#cb1-137" aria-hidden="true" tabindex="-1"></a><span class="fu">### Prediction</span></span>
+<span id="cb1-138"><a href="#cb1-138" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-139"><a href="#cb1-139" aria-hidden="true" tabindex="-1"></a>For $t\ge2$, after filtering time $t-1$,</span>
+<span id="cb1-140"><a href="#cb1-140" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-141"><a href="#cb1-141" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-142"><a href="#cb1-142" aria-hidden="true" tabindex="-1"></a>m_{t\mid t-1}=A m_{t-1\mid t-1}+B u_{t-1},</span>
+<span id="cb1-143"><a href="#cb1-143" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-144"><a href="#cb1-144" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-145"><a href="#cb1-145" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-146"><a href="#cb1-146" aria-hidden="true" tabindex="-1"></a>P_{t\mid t-1}=A P_{t-1\mid t-1}A^\top+Q.</span>
+<span id="cb1-147"><a href="#cb1-147" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-148"><a href="#cb1-148" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-149"><a href="#cb1-149" aria-hidden="true" tabindex="-1"></a>Thus</span>
+<span id="cb1-150"><a href="#cb1-150" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-151"><a href="#cb1-151" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-152"><a href="#cb1-152" aria-hidden="true" tabindex="-1"></a>p(z_t\mid x_{1:t-1},u_{1:t})</span>
+<span id="cb1-153"><a href="#cb1-153" aria-hidden="true" tabindex="-1"></a>=\mathcal N(m_{t\mid t-1},P_{t\mid t-1}).</span>
+<span id="cb1-154"><a href="#cb1-154" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-155"><a href="#cb1-155" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-156"><a href="#cb1-156" aria-hidden="true" tabindex="-1"></a>The transition input is $u_{t-1}$ because it drives $z_{t-1}\mapsto z_t$. The conditioning notation includes $u_t$ because the contemporaneous observation mean may use $D u_t$; $u_t$ does not retroactively drive the preceding transition.</span>
+<span id="cb1-157"><a href="#cb1-157" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-158"><a href="#cb1-158" aria-hidden="true" tabindex="-1"></a><span class="fu">### Innovation and update</span></span>
+<span id="cb1-159"><a href="#cb1-159" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-160"><a href="#cb1-160" aria-hidden="true" tabindex="-1"></a>The predicted observation mean, innovation, and innovation covariance are</span>
+<span id="cb1-161"><a href="#cb1-161" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-162"><a href="#cb1-162" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-163"><a href="#cb1-163" aria-hidden="true" tabindex="-1"></a>\widehat x_{t\mid t-1}=C m_{t\mid t-1}+D u_t,</span>
+<span id="cb1-164"><a href="#cb1-164" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-165"><a href="#cb1-165" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-166"><a href="#cb1-166" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-167"><a href="#cb1-167" aria-hidden="true" tabindex="-1"></a>\nu_t=x_t-\widehat x_{t\mid t-1},</span>
+<span id="cb1-168"><a href="#cb1-168" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-169"><a href="#cb1-169" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-170"><a href="#cb1-170" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-171"><a href="#cb1-171" aria-hidden="true" tabindex="-1"></a>S_t=C P_{t\mid t-1}C^\top+R.</span>
+<span id="cb1-172"><a href="#cb1-172" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-173"><a href="#cb1-173" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-174"><a href="#cb1-174" aria-hidden="true" tabindex="-1"></a>The predictive observation law is</span>
+<span id="cb1-175"><a href="#cb1-175" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-176"><a href="#cb1-176" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-177"><a href="#cb1-177" aria-hidden="true" tabindex="-1"></a>p(x_t\mid x_{1:t-1},u_{1:t})</span>
+<span id="cb1-178"><a href="#cb1-178" aria-hidden="true" tabindex="-1"></a>=\mathcal N(\widehat x_{t\mid t-1},S_t).</span>
+<span id="cb1-179"><a href="#cb1-179" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-180"><a href="#cb1-180" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-181"><a href="#cb1-181" aria-hidden="true" tabindex="-1"></a>The Kalman gain is</span>
+<span id="cb1-182"><a href="#cb1-182" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-183"><a href="#cb1-183" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-184"><a href="#cb1-184" aria-hidden="true" tabindex="-1"></a>K_t=P_{t\mid t-1}C^\top S_t^{-1},</span>
+<span id="cb1-185"><a href="#cb1-185" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-186"><a href="#cb1-186" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-187"><a href="#cb1-187" aria-hidden="true" tabindex="-1"></a>and the filtering moments are</span>
+<span id="cb1-188"><a href="#cb1-188" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-189"><a href="#cb1-189" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-190"><a href="#cb1-190" aria-hidden="true" tabindex="-1"></a>m_{t\mid t}=m_{t\mid t-1}+K_t\nu_t,</span>
+<span id="cb1-191"><a href="#cb1-191" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-192"><a href="#cb1-192" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-193"><a href="#cb1-193" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-194"><a href="#cb1-194" aria-hidden="true" tabindex="-1"></a>P_{t\mid t}=P_{t\mid t-1}-K_tS_tK_t^\top.</span>
+<span id="cb1-195"><a href="#cb1-195" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-196"><a href="#cb1-196" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-197"><a href="#cb1-197" aria-hidden="true" tabindex="-1"></a>These are the closed-form Gaussian conditioning equations <span class="co">[</span><span class="ot">@Sarkka2013, theorem 4.2</span><span class="co">]</span>. Implementations should solve linear systems involving $S_t$ rather than explicitly forming $S_t^{-1}$.</span>
+<span id="cb1-198"><a href="#cb1-198" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-199"><a href="#cb1-199" aria-hidden="true" tabindex="-1"></a><span class="fu">### Covariance-update forms and numerical boundary</span></span>
+<span id="cb1-200"><a href="#cb1-200" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-201"><a href="#cb1-201" aria-hidden="true" tabindex="-1"></a>In exact arithmetic, the previous covariance update is equivalent to</span>
+<span id="cb1-202"><a href="#cb1-202" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-203"><a href="#cb1-203" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-204"><a href="#cb1-204" aria-hidden="true" tabindex="-1"></a>P_{t\mid t}=(I-K_tC)P_{t\mid t-1}.</span>
+<span id="cb1-205"><a href="#cb1-205" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-206"><a href="#cb1-206" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-207"><a href="#cb1-207" aria-hidden="true" tabindex="-1"></a>The short form can lose symmetry or positive-semidefinite structure through floating-point cancellation. The Joseph form</span>
+<span id="cb1-208"><a href="#cb1-208" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-209"><a href="#cb1-209" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-210"><a href="#cb1-210" aria-hidden="true" tabindex="-1"></a>P_{t\mid t}</span>
+<span id="cb1-211"><a href="#cb1-211" aria-hidden="true" tabindex="-1"></a>=(I-K_tC)P_{t\mid t-1}(I-K_tC)^\top</span>
+<span id="cb1-212"><a href="#cb1-212" aria-hidden="true" tabindex="-1"></a>+K_t R K_t^\top</span>
+<span id="cb1-213"><a href="#cb1-213" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-214"><a href="#cb1-214" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-215"><a href="#cb1-215" aria-hidden="true" tabindex="-1"></a>is algebraically equivalent when $K_t$ is the Kalman gain and expresses the covariance as a sum of positive-semidefinite terms. Asada's inspected implementation notes specifically use this form to reduce asymmetric covariance caused by round-off and discuss factorized covariance representations as a further safeguard <span class="co">[</span><span class="ot">@Asada2006Lecture8, sec. 4.10</span><span class="co">]</span>.</span>
+<span id="cb1-216"><a href="#cb1-216" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-217"><a href="#cb1-217" aria-hidden="true" tabindex="-1"></a>The Joseph form is not a universal numerical cure. Stable implementations should also use symmetric factorizations and solves, monitor symmetry and definiteness, and avoid explicit matrix inverses. Square-root or factorized filters propagate covariance factors and can be preferable for severe scaling or conditioning problems; they are computational realizations of the same declared filtering target, not different scientific models <span class="co">[</span><span class="ot">@Sarkka2013, sec. 4.3; @Asada2006Lecture8, sec. 4.10</span><span class="co">]</span>. Detailed square-root algorithms are outside scope.</span>
+<span id="cb1-218"><a href="#cb1-218" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-219"><a href="#cb1-219" aria-hidden="true" tabindex="-1"></a><span class="fu">### Partially missing observations</span></span>
+<span id="cb1-220"><a href="#cb1-220" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-221"><a href="#cb1-221" aria-hidden="true" tabindex="-1"></a>Let $M_t$ be a row-selection matrix that retains only the components observed at time $t$. Define</span>
+<span id="cb1-222"><a href="#cb1-222" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-223"><a href="#cb1-223" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-224"><a href="#cb1-224" aria-hidden="true" tabindex="-1"></a>x_t^{(o)}=M_t x_t,</span>
+<span id="cb1-225"><a href="#cb1-225" aria-hidden="true" tabindex="-1"></a>\quad</span>
+<span id="cb1-226"><a href="#cb1-226" aria-hidden="true" tabindex="-1"></a>C_t=M_tC,</span>
+<span id="cb1-227"><a href="#cb1-227" aria-hidden="true" tabindex="-1"></a>\quad</span>
+<span id="cb1-228"><a href="#cb1-228" aria-hidden="true" tabindex="-1"></a>D_t=M_tD,</span>
+<span id="cb1-229"><a href="#cb1-229" aria-hidden="true" tabindex="-1"></a>\quad</span>
+<span id="cb1-230"><a href="#cb1-230" aria-hidden="true" tabindex="-1"></a>R_t=M_tRM_t^\top.</span>
+<span id="cb1-231"><a href="#cb1-231" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-232"><a href="#cb1-232" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-233"><a href="#cb1-233" aria-hidden="true" tabindex="-1"></a>Apply the ordinary update using $x_t^{(o)},C_t,D_t,R_t$. This preserves correlations among the retained measurement errors. If no component is observed, skip the measurement update:</span>
+<span id="cb1-234"><a href="#cb1-234" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-235"><a href="#cb1-235" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-236"><a href="#cb1-236" aria-hidden="true" tabindex="-1"></a>m_{t\mid t}=m_{t\mid t-1},</span>
+<span id="cb1-237"><a href="#cb1-237" aria-hidden="true" tabindex="-1"></a>\qquad</span>
+<span id="cb1-238"><a href="#cb1-238" aria-hidden="true" tabindex="-1"></a>P_{t\mid t}=P_{t\mid t-1}.</span>
+<span id="cb1-239"><a href="#cb1-239" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-240"><a href="#cb1-240" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-241"><a href="#cb1-241" aria-hidden="true" tabindex="-1"></a>This row-selection rule is exact only when the missingness indicator contributes no additional information about $z_t$ beyond the modeled observations and covariates. Informative dropout, threshold censoring, saturation, or state-dependent sensor failure requires an explicit observation/missingness model.</span>
+<span id="cb1-242"><a href="#cb1-242" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-243"><a href="#cb1-243" aria-hidden="true" tabindex="-1"></a><span class="fu">### Singular or ill-conditioned innovation covariance</span></span>
+<span id="cb1-244"><a href="#cb1-244" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-245"><a href="#cb1-245" aria-hidden="true" tabindex="-1"></a>Under the canonical assumptions $P_{t\mid t-1}\succeq0$ and $R\succ0$, the innovation covariance $S_t$ is positive definite. After row selection, $R_t\succ0$ for a nonempty set of distinct retained coordinates, so a Cholesky-based solve is available in exact arithmetic.</span>
+<span id="cb1-246"><a href="#cb1-246" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-247"><a href="#cb1-247" aria-hidden="true" tabindex="-1"></a>A singular $S_t$ indicates that the implementation has left this regular model class—for example, by using zero-noise exact constraints, duplicated deterministic measurement rows, or a semidefinite $R$. The ordinary density and inverse formula then do not apply unchanged. Redundant rows may be removed, or a separately justified degenerate-Gaussian/constraint formulation may use support-aware generalized inverses. Adding arbitrary diagonal "jitter" changes the observation model and must not be presented as a neutral mathematical fix.</span>
+<span id="cb1-248"><a href="#cb1-248" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-249"><a href="#cb1-249" aria-hidden="true" tabindex="-1"></a>If $S_t$ is theoretically positive definite but ill-conditioned, rescale variables, use Cholesky or another rank-revealing factorization, avoid explicit inversion, and inspect the model for nearly redundant sensors or extreme covariance scales. A failed factorization is a diagnostic, not permission to silently discard uncertainty.</span>
+<span id="cb1-250"><a href="#cb1-250" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-251"><a href="#cb1-251" aria-hidden="true" tabindex="-1"></a><span class="fu">### Likelihood contribution</span></span>
+<span id="cb1-252"><a href="#cb1-252" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-253"><a href="#cb1-253" aria-hidden="true" tabindex="-1"></a>For a complete $p$-dimensional observation and nonsingular $S_t$, the innovation gives the one-step log predictive density</span>
+<span id="cb1-254"><a href="#cb1-254" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-255"><a href="#cb1-255" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-256"><a href="#cb1-256" aria-hidden="true" tabindex="-1"></a>\ell_t</span>
+<span id="cb1-257"><a href="#cb1-257" aria-hidden="true" tabindex="-1"></a>=-\frac12\left[</span>
+<span id="cb1-258"><a href="#cb1-258" aria-hidden="true" tabindex="-1"></a>p\log(2\pi)+\log|S_t|+\nu_t^\top S_t^{-1}\nu_t</span>
+<span id="cb1-259"><a href="#cb1-259" aria-hidden="true" tabindex="-1"></a>\right].</span>
+<span id="cb1-260"><a href="#cb1-260" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-261"><a href="#cb1-261" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-262"><a href="#cb1-262" aria-hidden="true" tabindex="-1"></a>With partial observation, replace $p,\nu_t,S_t$ by the retained dimension and selected quantities. Summing $\ell_t$ gives the fixed-parameter marginal sequence log likelihood. Using this likelihood inside parameter estimation does not turn the filtering recursion itself into a parameter-learning algorithm.</span>
+<span id="cb1-263"><a href="#cb1-263" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-264"><a href="#cb1-264" aria-hidden="true" tabindex="-1"></a><span class="fu">## What is learned?</span></span>
+<span id="cb1-265"><a href="#cb1-265" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-266"><a href="#cb1-266" aria-hidden="true" tabindex="-1"></a>With parameters fixed, the filter learns no model parameter. It computes successive conditional distributions over $z_t$ and one-step predictive distributions over $x_t$ from incoming observations.</span>
+<span id="cb1-267"><a href="#cb1-267" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-268"><a href="#cb1-268" aria-hidden="true" tabindex="-1"></a>The model parameters may have been set from physics, estimated on separate training sequences, or updated by a distinct algorithm. EM and likelihood optimization can call a filter internally, but the outer parameter-learning criterion and updates remain separate. Treating the filtered means as error-free observations for an unqualified second-stage fit discards posterior uncertainty and can create circular conclusions.</span>
+<span id="cb1-269"><a href="#cb1-269" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-270"><a href="#cb1-270" aria-hidden="true" tabindex="-1"></a><span class="fu">## What is fixed?</span></span>
+<span id="cb1-271"><a href="#cb1-271" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-272"><a href="#cb1-272" aria-hidden="true" tabindex="-1"></a>The analyst fixes the LGSSM structure, state dimension, parameter tuple, coordinate systems, sequence/reset policy, input timing, missingness assumptions, initialization, numerical precision, covariance representation, and any diagnostic thresholds. If parameters are estimated, the training split, estimator, constraints, and model-selection rule are fixed outside the filtering operation.</span>
+<span id="cb1-273"><a href="#cb1-273" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-274"><a href="#cb1-274" aria-hidden="true" tabindex="-1"></a>The filter does not choose $Q$ and $R$ by deciding how much to trust dynamics versus measurements. Those covariances are model parameters whose values require external specification or a declared estimation procedure.</span>
+<span id="cb1-275"><a href="#cb1-275" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-276"><a href="#cb1-276" aria-hidden="true" tabindex="-1"></a><span class="fu">## Temporal assumptions</span></span>
+<span id="cb1-277"><a href="#cb1-277" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-278"><a href="#cb1-278" aria-hidden="true" tabindex="-1"></a>Filtering is causal with respect to the declared information order: $m_{t\mid t}$ and $P_{t\mid t}$ depend on $x_{1:t}$ but not $x_{t+1:T}$. Late-arriving or revised observations require a separately declared replay, out-of-sequence update, or smoothing procedure.</span>
+<span id="cb1-279"><a href="#cb1-279" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-280"><a href="#cb1-280" aria-hidden="true" tabindex="-1"></a>The algorithm assumes the discrete sampling and sequence boundaries of the LGSSM. Unequal time gaps require gap-specific transitions and process covariances; incrementing the index as if every gap were equal changes the temporal model. Filtering does not by itself make the inferred mean trajectory dynamical evidence: its temporal structure is inherited from $A,Q$, the initialization, and the observations.</span>
+<span id="cb1-281"><a href="#cb1-281" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-282"><a href="#cb1-282" aria-hidden="true" tabindex="-1"></a><span class="fu">## Geometry assumptions</span></span>
+<span id="cb1-283"><a href="#cb1-283" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-284"><a href="#cb1-284" aria-hidden="true" tabindex="-1"></a>The state occupies a finite-dimensional vector space. Prediction and update use affine maps and covariance ellipsoids in declared coordinates. $P_{t\mid s}$ and $S_t$ define coordinate-dependent Mahalanobis geometries for uncertainty and innovations.</span>
+<span id="cb1-285"><a href="#cb1-285" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-286"><a href="#cb1-286" aria-hidden="true" tabindex="-1"></a>Under an invertible state-coordinate change $z'_t=Tz_t$, the moments and model matrices must transform consistently, including</span>
+<span id="cb1-287"><a href="#cb1-287" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-288"><a href="#cb1-288" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-289"><a href="#cb1-289" aria-hidden="true" tabindex="-1"></a>m'_{t\mid s}=Tm_{t\mid s},</span>
+<span id="cb1-290"><a href="#cb1-290" aria-hidden="true" tabindex="-1"></a>\qquad</span>
+<span id="cb1-291"><a href="#cb1-291" aria-hidden="true" tabindex="-1"></a>P'_{t\mid s}=TP_{t\mid s}T^\top,</span>
+<span id="cb1-292"><a href="#cb1-292" aria-hidden="true" tabindex="-1"></a>\qquad</span>
+<span id="cb1-293"><a href="#cb1-293" aria-hidden="true" tabindex="-1"></a>C'=CT^{-1}.</span>
+<span id="cb1-294"><a href="#cb1-294" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-295"><a href="#cb1-295" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-296"><a href="#cb1-296" aria-hidden="true" tabindex="-1"></a>The observable predictive law can remain unchanged while latent axes and gain entries change. Euclidean distance between filtering means, visual smoothness, or covariance ellipsoids do not establish a manifold, Riemannian geometry, intrinsic dimension, or privileged biological coordinates.</span>
+<span id="cb1-297"><a href="#cb1-297" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-298"><a href="#cb1-298" aria-hidden="true" tabindex="-1"></a><span class="fu">## Supervision</span></span>
+<span id="cb1-299"><a href="#cb1-299" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-300"><a href="#cb1-300" aria-hidden="true" tabindex="-1"></a>No external outcome label is required. The current measurement is evidence in a probabilistic observation model, not a supervised target in the ordinary prediction-label sense. Known inputs condition the model; they do not become labels merely by being supplied.</span>
+<span id="cb1-301"><a href="#cb1-301" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-302"><a href="#cb1-302" aria-hidden="true" tabindex="-1"></a>External labels or outcomes used to choose state dimension, matrices, covariance parameters, preprocessing, or diagnostic thresholds introduce task dependence. Such selection must occur within training/validation boundaries and be reported separately from online filtering.</span>
+<span id="cb1-303"><a href="#cb1-303" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-304"><a href="#cb1-304" aria-hidden="true" tabindex="-1"></a><span class="fu">## Optimization / inference</span></span>
+<span id="cb1-305"><a href="#cb1-305" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-306"><a href="#cb1-306" aria-hidden="true" tabindex="-1"></a>For fixed parameters, filtering is recursive Gaussian inference rather than nonconvex optimization. Each step uses matrix multiplication, addition, and a solve in the innovation covariance. Computational cost and conditioning depend on state and observed dimensions and on the selected factorization.</span>
+<span id="cb1-307"><a href="#cb1-307" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-308"><a href="#cb1-308" aria-hidden="true" tabindex="-1"></a>There is no guarantee that an arbitrary software implementation reproduces the mathematical recursion. Tests should compare covariance forms, preserve symmetry, check positive-semidefinite tolerances, and verify small problems against direct joint-Gaussian conditioning. Computing a finite output without an exception is not evidence of numerical correctness.</span>
+<span id="cb1-309"><a href="#cb1-309" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-310"><a href="#cb1-310" aria-hidden="true" tabindex="-1"></a><span class="fu">## Strengths</span></span>
+<span id="cb1-311"><a href="#cb1-311" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-312"><a href="#cb1-312" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Exact finite-horizon filtering moments under the fixed linear-Gaussian model.</span>
+<span id="cb1-313"><a href="#cb1-313" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Sequential processing with a fixed-size state summary rather than repeated conditioning on the entire history.</span>
+<span id="cb1-314"><a href="#cb1-314" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Explicit propagation of process and observation uncertainty.</span>
+<span id="cb1-315"><a href="#cb1-315" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>One-step predictive densities and innovations suitable for scoring and diagnostics.</span>
+<span id="cb1-316"><a href="#cb1-316" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Natural handling of irregularly absent measurement components through declared row selection.</span>
+<span id="cb1-317"><a href="#cb1-317" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>A transparent baseline for later smoothing and for approximate nonlinear or non-Gaussian filters.</span>
+<span id="cb1-318"><a href="#cb1-318" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-319"><a href="#cb1-319" aria-hidden="true" tabindex="-1"></a><span class="fu">## Failure modes</span></span>
+<span id="cb1-320"><a href="#cb1-320" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-321"><a href="#cb1-321" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Model misspecification:** nonlinear transitions, non-Gaussian tails, colored noise, correlated process/observation noise, time-varying parameters, or omitted inputs make the declared recursion model-mismatched.</span>
+<span id="cb1-322"><a href="#cb1-322" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Wrong $Q/R$ balance:** underestimated process noise can make the filter overconfident in propagation; underestimated observation noise can make it chase measurements.</span>
+<span id="cb1-323"><a href="#cb1-323" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Bad initialization:** a poorly chosen mean or covariance can dominate short sequences or interact with weak observability.</span>
+<span id="cb1-324"><a href="#cb1-324" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Unobservable or weakly observed directions:** uncertainty can remain large or become practically ill-conditioned even when some observed coordinates fit well.</span>
+<span id="cb1-325"><a href="#cb1-325" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Anticipating inputs:** controls or regressors containing contemporaneous/future observation information leak evidence into prediction.</span>
+<span id="cb1-326"><a href="#cb1-326" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Sequence leakage:** carrying a posterior across independent subjects, sessions, or trials invents a transition unless continuity is part of the model.</span>
+<span id="cb1-327"><a href="#cb1-327" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Missingness misspecification:** skipping state-dependent dropout as though it were uninformative can bias inference.</span>
+<span id="cb1-328"><a href="#cb1-328" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Numerical loss of symmetry or definiteness:** subtraction updates, explicit inverses, poor scaling, and round-off can corrupt covariances <span class="co">[</span><span class="ot">@Asada2006Lecture8, sec. 4.10</span><span class="co">]</span>.</span>
+<span id="cb1-329"><a href="#cb1-329" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Singular innovation covariance:** deterministic or redundant measurements can invalidate the ordinary inverse-density update.</span>
+<span id="cb1-330"><a href="#cb1-330" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Outliers:** a Gaussian likelihood can give atypical observations excessive influence; ad hoc clipping changes the method.</span>
+<span id="cb1-331"><a href="#cb1-331" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Parameter plug-in certainty:** conditioning on estimated parameters as though known understates total uncertainty.</span>
+<span id="cb1-332"><a href="#cb1-332" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Interpretive overreach:** a smooth or predictive filtered path can be mistaken for a validated mechanism or unique latent trajectory.</span>
+<span id="cb1-333"><a href="#cb1-333" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-334"><a href="#cb1-334" aria-hidden="true" tabindex="-1"></a><span class="fu">## Identifiability issues</span></span>
+<span id="cb1-335"><a href="#cb1-335" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-336"><a href="#cb1-336" aria-hidden="true" tabindex="-1"></a>Filtering does not repair non-identifiability of the LGSSM. If two parameter/state-coordinate specifications induce the same observable law, their filtering distributions transform within the corresponding equivalence while the observed predictive distribution can agree. Similarity transformations can change latent axes, transition entries, observation loadings, gains, and posterior means without selecting a unique scientific coordinate frame.</span>
+<span id="cb1-337"><a href="#cb1-337" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-338"><a href="#cb1-338" aria-hidden="true" tabindex="-1"></a>Observability and identifiability are related but distinct. Weak observation of a state direction can make its current conditional uncertainty large under one fixed model. Structural identifiability asks whether different model specifications induce the same observable distribution. Neither property follows from a small filtering covariance computed under assumed parameters.</span>
+<span id="cb1-339"><a href="#cb1-339" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-340"><a href="#cb1-340" aria-hidden="true" tabindex="-1"></a><span class="fu">## Comparison with simpler methods</span></span>
+<span id="cb1-341"><a href="#cb1-341" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-342"><a href="#cb1-342" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Open-loop prediction:** propagate $m$ and $P$ without measurement updates. Filtering should improve declared current-state or one-step predictive criteria when measurements contain model-consistent information.</span>
+<span id="cb1-343"><a href="#cb1-343" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Measurement-only estimate:** where a state component is directly observed, use the current measurement or a calibrated static linear transform. This tests whether temporal propagation contributes beyond sensor smoothing.</span>
+<span id="cb1-344"><a href="#cb1-344" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Persistence / last observation:** carry forward the most recent usable observation or state proxy. This is a minimal sequential baseline.</span>
+<span id="cb1-345"><a href="#cb1-345" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Static Factor Analysis:** infer a latent factor independently at each time under a static observation model. It separates the contribution of the temporal transition from a probabilistic observation layer.</span>
+<span id="cb1-346"><a href="#cb1-346" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Direct batch Gaussian conditioning:** for a short sequence, condition the full joint Gaussian distribution at once. Its current-time marginal should match the recursive filter and is an implementation oracle, not a cheaper deployment baseline.</span>
+<span id="cb1-347"><a href="#cb1-347" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-348"><a href="#cb1-348" aria-hidden="true" tabindex="-1"></a>A fixed-gain or steady-state filter is not automatically a simpler version of the finite-horizon filter: it requires conditions under which covariance/gain convergence and the chosen initialization are appropriate.</span>
+<span id="cb1-349"><a href="#cb1-349" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-350"><a href="#cb1-350" aria-hidden="true" tabindex="-1"></a><span class="fu">## Evaluation criteria</span></span>
+<span id="cb1-351"><a href="#cb1-351" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-352"><a href="#cb1-352" aria-hidden="true" tabindex="-1"></a>Evaluation must match the intended use and separate model fit from implementation correctness:</span>
+<span id="cb1-353"><a href="#cb1-353" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-354"><a href="#cb1-354" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>**One-step predictive log likelihood:** evaluate held-out sequences through innovation densities, with parameters and preprocessing fit only on training data.</span>
+<span id="cb1-355"><a href="#cb1-355" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>**Innovation calibration:** inspect mean, variance, cross-correlation, and temporal autocorrelation of standardized innovations. Apparent whiteness is a model check, not proof of correct latent states.</span>
+<span id="cb1-356"><a href="#cb1-356" aria-hidden="true" tabindex="-1"></a><span class="ss">3. </span>**State error when truth exists:** in simulation or a genuinely observed-state benchmark, report time-resolved RMSE or Mahalanobis error and interval coverage. A proxy state must be labeled as a proxy.</span>
+<span id="cb1-357"><a href="#cb1-357" aria-hidden="true" tabindex="-1"></a><span class="ss">4. </span>**Uncertainty calibration:** under repeated data from a known simulator, compare nominal posterior coverage with empirical coverage. Plug-in parameter uncertainty must be distinguished.</span>
+<span id="cb1-358"><a href="#cb1-358" aria-hidden="true" tabindex="-1"></a><span class="ss">5. </span>**Baselines:** compare open-loop prediction, measurement-only, persistence, and static FA under identical splits and available information.</span>
+<span id="cb1-359"><a href="#cb1-359" aria-hidden="true" tabindex="-1"></a><span class="ss">6. </span>**Missingness stress tests:** evaluate declared missing-channel patterns and distinguish random masking from state-dependent dropout.</span>
+<span id="cb1-360"><a href="#cb1-360" aria-hidden="true" tabindex="-1"></a><span class="ss">7. </span>**Numerical checks:** compare recursive output with batch conditioning on small problems; monitor covariance symmetry, factorization failures, and sensitivity to scaling and precision.</span>
+<span id="cb1-361"><a href="#cb1-361" aria-hidden="true" tabindex="-1"></a><span class="ss">8. </span>**Distribution shift:** separate held-out time within a sequence from held-out trials, subjects, sessions, conditions, or acquisition systems.</span>
+<span id="cb1-362"><a href="#cb1-362" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-363"><a href="#cb1-363" aria-hidden="true" tabindex="-1"></a>Do not select parameters on the test sequences and then report the same innovations as out-of-sample evidence. Lower state RMSE or predictive loss under one simulator supports that declared criterion; it does not validate a biological mechanism.</span>
+<span id="cb1-364"><a href="#cb1-364" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-365"><a href="#cb1-365" aria-hidden="true" tabindex="-1"></a><span class="fu">## Minimal toy model</span></span>
+<span id="cb1-366"><a href="#cb1-366" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-367"><a href="#cb1-367" aria-hidden="true" tabindex="-1"></a>Consider the scalar random-walk model</span>
+<span id="cb1-368"><a href="#cb1-368" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-369"><a href="#cb1-369" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-370"><a href="#cb1-370" aria-hidden="true" tabindex="-1"></a>z_1\sim\mathcal N(m_1,p_1),</span>
+<span id="cb1-371"><a href="#cb1-371" aria-hidden="true" tabindex="-1"></a>\qquad</span>
+<span id="cb1-372"><a href="#cb1-372" aria-hidden="true" tabindex="-1"></a>z_{t+1}=z_t+w_t,</span>
+<span id="cb1-373"><a href="#cb1-373" aria-hidden="true" tabindex="-1"></a>\quad w_t\sim\mathcal N(0,q),</span>
+<span id="cb1-374"><a href="#cb1-374" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-375"><a href="#cb1-375" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-376"><a href="#cb1-376" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-377"><a href="#cb1-377" aria-hidden="true" tabindex="-1"></a>x_t=z_t+v_t,</span>
+<span id="cb1-378"><a href="#cb1-378" aria-hidden="true" tabindex="-1"></a>\quad v_t\sim\mathcal N(0,r),</span>
+<span id="cb1-379"><a href="#cb1-379" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-380"><a href="#cb1-380" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-381"><a href="#cb1-381" aria-hidden="true" tabindex="-1"></a>with $q\ge0$ and $r&gt;0$. At the first observation,</span>
+<span id="cb1-382"><a href="#cb1-382" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-383"><a href="#cb1-383" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-384"><a href="#cb1-384" aria-hidden="true" tabindex="-1"></a>s_1=p_1+r,</span>
+<span id="cb1-385"><a href="#cb1-385" aria-hidden="true" tabindex="-1"></a>\qquad</span>
+<span id="cb1-386"><a href="#cb1-386" aria-hidden="true" tabindex="-1"></a>k_1=\frac{p_1}{p_1+r},</span>
+<span id="cb1-387"><a href="#cb1-387" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-388"><a href="#cb1-388" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-389"><a href="#cb1-389" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-390"><a href="#cb1-390" aria-hidden="true" tabindex="-1"></a>m_{1\mid1}=m_1+k_1(x_1-m_1),</span>
+<span id="cb1-391"><a href="#cb1-391" aria-hidden="true" tabindex="-1"></a>\qquad</span>
+<span id="cb1-392"><a href="#cb1-392" aria-hidden="true" tabindex="-1"></a>p_{1\mid1}=\frac{p_1r}{p_1+r}.</span>
+<span id="cb1-393"><a href="#cb1-393" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-394"><a href="#cb1-394" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-395"><a href="#cb1-395" aria-hidden="true" tabindex="-1"></a>The next prediction is</span>
+<span id="cb1-396"><a href="#cb1-396" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-397"><a href="#cb1-397" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-398"><a href="#cb1-398" aria-hidden="true" tabindex="-1"></a>m_{2\mid1}=m_{1\mid1},</span>
+<span id="cb1-399"><a href="#cb1-399" aria-hidden="true" tabindex="-1"></a>\qquad</span>
+<span id="cb1-400"><a href="#cb1-400" aria-hidden="true" tabindex="-1"></a>p_{2\mid1}=p_{1\mid1}+q.</span>
+<span id="cb1-401"><a href="#cb1-401" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-402"><a href="#cb1-402" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-403"><a href="#cb1-403" aria-hidden="true" tabindex="-1"></a>This example makes the uncertainty tradeoff explicit: $r\to\infty$ makes the update approach the prediction, whereas $r\to0$ makes a nondegenerate direct measurement dominate. These limits describe the model, not how $q$ or $r$ should be chosen from data.</span>
+<span id="cb1-404"><a href="#cb1-404" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-405"><a href="#cb1-405" aria-hidden="true" tabindex="-1"></a>A future non-executable toy contract should generate independent scalar sequences with retained latent truth, compare Kalman filtering with open-loop, measurement-only, persistence, static FA where meaningful, and direct batch conditioning, and score held-out predictive density, state RMSE, and interval coverage. Required stress cases are every-third-step missing observations, misspecified $q/r$, a wrong initial prior, an outlier, and nearly duplicate measurement rows with very different scaling. The exercise should compare the short and Joseph covariance forms against a factorized implementation in finite precision, but no code, data, figures, or result claims are created here.</span>
+<span id="cb1-406"><a href="#cb1-406" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-407"><a href="#cb1-407" aria-hidden="true" tabindex="-1"></a><span class="fu">## Relevance to LDG</span></span>
+<span id="cb1-408"><a href="#cb1-408" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-409"><a href="#cb1-409" aria-hidden="true" tabindex="-1"></a>Kalman filtering is LDG's canonical online latent-state inference baseline for a discrete-time LGSSM. It operationalizes the distinction between a model, a current filtering distribution, a future prediction, and a later full-interval smoothing distribution.</span>
+<span id="cb1-410"><a href="#cb1-410" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-411"><a href="#cb1-411" aria-hidden="true" tabindex="-1"></a>::: {.callout-warning title="What this does NOT imply"}</span>
+<span id="cb1-412"><a href="#cb1-412" aria-hidden="true" tabindex="-1"></a>Exact Kalman filtering under a declared LGSSM does not show that the model is correct, that the filtered mean is the true state, that latent coordinates are identifiable, that dynamics are mechanistic, or that future observations were legitimately available. Smoothness, low posterior variance, innovation fit, or predictive success alone do not establish a manifold, intrinsic dimension, causal structure, or biological mechanism.</span>
+<span id="cb1-413"><a href="#cb1-413" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb1-414"><a href="#cb1-414" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-415"><a href="#cb1-415" aria-hidden="true" tabindex="-1"></a><span class="fu">### Mouse trajectory</span></span>
+<span id="cb1-416"><a href="#cb1-416" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-417"><a href="#cb1-417" aria-hidden="true" tabindex="-1"></a>No modality-specific empirical claim is retained. Filtering could be applied to a declared movement-state model, but inferred position, velocity, intention, and control variables require different observation and transition assumptions.</span>
+<span id="cb1-418"><a href="#cb1-418" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-419"><a href="#cb1-419" aria-hidden="true" tabindex="-1"></a><span class="fu">### Eye movement</span></span>
+<span id="cb1-420"><a href="#cb1-420" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-421"><a href="#cb1-421" aria-hidden="true" tabindex="-1"></a>No modality-specific empirical claim is retained. Missing samples, blinks, saturation, event segmentation, and irregular timing can violate simple row-selection and equal-step assumptions.</span>
+<span id="cb1-422"><a href="#cb1-422" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-423"><a href="#cb1-423" aria-hidden="true" tabindex="-1"></a><span class="fu">### EEG</span></span>
+<span id="cb1-424"><a href="#cb1-424" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-425"><a href="#cb1-425" aria-hidden="true" tabindex="-1"></a>No modality-specific empirical claim is retained. Sensor mixing, rereferencing, artifacts, spatial correlation, and nonstationarity must be represented or treated as model mismatch; a filtered latent coordinate is not automatically a neural source.</span>
+<span id="cb1-426"><a href="#cb1-426" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-427"><a href="#cb1-427" aria-hidden="true" tabindex="-1"></a><span class="fu">### MEG / neural population data</span></span>
+<span id="cb1-428"><a href="#cb1-428" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-429"><a href="#cb1-429" aria-hidden="true" tabindex="-1"></a>No modality-specific empirical claim is retained. Trial boundaries, unit/channel missingness, observation-noise correlations, parameter sharing, and input timing determine the filtering problem. A smooth posterior mean does not establish neural population dynamics or mechanism.</span>
+<span id="cb1-430"><a href="#cb1-430" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-431"><a href="#cb1-431" aria-hidden="true" tabindex="-1"></a><span class="fu">## Primary sources</span></span>
+<span id="cb1-432"><a href="#cb1-432" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-433"><a href="#cb1-433" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Kalman introduces the state-transition approach to linear filtering and prediction, defines filtering relative to observations through the current time, derives recursive state estimation and error-covariance equations, and treats model construction as a separate problem <span class="co">[</span><span class="ot">@Kalman1960</span><span class="co">]</span>.</span>
+<span id="cb1-434"><a href="#cb1-434" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-435"><a href="#cb1-435" aria-hidden="true" tabindex="-1"></a><span class="fu">## Reviews / secondary sources</span></span>
+<span id="cb1-436"><a href="#cb1-436" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-437"><a href="#cb1-437" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Särkkä gives the inspected Bayesian prediction/update derivation, Gaussian filtering distributions, innovation covariance, Kalman gain, covariance recursion, and the boundary between filtering and later smoothing <span class="co">[</span><span class="ot">@Sarkka2013, ch. 4</span><span class="co">]</span>.</span>
+<span id="cb1-438"><a href="#cb1-438" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Asada's inspected graduate implementation notes document round-off-driven covariance asymmetry, the Joseph stabilized covariance form, and factorized covariance representations as numerical safeguards <span class="co">[</span><span class="ot">@Asada2006Lecture8, sec. 4.10</span><span class="co">]</span>.</span>
+<span id="cb1-439"><a href="#cb1-439" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-440"><a href="#cb1-440" aria-hidden="true" tabindex="-1"></a><span class="fu">## Open methodological questions</span></span>
+<span id="cb1-441"><a href="#cb1-441" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-442"><a href="#cb1-442" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>How should uncertainty from parameter estimation be propagated into online state uncertainty without changing the bounded fixed-parameter target?</span>
+<span id="cb1-443"><a href="#cb1-443" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Which innovation diagnostics are most informative under dependent missingness or deliberate experimental inputs?</span>
+<span id="cb1-444"><a href="#cb1-444" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>When should a factorized or square-root implementation be mandatory rather than optional?</span>
+<span id="cb1-445"><a href="#cb1-445" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>How should filters be compared when state coordinates differ by observationally equivalent transformations?</span>
+<span id="cb1-446"><a href="#cb1-446" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Which sequence split best tests the intended use: future time, new trials, new sessions, new subjects, or new acquisition systems?</span>
+<span id="cb1-447"><a href="#cb1-447" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>When do robust or constrained filters solve a scientifically different problem rather than merely a numerical one?</span>
+<span id="cb1-448"><a href="#cb1-448" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-449"><a href="#cb1-449" aria-hidden="true" tabindex="-1"></a><span class="fu">## Maturity checklist</span></span>
+<span id="cb1-450"><a href="#cb1-450" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-451"><a href="#cb1-451" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> Uses the complete Method schema and the existing discrete-time LGSSM notation.</span>
+<span id="cb1-452"><a href="#cb1-452" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> Distinguishes prior, prediction, innovation, update, and filtering distributions.</span>
+<span id="cb1-453"><a href="#cb1-453" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> Conditions only on observations available through the current time.</span>
+<span id="cb1-454"><a href="#cb1-454" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> States Kalman gain, innovation covariance, likelihood contribution, and Joseph covariance update.</span>
+<span id="cb1-455"><a href="#cb1-455" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> Declares initialization, input timing, partial-observation row selection, and missingness limits.</span>
+<span id="cb1-456"><a href="#cb1-456" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> Covers singular and ill-conditioned innovation covariance and factorized numerical boundaries.</span>
+<span id="cb1-457"><a href="#cb1-457" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> Separates fixed-parameter filtering from model specification, learning, forecasting, and smoothing.</span>
+<span id="cb1-458"><a href="#cb1-458" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> States learned/fixed quantities, temporal order, geometry, supervision, and inherited identifiability.</span>
+<span id="cb1-459"><a href="#cb1-459" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> Includes failure modes, baselines, evaluation criteria, and a non-executable analytic toy contract.</span>
+<span id="cb1-460"><a href="#cb1-460" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> Retains no modality-specific empirical claim.</span>
+<span id="cb1-461"><a href="#cb1-461" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> Foundational, authoritative Bayesian, and numerical-stability sources were inspected and verified.</span>
+<span id="cb1-462"><a href="#cb1-462" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> Independent mixed review returned PASS with no correction round required.</span>
+<span id="cb1-463"><a href="#cb1-463" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> Stable promotion authorized under the recorded review decision after object-specific PASS and validation.</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></div>
+</div></div></div></div></div>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

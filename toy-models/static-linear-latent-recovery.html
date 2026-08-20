@@ -1,0 +1,1642 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.10.18">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Static Linear Latent Recovery – Latent Dynamics &amp; Geometry</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-445b8638c3d06994fee0907d791121c4.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-chtml.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../index.html">
+    <span class="navbar-title">Latent Dynamics &amp; Geometry</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../index.html"> 
+<span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../knowledge/concepts/index.html"> 
+<span class="menu-text">Concepts</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../knowledge/methods/index.html"> 
+<span class="menu-text">Methods</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../knowledge/math/index.html"> 
+<span class="menu-text">Math</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../knowledge/papers/index.html"> 
+<span class="menu-text">Papers</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../toy-models/index.html"> 
+<span class="menu-text">Toy Models</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../research-questions/index.html"> 
+<span class="menu-text">Research Questions</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../benchmarks/index.html"> 
+<span class="menu-text">Benchmarks</span></a>
+  </li>  
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/AbelZheng/latent-dynamics-geometry-public"> <i class="bi bi-github" role="img" aria-label="GitHub repository">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="https://github.com/AbelZheng/latent-dynamics-geometry-public/discussions"> 
+<span class="menu-text">Discussions</span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#static-linear-latent-recovery" id="toc-static-linear-latent-recovery" class="nav-link active" data-scroll-target="#static-linear-latent-recovery">Static Linear Latent Recovery</a>
+  <ul class="collapse">
+  <li><a href="#question" id="toc-question" class="nav-link" data-scroll-target="#question">Question</a></li>
+  <li><a href="#ground-truth" id="toc-ground-truth" class="nav-link" data-scroll-target="#ground-truth">Ground truth</a>
+  <ul class="collapse">
+  <li><a href="#structural-identification-boundary" id="toc-structural-identification-boundary" class="nav-link" data-scroll-target="#structural-identification-boundary">Structural identification boundary</a></li>
+  </ul></li>
+  <li><a href="#generative-model" id="toc-generative-model" class="nav-link" data-scroll-target="#generative-model">Generative model</a></li>
+  <li><a href="#parameters" id="toc-parameters" class="nav-link" data-scroll-target="#parameters">Parameters</a></li>
+  <li><a href="#simulation" id="toc-simulation" class="nav-link" data-scroll-target="#simulation">Simulation</a>
+  <ul class="collapse">
+  <li><a href="#primary-matched-diagonal-condition" id="toc-primary-matched-diagonal-condition" class="nav-link" data-scroll-target="#primary-matched-diagonal-condition">Primary matched-diagonal condition</a></li>
+  <li><a href="#repeated-signal-eigenvalues" id="toc-repeated-signal-eigenvalues" class="nav-link" data-scroll-target="#repeated-signal-eigenvalues">Repeated signal eigenvalues</a></li>
+  <li><a href="#near-zero-uniqueness" id="toc-near-zero-uniqueness" class="nav-link" data-scroll-target="#near-zero-uniqueness">Near-zero uniqueness</a></li>
+  <li><a href="#correlated-residuals" id="toc-correlated-residuals" class="nav-link" data-scroll-target="#correlated-residuals">Correlated residuals</a></li>
+  <li><a href="#high-variance-nuisance" id="toc-high-variance-nuisance" class="nav-link" data-scroll-target="#high-variance-nuisance">High-variance nuisance</a></li>
+  <li><a href="#outliers" id="toc-outliers" class="nav-link" data-scroll-target="#outliers">Outliers</a></li>
+  <li><a href="#scaling-leakage-negative-control" id="toc-scaling-leakage-negative-control" class="nav-link" data-scroll-target="#scaling-leakage-negative-control">Scaling-leakage negative control</a></li>
+  </ul></li>
+  <li><a href="#visualization" id="toc-visualization" class="nav-link" data-scroll-target="#visualization">Visualization</a></li>
+  <li><a href="#expected-behavior" id="toc-expected-behavior" class="nav-link" data-scroll-target="#expected-behavior">Expected behavior</a></li>
+  <li><a href="#parameter-manipulations" id="toc-parameter-manipulations" class="nav-link" data-scroll-target="#parameter-manipulations">Parameter manipulations</a></li>
+  <li><a href="#sanity-checks" id="toc-sanity-checks" class="nav-link" data-scroll-target="#sanity-checks">Sanity checks</a></li>
+  <li><a href="#failure-cases" id="toc-failure-cases" class="nav-link" data-scroll-target="#failure-cases">Failure cases</a></li>
+  <li><a href="#recovery-task" id="toc-recovery-task" class="nav-link" data-scroll-target="#recovery-task">Recovery task</a>
+  <ul class="collapse">
+  <li><a href="#pca" id="toc-pca" class="nav-link" data-scroll-target="#pca">PCA</a></li>
+  <li><a href="#ppca" id="toc-ppca" class="nav-link" data-scroll-target="#ppca">PPCA</a></li>
+  <li><a href="#diagonal-noise-fa" id="toc-diagonal-noise-fa" class="nav-link" data-scroll-target="#diagonal-noise-fa">Diagonal-noise FA</a></li>
+  <li><a href="#oracle-gaussian" id="toc-oracle-gaussian" class="nav-link" data-scroll-target="#oracle-gaussian">Oracle Gaussian</a></li>
+  </ul></li>
+  <li><a href="#candidate-analysis-methods" id="toc-candidate-analysis-methods" class="nav-link" data-scroll-target="#candidate-analysis-methods">Candidate analysis methods</a></li>
+  <li><a href="#evaluation" id="toc-evaluation" class="nav-link" data-scroll-target="#evaluation">Evaluation</a>
+  <ul class="collapse">
+  <li><a href="#empirical-results" id="toc-empirical-results" class="nav-link" data-scroll-target="#empirical-results">Empirical results</a></li>
+  </ul></li>
+  <li><a href="#interpretation" id="toc-interpretation" class="nav-link" data-scroll-target="#interpretation">Interpretation</a></li>
+  <li><a href="#what-this-toy-model-does-not-establish" id="toc-what-this-toy-model-does-not-establish" class="nav-link" data-scroll-target="#what-this-toy-model-does-not-establish">What this toy model does NOT establish</a></li>
+  <li><a href="#extensions-to-real-data" id="toc-extensions-to-real-data" class="nav-link" data-scroll-target="#extensions-to-real-data">Extensions to real data</a></li>
+  <li><a href="#reproducibility" id="toc-reproducibility" class="nav-link" data-scroll-target="#reproducibility">Reproducibility</a>
+  <ul class="collapse">
+  <li><a href="#evidence-inspected" id="toc-evidence-inspected" class="nav-link" data-scroll-target="#evidence-inspected">Evidence inspected</a></li>
+  </ul></li>
+  <li><a href="#maturity-checklist" id="toc-maturity-checklist" class="nav-link" data-scroll-target="#maturity-checklist">Maturity checklist</a></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<div class="quarto-title-block"><div><h1 class="title">Static Linear Latent Recovery</h1><button type="button" class="btn code-tools-button" id="quarto-code-tools-source"><i class="bi"></i> Code</button></div></div>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="static-linear-latent-recovery" class="level1">
+<h1>Static Linear Latent Recovery</h1>
+<p>This L1/stable Toy Model is the Candidate A generation/recovery slice. It asks whether PCA and Gaussian latent-factor models recover the distinct targets their criteria define, and how residual misspecification, weak uniquenesses, nuisance variance, outliers, and preprocessing leakage make those targets diverge. Numerical values below are deterministic outputs under master seed <code>20260819</code>; they are not population theorems or real-data claims.</p>
+<p><strong>Assumed background:</strong> centered covariance PCA, Gaussian likelihood, linear subspaces, principal angles, and the Gaussian factor model. The stable Method Objects provide LDG terminology but do not replace the external evidence inspection recorded below.</p>
+<section id="question" class="level2">
+<h2 class="anchored" data-anchor-id="question">Question</h2>
+<p>For observations generated by a known rank-two Gaussian factor model:</p>
+<ol type="1">
+<li>does ordinary PCA recover the leading eigenspace of the <strong>observable covariance</strong>;</li>
+<li>does correctly specified diagonal-noise FA recover the <strong>common loading subspace</strong>, common covariance, diagonal uniquenesses, and observable covariance up to loading rotations;</li>
+<li>how does isotropic-noise PPCA differ from heterogeneous-noise FA; and</li>
+<li>how do repeated signal eigenvalues, near-zero uniquenesses, correlated residuals, high nuisance variance, outliers, and pooled train/test scaling expose criterion or evaluation failures?</li>
+</ol>
+<p>The object keeps four targets distinct:</p>
+<ul>
+<li>loading subspace <span class="math inline">\(\mathcal S_\Lambda=\operatorname{col}(\Lambda)\)</span>;</li>
+<li>common covariance <span class="math inline">\(\Lambda\Lambda^\top\)</span>;</li>
+<li>observable covariance <span class="math inline">\(C=\Lambda\Lambda^\top+\Sigma_\epsilon\)</span>; and</li>
+<li>the rank-two population principal subspace of <span class="math inline">\(C\)</span>.</li>
+</ul>
+<p>PCA is scored against the last target. Diagonal FA is scored against the loading/common-covariance target only where its diagonal residual model is correctly specified <strong>and</strong> the displayed loading matrix passes the sufficient rank diagnostic stated below. Heterogeneous uniqueness means these subspaces need not coincide <span class="citation" data-cites="JolliffeCadima2016 AndersonRubin1956 TippingBishop1999">(<a href="#ref-JolliffeCadima2016" role="doc-biblioref">Jolliffe and Cadima 2016</a>; <a href="#ref-AndersonRubin1956" role="doc-biblioref">Anderson and Rubin 1956</a>; <a href="#ref-TippingBishop1999" role="doc-biblioref">Tipping and Bishop 1999</a>)</span>.</p>
+</section>
+<section id="ground-truth" class="level2">
+<h2 class="anchored" data-anchor-id="ground-truth">Ground truth</h2>
+<p>The ambient dimension is <span class="math inline">\(p=8\)</span> and latent rank is <span class="math inline">\(q=2\)</span>. For each independent row,</p>
+<p><span class="math display">\[
+z_i\sim\mathcal N(0,I_2),\qquad
+\epsilon_i\sim\mathcal N(0,\Sigma_\epsilon),\qquad
+x_i=\Lambda z_i+\epsilon_i.
+\]</span></p>
+<p>The latent draws and residuals are mutually independent. The base loading basis <span class="math inline">\(U\)</span> is the deterministic QR-orthonormalization of</p>
+<p><span class="math display">\[
+B=\begin{pmatrix}
+1.0&amp;0.2\\
+0.7&amp;-0.5\\
+0.4&amp;1.0\\
+-0.6&amp;0.8\\
+0.9&amp;0.3\\
+-0.2&amp;-0.9\\
+0.5&amp;-0.4\\
+-0.7&amp;-0.2
+\end{pmatrix},
+\]</span></p>
+<p>with QR signs chosen so the diagonal of <span class="math inline">\(R\)</span> is nonnegative. The primary loading is</p>
+<p><span class="math display">\[
+\Lambda=U\operatorname{diag}(2.0,1.25),
+\]</span></p>
+<p>and the primary uniqueness vector is</p>
+<p><span class="math display">\[
+\psi=(0.12,0.20,0.32,0.48,0.70,0.95,1.25,1.60).
+\]</span></p>
+<p>The retained truth contains <span class="math inline">\(z\)</span>, <span class="math inline">\(\Lambda\)</span>, <span class="math inline">\(\Sigma_\epsilon\)</span>, <span class="math inline">\(C\)</span>, the loading subspace, and the population principal subspace. Latent arrays enter only scoring and poison tests; fitting and model selection receive observations only.</p>
+<section id="structural-identification-boundary" class="level3">
+<h3 class="anchored" data-anchor-id="structural-identification-boundary">Structural identification boundary</h3>
+<p>Correct diagonal residual specification alone is not an identification result. For each displayed loading matrix, the implementation checks the following Anderson–Rubin-style sufficient rank condition: after deleting any one of the eight rows, the remaining rows contain two disjoint two-row submatrices, each of rank two. The diagnostic records witnesses for every deleted row, and all six loading matrices pass <span class="citation" data-cites="AndersonRubin1956">(<a href="#ref-AndersonRubin1956" role="doc-biblioref">Anderson and Rubin 1956</a>)</span>.</p>
+<p>Within conditions that also have an applicable diagonal residual specification, this supports structural identification of the diagonal uniquenesses and common-loading structure up to orthogonal loading rotation. It does <strong>not</strong> guarantee finite-sample accuracy, optimizer convergence, or recovery by the bounded implementation. Uniqueness-error rows are emitted only when both the diagonal residual model and this rank diagnostic apply.</p>
+</section>
+</section>
+<section id="generative-model" class="level2">
+<h2 class="anchored" data-anchor-id="generative-model">Generative model</h2>
+<p>Independent train, validation, and test samples are generated separately for every condition:</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Split</th>
+<th style="text-align: right;">Rows per condition</th>
+<th>Use</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>train</td>
+<td style="text-align: right;">700</td>
+<td>means, PCA/PPCA, and FA fitting</td>
+</tr>
+<tr class="even">
+<td>validation</td>
+<td style="text-align: right;">350</td>
+<td>bounded FA floor/restart selection</td>
+</tr>
+<tr class="odd">
+<td>test</td>
+<td style="text-align: right;">500</td>
+<td>held-out scoring only</td>
+</tr>
+</tbody>
+</table>
+<p>Randomness uses <code>Generator(PCG64(SeedSequence(words)))</code> with master seed <code>20260819</code> and stage, condition, and split words. Exact split regeneration is verified, and train and validation prefixes are checked not to coincide.</p>
+<p>Generation, standardization, fitting, selection, scoring, plotting, and verification are separate functions. Test observations and all latent truth are excluded from lawful fitting and selection. For all six conditions, computed poison tests replace test observations or every retained latent array and verify that PCA, PPCA, every FA candidate, selected FA settings, and observation-only reconstructions remain unchanged.</p>
+</section>
+<section id="parameters" class="level2">
+<h2 class="anchored" data-anchor-id="parameters">Parameters</h2>
+<p>The fixed numerical contract is:</p>
+<ul>
+<li>rank <span class="math inline">\(q=2\)</span>;</li>
+<li>two uniqueness floors, <span class="math inline">\(10^{-5}\)</span> and <span class="math inline">\(10^{-3}\)</span>;</li>
+<li>three deterministic initializations per floor;</li>
+<li>at most 250 EM iterations;</li>
+<li>relative per-observation training-NLL tolerance <span class="math inline">\(10^{-8}\)</span>;</li>
+<li>validation NLL selects among the six candidates with deterministic floor/restart tie breaking;</li>
+<li>seven deterministic random rank-two projection baselines;</li>
+<li>covariance symmetry tolerance <span class="math inline">\(10^{-10}\)</span>;</li>
+<li>covariance PSD tolerance <span class="math inline">\(10^{-9}\)</span>; and</li>
+<li>poison-output tolerance <span class="math inline">\(10^{-12}\)</span>.</li>
+</ul>
+<p>The finite floors, starts, and iteration budget are controlled numerical choices, not general FA maximum-likelihood guarantees.</p>
+</section>
+<section id="simulation" class="level2">
+<h2 class="anchored" data-anchor-id="simulation">Simulation</h2>
+<section id="primary-matched-diagonal-condition" class="level3">
+<h3 class="anchored" data-anchor-id="primary-matched-diagonal-condition">Primary matched-diagonal condition</h3>
+<p>Use the base loading and <span class="math inline">\(\Sigma_\epsilon=\operatorname{diag}(\psi)\)</span>. This is the primary correctly specified condition for diagonal FA.</p>
+</section>
+<section id="repeated-signal-eigenvalues" class="level3">
+<h3 class="anchored" data-anchor-id="repeated-signal-eigenvalues">Repeated signal eigenvalues</h3>
+<p>Use <span class="math inline">\(\Lambda=1.65U\)</span> and <span class="math inline">\(\Sigma_\epsilon=0.30I_8\)</span>. The two common-factor eigenvalues are equal. Only the complete rank-two eigenspace is scored; arbitrary axes inside it are not identified. Repeated eigenvalues inside a retained block permit a subspace target but not a preferred ordered basis <span class="citation" data-cites="JolliffeCadima2016 TippingBishop1999">(<a href="#ref-JolliffeCadima2016" role="doc-biblioref">Jolliffe and Cadima 2016</a>; <a href="#ref-TippingBishop1999" role="doc-biblioref">Tipping and Bishop 1999</a>)</span>.</p>
+</section>
+<section id="near-zero-uniqueness" class="level3">
+<h3 class="anchored" data-anchor-id="near-zero-uniqueness">Near-zero uniqueness</h3>
+<p>Use uniquenesses</p>
+<p><span class="math display">\[
+(10^{-5},2\times10^{-5},5\times10^{-5},10^{-4},0.02,0.04,0.08,0.12).
+\]</span></p>
+<p>This remains positive definite but stresses the declared floors and slow likelihood convergence. A fitted floor is not interpreted as evidence for an exact zero.</p>
+</section>
+<section id="correlated-residuals" class="level3">
+<h3 class="anchored" data-anchor-id="correlated-residuals">Correlated residuals</h3>
+<p>Keep the primary loading and marginal uniquenesses, but use residual correlations</p>
+<p><span class="math display">\[
+R_{ij}=0.42^{|i-j|},\qquad
+\Sigma_\epsilon=\operatorname{diag}(\sqrt\psi)R\operatorname{diag}(\sqrt\psi).
+\]</span></p>
+<p>Diagonal FA is intentionally misspecified, so uniqueness recovery is not scored.</p>
+</section>
+<section id="high-variance-nuisance" class="level3">
+<h3 class="anchored" data-anchor-id="high-variance-nuisance">High-variance nuisance</h3>
+<p>Increase the eighth residual variance to <span class="math inline">\(7.5\)</span>. The population principal subspace now prioritizes observable variance, while the semantic loading target remains unchanged. PCA is scored against its population covariance target rather than punished for not knowing which variance is scientifically preferred. The selected FA run reaches the fixed 250-iteration bound; its <span class="math inline">\(85.84^\circ\)</span> loading angle is therefore reported as a bounded optimizer nonconvergence/computational failure, not evidence that the correctly specified population FA model cannot represent the loading structure.</p>
+</section>
+<section id="outliers" class="level3">
+<h3 class="anchored" data-anchor-id="outliers">Outliers</h3>
+<p>Add deterministic random-direction contamination of magnitude <code>9.0</code> to 2.5% of every split. This is a contaminated distribution, not a Gaussian FA model. Every PPCA, FA, and reference covariance-error row is compared with and labelled <code>nominal_clean_gaussian_covariance</code>, not the covariance of the full contaminated observation law. Held-out NLL rows are labelled as Gaussian scores on the contaminated observation distribution. The true-parameter Gaussian is a nominal reference rather than a robust oracle. The symmetric random-direction construction adds isotropic covariance in population expectation, but no finite contaminated sample is treated as exactly Gaussian.</p>
+</section>
+<section id="scaling-leakage-negative-control" class="level3">
+<h3 class="anchored" data-anchor-id="scaling-leakage-negative-control">Scaling-leakage negative control</h3>
+<p>Using the primary generated observations, compare:</p>
+<ol type="1">
+<li>a lawful standardizer fit on training observations only; and</li>
+<li>an invalid standardizer fit on pooled train and test observations.</li>
+</ol>
+<p>Both fit PCA using transformed training rows and score test reconstruction back in original units. Poisoning test features must leave the lawful preprocessing unchanged and must change the pooled preprocessing. Leakage is invalid regardless of whether one finite test MSE improves.</p>
+</section>
+</section>
+<section id="visualization" class="level2">
+<h2 class="anchored" data-anchor-id="visualization">Visualization</h2>
+<p>The single composite figure is a diagnostic summary. It shows a bounded score-space display, method-specific whole-subspace angles, matched-condition metrics, and verification/interpretation limits. The score display is not acceptance evidence.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="artifacts/static-linear-latent-recovery/summary.png" class="img-fluid figure-img"></p>
+<figcaption>Static linear latent recovery diagnostic</figcaption>
+</figure>
+</div>
+<p>PCA angles are measured against the population PCA target; FA angles are measured against the true loading subspace. Ordinary PCA has no Gaussian likelihood row. All values are conditional on the declared simulator and preprocessing.</p>
+</section>
+<section id="expected-behavior" class="level2">
+<h2 class="anchored" data-anchor-id="expected-behavior">Expected behavior</h2>
+<ul>
+<li>Under the primary model, finite-sample PCA should approximate the leading observable-covariance eigenspace, not necessarily <span class="math inline">\(\operatorname{col}(\Lambda)\)</span>.</li>
+<li>Under correctly specified diagonal residuals <strong>and the verified sufficient rank condition</strong>, a successful bounded FA fit may approximate the structurally identified loading subspace, common covariance, uniquenesses, and observable covariance up to orthogonal loading rotation. Structural identification does not imply computational recovery.</li>
+<li>PPCA shares the PCA principal-subspace target at its likelihood optimum but restricts residual covariance to one isotropic variance <span class="citation" data-cites="TippingBishop1999">(<a href="#ref-TippingBishop1999" role="doc-biblioref">Tipping and Bishop 1999</a>)</span>.</li>
+<li>Equal retained signal eigenvalues identify the retained eigenspace but not ordered axes.</li>
+<li>Correlated residuals and outliers can alter fitted low-rank structure because the models do not know the intended scientific semantics. High nuisance variance directly changes PCA’s covariance target; the present FA nuisance result is classified only as bounded optimizer nonconvergence.</li>
+<li>Near-zero uniqueness can slow or prevent convergence within a bounded iteration budget.</li>
+<li>Lawful training-only preprocessing is invariant to test poisoning; pooled train/test preprocessing is not.</li>
+</ul>
+<p>These expectations do not guarantee a particular finite-sample ranking.</p>
+</section>
+<section id="parameter-manipulations" class="level2">
+<h2 class="anchored" data-anchor-id="parameter-manipulations">Parameter manipulations</h2>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Condition</th>
+<th>Changed assumption</th>
+<th>Primary diagnostic</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>matched_diagonal</code></td>
+<td>none</td>
+<td>correct-model loading/covariance recovery</td>
+</tr>
+<tr class="even">
+<td><code>repeated_signal_eigenvalues</code></td>
+<td>equal common-factor strengths, isotropic residual</td>
+<td>whole-eigenspace recovery only</td>
+</tr>
+<tr class="odd">
+<td><code>near_zero_uniqueness</code></td>
+<td>uniquenesses near boundary</td>
+<td>floors, convergence, covariance validity</td>
+</tr>
+<tr class="even">
+<td><code>correlated_residuals</code></td>
+<td>residual covariance not diagonal</td>
+<td>residual off-diagonal error and NLL</td>
+</tr>
+<tr class="odd">
+<td><code>high_variance_nuisance</code></td>
+<td>one large residual variance</td>
+<td>PCA target versus semantic loading target</td>
+</tr>
+<tr class="even">
+<td><code>outliers</code></td>
+<td>non-Gaussian contamination</td>
+<td>mean/covariance/likelihood sensitivity</td>
+</tr>
+<tr class="odd">
+<td><code>scaling_leakage_negative_control</code></td>
+<td>test data enters preprocessing</td>
+<td>computed test-poison dependence</td>
+</tr>
+</tbody>
+</table>
+<p>No parameter was retuned after observing the result.</p>
+</section>
+<section id="sanity-checks" class="level2">
+<h2 class="anchored" data-anchor-id="sanity-checks">Sanity checks</h2>
+<p>The verifier asserts:</p>
+<ol type="1">
+<li>all generated and fitted covariance matrices are finite, symmetric within <span class="math inline">\(10^{-10}\)</span>, and not below the declared PSD tolerance;</li>
+<li>all independent splits regenerate exactly from their seed words;</li>
+<li>across every condition, test-observation poisoning leaves PCA, PPCA, all FA candidates, selected FA settings, and fixed-test observation-only reconstructions unchanged;</li>
+<li>across every condition, poisoning all retained latent arrays leaves the same fitted states, selection records, and reconstructions unchanged;</li>
+<li>lawful training-only scaling is invariant to test poisoning, while invalid pooled scaling changes materially;</li>
+<li>every condition has the complete six-candidate FA selection record;</li>
+<li>the Anderson–Rubin-style row-deletion rank diagnostic passes before uniqueness metrics are emitted;</li>
+<li>observed-data NLL does not increase by more than <span class="math inline">\(10^{-10}\)</span> across stored EM updates;</li>
+<li>selected floor and restart equal the minimum validation-NLL candidate under the deterministic tie rule;</li>
+<li>metrics have the exact seven-field schema, nonempty labels, finite numeric values, and no duplicate composite keys; and</li>
+<li>manifest hashes and a temporary clean regeneration are byte-identical.</li>
+</ol>
+<p>These checks establish implementation consistency, not real-data adequacy or global FA optimization.</p>
+</section>
+<section id="failure-cases" class="level2">
+<h2 class="anchored" data-anchor-id="failure-cases">Failure cases</h2>
+<ul>
+<li><strong>Cross-target scoring:</strong> calling PCA wrong because it differs from the loading subspace under heterogeneous residual variance.</li>
+<li><strong>Axis recovery inside a repeat:</strong> treating arbitrary axes within an equal-eigenvalue eigenspace as identified.</li>
+<li><strong>Residual misspecification hidden by factors:</strong> interpreting factors forced by correlated residuals as true common causes.</li>
+<li><strong>Nuisance variance called signal:</strong> assuming a leading variance direction has semantic relevance.</li>
+<li><strong>Boundary convergence concealed:</strong> reporting the near-zero condition as an ordinary converged interior fit.</li>
+<li><strong>Outlier oracle overclaim:</strong> calling the nominal Gaussian generating parameters the true contaminated distribution.</li>
+<li><strong>Leakage ranked as a method:</strong> treating pooled train/test scaling as legitimate because of one score.</li>
+<li><strong>Reconstruction substituted for likelihood or covariance recovery:</strong> conflating different evaluation targets.</li>
+<li><strong>Latent truth leakage:</strong> using <span class="math inline">\(z\)</span> to initialize, fit, select, or preprocess.</li>
+<li><strong>Low-dimensional overclaim:</strong> inferring intrinsic dimension, manifold structure, mechanism, or representation from a rank-two fit.</li>
+</ul>
+</section>
+<section id="recovery-task" class="level2">
+<h2 class="anchored" data-anchor-id="recovery-task">Recovery task</h2>
+<section id="pca" class="level3">
+<h3 class="anchored" data-anchor-id="pca">PCA</h3>
+<p>Fit the training mean and sample covariance using divisor <span class="math inline">\(n\)</span>, then retain the top two eigenvectors. Reconstruct test rows by orthogonal projection. Compare the fitted projector with the population leading eigenspace by principal angles.</p>
+</section>
+<section id="ppca" class="level3">
+<h3 class="anchored" data-anchor-id="ppca">PPCA</h3>
+<p>Use the closed-form isotropic-noise maximum-likelihood solution based on the PCA eigensystem. Report held-out Gaussian NLL, observable-covariance error, reconstruction, and maximum/RMS principal-subspace alignment. The PPCA angle rows equal the PCA angle rows because the closed-form fit uses the same leading eigenspace; the verifier checks that equality. This is a probabilistic model distinct from ordinary PCA <span class="citation" data-cites="TippingBishop1999">(<a href="#ref-TippingBishop1999" role="doc-biblioref">Tipping and Bishop 1999</a>)</span>.</p>
+</section>
+<section id="diagonal-noise-fa" class="level3">
+<h3 class="anchored" data-anchor-id="diagonal-noise-fa">Diagonal-noise FA</h3>
+<p>Fit a zero-mean-latent Gaussian FA model by bounded deterministic EM. Each iteration updates posterior factor moments, loadings, and diagonal uniquenesses, applying the declared floor. Six floor/restart candidates are fit on training observations and selected by validation NLL. This is a controlled fitting baseline, not proof of the global maximum.</p>
+</section>
+<section id="oracle-gaussian" class="level3">
+<h3 class="anchored" data-anchor-id="oracle-gaussian">Oracle Gaussian</h3>
+<p>Use the declared condition mean, loading, and residual covariance for a reference Gaussian NLL and posterior reconstruction. In the outlier condition its machine-readable method is <code>nominal_clean_gaussian_reference</code> and its covariance target is <code>nominal_clean_gaussian_covariance</code>; it remains misspecified for the contaminated law.</p>
+</section>
+</section>
+<section id="candidate-analysis-methods" class="level2">
+<h2 class="anchored" data-anchor-id="candidate-analysis-methods">Candidate analysis methods</h2>
+<ol type="1">
+<li>training mean reconstruction;</li>
+<li>one fixed rank-two orthonormal projection;</li>
+<li>seven fixed deterministic random rank-two projections summarized by mean/minimum/maximum/standard deviation;</li>
+<li>ordinary covariance PCA;</li>
+<li>closed-form PPCA;</li>
+<li>bounded diagonal-noise FA; and</li>
+<li>the condition-specific true-parameter Gaussian reference.</li>
+</ol>
+<p>The fixed/random projections are rank-matched compression baselines and do not define likelihoods.</p>
+</section>
+<section id="evaluation" class="level2">
+<h2 class="anchored" data-anchor-id="evaluation">Evaluation</h2>
+<p><code>metrics.csv</code> contains exactly:</p>
+<pre class="text"><code>split,condition,preprocessing,method,target,metric,value</code></pre>
+<p>Metrics include:</p>
+<ul>
+<li>held-out original-coordinate reconstruction MSE;</li>
+<li>held-out Gaussian NLL for PPCA, FA, and oracle models;</li>
+<li>maximum and RMS principal angles for the method-specific target;</li>
+<li>observable-covariance relative Frobenius error;</li>
+<li>residual off-diagonal RMSE;</li>
+<li>uniqueness RMSE and relative error only in conditions marked identified;</li>
+<li>FA selected floor, restart, iterations, convergence flag, train NLL, and validation NLL; and</li>
+<li>proper-versus-leaked scaling MSE and preprocessing dependence.</li>
+</ul>
+<section id="empirical-results" class="level3">
+<h3 class="anchored" data-anchor-id="empirical-results">Empirical results</h3>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Result</th>
+<th style="text-align: right;">Value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Primary PCA angle to population PCA target</td>
+<td style="text-align: right;"><span class="math inline">\(3.70^\circ\)</span></td>
+</tr>
+<tr class="even">
+<td>Primary FA angle to true loading subspace</td>
+<td style="text-align: right;"><span class="math inline">\(3.98^\circ\)</span></td>
+</tr>
+<tr class="odd">
+<td>Primary PCA test reconstruction MSE</td>
+<td style="text-align: right;">0.5607</td>
+</tr>
+<tr class="even">
+<td>Primary FA test reconstruction MSE</td>
+<td style="text-align: right;">0.6565</td>
+</tr>
+<tr class="odd">
+<td>Primary FA test Gaussian NLL</td>
+<td style="text-align: right;">10.9603</td>
+</tr>
+<tr class="even">
+<td>Primary oracle Gaussian NLL</td>
+<td style="text-align: right;">10.9413</td>
+</tr>
+<tr class="odd">
+<td>Primary FA observable-covariance relative error</td>
+<td style="text-align: right;">0.0617</td>
+</tr>
+<tr class="even">
+<td>Primary FA uniqueness relative error</td>
+<td style="text-align: right;">0.0668</td>
+</tr>
+<tr class="odd">
+<td>Maximum covariance asymmetry</td>
+<td style="text-align: right;"><span class="math inline">\(1.11\times10^{-16}\)</span></td>
+</tr>
+<tr class="even">
+<td>Minimum checked covariance eigenvalue</td>
+<td style="text-align: right;"><span class="math inline">\(2.16\times10^{-5}\)</span></td>
+</tr>
+</tbody>
+</table>
+<p>Failure diagnostics include:</p>
+<ul>
+<li>correlated-residual FA loading angle <span class="math inline">\(11.21^\circ\)</span> and NLL 10.6014 versus oracle 10.2750;</li>
+<li>nuisance-variance PCA remains <span class="math inline">\(4.63^\circ\)</span> from the population PCA target; the FA loading angle <span class="math inline">\(85.84^\circ\)</span> is explicitly a nonconverged bounded-optimizer result and supports no method-level population conclusion;</li>
+<li>outlier FA loading angle <span class="math inline">\(11.82^\circ\)</span>;</li>
+<li>repeated-eigenvalue whole-subspace PCA/FA angles <span class="math inline">\(1.45^\circ/1.18^\circ\)</span>;</li>
+<li>near-zero FA loading angle <span class="math inline">\(1.14^\circ\)</span>, with the selected run reaching the 250-iteration bound rather than satisfying the strict convergence tolerance; and</li>
+<li>lawful/leaked scaling MSE 0.5725/0.5734. Lawful preprocessing changed by zero under test poison; leaked mean and scale changed by 20.83 and 23.53.</li>
+</ul>
+<p>The primary PCA reconstruction is lower than FA posterior-mean reconstruction because the methods optimize different losses. This is not evidence that PCA better recovers the FA generative decomposition. The near-zero and high-variance-nuisance FA fits reach the iteration bound; both are machine-labelled bounded optimizer nonconvergence/computational failure and are retained rather than hidden.</p>
+</section>
+</section>
+<section id="interpretation" class="level2">
+<h2 class="anchored" data-anchor-id="interpretation">Interpretation</h2>
+<p>The correct-model result supports a bounded distinction: PCA closely recovers the observable covariance’s principal subspace, while diagonal FA closely recovers the structurally identified common loading subspace and Gaussian covariance under the diagonal-residual and sufficient-rank assumptions. Structural identification, finite-sample recovery, and optimizer convergence remain distinct. The selected FA NLL remains above the oracle reference, as expected for a fitted finite-sample model.</p>
+<p>The negative controls show why target definitions matter. PCA can be correct about variance while scientifically unhelpful under nuisance variance. A converged diagonal FA fit can allocate correlated residual structure to common factors under misspecification; the nonconverged nuisance FA fit supports only a computational-failure statement. A whole repeated eigenspace can be recovered even though its displayed axes are arbitrary. Leakage is proven by dependence on test values, not by assuming that invalid preprocessing must improve one finite score.</p>
+<div class="callout callout-style-default callout-warning callout-titled" title="What this does NOT imply">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Warning</span>What this does NOT imply
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Small principal angles, covariance fit, likelihood, or reconstruction do not establish a unique latent cause, intrinsic dimension, manifold, biological representation, dynamics, or mechanism.</p>
+</div>
+</div>
+</section>
+<section id="what-this-toy-model-does-not-establish" class="level2">
+<h2 class="anchored" data-anchor-id="what-this-toy-model-does-not-establish">What this toy model does NOT establish</h2>
+<ul>
+<li>a model-free latent dimension;</li>
+<li>a manifold or nonlinear geometry;</li>
+<li>uniquely identified loading columns beyond orthogonal equivalence;</li>
+<li>causal, physical, neural, or biological factors;</li>
+<li>robustness to arbitrary contamination or residual dependence;</li>
+<li>a globally optimal FA likelihood solution;</li>
+<li>validity of pooled train/test preprocessing;</li>
+<li>that the largest variance direction is the desired scientific signal; or</li>
+<li>that reconstruction is interchangeable with likelihood or covariance recovery.</li>
+</ul>
+</section>
+<section id="extensions-to-real-data" class="level2">
+<h2 class="anchored" data-anchor-id="extensions-to-real-data">Extensions to real data</h2>
+<p>A real-data analysis must define independent sampling units, feature units, scaling, missing-data policy, rank selection, residual covariance assumptions, and held-out splits. Preprocessing must be fitted inside training folds. PCA requires scale, outlier, and eigengap sensitivity checks. Diagonal FA requires residual-covariance, tail, subgroup, convergence, floor, and multistart checks. Loading axes should not receive mechanistic names solely because one rotation is convenient.</p>
+<p>Temporal, hierarchical, robust, sparse, confirmatory, nonlinear, or correlated-residual variants require separate contracts.</p>
+</section>
+<section id="reproducibility" class="level2">
+<h2 class="anchored" data-anchor-id="reproducibility">Reproducibility</h2>
+<p>The bounded artifact set is:</p>
+<pre class="text"><code>toy-models/static-linear-latent-recovery.py
+toy-models/artifacts/static-linear-latent-recovery/manifest.json
+toy-models/artifacts/static-linear-latent-recovery/metrics.csv
+toy-models/artifacts/static-linear-latent-recovery/diagnostics.json
+toy-models/artifacts/static-linear-latent-recovery/summary.png</code></pre>
+<p>The bundled-runtime command is:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">/Users/bytedance/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3</span> toy-models/static-linear-latent-recovery.py</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Default execution generates and verifies, including a byte-identical temporary regeneration. Explicit <code>--generate</code> and <code>--verify</code> modes are available. The manifest records seeds, dimensions, split sizes, methods, FA search bounds, tolerances, versions, commands, and hashes.</p>
+<section id="evidence-inspected" class="level3">
+<h3 class="anchored" data-anchor-id="evidence-inspected">Evidence inspected</h3>
+<ul>
+<li><strong>Jolliffe and Cadima (2016):</strong> abstract, introduction, and the basic PCA sections on covariance eigendecomposition, centered SVD, principal-subspace approximation, sign ambiguity, rank, and covariance-versus-correlation scaling were inspected. Specialized adaptations were not inspected exhaustively <span class="citation" data-cites="JolliffeCadima2016">(<a href="#ref-JolliffeCadima2016" role="doc-biblioref">Jolliffe and Cadima 2016</a>)</span>.</li>
+<li><strong>Anderson and Rubin (1956):</strong> the 40-page proceedings PDF was inspected at equation level for the Gaussian factor model, covariance decomposition, loading rotation, identification conditions, likelihood, diagonal-uniqueness iteration, isotropic-noise/PCA connection, and measurement-unit discussion. Part II proofs and all testing/asymptotic sections were not read line by line <span class="citation" data-cites="AndersonRubin1956">(<a href="#ref-AndersonRubin1956" role="doc-biblioref">Anderson and Rubin 1956</a>)</span>.</li>
+<li><strong>Tipping and Bishop (1999):</strong> the complete 12-page article was inspected for the FA/PCA distinction, PPCA model and likelihood, maximum-likelihood principal subspace, isotropic residual estimate, loading rotation ambiguity, reconstruction distinction, discussion, and Appendix A equal-eigenvalue boundaries. Applied examples and Appendix B were inspected only at overview level <span class="citation" data-cites="TippingBishop1999">(<a href="#ref-TippingBishop1999" role="doc-biblioref">Tipping and Bishop 1999</a>)</span>.</li>
+</ul>
+<p>These sources do not supply the simulator dimensions, seeds, stress magnitudes, optimizer budget, or numerical tolerances; those are LDG design choices.</p>
+</section>
+</section>
+<section id="maturity-checklist" class="level2">
+<h2 class="anchored" data-anchor-id="maturity-checklist">Maturity checklist</h2>
+<ul class="task-list">
+<li><label><input type="checkbox" checked="">Complete Toy Model schema at L1/stable.</label></li>
+<li><label><input type="checkbox" checked="">Generation, preprocessing, fitting, selection, and scoring are separate.</label></li>
+<li><label><input type="checkbox" checked="">PCA and FA targets are explicitly distinct.</label></li>
+<li><label><input type="checkbox" checked="">Independent train/validation/test data and latent-leakage poison checks are present.</label></li>
+<li><label><input type="checkbox" checked="">Mean, fixed/random projection, PCA, PPCA, bounded FA, and oracle baselines are implemented.</label></li>
+<li><label><input type="checkbox" checked="">Repeated eigenvalues, near-zero uniqueness, correlated residuals, nuisance variance, outliers, and scaling leakage are implemented.</label></li>
+<li><label><input type="checkbox" checked="">Deterministic bounded artifacts and byte-identical verification pass.</label></li>
+<li><label><input type="checkbox" checked="">Independent scientific review PASS after focused re-review of identification, outlier-target, and nuisance-optimizer findings.</label></li>
+<li><label><input type="checkbox" checked="">Independent implementation review PASS after focused re-review of poison scope, PPCA metrics, CSV verification, and outlier labels.</label></li>
+<li><label><input type="checkbox" checked="">Repository validation and renders PASS after review.</label></li>
+<li><label><input type="checkbox" checked="">Mechanical L1/stable promotion authorized under the recorded review decision.</label></li>
+</ul>
+
+
+<!-- -->
+
+
+</section>
+</section>
+
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography" id="quarto-bibliography"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body hanging-indent" role="list">
+<div id="ref-AndersonRubin1956" class="csl-entry" role="listitem">
+Anderson, T. W., and Herman Rubin. 1956. <span>“Statistical Inference in Factor Analysis.”</span> In <em>Proceedings of the Third Berkeley Symposium on Mathematical Statistics and Probability, Volume 5: Contributions to Econometrics, Industrial Research, and Psychometry</em>, edited by Jerzy Neyman. University of California Press. <a href="https://projecteuclid.org/euclid.bsmsp/1200511860">https://projecteuclid.org/euclid.bsmsp/1200511860</a>.
+</div>
+<div id="ref-JolliffeCadima2016" class="csl-entry" role="listitem">
+Jolliffe, Ian T., and Jorge Cadima. 2016. <span>“Principal Component Analysis: A Review and Recent Developments.”</span> <em>Philosophical Transactions of the Royal Society A: Mathematical, Physical and Engineering Sciences</em> 374 (2065): 20150202. <a href="https://doi.org/10.1098/rsta.2015.0202">https://doi.org/10.1098/rsta.2015.0202</a>.
+</div>
+<div id="ref-TippingBishop1999" class="csl-entry" role="listitem">
+Tipping, Michael E., and Christopher M. Bishop. 1999. <span>“Probabilistic Principal Component Analysis.”</span> <em>Journal of the Royal Statistical Society: Series B (Statistical Methodology)</em> 61 (3): 611–22. <a href="https://doi.org/10.1111/1467-9868.00196">https://doi.org/10.1111/1467-9868.00196</a>.
+</div>
+</div></section></div></main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+    const viewSource = window.document.getElementById('quarto-view-source') ||
+                       window.document.getElementById('quarto-code-tools-source');
+    if (viewSource) {
+      const sourceUrl = viewSource.getAttribute("data-quarto-source-url");
+      viewSource.addEventListener("click", function(e) {
+        if (sourceUrl) {
+          // rstudio viewer pane
+          if (/\bcapabilities=\b/.test(window.location)) {
+            window.open(sourceUrl);
+          } else {
+            window.location.href = sourceUrl;
+          }
+        } else {
+          const modal = new bootstrap.Modal(document.getElementById('quarto-embedded-source-code-modal'));
+          modal.show();
+        }
+        return false;
+      });
+    }
+    function toggleCodeHandler(show) {
+      return function(e) {
+        const cellDetails = window.document.querySelectorAll(".cell details.code-fold");
+        for (let i=0; i<cellDetails.length; i++) {
+          const details = cellDetails[i];
+          if (show) {
+            details.open = true;
+          } else {
+            details.removeAttribute("open");
+          }
+        }
+        const cellCodeDivs = window.document.querySelectorAll(".cell div.sourceCode.cell-code");
+        const fromCls = show ? "hidden" : "unhidden";
+        const toCls = show ? "unhidden" : "hidden";
+        for (let i=0; i<cellCodeDivs.length; i++) {
+          const codeDiv = cellCodeDivs[i];
+          if (codeDiv.classList.contains(fromCls)) {
+            codeDiv.classList.remove(fromCls);
+            codeDiv.classList.add(toCls);
+          } 
+        }
+        return false;
+      }
+    }
+    const hideAllCode = window.document.getElementById("quarto-hide-all-code");
+    if (hideAllCode) {
+      hideAllCode.addEventListener("click", toggleCodeHandler(false));
+    }
+    const showAllCode = window.document.getElementById("quarto-show-all-code");
+    if (showAllCode) {
+      showAllCode.addEventListener("click", toggleCodeHandler(true));
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/abelzheng\.github\.io\/latent-dynamics-geometry-public\/");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+            // target, if specified
+            link.setAttribute("target", "_blank");
+            if (link.getAttribute("rel") === null) {
+              link.setAttribute("rel", "noopener");
+            }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<input type="hidden" id="giscus-base-theme" value="preferred_color_scheme">
+<input type="hidden" id="giscus-alt-theme" value="preferred_color_scheme">
+<script>
+  function loadGiscus() {
+    // Function to get the theme based on body class
+    const getTheme = () => {
+      let baseTheme = document.getElementById('giscus-base-theme').value;
+      let altTheme = document.getElementById('giscus-alt-theme').value;
+      return document.body.classList.contains('quarto-dark') ? altTheme : baseTheme;
+    };
+    const script = document.createElement("script");
+    script.src = "https://giscus.app/client.js";
+    script.async = true;
+    script.dataset.repo = "AbelZheng/latent-dynamics-geometry-public";
+    script.dataset.repoId = "R_kgDOT-VBkw";
+    script.dataset.category = "Announcements";
+    script.dataset.categoryId = "DIC_kwDOT-VBk84DDyEz";
+    script.dataset.mapping = "pathname";
+    script.dataset.reactionsEnabled = "1";
+    script.dataset.emitMetadata = "0";
+    script.dataset.inputPosition = "bottom";
+    script.dataset.theme = getTheme();
+    script.dataset.lang = "en";
+    script.crossOrigin = "anonymous";
+    // Append the script to the desired div instead of at the end of the body
+    document.getElementById("quarto-content").appendChild(script);
+  }
+  loadGiscus();
+</script><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">Source Code</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4" data-shortcodes="false"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="an">title:</span><span class="co"> "Static Linear Latent Recovery"</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="an">object_type:</span><span class="co"> toy-model</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="an">maturity:</span><span class="co"> L1</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="an">status:</span><span class="co"> stable</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="an">domain:</span><span class="co"> [statistics, dimensionality-reduction, latent-variable-models]</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="an">tags:</span><span class="co"> [pca, factor-analysis, ppca, subspace-recovery, covariance, identifiability, leakage]</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="an">prerequisites:</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a><span class="co">- knowledge/methods/principal-component-analysis.qmd</span></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a><span class="co">- knowledge/methods/factor-analysis.qmd</span></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a><span class="co">- knowledge/concepts/linear-subspace.qmd</span></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a><span class="co">- knowledge/concepts/identifiability.qmd</span></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a><span class="an">related:</span></span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a><span class="co">- toy-models/linear-gaussian-inference-ladder.qmd</span></span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a><span class="an">created:</span><span class="co"> 2026-08-19</span></span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a><span class="an">updated:</span><span class="co"> 2026-08-19</span></span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a><span class="fu"># Static Linear Latent Recovery</span></span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a>This L1/stable Toy Model is the Candidate A generation/recovery slice. It asks whether PCA and Gaussian latent-factor models recover the distinct targets their criteria define, and how residual misspecification, weak uniquenesses, nuisance variance, outliers, and preprocessing leakage make those targets diverge. Numerical values below are deterministic outputs under master seed <span class="in">`20260819`</span>; they are not population theorems or real-data claims.</span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a>**Assumed background:** centered covariance PCA, Gaussian likelihood, linear subspaces, principal angles, and the Gaussian factor model. The stable Method Objects provide LDG terminology but do not replace the external evidence inspection recorded below.</span>
+<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a><span class="fu">## Question</span></span>
+<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a>For observations generated by a known rank-two Gaussian factor model:</span>
+<span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-29"><a href="#cb4-29" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>does ordinary PCA recover the leading eigenspace of the **observable covariance**;</span>
+<span id="cb4-30"><a href="#cb4-30" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>does correctly specified diagonal-noise FA recover the **common loading subspace**, common covariance, diagonal uniquenesses, and observable covariance up to loading rotations;</span>
+<span id="cb4-31"><a href="#cb4-31" aria-hidden="true" tabindex="-1"></a><span class="ss">3. </span>how does isotropic-noise PPCA differ from heterogeneous-noise FA; and</span>
+<span id="cb4-32"><a href="#cb4-32" aria-hidden="true" tabindex="-1"></a><span class="ss">4. </span>how do repeated signal eigenvalues, near-zero uniquenesses, correlated residuals, high nuisance variance, outliers, and pooled train/test scaling expose criterion or evaluation failures?</span>
+<span id="cb4-33"><a href="#cb4-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-34"><a href="#cb4-34" aria-hidden="true" tabindex="-1"></a>The object keeps four targets distinct:</span>
+<span id="cb4-35"><a href="#cb4-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-36"><a href="#cb4-36" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>loading subspace $\mathcal S_\Lambda=\operatorname{col}(\Lambda)$;</span>
+<span id="cb4-37"><a href="#cb4-37" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>common covariance $\Lambda\Lambda^\top$;</span>
+<span id="cb4-38"><a href="#cb4-38" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>observable covariance $C=\Lambda\Lambda^\top+\Sigma_\epsilon$; and</span>
+<span id="cb4-39"><a href="#cb4-39" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>the rank-two population principal subspace of $C$.</span>
+<span id="cb4-40"><a href="#cb4-40" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-41"><a href="#cb4-41" aria-hidden="true" tabindex="-1"></a>PCA is scored against the last target. Diagonal FA is scored against the loading/common-covariance target only where its diagonal residual model is correctly specified **and** the displayed loading matrix passes the sufficient rank diagnostic stated below. Heterogeneous uniqueness means these subspaces need not coincide <span class="co">[</span><span class="ot">@JolliffeCadima2016; @AndersonRubin1956; @TippingBishop1999</span><span class="co">]</span>.</span>
+<span id="cb4-42"><a href="#cb4-42" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-43"><a href="#cb4-43" aria-hidden="true" tabindex="-1"></a><span class="fu">## Ground truth</span></span>
+<span id="cb4-44"><a href="#cb4-44" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-45"><a href="#cb4-45" aria-hidden="true" tabindex="-1"></a>The ambient dimension is $p=8$ and latent rank is $q=2$. For each independent row,</span>
+<span id="cb4-46"><a href="#cb4-46" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-47"><a href="#cb4-47" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb4-48"><a href="#cb4-48" aria-hidden="true" tabindex="-1"></a>z_i\sim\mathcal N(0,I_2),\qquad</span>
+<span id="cb4-49"><a href="#cb4-49" aria-hidden="true" tabindex="-1"></a>\epsilon_i\sim\mathcal N(0,\Sigma_\epsilon),\qquad</span>
+<span id="cb4-50"><a href="#cb4-50" aria-hidden="true" tabindex="-1"></a>x_i=\Lambda z_i+\epsilon_i.</span>
+<span id="cb4-51"><a href="#cb4-51" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb4-52"><a href="#cb4-52" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-53"><a href="#cb4-53" aria-hidden="true" tabindex="-1"></a>The latent draws and residuals are mutually independent. The base loading basis $U$ is the deterministic QR-orthonormalization of</span>
+<span id="cb4-54"><a href="#cb4-54" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-55"><a href="#cb4-55" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb4-56"><a href="#cb4-56" aria-hidden="true" tabindex="-1"></a>B=\begin{pmatrix}</span>
+<span id="cb4-57"><a href="#cb4-57" aria-hidden="true" tabindex="-1"></a>1.0&amp;0.2<span class="sc">\\</span></span>
+<span id="cb4-58"><a href="#cb4-58" aria-hidden="true" tabindex="-1"></a>0.7&amp;-0.5<span class="sc">\\</span></span>
+<span id="cb4-59"><a href="#cb4-59" aria-hidden="true" tabindex="-1"></a>0.4&amp;1.0<span class="sc">\\</span></span>
+<span id="cb4-60"><a href="#cb4-60" aria-hidden="true" tabindex="-1"></a>-0.6&amp;0.8<span class="sc">\\</span></span>
+<span id="cb4-61"><a href="#cb4-61" aria-hidden="true" tabindex="-1"></a>0.9&amp;0.3<span class="sc">\\</span></span>
+<span id="cb4-62"><a href="#cb4-62" aria-hidden="true" tabindex="-1"></a>-0.2&amp;-0.9<span class="sc">\\</span></span>
+<span id="cb4-63"><a href="#cb4-63" aria-hidden="true" tabindex="-1"></a>0.5&amp;-0.4<span class="sc">\\</span></span>
+<span id="cb4-64"><a href="#cb4-64" aria-hidden="true" tabindex="-1"></a>-0.7&amp;-0.2</span>
+<span id="cb4-65"><a href="#cb4-65" aria-hidden="true" tabindex="-1"></a>\end{pmatrix},</span>
+<span id="cb4-66"><a href="#cb4-66" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb4-67"><a href="#cb4-67" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-68"><a href="#cb4-68" aria-hidden="true" tabindex="-1"></a>with QR signs chosen so the diagonal of $R$ is nonnegative. The primary loading is</span>
+<span id="cb4-69"><a href="#cb4-69" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-70"><a href="#cb4-70" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb4-71"><a href="#cb4-71" aria-hidden="true" tabindex="-1"></a>\Lambda=U\operatorname{diag}(2.0,1.25),</span>
+<span id="cb4-72"><a href="#cb4-72" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb4-73"><a href="#cb4-73" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-74"><a href="#cb4-74" aria-hidden="true" tabindex="-1"></a>and the primary uniqueness vector is</span>
+<span id="cb4-75"><a href="#cb4-75" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-76"><a href="#cb4-76" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb4-77"><a href="#cb4-77" aria-hidden="true" tabindex="-1"></a>\psi=(0.12,0.20,0.32,0.48,0.70,0.95,1.25,1.60).</span>
+<span id="cb4-78"><a href="#cb4-78" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb4-79"><a href="#cb4-79" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-80"><a href="#cb4-80" aria-hidden="true" tabindex="-1"></a>The retained truth contains $z$, $\Lambda$, $\Sigma_\epsilon$, $C$, the loading subspace, and the population principal subspace. Latent arrays enter only scoring and poison tests; fitting and model selection receive observations only.</span>
+<span id="cb4-81"><a href="#cb4-81" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-82"><a href="#cb4-82" aria-hidden="true" tabindex="-1"></a><span class="fu">### Structural identification boundary</span></span>
+<span id="cb4-83"><a href="#cb4-83" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-84"><a href="#cb4-84" aria-hidden="true" tabindex="-1"></a>Correct diagonal residual specification alone is not an identification result. For each displayed loading matrix, the implementation checks the following Anderson--Rubin-style sufficient rank condition: after deleting any one of the eight rows, the remaining rows contain two disjoint two-row submatrices, each of rank two. The diagnostic records witnesses for every deleted row, and all six loading matrices pass <span class="co">[</span><span class="ot">@AndersonRubin1956</span><span class="co">]</span>.</span>
+<span id="cb4-85"><a href="#cb4-85" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-86"><a href="#cb4-86" aria-hidden="true" tabindex="-1"></a>Within conditions that also have an applicable diagonal residual specification, this supports structural identification of the diagonal uniquenesses and common-loading structure up to orthogonal loading rotation. It does **not** guarantee finite-sample accuracy, optimizer convergence, or recovery by the bounded implementation. Uniqueness-error rows are emitted only when both the diagonal residual model and this rank diagnostic apply.</span>
+<span id="cb4-87"><a href="#cb4-87" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-88"><a href="#cb4-88" aria-hidden="true" tabindex="-1"></a><span class="fu">## Generative model</span></span>
+<span id="cb4-89"><a href="#cb4-89" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-90"><a href="#cb4-90" aria-hidden="true" tabindex="-1"></a>Independent train, validation, and test samples are generated separately for every condition:</span>
+<span id="cb4-91"><a href="#cb4-91" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-92"><a href="#cb4-92" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Split <span class="pp">|</span> Rows per condition <span class="pp">|</span> Use <span class="pp">|</span></span>
+<span id="cb4-93"><a href="#cb4-93" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---:|---|</span></span>
+<span id="cb4-94"><a href="#cb4-94" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> train <span class="pp">|</span> 700 <span class="pp">|</span> means, PCA/PPCA, and FA fitting <span class="pp">|</span></span>
+<span id="cb4-95"><a href="#cb4-95" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> validation <span class="pp">|</span> 350 <span class="pp">|</span> bounded FA floor/restart selection <span class="pp">|</span></span>
+<span id="cb4-96"><a href="#cb4-96" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> test <span class="pp">|</span> 500 <span class="pp">|</span> held-out scoring only <span class="pp">|</span></span>
+<span id="cb4-97"><a href="#cb4-97" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-98"><a href="#cb4-98" aria-hidden="true" tabindex="-1"></a>Randomness uses <span class="in">`Generator(PCG64(SeedSequence(words)))`</span> with master seed <span class="in">`20260819`</span> and stage, condition, and split words. Exact split regeneration is verified, and train and validation prefixes are checked not to coincide.</span>
+<span id="cb4-99"><a href="#cb4-99" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-100"><a href="#cb4-100" aria-hidden="true" tabindex="-1"></a>Generation, standardization, fitting, selection, scoring, plotting, and verification are separate functions. Test observations and all latent truth are excluded from lawful fitting and selection. For all six conditions, computed poison tests replace test observations or every retained latent array and verify that PCA, PPCA, every FA candidate, selected FA settings, and observation-only reconstructions remain unchanged.</span>
+<span id="cb4-101"><a href="#cb4-101" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-102"><a href="#cb4-102" aria-hidden="true" tabindex="-1"></a><span class="fu">## Parameters</span></span>
+<span id="cb4-103"><a href="#cb4-103" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-104"><a href="#cb4-104" aria-hidden="true" tabindex="-1"></a>The fixed numerical contract is:</span>
+<span id="cb4-105"><a href="#cb4-105" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-106"><a href="#cb4-106" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>rank $q=2$;</span>
+<span id="cb4-107"><a href="#cb4-107" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>two uniqueness floors, $10^{-5}$ and $10^{-3}$;</span>
+<span id="cb4-108"><a href="#cb4-108" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>three deterministic initializations per floor;</span>
+<span id="cb4-109"><a href="#cb4-109" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>at most 250 EM iterations;</span>
+<span id="cb4-110"><a href="#cb4-110" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>relative per-observation training-NLL tolerance $10^{-8}$;</span>
+<span id="cb4-111"><a href="#cb4-111" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>validation NLL selects among the six candidates with deterministic floor/restart tie breaking;</span>
+<span id="cb4-112"><a href="#cb4-112" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>seven deterministic random rank-two projection baselines;</span>
+<span id="cb4-113"><a href="#cb4-113" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>covariance symmetry tolerance $10^{-10}$;</span>
+<span id="cb4-114"><a href="#cb4-114" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>covariance PSD tolerance $10^{-9}$; and</span>
+<span id="cb4-115"><a href="#cb4-115" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>poison-output tolerance $10^{-12}$.</span>
+<span id="cb4-116"><a href="#cb4-116" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-117"><a href="#cb4-117" aria-hidden="true" tabindex="-1"></a>The finite floors, starts, and iteration budget are controlled numerical choices, not general FA maximum-likelihood guarantees.</span>
+<span id="cb4-118"><a href="#cb4-118" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-119"><a href="#cb4-119" aria-hidden="true" tabindex="-1"></a><span class="fu">## Simulation</span></span>
+<span id="cb4-120"><a href="#cb4-120" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-121"><a href="#cb4-121" aria-hidden="true" tabindex="-1"></a><span class="fu">### Primary matched-diagonal condition</span></span>
+<span id="cb4-122"><a href="#cb4-122" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-123"><a href="#cb4-123" aria-hidden="true" tabindex="-1"></a>Use the base loading and $\Sigma_\epsilon=\operatorname{diag}(\psi)$. This is the primary correctly specified condition for diagonal FA.</span>
+<span id="cb4-124"><a href="#cb4-124" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-125"><a href="#cb4-125" aria-hidden="true" tabindex="-1"></a><span class="fu">### Repeated signal eigenvalues</span></span>
+<span id="cb4-126"><a href="#cb4-126" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-127"><a href="#cb4-127" aria-hidden="true" tabindex="-1"></a>Use $\Lambda=1.65U$ and $\Sigma_\epsilon=0.30I_8$. The two common-factor eigenvalues are equal. Only the complete rank-two eigenspace is scored; arbitrary axes inside it are not identified. Repeated eigenvalues inside a retained block permit a subspace target but not a preferred ordered basis <span class="co">[</span><span class="ot">@JolliffeCadima2016; @TippingBishop1999</span><span class="co">]</span>.</span>
+<span id="cb4-128"><a href="#cb4-128" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-129"><a href="#cb4-129" aria-hidden="true" tabindex="-1"></a><span class="fu">### Near-zero uniqueness</span></span>
+<span id="cb4-130"><a href="#cb4-130" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-131"><a href="#cb4-131" aria-hidden="true" tabindex="-1"></a>Use uniquenesses</span>
+<span id="cb4-132"><a href="#cb4-132" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-133"><a href="#cb4-133" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb4-134"><a href="#cb4-134" aria-hidden="true" tabindex="-1"></a>(10^{-5},2\times10^{-5},5\times10^{-5},10^{-4},0.02,0.04,0.08,0.12).</span>
+<span id="cb4-135"><a href="#cb4-135" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb4-136"><a href="#cb4-136" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-137"><a href="#cb4-137" aria-hidden="true" tabindex="-1"></a>This remains positive definite but stresses the declared floors and slow likelihood convergence. A fitted floor is not interpreted as evidence for an exact zero.</span>
+<span id="cb4-138"><a href="#cb4-138" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-139"><a href="#cb4-139" aria-hidden="true" tabindex="-1"></a><span class="fu">### Correlated residuals</span></span>
+<span id="cb4-140"><a href="#cb4-140" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-141"><a href="#cb4-141" aria-hidden="true" tabindex="-1"></a>Keep the primary loading and marginal uniquenesses, but use residual correlations</span>
+<span id="cb4-142"><a href="#cb4-142" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-143"><a href="#cb4-143" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb4-144"><a href="#cb4-144" aria-hidden="true" tabindex="-1"></a>R_{ij}=0.42^{|i-j|},\qquad</span>
+<span id="cb4-145"><a href="#cb4-145" aria-hidden="true" tabindex="-1"></a>\Sigma_\epsilon=\operatorname{diag}(\sqrt\psi)R\operatorname{diag}(\sqrt\psi).</span>
+<span id="cb4-146"><a href="#cb4-146" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb4-147"><a href="#cb4-147" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-148"><a href="#cb4-148" aria-hidden="true" tabindex="-1"></a>Diagonal FA is intentionally misspecified, so uniqueness recovery is not scored.</span>
+<span id="cb4-149"><a href="#cb4-149" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-150"><a href="#cb4-150" aria-hidden="true" tabindex="-1"></a><span class="fu">### High-variance nuisance</span></span>
+<span id="cb4-151"><a href="#cb4-151" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-152"><a href="#cb4-152" aria-hidden="true" tabindex="-1"></a>Increase the eighth residual variance to $7.5$. The population principal subspace now prioritizes observable variance, while the semantic loading target remains unchanged. PCA is scored against its population covariance target rather than punished for not knowing which variance is scientifically preferred. The selected FA run reaches the fixed 250-iteration bound; its $85.84^\circ$ loading angle is therefore reported as a bounded optimizer nonconvergence/computational failure, not evidence that the correctly specified population FA model cannot represent the loading structure.</span>
+<span id="cb4-153"><a href="#cb4-153" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-154"><a href="#cb4-154" aria-hidden="true" tabindex="-1"></a><span class="fu">### Outliers</span></span>
+<span id="cb4-155"><a href="#cb4-155" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-156"><a href="#cb4-156" aria-hidden="true" tabindex="-1"></a>Add deterministic random-direction contamination of magnitude <span class="in">`9.0`</span> to 2.5% of every split. This is a contaminated distribution, not a Gaussian FA model. Every PPCA, FA, and reference covariance-error row is compared with and labelled <span class="in">`nominal_clean_gaussian_covariance`</span>, not the covariance of the full contaminated observation law. Held-out NLL rows are labelled as Gaussian scores on the contaminated observation distribution. The true-parameter Gaussian is a nominal reference rather than a robust oracle. The symmetric random-direction construction adds isotropic covariance in population expectation, but no finite contaminated sample is treated as exactly Gaussian.</span>
+<span id="cb4-157"><a href="#cb4-157" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-158"><a href="#cb4-158" aria-hidden="true" tabindex="-1"></a><span class="fu">### Scaling-leakage negative control</span></span>
+<span id="cb4-159"><a href="#cb4-159" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-160"><a href="#cb4-160" aria-hidden="true" tabindex="-1"></a>Using the primary generated observations, compare:</span>
+<span id="cb4-161"><a href="#cb4-161" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-162"><a href="#cb4-162" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>a lawful standardizer fit on training observations only; and</span>
+<span id="cb4-163"><a href="#cb4-163" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>an invalid standardizer fit on pooled train and test observations.</span>
+<span id="cb4-164"><a href="#cb4-164" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-165"><a href="#cb4-165" aria-hidden="true" tabindex="-1"></a>Both fit PCA using transformed training rows and score test reconstruction back in original units. Poisoning test features must leave the lawful preprocessing unchanged and must change the pooled preprocessing. Leakage is invalid regardless of whether one finite test MSE improves.</span>
+<span id="cb4-166"><a href="#cb4-166" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-167"><a href="#cb4-167" aria-hidden="true" tabindex="-1"></a><span class="fu">## Visualization</span></span>
+<span id="cb4-168"><a href="#cb4-168" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-169"><a href="#cb4-169" aria-hidden="true" tabindex="-1"></a>The single composite figure is a diagnostic summary. It shows a bounded score-space display, method-specific whole-subspace angles, matched-condition metrics, and verification/interpretation limits. The score display is not acceptance evidence.</span>
+<span id="cb4-170"><a href="#cb4-170" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-171"><a href="#cb4-171" aria-hidden="true" tabindex="-1"></a><span class="al">![Static linear latent recovery diagnostic](artifacts/static-linear-latent-recovery/summary.png)</span></span>
+<span id="cb4-172"><a href="#cb4-172" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-173"><a href="#cb4-173" aria-hidden="true" tabindex="-1"></a>PCA angles are measured against the population PCA target; FA angles are measured against the true loading subspace. Ordinary PCA has no Gaussian likelihood row. All values are conditional on the declared simulator and preprocessing.</span>
+<span id="cb4-174"><a href="#cb4-174" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-175"><a href="#cb4-175" aria-hidden="true" tabindex="-1"></a><span class="fu">## Expected behavior</span></span>
+<span id="cb4-176"><a href="#cb4-176" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-177"><a href="#cb4-177" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Under the primary model, finite-sample PCA should approximate the leading observable-covariance eigenspace, not necessarily $\operatorname{col}(\Lambda)$.</span>
+<span id="cb4-178"><a href="#cb4-178" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Under correctly specified diagonal residuals **and the verified sufficient rank condition**, a successful bounded FA fit may approximate the structurally identified loading subspace, common covariance, uniquenesses, and observable covariance up to orthogonal loading rotation. Structural identification does not imply computational recovery.</span>
+<span id="cb4-179"><a href="#cb4-179" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>PPCA shares the PCA principal-subspace target at its likelihood optimum but restricts residual covariance to one isotropic variance <span class="co">[</span><span class="ot">@TippingBishop1999</span><span class="co">]</span>.</span>
+<span id="cb4-180"><a href="#cb4-180" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Equal retained signal eigenvalues identify the retained eigenspace but not ordered axes.</span>
+<span id="cb4-181"><a href="#cb4-181" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Correlated residuals and outliers can alter fitted low-rank structure because the models do not know the intended scientific semantics. High nuisance variance directly changes PCA's covariance target; the present FA nuisance result is classified only as bounded optimizer nonconvergence.</span>
+<span id="cb4-182"><a href="#cb4-182" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Near-zero uniqueness can slow or prevent convergence within a bounded iteration budget.</span>
+<span id="cb4-183"><a href="#cb4-183" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Lawful training-only preprocessing is invariant to test poisoning; pooled train/test preprocessing is not.</span>
+<span id="cb4-184"><a href="#cb4-184" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-185"><a href="#cb4-185" aria-hidden="true" tabindex="-1"></a>These expectations do not guarantee a particular finite-sample ranking.</span>
+<span id="cb4-186"><a href="#cb4-186" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-187"><a href="#cb4-187" aria-hidden="true" tabindex="-1"></a><span class="fu">## Parameter manipulations</span></span>
+<span id="cb4-188"><a href="#cb4-188" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-189"><a href="#cb4-189" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Condition <span class="pp">|</span> Changed assumption <span class="pp">|</span> Primary diagnostic <span class="pp">|</span></span>
+<span id="cb4-190"><a href="#cb4-190" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|---|</span></span>
+<span id="cb4-191"><a href="#cb4-191" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`matched_diagonal`</span> <span class="pp">|</span> none <span class="pp">|</span> correct-model loading/covariance recovery <span class="pp">|</span></span>
+<span id="cb4-192"><a href="#cb4-192" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`repeated_signal_eigenvalues`</span> <span class="pp">|</span> equal common-factor strengths, isotropic residual <span class="pp">|</span> whole-eigenspace recovery only <span class="pp">|</span></span>
+<span id="cb4-193"><a href="#cb4-193" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`near_zero_uniqueness`</span> <span class="pp">|</span> uniquenesses near boundary <span class="pp">|</span> floors, convergence, covariance validity <span class="pp">|</span></span>
+<span id="cb4-194"><a href="#cb4-194" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`correlated_residuals`</span> <span class="pp">|</span> residual covariance not diagonal <span class="pp">|</span> residual off-diagonal error and NLL <span class="pp">|</span></span>
+<span id="cb4-195"><a href="#cb4-195" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`high_variance_nuisance`</span> <span class="pp">|</span> one large residual variance <span class="pp">|</span> PCA target versus semantic loading target <span class="pp">|</span></span>
+<span id="cb4-196"><a href="#cb4-196" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`outliers`</span> <span class="pp">|</span> non-Gaussian contamination <span class="pp">|</span> mean/covariance/likelihood sensitivity <span class="pp">|</span></span>
+<span id="cb4-197"><a href="#cb4-197" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`scaling_leakage_negative_control`</span> <span class="pp">|</span> test data enters preprocessing <span class="pp">|</span> computed test-poison dependence <span class="pp">|</span></span>
+<span id="cb4-198"><a href="#cb4-198" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-199"><a href="#cb4-199" aria-hidden="true" tabindex="-1"></a>No parameter was retuned after observing the result.</span>
+<span id="cb4-200"><a href="#cb4-200" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-201"><a href="#cb4-201" aria-hidden="true" tabindex="-1"></a><span class="fu">## Sanity checks</span></span>
+<span id="cb4-202"><a href="#cb4-202" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-203"><a href="#cb4-203" aria-hidden="true" tabindex="-1"></a>The verifier asserts:</span>
+<span id="cb4-204"><a href="#cb4-204" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-205"><a href="#cb4-205" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>all generated and fitted covariance matrices are finite, symmetric within $10^{-10}$, and not below the declared PSD tolerance;</span>
+<span id="cb4-206"><a href="#cb4-206" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>all independent splits regenerate exactly from their seed words;</span>
+<span id="cb4-207"><a href="#cb4-207" aria-hidden="true" tabindex="-1"></a><span class="ss">3. </span>across every condition, test-observation poisoning leaves PCA, PPCA, all FA candidates, selected FA settings, and fixed-test observation-only reconstructions unchanged;</span>
+<span id="cb4-208"><a href="#cb4-208" aria-hidden="true" tabindex="-1"></a><span class="ss">4. </span>across every condition, poisoning all retained latent arrays leaves the same fitted states, selection records, and reconstructions unchanged;</span>
+<span id="cb4-209"><a href="#cb4-209" aria-hidden="true" tabindex="-1"></a><span class="ss">5. </span>lawful training-only scaling is invariant to test poisoning, while invalid pooled scaling changes materially;</span>
+<span id="cb4-210"><a href="#cb4-210" aria-hidden="true" tabindex="-1"></a><span class="ss">6. </span>every condition has the complete six-candidate FA selection record;</span>
+<span id="cb4-211"><a href="#cb4-211" aria-hidden="true" tabindex="-1"></a><span class="ss">7. </span>the Anderson--Rubin-style row-deletion rank diagnostic passes before uniqueness metrics are emitted;</span>
+<span id="cb4-212"><a href="#cb4-212" aria-hidden="true" tabindex="-1"></a><span class="ss">8. </span>observed-data NLL does not increase by more than $10^{-10}$ across stored EM updates;</span>
+<span id="cb4-213"><a href="#cb4-213" aria-hidden="true" tabindex="-1"></a><span class="ss">9. </span>selected floor and restart equal the minimum validation-NLL candidate under the deterministic tie rule;</span>
+<span id="cb4-214"><a href="#cb4-214" aria-hidden="true" tabindex="-1"></a><span class="ss">10. </span>metrics have the exact seven-field schema, nonempty labels, finite numeric values, and no duplicate composite keys; and</span>
+<span id="cb4-215"><a href="#cb4-215" aria-hidden="true" tabindex="-1"></a><span class="ss">11. </span>manifest hashes and a temporary clean regeneration are byte-identical.</span>
+<span id="cb4-216"><a href="#cb4-216" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-217"><a href="#cb4-217" aria-hidden="true" tabindex="-1"></a>These checks establish implementation consistency, not real-data adequacy or global FA optimization.</span>
+<span id="cb4-218"><a href="#cb4-218" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-219"><a href="#cb4-219" aria-hidden="true" tabindex="-1"></a><span class="fu">## Failure cases</span></span>
+<span id="cb4-220"><a href="#cb4-220" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-221"><a href="#cb4-221" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Cross-target scoring:** calling PCA wrong because it differs from the loading subspace under heterogeneous residual variance.</span>
+<span id="cb4-222"><a href="#cb4-222" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Axis recovery inside a repeat:** treating arbitrary axes within an equal-eigenvalue eigenspace as identified.</span>
+<span id="cb4-223"><a href="#cb4-223" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Residual misspecification hidden by factors:** interpreting factors forced by correlated residuals as true common causes.</span>
+<span id="cb4-224"><a href="#cb4-224" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Nuisance variance called signal:** assuming a leading variance direction has semantic relevance.</span>
+<span id="cb4-225"><a href="#cb4-225" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Boundary convergence concealed:** reporting the near-zero condition as an ordinary converged interior fit.</span>
+<span id="cb4-226"><a href="#cb4-226" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Outlier oracle overclaim:** calling the nominal Gaussian generating parameters the true contaminated distribution.</span>
+<span id="cb4-227"><a href="#cb4-227" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Leakage ranked as a method:** treating pooled train/test scaling as legitimate because of one score.</span>
+<span id="cb4-228"><a href="#cb4-228" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Reconstruction substituted for likelihood or covariance recovery:** conflating different evaluation targets.</span>
+<span id="cb4-229"><a href="#cb4-229" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Latent truth leakage:** using $z$ to initialize, fit, select, or preprocess.</span>
+<span id="cb4-230"><a href="#cb4-230" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Low-dimensional overclaim:** inferring intrinsic dimension, manifold structure, mechanism, or representation from a rank-two fit.</span>
+<span id="cb4-231"><a href="#cb4-231" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-232"><a href="#cb4-232" aria-hidden="true" tabindex="-1"></a><span class="fu">## Recovery task</span></span>
+<span id="cb4-233"><a href="#cb4-233" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-234"><a href="#cb4-234" aria-hidden="true" tabindex="-1"></a><span class="fu">### PCA</span></span>
+<span id="cb4-235"><a href="#cb4-235" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-236"><a href="#cb4-236" aria-hidden="true" tabindex="-1"></a>Fit the training mean and sample covariance using divisor $n$, then retain the top two eigenvectors. Reconstruct test rows by orthogonal projection. Compare the fitted projector with the population leading eigenspace by principal angles.</span>
+<span id="cb4-237"><a href="#cb4-237" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-238"><a href="#cb4-238" aria-hidden="true" tabindex="-1"></a><span class="fu">### PPCA</span></span>
+<span id="cb4-239"><a href="#cb4-239" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-240"><a href="#cb4-240" aria-hidden="true" tabindex="-1"></a>Use the closed-form isotropic-noise maximum-likelihood solution based on the PCA eigensystem. Report held-out Gaussian NLL, observable-covariance error, reconstruction, and maximum/RMS principal-subspace alignment. The PPCA angle rows equal the PCA angle rows because the closed-form fit uses the same leading eigenspace; the verifier checks that equality. This is a probabilistic model distinct from ordinary PCA <span class="co">[</span><span class="ot">@TippingBishop1999</span><span class="co">]</span>.</span>
+<span id="cb4-241"><a href="#cb4-241" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-242"><a href="#cb4-242" aria-hidden="true" tabindex="-1"></a><span class="fu">### Diagonal-noise FA</span></span>
+<span id="cb4-243"><a href="#cb4-243" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-244"><a href="#cb4-244" aria-hidden="true" tabindex="-1"></a>Fit a zero-mean-latent Gaussian FA model by bounded deterministic EM. Each iteration updates posterior factor moments, loadings, and diagonal uniquenesses, applying the declared floor. Six floor/restart candidates are fit on training observations and selected by validation NLL. This is a controlled fitting baseline, not proof of the global maximum.</span>
+<span id="cb4-245"><a href="#cb4-245" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-246"><a href="#cb4-246" aria-hidden="true" tabindex="-1"></a><span class="fu">### Oracle Gaussian</span></span>
+<span id="cb4-247"><a href="#cb4-247" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-248"><a href="#cb4-248" aria-hidden="true" tabindex="-1"></a>Use the declared condition mean, loading, and residual covariance for a reference Gaussian NLL and posterior reconstruction. In the outlier condition its machine-readable method is <span class="in">`nominal_clean_gaussian_reference`</span> and its covariance target is <span class="in">`nominal_clean_gaussian_covariance`</span>; it remains misspecified for the contaminated law.</span>
+<span id="cb4-249"><a href="#cb4-249" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-250"><a href="#cb4-250" aria-hidden="true" tabindex="-1"></a><span class="fu">## Candidate analysis methods</span></span>
+<span id="cb4-251"><a href="#cb4-251" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-252"><a href="#cb4-252" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>training mean reconstruction;</span>
+<span id="cb4-253"><a href="#cb4-253" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>one fixed rank-two orthonormal projection;</span>
+<span id="cb4-254"><a href="#cb4-254" aria-hidden="true" tabindex="-1"></a><span class="ss">3. </span>seven fixed deterministic random rank-two projections summarized by mean/minimum/maximum/standard deviation;</span>
+<span id="cb4-255"><a href="#cb4-255" aria-hidden="true" tabindex="-1"></a><span class="ss">4. </span>ordinary covariance PCA;</span>
+<span id="cb4-256"><a href="#cb4-256" aria-hidden="true" tabindex="-1"></a><span class="ss">5. </span>closed-form PPCA;</span>
+<span id="cb4-257"><a href="#cb4-257" aria-hidden="true" tabindex="-1"></a><span class="ss">6. </span>bounded diagonal-noise FA; and</span>
+<span id="cb4-258"><a href="#cb4-258" aria-hidden="true" tabindex="-1"></a><span class="ss">7. </span>the condition-specific true-parameter Gaussian reference.</span>
+<span id="cb4-259"><a href="#cb4-259" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-260"><a href="#cb4-260" aria-hidden="true" tabindex="-1"></a>The fixed/random projections are rank-matched compression baselines and do not define likelihoods.</span>
+<span id="cb4-261"><a href="#cb4-261" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-262"><a href="#cb4-262" aria-hidden="true" tabindex="-1"></a><span class="fu">## Evaluation</span></span>
+<span id="cb4-263"><a href="#cb4-263" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-264"><a href="#cb4-264" aria-hidden="true" tabindex="-1"></a><span class="in">`metrics.csv`</span> contains exactly:</span>
+<span id="cb4-265"><a href="#cb4-265" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-266"><a href="#cb4-266" aria-hidden="true" tabindex="-1"></a><span class="in">```text</span></span>
+<span id="cb4-267"><a href="#cb4-267" aria-hidden="true" tabindex="-1"></a><span class="in">split,condition,preprocessing,method,target,metric,value</span></span>
+<span id="cb4-268"><a href="#cb4-268" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb4-269"><a href="#cb4-269" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-270"><a href="#cb4-270" aria-hidden="true" tabindex="-1"></a>Metrics include:</span>
+<span id="cb4-271"><a href="#cb4-271" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-272"><a href="#cb4-272" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>held-out original-coordinate reconstruction MSE;</span>
+<span id="cb4-273"><a href="#cb4-273" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>held-out Gaussian NLL for PPCA, FA, and oracle models;</span>
+<span id="cb4-274"><a href="#cb4-274" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>maximum and RMS principal angles for the method-specific target;</span>
+<span id="cb4-275"><a href="#cb4-275" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>observable-covariance relative Frobenius error;</span>
+<span id="cb4-276"><a href="#cb4-276" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>residual off-diagonal RMSE;</span>
+<span id="cb4-277"><a href="#cb4-277" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>uniqueness RMSE and relative error only in conditions marked identified;</span>
+<span id="cb4-278"><a href="#cb4-278" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>FA selected floor, restart, iterations, convergence flag, train NLL, and validation NLL; and</span>
+<span id="cb4-279"><a href="#cb4-279" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>proper-versus-leaked scaling MSE and preprocessing dependence.</span>
+<span id="cb4-280"><a href="#cb4-280" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-281"><a href="#cb4-281" aria-hidden="true" tabindex="-1"></a><span class="fu">### Empirical results</span></span>
+<span id="cb4-282"><a href="#cb4-282" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-283"><a href="#cb4-283" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Result <span class="pp">|</span> Value <span class="pp">|</span></span>
+<span id="cb4-284"><a href="#cb4-284" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---:|</span></span>
+<span id="cb4-285"><a href="#cb4-285" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Primary PCA angle to population PCA target <span class="pp">|</span> $3.70^\circ$ <span class="pp">|</span></span>
+<span id="cb4-286"><a href="#cb4-286" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Primary FA angle to true loading subspace <span class="pp">|</span> $3.98^\circ$ <span class="pp">|</span></span>
+<span id="cb4-287"><a href="#cb4-287" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Primary PCA test reconstruction MSE <span class="pp">|</span> 0.5607 <span class="pp">|</span></span>
+<span id="cb4-288"><a href="#cb4-288" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Primary FA test reconstruction MSE <span class="pp">|</span> 0.6565 <span class="pp">|</span></span>
+<span id="cb4-289"><a href="#cb4-289" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Primary FA test Gaussian NLL <span class="pp">|</span> 10.9603 <span class="pp">|</span></span>
+<span id="cb4-290"><a href="#cb4-290" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Primary oracle Gaussian NLL <span class="pp">|</span> 10.9413 <span class="pp">|</span></span>
+<span id="cb4-291"><a href="#cb4-291" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Primary FA observable-covariance relative error <span class="pp">|</span> 0.0617 <span class="pp">|</span></span>
+<span id="cb4-292"><a href="#cb4-292" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Primary FA uniqueness relative error <span class="pp">|</span> 0.0668 <span class="pp">|</span></span>
+<span id="cb4-293"><a href="#cb4-293" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Maximum covariance asymmetry <span class="pp">|</span> $1.11\times10^{-16}$ <span class="pp">|</span></span>
+<span id="cb4-294"><a href="#cb4-294" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Minimum checked covariance eigenvalue <span class="pp">|</span> $2.16\times10^{-5}$ <span class="pp">|</span></span>
+<span id="cb4-295"><a href="#cb4-295" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-296"><a href="#cb4-296" aria-hidden="true" tabindex="-1"></a>Failure diagnostics include:</span>
+<span id="cb4-297"><a href="#cb4-297" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-298"><a href="#cb4-298" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>correlated-residual FA loading angle $11.21^\circ$ and NLL 10.6014 versus oracle 10.2750;</span>
+<span id="cb4-299"><a href="#cb4-299" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>nuisance-variance PCA remains $4.63^\circ$ from the population PCA target; the FA loading angle $85.84^\circ$ is explicitly a nonconverged bounded-optimizer result and supports no method-level population conclusion;</span>
+<span id="cb4-300"><a href="#cb4-300" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>outlier FA loading angle $11.82^\circ$;</span>
+<span id="cb4-301"><a href="#cb4-301" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>repeated-eigenvalue whole-subspace PCA/FA angles $1.45^\circ/1.18^\circ$;</span>
+<span id="cb4-302"><a href="#cb4-302" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>near-zero FA loading angle $1.14^\circ$, with the selected run reaching the 250-iteration bound rather than satisfying the strict convergence tolerance; and</span>
+<span id="cb4-303"><a href="#cb4-303" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>lawful/leaked scaling MSE 0.5725/0.5734. Lawful preprocessing changed by zero under test poison; leaked mean and scale changed by 20.83 and 23.53.</span>
+<span id="cb4-304"><a href="#cb4-304" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-305"><a href="#cb4-305" aria-hidden="true" tabindex="-1"></a>The primary PCA reconstruction is lower than FA posterior-mean reconstruction because the methods optimize different losses. This is not evidence that PCA better recovers the FA generative decomposition. The near-zero and high-variance-nuisance FA fits reach the iteration bound; both are machine-labelled bounded optimizer nonconvergence/computational failure and are retained rather than hidden.</span>
+<span id="cb4-306"><a href="#cb4-306" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-307"><a href="#cb4-307" aria-hidden="true" tabindex="-1"></a><span class="fu">## Interpretation</span></span>
+<span id="cb4-308"><a href="#cb4-308" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-309"><a href="#cb4-309" aria-hidden="true" tabindex="-1"></a>The correct-model result supports a bounded distinction: PCA closely recovers the observable covariance's principal subspace, while diagonal FA closely recovers the structurally identified common loading subspace and Gaussian covariance under the diagonal-residual and sufficient-rank assumptions. Structural identification, finite-sample recovery, and optimizer convergence remain distinct. The selected FA NLL remains above the oracle reference, as expected for a fitted finite-sample model.</span>
+<span id="cb4-310"><a href="#cb4-310" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-311"><a href="#cb4-311" aria-hidden="true" tabindex="-1"></a>The negative controls show why target definitions matter. PCA can be correct about variance while scientifically unhelpful under nuisance variance. A converged diagonal FA fit can allocate correlated residual structure to common factors under misspecification; the nonconverged nuisance FA fit supports only a computational-failure statement. A whole repeated eigenspace can be recovered even though its displayed axes are arbitrary. Leakage is proven by dependence on test values, not by assuming that invalid preprocessing must improve one finite score.</span>
+<span id="cb4-312"><a href="#cb4-312" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-313"><a href="#cb4-313" aria-hidden="true" tabindex="-1"></a>::: {.callout-warning title="What this does NOT imply"}</span>
+<span id="cb4-314"><a href="#cb4-314" aria-hidden="true" tabindex="-1"></a>Small principal angles, covariance fit, likelihood, or reconstruction do not establish a unique latent cause, intrinsic dimension, manifold, biological representation, dynamics, or mechanism.</span>
+<span id="cb4-315"><a href="#cb4-315" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb4-316"><a href="#cb4-316" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-317"><a href="#cb4-317" aria-hidden="true" tabindex="-1"></a><span class="fu">## What this toy model does NOT establish</span></span>
+<span id="cb4-318"><a href="#cb4-318" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-319"><a href="#cb4-319" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>a model-free latent dimension;</span>
+<span id="cb4-320"><a href="#cb4-320" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>a manifold or nonlinear geometry;</span>
+<span id="cb4-321"><a href="#cb4-321" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>uniquely identified loading columns beyond orthogonal equivalence;</span>
+<span id="cb4-322"><a href="#cb4-322" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>causal, physical, neural, or biological factors;</span>
+<span id="cb4-323"><a href="#cb4-323" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>robustness to arbitrary contamination or residual dependence;</span>
+<span id="cb4-324"><a href="#cb4-324" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>a globally optimal FA likelihood solution;</span>
+<span id="cb4-325"><a href="#cb4-325" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>validity of pooled train/test preprocessing;</span>
+<span id="cb4-326"><a href="#cb4-326" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>that the largest variance direction is the desired scientific signal; or</span>
+<span id="cb4-327"><a href="#cb4-327" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>that reconstruction is interchangeable with likelihood or covariance recovery.</span>
+<span id="cb4-328"><a href="#cb4-328" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-329"><a href="#cb4-329" aria-hidden="true" tabindex="-1"></a><span class="fu">## Extensions to real data</span></span>
+<span id="cb4-330"><a href="#cb4-330" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-331"><a href="#cb4-331" aria-hidden="true" tabindex="-1"></a>A real-data analysis must define independent sampling units, feature units, scaling, missing-data policy, rank selection, residual covariance assumptions, and held-out splits. Preprocessing must be fitted inside training folds. PCA requires scale, outlier, and eigengap sensitivity checks. Diagonal FA requires residual-covariance, tail, subgroup, convergence, floor, and multistart checks. Loading axes should not receive mechanistic names solely because one rotation is convenient.</span>
+<span id="cb4-332"><a href="#cb4-332" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-333"><a href="#cb4-333" aria-hidden="true" tabindex="-1"></a>Temporal, hierarchical, robust, sparse, confirmatory, nonlinear, or correlated-residual variants require separate contracts.</span>
+<span id="cb4-334"><a href="#cb4-334" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-335"><a href="#cb4-335" aria-hidden="true" tabindex="-1"></a><span class="fu">## Reproducibility</span></span>
+<span id="cb4-336"><a href="#cb4-336" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-337"><a href="#cb4-337" aria-hidden="true" tabindex="-1"></a>The bounded artifact set is:</span>
+<span id="cb4-338"><a href="#cb4-338" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-339"><a href="#cb4-339" aria-hidden="true" tabindex="-1"></a><span class="in">```text</span></span>
+<span id="cb4-340"><a href="#cb4-340" aria-hidden="true" tabindex="-1"></a><span class="in">toy-models/static-linear-latent-recovery.py</span></span>
+<span id="cb4-341"><a href="#cb4-341" aria-hidden="true" tabindex="-1"></a><span class="in">toy-models/artifacts/static-linear-latent-recovery/manifest.json</span></span>
+<span id="cb4-342"><a href="#cb4-342" aria-hidden="true" tabindex="-1"></a><span class="in">toy-models/artifacts/static-linear-latent-recovery/metrics.csv</span></span>
+<span id="cb4-343"><a href="#cb4-343" aria-hidden="true" tabindex="-1"></a><span class="in">toy-models/artifacts/static-linear-latent-recovery/diagnostics.json</span></span>
+<span id="cb4-344"><a href="#cb4-344" aria-hidden="true" tabindex="-1"></a><span class="in">toy-models/artifacts/static-linear-latent-recovery/summary.png</span></span>
+<span id="cb4-345"><a href="#cb4-345" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb4-346"><a href="#cb4-346" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-347"><a href="#cb4-347" aria-hidden="true" tabindex="-1"></a>The bundled-runtime command is:</span>
+<span id="cb4-348"><a href="#cb4-348" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-349"><a href="#cb4-349" aria-hidden="true" tabindex="-1"></a><span class="in">```bash</span></span>
+<span id="cb4-350"><a href="#cb4-350" aria-hidden="true" tabindex="-1"></a><span class="ex">/Users/bytedance/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3</span> toy-models/static-linear-latent-recovery.py</span>
+<span id="cb4-351"><a href="#cb4-351" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb4-352"><a href="#cb4-352" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-353"><a href="#cb4-353" aria-hidden="true" tabindex="-1"></a>Default execution generates and verifies, including a byte-identical temporary regeneration. Explicit <span class="in">`--generate`</span> and <span class="in">`--verify`</span> modes are available. The manifest records seeds, dimensions, split sizes, methods, FA search bounds, tolerances, versions, commands, and hashes.</span>
+<span id="cb4-354"><a href="#cb4-354" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-355"><a href="#cb4-355" aria-hidden="true" tabindex="-1"></a><span class="fu">### Evidence inspected</span></span>
+<span id="cb4-356"><a href="#cb4-356" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-357"><a href="#cb4-357" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Jolliffe and Cadima (2016):** abstract, introduction, and the basic PCA sections on covariance eigendecomposition, centered SVD, principal-subspace approximation, sign ambiguity, rank, and covariance-versus-correlation scaling were inspected. Specialized adaptations were not inspected exhaustively <span class="co">[</span><span class="ot">@JolliffeCadima2016</span><span class="co">]</span>.</span>
+<span id="cb4-358"><a href="#cb4-358" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Anderson and Rubin (1956):** the 40-page proceedings PDF was inspected at equation level for the Gaussian factor model, covariance decomposition, loading rotation, identification conditions, likelihood, diagonal-uniqueness iteration, isotropic-noise/PCA connection, and measurement-unit discussion. Part II proofs and all testing/asymptotic sections were not read line by line <span class="co">[</span><span class="ot">@AndersonRubin1956</span><span class="co">]</span>.</span>
+<span id="cb4-359"><a href="#cb4-359" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Tipping and Bishop (1999):** the complete 12-page article was inspected for the FA/PCA distinction, PPCA model and likelihood, maximum-likelihood principal subspace, isotropic residual estimate, loading rotation ambiguity, reconstruction distinction, discussion, and Appendix A equal-eigenvalue boundaries. Applied examples and Appendix B were inspected only at overview level <span class="co">[</span><span class="ot">@TippingBishop1999</span><span class="co">]</span>.</span>
+<span id="cb4-360"><a href="#cb4-360" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-361"><a href="#cb4-361" aria-hidden="true" tabindex="-1"></a>These sources do not supply the simulator dimensions, seeds, stress magnitudes, optimizer budget, or numerical tolerances; those are LDG design choices.</span>
+<span id="cb4-362"><a href="#cb4-362" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-363"><a href="#cb4-363" aria-hidden="true" tabindex="-1"></a><span class="fu">## Maturity checklist</span></span>
+<span id="cb4-364"><a href="#cb4-364" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-365"><a href="#cb4-365" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> Complete Toy Model schema at L1/stable.</span>
+<span id="cb4-366"><a href="#cb4-366" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> Generation, preprocessing, fitting, selection, and scoring are separate.</span>
+<span id="cb4-367"><a href="#cb4-367" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> PCA and FA targets are explicitly distinct.</span>
+<span id="cb4-368"><a href="#cb4-368" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> Independent train/validation/test data and latent-leakage poison checks are present.</span>
+<span id="cb4-369"><a href="#cb4-369" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> Mean, fixed/random projection, PCA, PPCA, bounded FA, and oracle baselines are implemented.</span>
+<span id="cb4-370"><a href="#cb4-370" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> Repeated eigenvalues, near-zero uniqueness, correlated residuals, nuisance variance, outliers, and scaling leakage are implemented.</span>
+<span id="cb4-371"><a href="#cb4-371" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> Deterministic bounded artifacts and byte-identical verification pass.</span>
+<span id="cb4-372"><a href="#cb4-372" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> Independent scientific review PASS after focused re-review of identification, outlier-target, and nuisance-optimizer findings.</span>
+<span id="cb4-373"><a href="#cb4-373" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> Independent implementation review PASS after focused re-review of poison scope, PPCA metrics, CSV verification, and outlier labels.</span>
+<span id="cb4-374"><a href="#cb4-374" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> Repository validation and renders PASS after review.</span>
+<span id="cb4-375"><a href="#cb4-375" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> Mechanical L1/stable promotion authorized under the recorded review decision.</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></div>
+</div></div></div></div></div>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
