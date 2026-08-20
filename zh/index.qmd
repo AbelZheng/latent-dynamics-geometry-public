@@ -1,0 +1,28 @@
+---
+title: "潜在动力学与几何"
+lang: zh-CN
+comments: false
+---
+
+LDG 是一套版本化管理的研究方法学知识体系，涵盖潜状态、动力系统、神经与行为动力学、表征几何、拓扑、降维与多模态建模。
+
+其预期推进主线为：
+
+```text
+Concept → Mathematical understanding → Method → Executable toy model
+        → Benchmark → Laboratory data → Open methodological question
+```
+
+本公开站点呈现该项目的科学层：定义、数学基础、方法描述、可执行的玩具模型、论文笔记与研究问题。内部规划与操作材料刻意不包含在发布站点中。
+
+## 从这里开始
+
+- [概念](knowledge/concepts/index.qmd) 定义了动力学、潜变量、几何、拓扑与维数方面的词汇。
+- [方法](knowledge/methods/index.qmd) 陈述每种方法的问题、假设、学习得到与固定的量、失效模式与基线比较。
+- [数学](knowledge/math/index.qmd) 发展可复用的形式化对象与推导。
+- [玩具模型](toy-models/index.qmd) 把已知的生成结构连接到恢复与评估。
+- [论文](knowledge/papers/index.qmd) 与 [研究问题](research-questions/index.qmd) 组织证据与开放的方法学问题。
+
+## 阅读准则
+
+LDG 区分已确立的定义与结果、原作者解读、项目层面的综合与研究假设。可视化、低重构误差、解码表现、时间相关性或低维嵌入，其本身不被视为机制性证据。

@@ -1,0 +1,56 @@
+---
+title: "概念"
+lang: zh-CN
+comments: false
+---
+
+概念对象定义术语、直觉、形式含义、相邻概念、非蕴含以及对 LDG 的意义。以下各节提供了当前概念库的公开阅读顺序。
+
+## 基础动力学
+
+- [State](state.qmd) — 什么信息算作指定系统在某一时刻的状态。*(L1, stable)*
+- [State Space](state-space.qmd) — 指定状态描述下的可取状态值。*(L1, stable)*
+- [Trajectory](trajectory.qmd) — 以系统时间为参数的一条可取系统演化。*(L1, stable)*
+- [Phase Space](phase-space.qmd) — 作为动力学轨迹舞台来理解的状态空间。*(L2, stable)*
+- [Initial Condition](initial-condition.qmd) — 在参考时刻赋予的状态值。*(L1, stable)*
+- [Vector Field](vector-field.qmd) — 局部的瞬时状态变化规则。*(L2, stable)*
+- [Flow](flow.qmd) — 在受支持初始状态上的有限时间演化。*(L2, stable)*
+- [Fixed Point](fixed-point.qmd) — 被指定演化保持不变的状态。*(L2, stable)*
+- [Stability](stability.qmd) — 声明动力对象对指定扰动的响应。*(L2, stable)*
+- [Attractor](attractor.qmd) — 从周围吸引盆被接近的不变集。*(L2, stable)*
+- [Limit Cycle](limit-cycle.qmd) — 单独陈述稳定性的孤立周期轨道。*(L2, stable)*
+- [Input-Driven Dynamics](input-driven-dynamics.qmd) — 依赖状态与外部输入信号的演化。*(L2, stable)*
+
+## 潜变量基础
+
+- [Latent Variable](latent-variable.qmd) — 在可用数据中未被直接观测的模型变量。*(L1, stable)*
+- [Observation Model](observation-model.qmd) — 从潜变量或系统变量到测量的关系。*(L2, stable)*
+- [State-Space Model](state-space-model.qmd) — 联合的转移与观测描述。*(L2, stable)*
+- [Linear Dynamical System](linear-dynamical-system.qmd) — 带可选输入与输出的线性状态演化。*(L2, stable)*
+- [Process Noise](process-noise.qmd) — 进入状态演化的随机扰动。*(L2, stable)*
+- [Observation Noise](observation-noise.qmd) — 在状态条件下的随机测量变异性。*(L2, stable)*
+- [Identifiability](identifiability.qmd) — 由可观测分布确定的模型规格的唯一性。*(L2, stable)*
+
+## 时间 / 核基础
+
+- [Kernel](kernel.qmd) — 时序线性算子中依赖时滞的加权。*(L1, stable)*
+- [Convolution](convolution.qmd) — 信号与核的时滞加权组合。*(L2, stable)*
+- [Deconvolution](deconvolution.qmd) — 卷积观测模型的噪声敏感求逆。*(L2, stable)*
+
+## 几何基础
+
+- [Ambient Dimension](ambient-dimension.qmd) — 周围表示空间的维数。*(L1, stable)*
+- [Intrinsic Dimension](intrinsic-dimension.qmd) — 在声明模型、尺度与准则下的自由度。*(L1, stable)*
+- [Linear Subspace](linear-subspace.qmd) — 对线性组合封闭的子集。*(L1, stable)*
+- [Embedding](embedding.qmd) — 保结构单射表示进入另一空间。*(L1, stable)*
+- [Manifold](manifold.qmd) — 具有相容光滑坐标卡的局部欧氏空间。*(L1, stable)*
+- [Tangent Space](tangent-space.qmd) — 一点处一阶方向的局部向量空间。*(L2, stable)*
+- [Metric](metric.qmd) — 满足度量公理的逐点距离。*(L2, stable)*
+- [Geodesic](geodesic.qmd) — 在所选几何下局部平直、零加速度的曲线。*(L2, stable)*
+- [Riemannian Metric](riemannian-metric.qmd) — 切空间内积的光滑场。*(L2, stable)*
+- [Curvature](curvature.qmd) — 在声明曲率概念下对平直几何的偏离。*(L2, stable)*
+- [Topology](topology.qmd) — 由开集定义的邻域与连续性结构。*(L1, stable)*
+- [Circle / S¹](circle-s1.qmd) — 具有圆拓扑的单一周期坐标。*(L1, stable)*
+- [Torus](torus.qmd) — 两个圆的积或两个周期坐标。*(L1, stable)*
+- [Latent Trajectory](latent-trajectory.qmd) — 时间索引的潜随机路径、其后验律或声明的实现/摘要。*(L2, stable)*
+- [Dynamics on Manifolds](dynamics-on-manifolds.qmd) — 约束在流形上的切向量场与流。*(L2, stable)*

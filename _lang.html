@@ -1,0 +1,71 @@
+<style>
+.ldg-lang{position:fixed;top:72px;right:16px;z-index:2000;display:flex;gap:4px;font-family:system-ui,-apple-system,"Segoe UI",sans-serif;}
+.ldg-lang a{display:inline-block;padding:4px 10px;border:1px solid #c8c8c8;border-radius:999px;background:#fff;color:#333;text-decoration:none;font-size:13px;box-shadow:0 1px 3px rgba(0,0,0,.15);}
+.ldg-lang a.active{background:#2c3e50;color:#fff;border-color:#2c3e50;}
+</style>
+<div class="ldg-lang" id="ldg-lang">
+  <a href="#" id="ldg-lang-en">EN</a>
+  <a href="#" id="ldg-lang-zh">中文</a>
+</div>
+<script>
+(function () {
+  var BASE = '';
+  if (window.location.pathname.indexOf('/latent-dynamics-geometry-public/') === 0) {
+    BASE = 'latent-dynamics-geometry-public';
+  }
+  function segs() {
+    var s = window.location.pathname.split('/').filter(Boolean);
+    if (BASE && s[0] === BASE) s = s.slice(1);
+    return s;
+  }
+  function isZh() { return segs()[0] === 'zh'; }
+  function target(lang) {
+    var s = segs();
+    if (s[0] === 'zh') s = s.slice(1);
+    if (lang === 'zh') s = ['zh'].concat(s);
+    var rel = s.join('/');
+    if (rel === '' || rel === 'zh') rel = (lang === 'zh' ? 'zh/index.html' : 'index.html');
+    return '/' + (BASE ? BASE + '/' : '') + rel;
+  }
+  function go(lang) {
+    try { localStorage.setItem('ldg-lang', lang); } catch (e) {}
+    window.location.href = target(lang);
+  }
+  function mark() {
+    var zh = isZh();
+    var a = document.getElementById('ldg-lang-en');
+    var b = document.getElementById('ldg-lang-zh');
+    if (a) a.className = zh ? '' : 'active';
+    if (b) b.className = zh ? 'active' : '';
+  }
+  function localizeNav() {
+    if (!isZh()) return;
+    var path = window.location.pathname;
+    var dir = path.substring(0, path.lastIndexOf('/') + 1);
+    document.querySelectorAll('nav a').forEach(function (a) {
+      var h = a.getAttribute('href') || '';
+      if (/^(https?:|#|mailto:)/.test(h)) return;
+      if (/\.html?$/.test(h) || /\/$/.test(h) || h === '') {
+        var abs = new URL(h, window.location.href).pathname;
+        if (BASE && abs.indexOf('/' + BASE + '/') === 0) abs = abs.substring(BASE.length + 1);
+        if (abs.charAt(0) === '/') abs = abs.substring(1);
+        if (abs === '') abs = 'index.html';
+        if (abs.indexOf('zh/') === 0) abs = abs.substring(3);
+        var target = 'zh/' + abs;
+        var f = dir.split('/').filter(Boolean);
+        var t = target.split('/').filter(Boolean);
+        var i = 0;
+        while (i < f.length && i < t.length && f[i] === t[i]) i++;
+        var rel = '';
+        for (var j = i; j < f.length; j++) rel += '../';
+        rel += t.slice(i).join('/');
+        a.setAttribute('href', rel);
+      }
+    });
+  }
+  document.getElementById('ldg-lang-en').addEventListener('click', function (e) { e.preventDefault(); go('en'); });
+  document.getElementById('ldg-lang-zh').addEventListener('click', function (e) { e.preventDefault(); go('zh'); });
+  mark();
+  localizeNav();
+})();
+</script>

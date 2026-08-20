@@ -1,0 +1,16 @@
+---
+title: "玩具模型"
+lang: zh-CN
+comments: false
+---
+
+玩具模型把明确问题与已知生成结构连接到模拟、恢复、评估与解读界限。
+
+- [二维自治动力学：生成与恢复](two-dimensional-autonomous-dynamics.qmd) — 可执行、已知真值的立方向量场恢复、仿射基线与导数置换对照比较。*(L1, stable)*
+- [线性高斯推断阶梯](linear-gaussian-inference-ladder.qmd) — 确定性标量 LGSSM 演示，区分有限网格参数选择、在线滤波、事后平滑、直接批量条件化、不确定性、缺失观测、误设与序列边界失效。*(L1, stable)*
+- [静态线性潜恢复](static-linear-latent-recovery.qmd) — 已知真值的 PCA、PPCA 与对角 FA 比较，分离主协方差与公共载荷目标，并测试残差误设、干扰方差、离群值与预处理泄漏。*(L1, stable)*
+- [标签依赖解混](label-dependent-demixing.qmd) — 有监督的时间 × 刺激 × 决策玩具模型，比较边际均值、PCA、边际 PCA、正则化 dPCA、解码、标签洗牌、缺失单元、伪群体与均值对单试次迁移。*(L1, stable)*
+- [旋转投影对照](rotational-projection-controls.qmd) — 用于 jPCA 式旋转投影的已知块斜对称正生成元与对称、时滞、输入、预处理、度量依赖、随机平面与协方差匹配对照。*(L1, stable)*
+- [协方差先验轨迹](covariance-prior-trajectories.qmd) — 精确高斯协方差先验阶梯，比较已知与选定的 GPFA、静态/两阶段 FA 与 PCA、独立通道/箱极限、递归 AR 卡尔曼/RTS、掩码与协方差族失效。*(L1, stable)*
+- [有界非线性重构](bounded-nonlinear-reconstruction.qmd) — 在弯曲、全维、干扰、少样本与移位范围重构条件下的确定性均值/PCA/线性自编码器/非线性自编码器/冻结编码器比较。*(L1, stable)*
+- [不宣称流形的图几何恢复](graph-geometry-recovery.qmd) — 确定性发卡图距离/Isomap 与有限圆扩散映射恢复研究，含留出扩展、连通性、捷径、密度、带宽、截断与度量对照。*(L1, stable)*

@@ -10,6 +10,14 @@ project:
     - "toy-models/*.qmd"
     - "research-questions/*.qmd"
     - "benchmarks/*.qmd"
+    - "zh/index.qmd"
+    - "zh/knowledge/concepts/*.qmd"
+    - "zh/knowledge/methods/*.qmd"
+    - "zh/knowledge/math/*.qmd"
+    - "zh/knowledge/papers/*.qmd"
+    - "zh/toy-models/*.qmd"
+    - "zh/research-questions/*.qmd"
+    - "zh/benchmarks/*.qmd"
 
 lang: en
 
@@ -65,6 +73,7 @@ format:
     code-tools: true
     citations-hover: true
     link-external-newwindow: true
+    include-in-header: _lang.html
 
 execute:
   echo: true

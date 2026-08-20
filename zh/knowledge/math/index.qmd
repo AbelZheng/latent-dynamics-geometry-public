@@ -1,0 +1,11 @@
+---
+title: "数学"
+lang: zh-CN
+comments: false
+---
+
+数学对象提供 LDG 问题所需的定义、记号、推导、示例、几何直觉与计算解释。
+
+## 基础动力学
+
+- [一阶自治动力系统](first-order-autonomous-dynamical-system.qmd) — 欧氏自治初值问题、其正则性阶梯、极大解与诱导局部流。*(L2, stable)*

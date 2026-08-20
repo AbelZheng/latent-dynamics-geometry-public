@@ -1,0 +1,23 @@
+---
+title: "方法"
+lang: zh-CN
+comments: false
+---
+
+方法对象围绕方法所解决的问题、假设、学习得到与固定的量、时间与几何的表示、失效模式、基线与评估来组织方法。
+
+## 当前方法库
+
+- [Principal Component Analysis](principal-component-analysis.qmd) — 经典的静态线性欧氏基线。*(L2, stable)*
+- [Factor Analysis](factor-analysis.qmd) — 静态概率性低秩加对角协方差基线。*(L2, stable)*
+- [Isomap](isomap.qmd) — 图最短路径与经典 MDS 几何基线。*(L2, stable)*
+- [Diffusion Maps](diffusion-maps.qmd) — 亲和算子与扩散距离谱基线。*(L2, stable)*
+- [Demixed Principal Component Analysis](demixed-principal-component-analysis.qmd) — 依赖标签的边际重构基线。*(L2, stable)*
+- [Discrete-Time Linear-Gaussian State-Space Model](linear-gaussian-state-space-model.qmd) — 概率性时序潜基线。*(L2, stable)*
+- [Bounded Autoencoder Baseline](autoencoder-baseline.qmd) — 确定性非线性重构基线。*(L2, stable)*
+- [Kalman Filtering](kalman-filtering.qmd) — 固定离散时间线性高斯状态空间模型的在线当前状态推断。*(L2, stable)*
+- [jPCA](jpca.qmd) — PCA 降维、导数拟合的斜对称旋转投影方法。*(L2, stable)*
+- [Fixed-Interval Kalman Smoothing](kalman-smoothing.qmd) — 固定 LGSSM 的事后全区间状态与路径推断。*(L2, stable)*
+- [Gaussian-Process Factor Analysis](gaussian-process-factor-analysis.qmd) — 带协方差先验事后潜轨迹的 FA 观测层。*(L2, stable)*
+
+稳定状态记录的是在声明的证据与非蕴含界限内的有界所有者验收；它并非普适经验有效性的声明。标记为 `review` 的对象已完成科学草稿与证据阶段，但尚未跨越其对象特定的验收门。
