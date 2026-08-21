@@ -28,14 +28,14 @@
   function isZh() { return zhIdx() !== -1; }
   function fileTarget(lang) {
     var s = pathSegs();
-    var zi = zhIdx();
-    var root = zi === -1 ? s.slice(0, -1) : s.slice(0, zi);
-    var rest = zi === -1 ? [] : s.slice(zi + 1);
-    var base = '/' + root.join('/') + '/';
-    if (lang === 'zh') {
-      return base + 'zh/' + (rest.length ? rest.join('/') : 'index.html');
-    }
-    return base + (rest.length ? rest.join('/') : 'index.html');
+    var siteIdx = s.lastIndexOf('_site');
+    var root = siteIdx === -1 ? s.slice(0, -1) : s.slice(0, siteIdx + 1);
+    var page = siteIdx === -1 ? [s[s.length - 1]] : s.slice(siteIdx + 1);
+    if (page[0] === 'zh') page = page.slice(1);
+    if (lang === 'zh') page = ['zh'].concat(page);
+    var rel = page.join('/');
+    if (rel === '' || rel === 'zh') rel = 'index.html';
+    return '/' + root.join('/') + '/' + rel;
   }
   function target(lang) {
     if (IS_FILE) return fileTarget(lang);
