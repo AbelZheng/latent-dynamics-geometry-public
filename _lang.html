@@ -13,13 +13,32 @@
   if (window.location.pathname.indexOf('/latent-dynamics-geometry-public/') === 0) {
     BASE = 'latent-dynamics-geometry-public';
   }
+  var IS_FILE = window.location.protocol === 'file:';
+  function pathSegs() {
+    return window.location.pathname.split('/').filter(Boolean);
+  }
+  function zhIdx() {
+    return pathSegs().indexOf('zh');
+  }
   function segs() {
     var s = window.location.pathname.split('/').filter(Boolean);
     if (BASE && s[0] === BASE) s = s.slice(1);
     return s;
   }
-  function isZh() { return segs()[0] === 'zh'; }
+  function isZh() { return zhIdx() !== -1; }
+  function fileTarget(lang) {
+    var s = pathSegs();
+    var zi = zhIdx();
+    var root = zi === -1 ? s.slice(0, -1) : s.slice(0, zi);
+    var rest = zi === -1 ? [] : s.slice(zi + 1);
+    var base = '/' + root.join('/') + '/';
+    if (lang === 'zh') {
+      return base + 'zh/' + (rest.length ? rest.join('/') : 'index.html');
+    }
+    return base + (rest.length ? rest.join('/') : 'index.html');
+  }
   function target(lang) {
+    if (IS_FILE) return fileTarget(lang);
     var s = segs();
     if (s[0] === 'zh') s = s.slice(1);
     if (lang === 'zh') s = ['zh'].concat(s);
@@ -40,20 +59,21 @@
   }
   function localizeNav() {
     if (!isZh()) return;
-    var path = window.location.pathname;
-    var dir = path.substring(0, path.lastIndexOf('/') + 1);
+    var cur = pathSegs();
+    var czi = zhIdx();
+    var dir = (czi === -1 ? cur.slice(0, -1) : cur.slice(czi, -1)).join('/');
     document.querySelectorAll('nav a').forEach(function (a) {
       var h = a.getAttribute('href') || '';
       if (/^(https?:|#|mailto:)/.test(h)) return;
       if (/\.html?$/.test(h) || /\/$/.test(h) || h === '') {
         var abs = new URL(h, window.location.href).pathname;
-        if (BASE && abs.indexOf('/' + BASE + '/') === 0) abs = abs.substring(BASE.length + 1);
-        if (abs.charAt(0) === '/') abs = abs.substring(1);
-        if (abs === '') abs = 'index.html';
-        if (abs.indexOf('zh/') === 0) abs = abs.substring(3);
-        var target = 'zh/' + abs;
+        var s = abs.split('/').filter(Boolean);
+        if (BASE && s[0] === BASE) s = s.slice(1);
+        var zi = s.indexOf('zh');
+        var rel = zi !== -1 ? s.slice(zi + 1).join('/') : s.slice(czi).join('/');
+        var tgt = 'zh/' + rel;
         var f = dir.split('/').filter(Boolean);
-        var t = target.split('/').filter(Boolean);
+        var t = tgt.split('/').filter(Boolean);
         var i = 0;
         while (i < f.length && i < t.length && f[i] === t[i]) i++;
         var rel = '';
