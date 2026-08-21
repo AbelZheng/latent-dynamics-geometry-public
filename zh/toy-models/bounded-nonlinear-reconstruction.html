@@ -1,0 +1,1617 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="zh-CN" xml:lang="zh-CN"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.10.18">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>有界非线性重构 – Latent Dynamics &amp; Geometry</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-e3adbaa939bcd423dddc8c8a834270b4.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "没有结果",
+    "search-matching-documents-text": "匹配的文档",
+    "search-copy-link-title": "复制搜索链接",
+    "search-hide-matches-text": "隐藏其它匹配结果",
+    "search-more-match-text": "更多匹配结果",
+    "search-more-matches-text": "更多匹配结果",
+    "search-clear-button-title": "清除",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "取消",
+    "search-submit-button-title": "提交",
+    "search-label": "搜索"
+  }
+}</script>
+<style>
+.ldg-lang{position:fixed;top:72px;right:16px;z-index:2000;display:flex;gap:4px;font-family:system-ui,-apple-system,"Segoe UI",sans-serif;}
+.ldg-lang a{display:inline-block;padding:4px 10px;border:1px solid #c8c8c8;border-radius:999px;background:#fff;color:#333;text-decoration:none;font-size:13px;box-shadow:0 1px 3px rgba(0,0,0,.15);}
+.ldg-lang a.active{background:#2c3e50;color:#fff;border-color:#2c3e50;}
+</style>
+</head><body class="nav-fixed quarto-light"><div class="ldg-lang" id="ldg-lang">
+  <a href="#" id="ldg-lang-en">EN</a>
+  <a href="#" id="ldg-lang-zh">中文</a>
+</div>
+<script>
+(function () {
+  var BASE = '';
+  if (window.location.pathname.indexOf('/latent-dynamics-geometry-public/') === 0) {
+    BASE = 'latent-dynamics-geometry-public';
+  }
+  var IS_FILE = window.location.protocol === 'file:';
+  function pathSegs() {
+    return window.location.pathname.split('/').filter(Boolean);
+  }
+  function zhIdx() {
+    return pathSegs().indexOf('zh');
+  }
+  function segs() {
+    var s = window.location.pathname.split('/').filter(Boolean);
+    if (BASE && s[0] === BASE) s = s.slice(1);
+    return s;
+  }
+  function isZh() { return zhIdx() !== -1; }
+  function fileTarget(lang) {
+    var s = pathSegs();
+    var siteIdx = s.lastIndexOf('_site');
+    var root = siteIdx === -1 ? s.slice(0, -1) : s.slice(0, siteIdx + 1);
+    var page = siteIdx === -1 ? [s[s.length - 1]] : s.slice(siteIdx + 1);
+    if (page[0] === 'zh') page = page.slice(1);
+    if (lang === 'zh') page = ['zh'].concat(page);
+    var rel = page.join('/');
+    if (rel === '' || rel === 'zh') rel = 'index.html';
+    return '/' + root.join('/') + '/' + rel;
+  }
+  function target(lang) {
+    if (IS_FILE) return fileTarget(lang);
+    var s = segs();
+    if (s[0] === 'zh') s = s.slice(1);
+    if (lang === 'zh') s = ['zh'].concat(s);
+    var rel = s.join('/');
+    if (rel === '' || rel === 'zh') rel = (lang === 'zh' ? 'zh/index.html' : 'index.html');
+    return '/' + (BASE ? BASE + '/' : '') + rel;
+  }
+  function go(lang) {
+    try { localStorage.setItem('ldg-lang', lang); } catch (e) {}
+    window.location.href = target(lang);
+  }
+  function mark() {
+    var zh = isZh();
+    var a = document.getElementById('ldg-lang-en');
+    var b = document.getElementById('ldg-lang-zh');
+    if (a) a.className = zh ? '' : 'active';
+    if (b) b.className = zh ? 'active' : '';
+  }
+  function localizeNav() {
+    if (!isZh()) return;
+    var cur = pathSegs();
+    var czi = zhIdx();
+    var dir = (czi === -1 ? cur.slice(0, -1) : cur.slice(czi, -1)).join('/');
+    document.querySelectorAll('nav a').forEach(function (a) {
+      var h = a.getAttribute('href') || '';
+      if (/^(https?:|#|mailto:)/.test(h)) return;
+      if (/\.html?$/.test(h) || /\/$/.test(h) || h === '') {
+        var abs = new URL(h, window.location.href).pathname;
+        var s = abs.split('/').filter(Boolean);
+        if (BASE && s[0] === BASE) s = s.slice(1);
+        var zi = s.indexOf('zh');
+        var rel = zi !== -1 ? s.slice(zi + 1).join('/') : s.slice(czi).join('/');
+        var tgt = 'zh/' + rel;
+        var f = dir.split('/').filter(Boolean);
+        var t = tgt.split('/').filter(Boolean);
+        var i = 0;
+        while (i < f.length && i < t.length && f[i] === t[i]) i++;
+        var rel = '';
+        for (var j = i; j < f.length; j++) rel += '../';
+        rel += t.slice(i).join('/');
+        a.setAttribute('href', rel);
+      }
+    });
+  }
+  document.getElementById('ldg-lang-en').addEventListener('click', function (e) { e.preventDefault(); go('en'); });
+  document.getElementById('ldg-lang-zh').addEventListener('click', function (e) { e.preventDefault(); go('zh'); });
+  mark();
+  localizeNav();
+})();
+</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-chtml.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+
+
+
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">Latent Dynamics &amp; Geometry</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="搜索"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="展开或折叠导航栏" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../index.html"> 
+<span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../knowledge/concepts/index.html"> 
+<span class="menu-text">Concepts</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../knowledge/methods/index.html"> 
+<span class="menu-text">Methods</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../knowledge/math/index.html"> 
+<span class="menu-text">Math</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../knowledge/papers/index.html"> 
+<span class="menu-text">Papers</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../toy-models/index.html"> 
+<span class="menu-text">Toy Models</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../research-questions/index.html"> 
+<span class="menu-text">Research Questions</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../benchmarks/index.html"> 
+<span class="menu-text">Benchmarks</span></a>
+  </li>  
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/AbelZheng/latent-dynamics-geometry-public"> <i class="bi bi-github" role="img" aria-label="GitHub repository">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="https://github.com/AbelZheng/latent-dynamics-geometry-public/discussions"> 
+<span class="menu-text">Discussions</span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">该页面内容</h2>
+   
+  <ul>
+  <li><a href="#有界非线性重构" id="toc-有界非线性重构" class="nav-link active" data-scroll-target="#有界非线性重构">有界非线性重构</a>
+  <ul class="collapse">
+  <li><a href="#问题" id="toc-问题" class="nav-link" data-scroll-target="#问题">问题</a></li>
+  <li><a href="#真值" id="toc-真值" class="nav-link" data-scroll-target="#真值">真值</a></li>
+  <li><a href="#生成模型" id="toc-生成模型" class="nav-link" data-scroll-target="#生成模型">生成模型</a></li>
+  <li><a href="#参数" id="toc-参数" class="nav-link" data-scroll-target="#参数">参数</a></li>
+  <li><a href="#模拟" id="toc-模拟" class="nav-link" data-scroll-target="#模拟">模拟</a>
+  <ul class="collapse">
+  <li><a href="#名义弯曲条件" id="toc-名义弯曲条件" class="nav-link" data-scroll-target="#名义弯曲条件">名义弯曲条件</a></li>
+  <li><a href="#全维高斯" id="toc-全维高斯" class="nav-link" data-scroll-target="#全维高斯">全维高斯</a></li>
+  <li><a href="#高方差干扰" id="toc-高方差干扰" class="nav-link" data-scroll-target="#高方差干扰">高方差干扰</a></li>
+  <li><a href="#少样本高容量" id="toc-少样本高容量" class="nav-link" data-scroll-target="#少样本高容量">少样本/高容量</a></li>
+  <li><a href="#移位范围" id="toc-移位范围" class="nav-link" data-scroll-target="#移位范围">移位范围</a></li>
+  </ul></li>
+  <li><a href="#可视化" id="toc-可视化" class="nav-link" data-scroll-target="#可视化">可视化</a></li>
+  <li><a href="#预期行为" id="toc-预期行为" class="nav-link" data-scroll-target="#预期行为">预期行为</a></li>
+  <li><a href="#参数操控" id="toc-参数操控" class="nav-link" data-scroll-target="#参数操控">参数操控</a></li>
+  <li><a href="#健全性检查" id="toc-健全性检查" class="nav-link" data-scroll-target="#健全性检查">健全性检查</a></li>
+  <li><a href="#失效情形" id="toc-失效情形" class="nav-link" data-scroll-target="#失效情形">失效情形</a></li>
+  <li><a href="#恢复任务" id="toc-恢复任务" class="nav-link" data-scroll-target="#恢复任务">恢复任务</a>
+  <ul class="collapse">
+  <li><a href="#均值与-pca" id="toc-均值与-pca" class="nav-link" data-scroll-target="#均值与-pca">均值与 PCA</a></li>
+  <li><a href="#线性自编码器" id="toc-线性自编码器" class="nav-link" data-scroll-target="#线性自编码器">线性自编码器</a></li>
+  <li><a href="#非线性自编码器" id="toc-非线性自编码器" class="nav-link" data-scroll-target="#非线性自编码器">非线性自编码器</a></li>
+  <li><a href="#冻结随机编码器" id="toc-冻结随机编码器" class="nav-link" data-scroll-target="#冻结随机编码器">冻结随机编码器</a></li>
+  </ul></li>
+  <li><a href="#候选分析方法" id="toc-候选分析方法" class="nav-link" data-scroll-target="#候选分析方法">候选分析方法</a></li>
+  <li><a href="#评估" id="toc-评估" class="nav-link" data-scroll-target="#评估">评估</a>
+  <ul class="collapse">
+  <li><a href="#经验结果" id="toc-经验结果" class="nav-link" data-scroll-target="#经验结果">经验结果</a></li>
+  </ul></li>
+  <li><a href="#解读" id="toc-解读" class="nav-link" data-scroll-target="#解读">解读</a></li>
+  <li><a href="#这个玩具模型并不确立" id="toc-这个玩具模型并不确立" class="nav-link" data-scroll-target="#这个玩具模型并不确立">这个玩具模型并不确立</a></li>
+  <li><a href="#向真实数据的扩展" id="toc-向真实数据的扩展" class="nav-link" data-scroll-target="#向真实数据的扩展">向真实数据的扩展</a></li>
+  <li><a href="#可复现性" id="toc-可复现性" class="nav-link" data-scroll-target="#可复现性">可复现性</a>
+  <ul class="collapse">
+  <li><a href="#经核查证据" id="toc-经核查证据" class="nav-link" data-scroll-target="#经核查证据">经核查证据</a></li>
+  </ul></li>
+  <li><a href="#成熟度检查表" id="toc-成熟度检查表" class="nav-link" data-scroll-target="#成熟度检查表">成熟度检查表</a></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<div class="quarto-title-block"><div><h1 class="title">有界非线性重构</h1><button type="button" class="btn code-tools-button" id="quarto-code-tools-source"><i class="bi"></i> 代码</button></div></div>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="有界非线性重构" class="level1">
+<h1>有界非线性重构</h1>
+<p>这个 L1/stable Candidate G 玩具模型询问：一个固定小非线性自编码器是否在已知弯曲模拟器上比秩匹配线性方法改善留出重构，同时对照暴露全维数据、干扰方差、有限样本容量与外推。数值是在主种子 <code>20260819</code> 下的确定性输出；它们以声明架构、优化器、预处理、划分与损失为条件。</p>
+<p><strong>假定背景：</strong> 中心化/缩放 PCA、确定性前馈网络、反向模式微分、全批 Adam 与防泄漏训练/验证/测试评估。</p>
+<section id="问题" class="level2">
+<h2 class="anchored" data-anchor-id="问题">问题</h2>
+<p>对从一个标量经固定弯曲映射生成到六个特征的观测：</p>
+<ol type="1">
+<li>单坐标非线性瓶颈是否在相同标准化度量中比训练均值、秩一 PCA 与训练线性自编码器改善留出 MSE；</li>
+<li>学习编码器是否优于带训练解码器的冻结随机非线性编码器；</li>
+<li>重构、码活动与检查点选择是否跨五个预先声明种子稳定；</li>
+<li>结果如何随全维高斯数据、独立高方差干扰特征、更大架构的少样本与移位测试支撑变化；以及</li>
+<li>哪些结论严格关乎重构，而非流形结构、本征维数、唯一坐标、表示或机制？</li>
+</ol>
+</section>
+<section id="真值" class="level2">
+<h2 class="anchored" data-anchor-id="真值">真值</h2>
+<p>外围维数是 <span class="math inline">\(p=6\)</span>，仅评分参数是 <span class="math inline">\(s\)</span>。对弯曲条件，</p>
+<p><span class="math display">\[
+g(s)=
+\begin{pmatrix}
+s\\ s^2\\0.35\sin(2s)\\0.2s^3\\\cos(s)-\sin(1.5)/1.5\\0.4\sin(3s)
+\end{pmatrix},
+\]</span></p>
+<p>且</p>
+<p><span class="math display">\[
+x=g(s)+\epsilon,\qquad \epsilon\sim\mathcal N(0,0.06^2I_6).
+\]</span></p>
+<p>名义训练、验证与测试值使用 <span class="math inline">\(s\sim\operatorname{Uniform}[-1.5,1.5]\)</span>。移位范围测试抽取两个符号且 <span class="math inline">\(|s|\sim\operatorname{Uniform}[1.5,2.4]\)</span>，而其训练与验证样本保持在范围内。实现保留 <span class="math inline">\(s\)</span> 与 <span class="math inline">\(g(s)\)</span> 仅用于模拟评分；两者都不是训练目标。</p>
+<p>全维对照从满秩高斯抽取，其总体均值与协方差精确匹配名义弯曲<strong>可观测</strong>分布，包括 <span class="math inline">\(0.06^2I_6\)</span> 噪声。在 <span class="math inline">\([-1.5,1.5]\)</span> 上的固定 256 节点 Gauss–Legendre 规则计算那些矩。所得协方差特征值约为</p>
+<p><span class="math display">\[
+(0.85225,0.53472,0.10844,0.00563,0.00378,0.00360),
+\]</span></p>
+<p>因此高斯保持满秩，同时没有标量生成器真值。可执行目标矩差异为零；有限采样划分允许普通采样偏差。对该条件应用一维瓶颈是施加的压缩，不是维数估计。</p>
+</section>
+<section id="生成模型" class="level2">
+<h2 class="anchored" data-anchor-id="生成模型">生成模型</h2>
+<p>独立划分大小是：</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>条件</th>
+<th style="text-align: right;">训练</th>
+<th style="text-align: right;">验证</th>
+<th style="text-align: right;">测试</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>名义弯曲</td>
+<td style="text-align: right;">320</td>
+<td style="text-align: right;">160</td>
+<td style="text-align: right;">240</td>
+</tr>
+<tr class="even">
+<td>全维高斯</td>
+<td style="text-align: right;">320</td>
+<td style="text-align: right;">160</td>
+<td style="text-align: right;">240</td>
+</tr>
+<tr class="odd">
+<td>高方差干扰</td>
+<td style="text-align: right;">320</td>
+<td style="text-align: right;">160</td>
+<td style="text-align: right;">240</td>
+</tr>
+<tr class="even">
+<td>少样本/高容量</td>
+<td style="text-align: right;">40</td>
+<td style="text-align: right;">80</td>
+<td style="text-align: right;">240</td>
+</tr>
+<tr class="odd">
+<td>移位范围</td>
+<td style="text-align: right;">320</td>
+<td style="text-align: right;">160</td>
+<td style="text-align: right;">240</td>
+</tr>
+</tbody>
+</table>
+<p>对干扰条件，在弯曲信号与普通噪声之后向特征 5–6 添加标准差 2.5 的独立高斯噪声。这把标准化目标表现与由科学上无信息方差主导的原始单位误差分开。</p>
+<p>所有流使用 <code>Generator(PCG64(SeedSequence(words)))</code>。生成、仅训练标准化、初始化、优化、验证检查点、种子选择、评分、绘图与验证是独立函数。</p>
+</section>
+<section id="参数" class="level2">
+<h2 class="anchored" data-anchor-id="参数">参数</h2>
+<p>每个条件使用训练拟合特征均值与总体除数标准差。所有确定性方法在相同变换坐标欧氏 MSE 中优化或被评分，重构也返回原始单位。</p>
+<p>瓶颈宽度为一。没有跳跃连接、随机层、去噪、稀疏性或输出非线性。</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 30%">
+<col style="width: 30%">
+<col style="width: 40%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>族</th>
+<th>架构</th>
+<th style="text-align: right;">可训练参数</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>训练线性 AE</td>
+<td><span class="math inline">\(6\to1\to6\)</span></td>
+<td style="text-align: right;">19</td>
+</tr>
+<tr class="even">
+<td>小非线性 AE</td>
+<td><span class="math inline">\(6\to8\to1\to8\to6\)</span></td>
+<td style="text-align: right;">135</td>
+</tr>
+<tr class="odd">
+<td>冻结随机编码器，普通条件</td>
+<td>冻结 <span class="math inline">\(6\to8\to1\)</span>，训练 <span class="math inline">\(1\to8\to6\)</span></td>
+<td style="text-align: right;">70 训练，65 冻结，共 135</td>
+</tr>
+<tr class="even">
+<td>少样本非线性 AE</td>
+<td><span class="math inline">\(6\to32\to1\to32\to6\)</span></td>
+<td style="text-align: right;">519 可训练</td>
+</tr>
+<tr class="odd">
+<td>少样本冻结编码器</td>
+<td>冻结 <span class="math inline">\(6\to32\to1\)</span>，训练 <span class="math inline">\(1\to32\to6\)</span></td>
+<td style="text-align: right;">262 训练，257 冻结，共 519</td>
+</tr>
+</tbody>
+</table>
+<p>五个预先声明种子是 <code>0,1,2,3,4</code>。初始化是族特定的并记录在清单中：</p>
+<ul>
+<li>线性 AE 是 <strong>PCA 热启动优化对照</strong>：编码器/解码器权重从训练秩一 PCA 方向加种子特定 <span class="math inline">\(\mathcal N(0,0.02^2)\)</span> 扰动开始，偏置为零；</li>
+<li>非线性 AE 权重使用独立中心化 Normal 抽样，Glorot 式尺度 <span class="math inline">\(\sqrt{2/(fan_{in}+fan_{out})}\)</span>，偏置为零；以及</li>
+<li>冻结编码器使用方差 <span class="math inline">\(1/6\)</span> 与 <span class="math inline">\(1/H\)</span> 的固定中心化 Normal 权重与小的随机编码器偏置，而其可训练解码器使用 Glorot 式中心化 Normal 权重与零解码器偏置。</li>
+</ul>
+<p>训练使用手动全批 Adam，<span class="math inline">\((\beta_1,\beta_2,\epsilon)=(0.9,0.999,10^{-8})\)</span>，无权重衰减，线性输出。学习率对线性 AE 为 0.025、非线性 AE 为 0.012、冻结编码器解码器为 0.015。每个族最多 900 轮、耐心 120。验证按种子选择最早严格最小值，然后选择验证损失最小且低种子破并列的种子。测试数据永不选择轮次或种子。</p>
+<p>这些是 LDG 设计选择，不是文献提供的优化设置。</p>
+</section>
+<section id="模拟" class="level2">
+<h2 class="anchored" data-anchor-id="模拟">模拟</h2>
+<section id="名义弯曲条件" class="level3">
+<h3 class="anchored" data-anchor-id="名义弯曲条件">名义弯曲条件</h3>
+<p>这是主非线性重构条件。生成器代码相关只在拟合后允许作为模拟诊断。</p>
+</section>
+<section id="全维高斯" class="level3">
+<h3 class="anchored" data-anchor-id="全维高斯">全维高斯</h3>
+<p>矩匹配满秩高斯没有 <span class="math inline">\(s\)</span> 或无噪一维映射。省略码–<span class="math inline">\(s\)</span>、单调性与生成器恢复行。任何非线性重构优势在控制第一与第二总体矩后仍是压缩结果。</p>
+</section>
+<section id="高方差干扰" class="level3">
+<h3 class="anchored" data-anchor-id="高方差干扰">高方差干扰</h3>
+<p>前四个特征保留弯曲信号；后两个接收大独立干扰方差。分别报告结构特征与干扰特征 MSE。标准化与原始单位 MSE 都不被声明普遍正确。</p>
+</section>
+<section id="少样本高容量" class="level3">
+<h3 class="anchored" data-anchor-id="少样本高容量">少样本/高容量</h3>
+<p>只有 40 行训练 519 参数非线性模型与架构匹配的宽度 32 冻结编码器对照（257 冻结、262 训练解码器参数）。报告完整训练、验证与测试误差及种子变异。在此实现数据集中，验证选择阻止戏剧性记忆差距；该阴性对照仍具信息性，尽管预期失败未被强迫。</p>
+</section>
+<section id="移位范围" class="level3">
+<h3 class="anchored" data-anchor-id="移位范围">移位范围</h3>
+<p>模型与标准化器只在范围内拟合，并原样应用于训练支撑之外。这是外推，不是另一个验证划分。</p>
+</section>
+</section>
+<section id="可视化" class="level2">
+<h2 class="anchored" data-anchor-id="可视化">可视化</h2>
+<p>单一复合 <code>summary.png</code> 显示有界名义重构、跨条件所选测试重构度量、所选损失历史以及名义与移位测试的码对 <span class="math inline">\(s\)</span> 诊断。</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="../../toy-models/artifacts/bounded-nonlinear-reconstruction/summary.png" class="img-fluid figure-img"></p>
+<figcaption>有界非线性重构诊断</figcaption>
+</figure>
+</div>
+<p>该图仅具诊断性。所有方法使用仅训练标准化；验证选择检查点/种子；测试数据不选择模型。码图是模拟侧诊断，不是流形或本征坐标证据。</p>
+</section>
+<section id="预期行为" class="level2">
+<h2 class="anchored" data-anchor-id="预期行为">预期行为</h2>
+<ul>
+<li>秩一 PCA 是解析线性重构参考。训练良好的线性 AE 应接近其重构子空间与损失 <span class="citation" data-cites="BourlardKamp1988 BaldiHornik1989">(<a href="#ref-BourlardKamp1988" role="doc-biblioref">Bourlard 和 Kamp 1988年</a>; <a href="#ref-BaldiHornik1989" role="doc-biblioref">Baldi 和 Hornik 1989年</a>)</span>。</li>
+<li>小非线性 AE 可以在弯曲生成器上改善插值，而不证明任意数据集一维或流形值。</li>
+<li>冻结随机非线性特征可以重构一些结构，因此在归功学习编码之前需要其完整种子分布。</li>
+<li>即使灵活模型改善 MSE，全维高斯数据也不提供有效标量生成器恢复主张。</li>
+<li>标准化可以防止干扰特征主导优化度量，而原始单位误差仍由干扰主导。</li>
+<li>范围外重构与码排序可以急剧退化，尽管范围内验证良好。</li>
+<li>大网络配少样本可以过拟合，但预先声明验证停止也可能阻止预期戏剧性失败。阴性对照被报告，而非被调优保证故事。</li>
+</ul>
+</section>
+<section id="参数操控" class="level2">
+<h2 class="anchored" data-anchor-id="参数操控">参数操控</h2>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>条件</th>
+<th>改变的假设</th>
+<th>诊断</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>nominal_curved</code></td>
+<td>无</td>
+<td>有界非线性留出增益</td>
+</tr>
+<tr class="even">
+<td><code>full_dimensional_gaussian</code></td>
+<td>无标量弯曲生成器</td>
+<td>施加单码压缩</td>
+</tr>
+<tr class="odd">
+<td><code>high_variance_nuisance</code></td>
+<td>特征 5–6 的大独立方差</td>
+<td>结构/干扰与度量依赖</td>
+</tr>
+<tr class="even">
+<td><code>few_sample_high_capacity</code></td>
+<td>40 训练行与宽度 32</td>
+<td>容量、种子与泛化差距</td>
+</tr>
+<tr class="odd">
+<td><code>shifted_range</code></td>
+<td>训练范围外测试支撑</td>
+<td>外推与码排序</td>
+</tr>
+</tbody>
+</table>
+<p>没有条件、架构、种子集、优化器预算或噪声幅度根据测试结果重调。</p>
+</section>
+<section id="健全性检查" class="level2">
+<h2 class="anchored" data-anchor-id="健全性检查">健全性检查</h2>
+<p>验证器检查：</p>
+<ol type="1">
+<li>观测、<span class="math inline">\(s\)</span> 与无噪曲线的精确划分再生；</li>
+<li>测试观测投毒使标准化、所有候选、检查点历史与所选种子不变；</li>
+<li>投毒每个 <span class="math inline">\(s\)</span> 与无噪真值数组使所有仅观测拟合与重构不变；</li>
+<li>PCA 与解析线性重构相同；</li>
+<li>所选训练线性 AE 复合投影器、子空间角与训练 MSE 在声明容差内接近 PCA；失败将被标记为优化失败；</li>
+<li>线性、非线性与冻结解码器网络的中心化有限差分梯度与分析反向传播一致；</li>
+<li>验证检查点损失与最早最小值轮次精确重算；</li>
+<li>验证种子选择精确重放；</li>
+<li>重复全批 Adam 训练确定性；</li>
+<li>冻结编码器参数永不变；</li>
+<li>瓶颈形状恰好 <span class="math inline">\(n\times1\)</span>、参数数与架构匹配，且不存在跳跃路径；</li>
+<li>所有损失、参数、码、重构与度量值有限；</li>
+<li>度量行具有精确 schema、非空标签、有限值与唯一复合键；以及</li>
+<li>干净临时再生成产生逐字节相同生成产物。</li>
+</ol>
+<p>这些检查支持实现完整性，而非流形或机制主张。</p>
+</section>
+<section id="失效情形" class="level2">
+<h2 class="anchored" data-anchor-id="失效情形">失效情形</h2>
+<ul>
+<li><strong>PCA 与 AE 度量不同：</strong> 预处理或测试拟合缩放使比较无效。</li>
+<li><strong>把糟糕线性优化称为非线性增益：</strong> 解析 PCA 保持为权威线性基线。</li>
+<li><strong>最佳测试种子选择：</strong> 所有检查点与种子选择必须只用验证。</li>
+<li><strong>把低训练误差称为恢复：</strong> 完整训练/验证/测试差距必须保持可见。</li>
+<li><strong>静默更新冻结编码器：</strong> 编码器不可变性被可执行检查。</li>
+<li><strong>隐藏死或塌缩码：</strong> 报告码方差、范围与碰撞诊断。</li>
+<li><strong>把干扰重构称为科学信号：</strong> 结构与干扰误差保持分离。</li>
+<li><strong>把全高斯称为一维：</strong> 该条件不存在标量真值行。</li>
+<li><strong>把范围内插值泛化到移位支撑：</strong> 移位度量显式是外推。</li>
+<li><strong>把码相关称为坐标辨识：</strong> 与 <span class="math inline">\(s\)</span> 的相关仅评分，不辨识唯一码。</li>
+<li><strong>把单个活跃瓶颈称为本征维数：</strong> 瓶颈宽度由分析者固定。</li>
+</ul>
+</section>
+<section id="恢复任务" class="level2">
+<h2 class="anchored" data-anchor-id="恢复任务">恢复任务</h2>
+<section id="均值与-pca" class="level3">
+<h3 class="anchored" data-anchor-id="均值与-pca">均值与 PCA</h3>
+<p>变换训练均值为零。秩一 PCA 拟合领先右奇异向量并应用其正交投影器。</p>
+</section>
+<section id="线性自编码器" class="level3">
+<h3 class="anchored" data-anchor-id="线性自编码器">线性自编码器</h3>
+<p>可训练线性编码器与解码器在相同 MSE 下优化。复合映射而非单个因子与 PCA 投影器比较。</p>
+</section>
+<section id="非线性自编码器" class="level3">
+<h3 class="anchored" data-anchor-id="非线性自编码器">非线性自编码器</h3>
+<p>对隐藏宽度 <span class="math inline">\(h\)</span>，编码器是 <span class="math inline">\(\tanh(W_eu+b_e)\)</span> 后接一个线性码；解码器应用一个 tanh 隐藏层与线性输出。所有可训练参数使用固定优化器规程。</p>
+</section>
+<section id="冻结随机编码器" class="level3">
+<h3 class="anchored" data-anchor-id="冻结随机编码器">冻结随机编码器</h3>
+<p>非线性编码器在训练前初始化并复制。只优化解码器。这控制通用冻结非线性特征是否充分。</p>
+</section>
+</section>
+<section id="候选分析方法" class="level2">
+<h2 class="anchored" data-anchor-id="候选分析方法">候选分析方法</h2>
+<ol type="1">
+<li>训练均值；</li>
+<li>秩一 PCA；</li>
+<li>训练秩一线性 AE；</li>
+<li>固定小非线性 tanh AE；</li>
+<li>带训练解码器的冻结随机 tanh 编码器；以及</li>
+<li>少样本压力中的更大非线性架构。</li>
+</ol>
+<p>没有方法接收 <span class="math inline">\(s\)</span>、无噪 <span class="math inline">\(g(s)\)</span>、测试预处理统计量或测试选择轮次。</p>
+</section>
+<section id="评估" class="level2">
+<h2 class="anchored" data-anchor-id="评估">评估</h2>
+<p><code>metrics.csv</code> 包含：</p>
+<pre class="text"><code>split,condition,preprocessing,method,seed,selection,target,metric,value</code></pre>
+<p>它报告按划分的变换与原始单位 MSE、逐特征 MSE、训练–测试差距、参数数、所选种子/轮次、所有种子验证记录、码均值/方差/范围与塌缩/死指示器，以及条件特定结构/干扰或生成器诊断。</p>
+<section id="经验结果" class="level3">
+<h3 class="anchored" data-anchor-id="经验结果">经验结果</h3>
+<p>所选模型测试原始单位 MSE：</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>条件</th>
+<th style="text-align: right;">PCA</th>
+<th style="text-align: right;">线性 AE</th>
+<th style="text-align: right;">非线性 AE</th>
+<th style="text-align: right;">冻结编码器</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>名义弯曲</td>
+<td style="text-align: right;">0.1082</td>
+<td style="text-align: right;">0.1085</td>
+<td style="text-align: right;"><strong>0.00958</strong></td>
+<td style="text-align: right;">0.1288</td>
+</tr>
+<tr class="even">
+<td>矩匹配全维高斯</td>
+<td style="text-align: right;">0.11245</td>
+<td style="text-align: right;">0.11213</td>
+<td style="text-align: right;">0.11318</td>
+<td style="text-align: right;">0.15416</td>
+</tr>
+<tr class="odd">
+<td>高方差干扰</td>
+<td style="text-align: right;">2.0780</td>
+<td style="text-align: right;">2.0854</td>
+<td style="text-align: right;">1.8351</td>
+<td style="text-align: right;"><strong>1.7160</strong></td>
+</tr>
+<tr class="even">
+<td>少样本/高容量</td>
+<td style="text-align: right;">0.1177</td>
+<td style="text-align: right;">0.1175</td>
+<td style="text-align: right;"><strong>0.00525</strong></td>
+<td style="text-align: right;">0.0389</td>
+</tr>
+<tr class="odd">
+<td>移位范围</td>
+<td style="text-align: right;">2.1218</td>
+<td style="text-align: right;">2.1228</td>
+<td style="text-align: right;"><strong>0.9146</strong></td>
+<td style="text-align: right;">2.7996</td>
+</tr>
+</tbody>
+</table>
+<p>名义非线性码与仅评分 <span class="math inline">\(s\)</span> 的绝对 Pearson/Spearman 相关为 0.901/0.846。报告的碰撞诊断是非标准 LDG 阈值检查：在所有 <span class="math inline">\(n(n-1)/2=28{,}680\)</span> 个测试对中，用 <span class="math inline">\(|\Delta z|\le0.05\)</span> 的观测码范围定义近码分母；碰撞额外要求 <span class="math inline">\(|\Delta s|&gt;0.5\)</span>。所选名义模型有 4,135 个近码对与 39 个碰撞，比例 0.00943。这些阈值与值不确立单射性或唯一坐标。在干扰方差下，非线性结构特征 MSE 为 0.0125，而干扰特征 MSE 为 5.48，显示聚合原始单位损失为何可以掩盖科学结构。少样本非线性训练/测试 MSE 为 0.00321/0.00525：更大网络拟合良好，但预先声明验证规程避免戏剧性记忆失败。移位非线性测试 MSE 用精确名义训练/验证捆绑、标准化器、候选历史、检查点、所选种子与拟合模型计算；只有外部支撑测试捆绑不同。其所选码有 13,390 个近码对与 1,852 个碰撞，比例 0.1383，暴露外推界限。</p>
+<p>矩匹配高斯非线性结果在该实现中略差于 PCA/线性 AE，不是一维结构的证据。种子变异保留在完整度量表中，选择仅验证。</p>
+</section>
+</section>
+<section id="解读" class="level2">
+<h2 class="anchored" data-anchor-id="解读">解读</h2>
+<p>名义结果只确立：所选有限非线性网络在声明标准化 MSE 下比秩一 PCA 更好地重构来自该弯曲模拟器的留出样本。全维、干扰、少样本、冻结特征与移位对照显示重构增益可以与一维真值缺失、无关方差、容量敏感性、有用随机特征或差外推共存。</p>
+<div class="callout callout-style-default callout-warning callout-titled" title="这并不蕴含">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">警告</span>这并不蕴含
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>低重构误差、活跃一维码或与已知模拟器参数的相关不证明流形、本征维数、唯一潜坐标、表示、因果变量、动力学或机制。</p>
+</div>
+</div>
+</section>
+<section id="这个玩具模型并不确立" class="level2">
+<h2 class="anchored" data-anchor-id="这个玩具模型并不确立">这个玩具模型并不确立</h2>
+<ul>
+<li>与模型无关的本征维数；</li>
+<li>光滑或单射流形坐标卡；</li>
+<li>唯一编码器/解码器参数或码轴；</li>
+<li>概率模型、后验或不确定性分布；</li>
+<li>动力学、时间顺序、向量场或状态转移；</li>
+<li>因果、生物或物理机制；</li>
+<li>非线性对 PCA 的普遍优越性；或</li>
+<li>在测试范围之外的可靠外推。</li>
+</ul>
+</section>
+<section id="向真实数据的扩展" class="level2">
+<h2 class="anchored" data-anchor-id="向真实数据的扩展">向真实数据的扩展</h2>
+<p>真实数据使用必须定义独立单元、特征缩放、缺失、架构/容量搜索、嵌套验证、受试者/会话移位、干扰特征与逐特征错误的科学代价。重构基线应伴随 PCA、随机特征、容量、种子、泄漏与分布移位检查。码不应仅从几何获得语义或机制名称。</p>
+</section>
+<section id="可复现性" class="level2">
+<h2 class="anchored" data-anchor-id="可复现性">可复现性</h2>
+<p>有界产物集是：</p>
+<pre class="text"><code>toy-models/bounded-nonlinear-reconstruction.py
+toy-models/artifacts/bounded-nonlinear-reconstruction/manifest.json
+toy-models/artifacts/bounded-nonlinear-reconstruction/metrics.csv
+toy-models/artifacts/bounded-nonlinear-reconstruction/diagnostics.json
+toy-models/artifacts/bounded-nonlinear-reconstruction/summary.png</code></pre>
+<p>捆绑运行时命令是：</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">/Users/bytedance/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3</span> toy-models/bounded-nonlinear-reconstruction.py</span></code></pre></div><button title="复制到剪贴板" class="code-copy-button"><i class="bi"></i></button></div>
+<p>默认执行生成并验证，包括临时逐字节相同再生。清单记录生成器与划分契约、预处理、架构、参数数、种子、优化器/检查点规则、适用性、运行时、命令与哈希。</p>
+<section id="经核查证据" class="level3">
+<h3 class="anchored" data-anchor-id="经核查证据">经核查证据</h3>
+<ul>
+<li><strong>Bourlard 与 Kamp（1988）：</strong> 完整四页文章经核查 SVD 解、中心化/偏置处理、线性隐单元关系、小信号 sigmoid 讨论、实验与结论 <span class="citation" data-cites="BourlardKamp1988">(<a href="#ref-BourlardKamp1988" role="doc-biblioref">Bourlard 和 Kamp 1988年</a>)</span>。</li>
+<li><strong>Baldi 与 Hornik（1989）：</strong> 完整六页文章经核查平方误差景观、主子空间最优、因子非唯一性、边界情形、算法讨论与附录 <span class="citation" data-cites="BaldiHornik1989">(<a href="#ref-BaldiHornik1989" role="doc-biblioref">Baldi 和 Hornik 1989年</a>)</span>。</li>
+<li><strong>Kramer（1991）：</strong> 非线性自联想架构、重构目标、容量/过拟合讨论、训练规程、示例与结论经核查；序列因子与相关工作细节仅以概览深度阅读 <span class="citation" data-cites="Kramer1991">(<a href="#ref-Kramer1991" role="doc-biblioref">Kramer 1991年</a>)</span>。</li>
+<li><strong>Goodfellow、Bengio 与 Courville（2016）第 14 章：</strong> 引言、欠完整自编码器、容量与复制失败、相关实值/MSE 材料、流形学习解读界限与优化/泛化讨论经核查。被排除的自编码器变体未逐方程核查 <span class="citation" data-cites="GoodfellowBengioCourville2016">(<a href="#ref-GoodfellowBengioCourville2016" role="doc-biblioref">Goodfellow 等 2016年</a>, chap.&nbsp;14)</span>。</li>
+</ul>
+<p>这些来源不提供该模拟器、架构、种子、优化器预算、阈值或产物格式；那些是 LDG 设计选择。</p>
+</section>
+</section>
+<section id="成熟度检查表" class="level2">
+<h2 class="anchored" data-anchor-id="成熟度检查表">成熟度检查表</h2>
+<ul class="task-list">
+<li><label><input type="checkbox" checked="">完整 L1/stable 玩具模型 schema 与产物契约。</label></li>
+<li><label><input type="checkbox" checked="">已知弯曲生成器、全维、干扰、少样本与移位对照显式。</label></li>
+<li><label><input type="checkbox" checked="">均值、PCA、线性 AE、非线性 AE 与冻结编码器比较共享仅训练预处理与 MSE 几何。</label></li>
+<li><label><input type="checkbox" checked="">架构、参数数、优化器、预算、耐心、种子、检查点与选择固定。</label></li>
+<li><label><input type="checkbox" checked="">报告划分损失、特征误差、种子分布、码活动、生成器与外推诊断。</label></li>
+<li><label><input type="checkbox" checked="">梯度、检查点、种子、泄漏、PCA/线性、架构与确定性神谕通过。</label></li>
+<li><label><input type="checkbox" checked="">禁止流形、维数、坐标、动力学、机制、表示与因果过度宣称。</label></li>
+<li><label><input type="checkbox" checked="">独立科学审查 PASS。</label></li>
+<li><label><input type="checkbox" checked="">独立实现审查 PASS。</label></li>
+<li><label><input type="checkbox" checked="">审查后仓库验证与渲染 PASS。</label></li>
+<li><label><input type="checkbox" checked="">在记录的审查决定下机械 L1/stable 晋升。</label></li>
+</ul>
+
+
+<!-- -->
+
+
+</section>
+</section>
+
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography" id="quarto-bibliography"><h2 class="anchored quarto-appendix-heading">参考文献</h2><div id="refs" class="references csl-bib-body hanging-indent" role="list">
+<div id="ref-BaldiHornik1989" class="csl-entry" role="listitem">
+Baldi, Pierre, 和 Kurt Hornik. 1989年. <span>《Neural Networks and Principal Component Analysis: Learning from Examples without Local Minima》</span>. <em>Neural Networks</em> 2 (1): 53～58. <a href="https://doi.org/10.1016/0893-6080(89)90014-2">https://doi.org/10.1016/0893-6080(89)90014-2</a>.
+</div>
+<div id="ref-BourlardKamp1988" class="csl-entry" role="listitem">
+Bourlard, Hervé, 和 Yves Kamp. 1988年. <span>《Auto-Association by Multilayer Perceptrons and Singular Value Decomposition》</span>. <em>Biological Cybernetics</em> 59 (4–5): 291～94. <a href="https://doi.org/10.1007/BF00332918">https://doi.org/10.1007/BF00332918</a>.
+</div>
+<div id="ref-GoodfellowBengioCourville2016" class="csl-entry" role="listitem">
+Goodfellow, Ian, Yoshua Bengio, 和 Aaron Courville. 2016年. <em>Deep Learning</em>. MIT Press. <a href="https://www.deeplearningbook.org/">https://www.deeplearningbook.org/</a>.
+</div>
+<div id="ref-Kramer1991" class="csl-entry" role="listitem">
+Kramer, Mark A. 1991年. <span>《Nonlinear Principal Component Analysis Using Autoassociative Neural Networks》</span>. <em>AIChE Journal</em> 37 (2): 233～43. <a href="https://doi.org/10.1002/aic.690370209">https://doi.org/10.1002/aic.690370209</a>.
+</div>
+</div></section></div></main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "已复制");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "已复制");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+    const viewSource = window.document.getElementById('quarto-view-source') ||
+                       window.document.getElementById('quarto-code-tools-source');
+    if (viewSource) {
+      const sourceUrl = viewSource.getAttribute("data-quarto-source-url");
+      viewSource.addEventListener("click", function(e) {
+        if (sourceUrl) {
+          // rstudio viewer pane
+          if (/\bcapabilities=\b/.test(window.location)) {
+            window.open(sourceUrl);
+          } else {
+            window.location.href = sourceUrl;
+          }
+        } else {
+          const modal = new bootstrap.Modal(document.getElementById('quarto-embedded-source-code-modal'));
+          modal.show();
+        }
+        return false;
+      });
+    }
+    function toggleCodeHandler(show) {
+      return function(e) {
+        const cellDetails = window.document.querySelectorAll(".cell details.code-fold");
+        for (let i=0; i<cellDetails.length; i++) {
+          const details = cellDetails[i];
+          if (show) {
+            details.open = true;
+          } else {
+            details.removeAttribute("open");
+          }
+        }
+        const cellCodeDivs = window.document.querySelectorAll(".cell div.sourceCode.cell-code");
+        const fromCls = show ? "hidden" : "unhidden";
+        const toCls = show ? "unhidden" : "hidden";
+        for (let i=0; i<cellCodeDivs.length; i++) {
+          const codeDiv = cellCodeDivs[i];
+          if (codeDiv.classList.contains(fromCls)) {
+            codeDiv.classList.remove(fromCls);
+            codeDiv.classList.add(toCls);
+          } 
+        }
+        return false;
+      }
+    }
+    const hideAllCode = window.document.getElementById("quarto-hide-all-code");
+    if (hideAllCode) {
+      hideAllCode.addEventListener("click", toggleCodeHandler(false));
+    }
+    const showAllCode = window.document.getElementById("quarto-show-all-code");
+    if (showAllCode) {
+      showAllCode.addEventListener("click", toggleCodeHandler(true));
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/abelzheng\.github\.io\/latent-dynamics-geometry-public\/");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+            // target, if specified
+            link.setAttribute("target", "_blank");
+            if (link.getAttribute("rel") === null) {
+              link.setAttribute("rel", "noopener");
+            }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">源代码</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4" data-shortcodes="false"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="an">title:</span><span class="co"> "有界非线性重构"</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="an">lang:</span><span class="co"> zh-CN</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="an">comments:</span><span class="co"> false</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="an">object_type:</span><span class="co"> toy-model</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="an">maturity:</span><span class="co"> L1</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="an">status:</span><span class="co"> stable</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="an">domain:</span><span class="co"> [dimensionality-reduction, neural-networks, nonlinear-reconstruction]</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a><span class="an">tags:</span><span class="co"> [autoencoder, pca, reconstruction, memorization, extrapolation, negative-control]</span></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a><span class="an">prerequisites:</span></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a><span class="co">- knowledge/methods/autoencoder-baseline.qmd</span></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a><span class="co">- knowledge/methods/principal-component-analysis.qmd</span></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a><span class="an">related:</span></span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a><span class="co">- knowledge/concepts/linear-subspace.qmd</span></span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a><span class="co">- knowledge/concepts/manifold.qmd</span></span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a><span class="co">- knowledge/concepts/intrinsic-dimension.qmd</span></span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a><span class="co">- toy-models/static-linear-latent-recovery.qmd</span></span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a><span class="an">created:</span><span class="co"> 2026-08-19</span></span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a><span class="an">updated:</span><span class="co"> 2026-08-20</span></span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a><span class="fu"># 有界非线性重构</span></span>
+<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a>这个 L1/stable Candidate G 玩具模型询问：一个固定小非线性自编码器是否在已知弯曲模拟器上比秩匹配线性方法改善留出重构，同时对照暴露全维数据、干扰方差、有限样本容量与外推。数值是在主种子 <span class="in">`20260819`</span> 下的确定性输出；它们以声明架构、优化器、预处理、划分与损失为条件。</span>
+<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a>**假定背景：** 中心化/缩放 PCA、确定性前馈网络、反向模式微分、全批 Adam 与防泄漏训练/验证/测试评估。</span>
+<span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a><span class="fu">## 问题</span></span>
+<span id="cb4-29"><a href="#cb4-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-30"><a href="#cb4-30" aria-hidden="true" tabindex="-1"></a>对从一个标量经固定弯曲映射生成到六个特征的观测：</span>
+<span id="cb4-31"><a href="#cb4-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-32"><a href="#cb4-32" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>单坐标非线性瓶颈是否在相同标准化度量中比训练均值、秩一 PCA 与训练线性自编码器改善留出 MSE；</span>
+<span id="cb4-33"><a href="#cb4-33" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>学习编码器是否优于带训练解码器的冻结随机非线性编码器；</span>
+<span id="cb4-34"><a href="#cb4-34" aria-hidden="true" tabindex="-1"></a><span class="ss">3. </span>重构、码活动与检查点选择是否跨五个预先声明种子稳定；</span>
+<span id="cb4-35"><a href="#cb4-35" aria-hidden="true" tabindex="-1"></a><span class="ss">4. </span>结果如何随全维高斯数据、独立高方差干扰特征、更大架构的少样本与移位测试支撑变化；以及</span>
+<span id="cb4-36"><a href="#cb4-36" aria-hidden="true" tabindex="-1"></a><span class="ss">5. </span>哪些结论严格关乎重构，而非流形结构、本征维数、唯一坐标、表示或机制？</span>
+<span id="cb4-37"><a href="#cb4-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-38"><a href="#cb4-38" aria-hidden="true" tabindex="-1"></a><span class="fu">## 真值</span></span>
+<span id="cb4-39"><a href="#cb4-39" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-40"><a href="#cb4-40" aria-hidden="true" tabindex="-1"></a>外围维数是 $p=6$，仅评分参数是 $s$。对弯曲条件，</span>
+<span id="cb4-41"><a href="#cb4-41" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-42"><a href="#cb4-42" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb4-43"><a href="#cb4-43" aria-hidden="true" tabindex="-1"></a>g(s)=</span>
+<span id="cb4-44"><a href="#cb4-44" aria-hidden="true" tabindex="-1"></a>\begin{pmatrix}</span>
+<span id="cb4-45"><a href="#cb4-45" aria-hidden="true" tabindex="-1"></a>s<span class="sc">\\</span> s^2<span class="sc">\\</span>0.35\sin(2s)<span class="sc">\\</span>0.2s^3<span class="sc">\\</span>\cos(s)-\sin(1.5)/1.5<span class="sc">\\</span>0.4\sin(3s)</span>
+<span id="cb4-46"><a href="#cb4-46" aria-hidden="true" tabindex="-1"></a>\end{pmatrix},</span>
+<span id="cb4-47"><a href="#cb4-47" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb4-48"><a href="#cb4-48" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-49"><a href="#cb4-49" aria-hidden="true" tabindex="-1"></a>且</span>
+<span id="cb4-50"><a href="#cb4-50" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-51"><a href="#cb4-51" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb4-52"><a href="#cb4-52" aria-hidden="true" tabindex="-1"></a>x=g(s)+\epsilon,\qquad \epsilon\sim\mathcal N(0,0.06^2I_6).</span>
+<span id="cb4-53"><a href="#cb4-53" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb4-54"><a href="#cb4-54" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-55"><a href="#cb4-55" aria-hidden="true" tabindex="-1"></a>名义训练、验证与测试值使用 $s\sim\operatorname{Uniform}<span class="co">[</span><span class="ot">-1.5,1.5</span><span class="co">]</span>$。移位范围测试抽取两个符号且 $|s|\sim\operatorname{Uniform}<span class="co">[</span><span class="ot">1.5,2.4</span><span class="co">]</span>$，而其训练与验证样本保持在范围内。实现保留 $s$ 与 $g(s)$ 仅用于模拟评分；两者都不是训练目标。</span>
+<span id="cb4-56"><a href="#cb4-56" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-57"><a href="#cb4-57" aria-hidden="true" tabindex="-1"></a>全维对照从满秩高斯抽取，其总体均值与协方差精确匹配名义弯曲**可观测**分布，包括 $0.06^2I_6$ 噪声。在 $<span class="co">[</span><span class="ot">-1.5,1.5</span><span class="co">]</span>$ 上的固定 256 节点 Gauss–Legendre 规则计算那些矩。所得协方差特征值约为</span>
+<span id="cb4-58"><a href="#cb4-58" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-59"><a href="#cb4-59" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb4-60"><a href="#cb4-60" aria-hidden="true" tabindex="-1"></a>(0.85225,0.53472,0.10844,0.00563,0.00378,0.00360),</span>
+<span id="cb4-61"><a href="#cb4-61" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb4-62"><a href="#cb4-62" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-63"><a href="#cb4-63" aria-hidden="true" tabindex="-1"></a>因此高斯保持满秩，同时没有标量生成器真值。可执行目标矩差异为零；有限采样划分允许普通采样偏差。对该条件应用一维瓶颈是施加的压缩，不是维数估计。</span>
+<span id="cb4-64"><a href="#cb4-64" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-65"><a href="#cb4-65" aria-hidden="true" tabindex="-1"></a><span class="fu">## 生成模型</span></span>
+<span id="cb4-66"><a href="#cb4-66" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-67"><a href="#cb4-67" aria-hidden="true" tabindex="-1"></a>独立划分大小是：</span>
+<span id="cb4-68"><a href="#cb4-68" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-69"><a href="#cb4-69" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> 条件 <span class="pp">|</span> 训练 <span class="pp">|</span> 验证 <span class="pp">|</span> 测试 <span class="pp">|</span></span>
+<span id="cb4-70"><a href="#cb4-70" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---:|---:|---:|</span></span>
+<span id="cb4-71"><a href="#cb4-71" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> 名义弯曲 <span class="pp">|</span> 320 <span class="pp">|</span> 160 <span class="pp">|</span> 240 <span class="pp">|</span></span>
+<span id="cb4-72"><a href="#cb4-72" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> 全维高斯 <span class="pp">|</span> 320 <span class="pp">|</span> 160 <span class="pp">|</span> 240 <span class="pp">|</span></span>
+<span id="cb4-73"><a href="#cb4-73" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> 高方差干扰 <span class="pp">|</span> 320 <span class="pp">|</span> 160 <span class="pp">|</span> 240 <span class="pp">|</span></span>
+<span id="cb4-74"><a href="#cb4-74" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> 少样本/高容量 <span class="pp">|</span> 40 <span class="pp">|</span> 80 <span class="pp">|</span> 240 <span class="pp">|</span></span>
+<span id="cb4-75"><a href="#cb4-75" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> 移位范围 <span class="pp">|</span> 320 <span class="pp">|</span> 160 <span class="pp">|</span> 240 <span class="pp">|</span></span>
+<span id="cb4-76"><a href="#cb4-76" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-77"><a href="#cb4-77" aria-hidden="true" tabindex="-1"></a>对干扰条件，在弯曲信号与普通噪声之后向特征 5–6 添加标准差 2.5 的独立高斯噪声。这把标准化目标表现与由科学上无信息方差主导的原始单位误差分开。</span>
+<span id="cb4-78"><a href="#cb4-78" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-79"><a href="#cb4-79" aria-hidden="true" tabindex="-1"></a>所有流使用 <span class="in">`Generator(PCG64(SeedSequence(words)))`</span>。生成、仅训练标准化、初始化、优化、验证检查点、种子选择、评分、绘图与验证是独立函数。</span>
+<span id="cb4-80"><a href="#cb4-80" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-81"><a href="#cb4-81" aria-hidden="true" tabindex="-1"></a><span class="fu">## 参数</span></span>
+<span id="cb4-82"><a href="#cb4-82" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-83"><a href="#cb4-83" aria-hidden="true" tabindex="-1"></a>每个条件使用训练拟合特征均值与总体除数标准差。所有确定性方法在相同变换坐标欧氏 MSE 中优化或被评分，重构也返回原始单位。</span>
+<span id="cb4-84"><a href="#cb4-84" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-85"><a href="#cb4-85" aria-hidden="true" tabindex="-1"></a>瓶颈宽度为一。没有跳跃连接、随机层、去噪、稀疏性或输出非线性。</span>
+<span id="cb4-86"><a href="#cb4-86" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-87"><a href="#cb4-87" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> 族 <span class="pp">|</span> 架构 <span class="pp">|</span> 可训练参数 <span class="pp">|</span></span>
+<span id="cb4-88"><a href="#cb4-88" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|---:|</span></span>
+<span id="cb4-89"><a href="#cb4-89" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> 训练线性 AE <span class="pp">|</span> $6\to1\to6$ <span class="pp">|</span> 19 <span class="pp">|</span></span>
+<span id="cb4-90"><a href="#cb4-90" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> 小非线性 AE <span class="pp">|</span> $6\to8\to1\to8\to6$ <span class="pp">|</span> 135 <span class="pp">|</span></span>
+<span id="cb4-91"><a href="#cb4-91" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> 冻结随机编码器，普通条件 <span class="pp">|</span> 冻结 $6\to8\to1$，训练 $1\to8\to6$ <span class="pp">|</span> 70 训练，65 冻结，共 135 <span class="pp">|</span></span>
+<span id="cb4-92"><a href="#cb4-92" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> 少样本非线性 AE <span class="pp">|</span> $6\to32\to1\to32\to6$ <span class="pp">|</span> 519 可训练 <span class="pp">|</span></span>
+<span id="cb4-93"><a href="#cb4-93" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> 少样本冻结编码器 <span class="pp">|</span> 冻结 $6\to32\to1$，训练 $1\to32\to6$ <span class="pp">|</span> 262 训练，257 冻结，共 519 <span class="pp">|</span></span>
+<span id="cb4-94"><a href="#cb4-94" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-95"><a href="#cb4-95" aria-hidden="true" tabindex="-1"></a>五个预先声明种子是 <span class="in">`0,1,2,3,4`</span>。初始化是族特定的并记录在清单中：</span>
+<span id="cb4-96"><a href="#cb4-96" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-97"><a href="#cb4-97" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>线性 AE 是 **PCA 热启动优化对照**：编码器/解码器权重从训练秩一 PCA 方向加种子特定 $\mathcal N(0,0.02^2)$ 扰动开始，偏置为零；</span>
+<span id="cb4-98"><a href="#cb4-98" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>非线性 AE 权重使用独立中心化 Normal 抽样，Glorot 式尺度 $\sqrt{2/(fan_{in}+fan_{out})}$，偏置为零；以及</span>
+<span id="cb4-99"><a href="#cb4-99" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>冻结编码器使用方差 $1/6$ 与 $1/H$ 的固定中心化 Normal 权重与小的随机编码器偏置，而其可训练解码器使用 Glorot 式中心化 Normal 权重与零解码器偏置。</span>
+<span id="cb4-100"><a href="#cb4-100" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-101"><a href="#cb4-101" aria-hidden="true" tabindex="-1"></a>训练使用手动全批 Adam，$(\beta_1,\beta_2,\epsilon)=(0.9,0.999,10^{-8})$，无权重衰减，线性输出。学习率对线性 AE 为 0.025、非线性 AE 为 0.012、冻结编码器解码器为 0.015。每个族最多 900 轮、耐心 120。验证按种子选择最早严格最小值，然后选择验证损失最小且低种子破并列的种子。测试数据永不选择轮次或种子。</span>
+<span id="cb4-102"><a href="#cb4-102" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-103"><a href="#cb4-103" aria-hidden="true" tabindex="-1"></a>这些是 LDG 设计选择，不是文献提供的优化设置。</span>
+<span id="cb4-104"><a href="#cb4-104" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-105"><a href="#cb4-105" aria-hidden="true" tabindex="-1"></a><span class="fu">## 模拟</span></span>
+<span id="cb4-106"><a href="#cb4-106" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-107"><a href="#cb4-107" aria-hidden="true" tabindex="-1"></a><span class="fu">### 名义弯曲条件</span></span>
+<span id="cb4-108"><a href="#cb4-108" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-109"><a href="#cb4-109" aria-hidden="true" tabindex="-1"></a>这是主非线性重构条件。生成器代码相关只在拟合后允许作为模拟诊断。</span>
+<span id="cb4-110"><a href="#cb4-110" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-111"><a href="#cb4-111" aria-hidden="true" tabindex="-1"></a><span class="fu">### 全维高斯</span></span>
+<span id="cb4-112"><a href="#cb4-112" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-113"><a href="#cb4-113" aria-hidden="true" tabindex="-1"></a>矩匹配满秩高斯没有 $s$ 或无噪一维映射。省略码–$s$、单调性与生成器恢复行。任何非线性重构优势在控制第一与第二总体矩后仍是压缩结果。</span>
+<span id="cb4-114"><a href="#cb4-114" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-115"><a href="#cb4-115" aria-hidden="true" tabindex="-1"></a><span class="fu">### 高方差干扰</span></span>
+<span id="cb4-116"><a href="#cb4-116" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-117"><a href="#cb4-117" aria-hidden="true" tabindex="-1"></a>前四个特征保留弯曲信号；后两个接收大独立干扰方差。分别报告结构特征与干扰特征 MSE。标准化与原始单位 MSE 都不被声明普遍正确。</span>
+<span id="cb4-118"><a href="#cb4-118" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-119"><a href="#cb4-119" aria-hidden="true" tabindex="-1"></a><span class="fu">### 少样本/高容量</span></span>
+<span id="cb4-120"><a href="#cb4-120" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-121"><a href="#cb4-121" aria-hidden="true" tabindex="-1"></a>只有 40 行训练 519 参数非线性模型与架构匹配的宽度 32 冻结编码器对照（257 冻结、262 训练解码器参数）。报告完整训练、验证与测试误差及种子变异。在此实现数据集中，验证选择阻止戏剧性记忆差距；该阴性对照仍具信息性，尽管预期失败未被强迫。</span>
+<span id="cb4-122"><a href="#cb4-122" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-123"><a href="#cb4-123" aria-hidden="true" tabindex="-1"></a><span class="fu">### 移位范围</span></span>
+<span id="cb4-124"><a href="#cb4-124" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-125"><a href="#cb4-125" aria-hidden="true" tabindex="-1"></a>模型与标准化器只在范围内拟合，并原样应用于训练支撑之外。这是外推，不是另一个验证划分。</span>
+<span id="cb4-126"><a href="#cb4-126" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-127"><a href="#cb4-127" aria-hidden="true" tabindex="-1"></a><span class="fu">## 可视化</span></span>
+<span id="cb4-128"><a href="#cb4-128" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-129"><a href="#cb4-129" aria-hidden="true" tabindex="-1"></a>单一复合 <span class="in">`summary.png`</span> 显示有界名义重构、跨条件所选测试重构度量、所选损失历史以及名义与移位测试的码对 $s$ 诊断。</span>
+<span id="cb4-130"><a href="#cb4-130" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-131"><a href="#cb4-131" aria-hidden="true" tabindex="-1"></a><span class="al">![有界非线性重构诊断](../../toy-models/artifacts/bounded-nonlinear-reconstruction/summary.png)</span></span>
+<span id="cb4-132"><a href="#cb4-132" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-133"><a href="#cb4-133" aria-hidden="true" tabindex="-1"></a>该图仅具诊断性。所有方法使用仅训练标准化；验证选择检查点/种子；测试数据不选择模型。码图是模拟侧诊断，不是流形或本征坐标证据。</span>
+<span id="cb4-134"><a href="#cb4-134" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-135"><a href="#cb4-135" aria-hidden="true" tabindex="-1"></a><span class="fu">## 预期行为</span></span>
+<span id="cb4-136"><a href="#cb4-136" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-137"><a href="#cb4-137" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>秩一 PCA 是解析线性重构参考。训练良好的线性 AE 应接近其重构子空间与损失 <span class="co">[</span><span class="ot">@BourlardKamp1988; @BaldiHornik1989</span><span class="co">]</span>。</span>
+<span id="cb4-138"><a href="#cb4-138" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>小非线性 AE 可以在弯曲生成器上改善插值，而不证明任意数据集一维或流形值。</span>
+<span id="cb4-139"><a href="#cb4-139" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>冻结随机非线性特征可以重构一些结构，因此在归功学习编码之前需要其完整种子分布。</span>
+<span id="cb4-140"><a href="#cb4-140" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>即使灵活模型改善 MSE，全维高斯数据也不提供有效标量生成器恢复主张。</span>
+<span id="cb4-141"><a href="#cb4-141" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>标准化可以防止干扰特征主导优化度量，而原始单位误差仍由干扰主导。</span>
+<span id="cb4-142"><a href="#cb4-142" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>范围外重构与码排序可以急剧退化，尽管范围内验证良好。</span>
+<span id="cb4-143"><a href="#cb4-143" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>大网络配少样本可以过拟合，但预先声明验证停止也可能阻止预期戏剧性失败。阴性对照被报告，而非被调优保证故事。</span>
+<span id="cb4-144"><a href="#cb4-144" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-145"><a href="#cb4-145" aria-hidden="true" tabindex="-1"></a><span class="fu">## 参数操控</span></span>
+<span id="cb4-146"><a href="#cb4-146" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-147"><a href="#cb4-147" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> 条件 <span class="pp">|</span> 改变的假设 <span class="pp">|</span> 诊断 <span class="pp">|</span></span>
+<span id="cb4-148"><a href="#cb4-148" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|---|</span></span>
+<span id="cb4-149"><a href="#cb4-149" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`nominal_curved`</span> <span class="pp">|</span> 无 <span class="pp">|</span> 有界非线性留出增益 <span class="pp">|</span></span>
+<span id="cb4-150"><a href="#cb4-150" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`full_dimensional_gaussian`</span> <span class="pp">|</span> 无标量弯曲生成器 <span class="pp">|</span> 施加单码压缩 <span class="pp">|</span></span>
+<span id="cb4-151"><a href="#cb4-151" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`high_variance_nuisance`</span> <span class="pp">|</span> 特征 5–6 的大独立方差 <span class="pp">|</span> 结构/干扰与度量依赖 <span class="pp">|</span></span>
+<span id="cb4-152"><a href="#cb4-152" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`few_sample_high_capacity`</span> <span class="pp">|</span> 40 训练行与宽度 32 <span class="pp">|</span> 容量、种子与泛化差距 <span class="pp">|</span></span>
+<span id="cb4-153"><a href="#cb4-153" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`shifted_range`</span> <span class="pp">|</span> 训练范围外测试支撑 <span class="pp">|</span> 外推与码排序 <span class="pp">|</span></span>
+<span id="cb4-154"><a href="#cb4-154" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-155"><a href="#cb4-155" aria-hidden="true" tabindex="-1"></a>没有条件、架构、种子集、优化器预算或噪声幅度根据测试结果重调。</span>
+<span id="cb4-156"><a href="#cb4-156" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-157"><a href="#cb4-157" aria-hidden="true" tabindex="-1"></a><span class="fu">## 健全性检查</span></span>
+<span id="cb4-158"><a href="#cb4-158" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-159"><a href="#cb4-159" aria-hidden="true" tabindex="-1"></a>验证器检查：</span>
+<span id="cb4-160"><a href="#cb4-160" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-161"><a href="#cb4-161" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>观测、$s$ 与无噪曲线的精确划分再生；</span>
+<span id="cb4-162"><a href="#cb4-162" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>测试观测投毒使标准化、所有候选、检查点历史与所选种子不变；</span>
+<span id="cb4-163"><a href="#cb4-163" aria-hidden="true" tabindex="-1"></a><span class="ss">3. </span>投毒每个 $s$ 与无噪真值数组使所有仅观测拟合与重构不变；</span>
+<span id="cb4-164"><a href="#cb4-164" aria-hidden="true" tabindex="-1"></a><span class="ss">4. </span>PCA 与解析线性重构相同；</span>
+<span id="cb4-165"><a href="#cb4-165" aria-hidden="true" tabindex="-1"></a><span class="ss">5. </span>所选训练线性 AE 复合投影器、子空间角与训练 MSE 在声明容差内接近 PCA；失败将被标记为优化失败；</span>
+<span id="cb4-166"><a href="#cb4-166" aria-hidden="true" tabindex="-1"></a><span class="ss">6. </span>线性、非线性与冻结解码器网络的中心化有限差分梯度与分析反向传播一致；</span>
+<span id="cb4-167"><a href="#cb4-167" aria-hidden="true" tabindex="-1"></a><span class="ss">7. </span>验证检查点损失与最早最小值轮次精确重算；</span>
+<span id="cb4-168"><a href="#cb4-168" aria-hidden="true" tabindex="-1"></a><span class="ss">8. </span>验证种子选择精确重放；</span>
+<span id="cb4-169"><a href="#cb4-169" aria-hidden="true" tabindex="-1"></a><span class="ss">9. </span>重复全批 Adam 训练确定性；</span>
+<span id="cb4-170"><a href="#cb4-170" aria-hidden="true" tabindex="-1"></a><span class="ss">10. </span>冻结编码器参数永不变；</span>
+<span id="cb4-171"><a href="#cb4-171" aria-hidden="true" tabindex="-1"></a><span class="ss">11. </span>瓶颈形状恰好 $n\times1$、参数数与架构匹配，且不存在跳跃路径；</span>
+<span id="cb4-172"><a href="#cb4-172" aria-hidden="true" tabindex="-1"></a><span class="ss">12. </span>所有损失、参数、码、重构与度量值有限；</span>
+<span id="cb4-173"><a href="#cb4-173" aria-hidden="true" tabindex="-1"></a><span class="ss">13. </span>度量行具有精确 schema、非空标签、有限值与唯一复合键；以及</span>
+<span id="cb4-174"><a href="#cb4-174" aria-hidden="true" tabindex="-1"></a><span class="ss">14. </span>干净临时再生成产生逐字节相同生成产物。</span>
+<span id="cb4-175"><a href="#cb4-175" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-176"><a href="#cb4-176" aria-hidden="true" tabindex="-1"></a>这些检查支持实现完整性，而非流形或机制主张。</span>
+<span id="cb4-177"><a href="#cb4-177" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-178"><a href="#cb4-178" aria-hidden="true" tabindex="-1"></a><span class="fu">## 失效情形</span></span>
+<span id="cb4-179"><a href="#cb4-179" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-180"><a href="#cb4-180" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**PCA 与 AE 度量不同：** 预处理或测试拟合缩放使比较无效。</span>
+<span id="cb4-181"><a href="#cb4-181" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**把糟糕线性优化称为非线性增益：** 解析 PCA 保持为权威线性基线。</span>
+<span id="cb4-182"><a href="#cb4-182" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**最佳测试种子选择：** 所有检查点与种子选择必须只用验证。</span>
+<span id="cb4-183"><a href="#cb4-183" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**把低训练误差称为恢复：** 完整训练/验证/测试差距必须保持可见。</span>
+<span id="cb4-184"><a href="#cb4-184" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**静默更新冻结编码器：** 编码器不可变性被可执行检查。</span>
+<span id="cb4-185"><a href="#cb4-185" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**隐藏死或塌缩码：** 报告码方差、范围与碰撞诊断。</span>
+<span id="cb4-186"><a href="#cb4-186" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**把干扰重构称为科学信号：** 结构与干扰误差保持分离。</span>
+<span id="cb4-187"><a href="#cb4-187" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**把全高斯称为一维：** 该条件不存在标量真值行。</span>
+<span id="cb4-188"><a href="#cb4-188" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**把范围内插值泛化到移位支撑：** 移位度量显式是外推。</span>
+<span id="cb4-189"><a href="#cb4-189" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**把码相关称为坐标辨识：** 与 $s$ 的相关仅评分，不辨识唯一码。</span>
+<span id="cb4-190"><a href="#cb4-190" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**把单个活跃瓶颈称为本征维数：** 瓶颈宽度由分析者固定。</span>
+<span id="cb4-191"><a href="#cb4-191" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-192"><a href="#cb4-192" aria-hidden="true" tabindex="-1"></a><span class="fu">## 恢复任务</span></span>
+<span id="cb4-193"><a href="#cb4-193" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-194"><a href="#cb4-194" aria-hidden="true" tabindex="-1"></a><span class="fu">### 均值与 PCA</span></span>
+<span id="cb4-195"><a href="#cb4-195" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-196"><a href="#cb4-196" aria-hidden="true" tabindex="-1"></a>变换训练均值为零。秩一 PCA 拟合领先右奇异向量并应用其正交投影器。</span>
+<span id="cb4-197"><a href="#cb4-197" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-198"><a href="#cb4-198" aria-hidden="true" tabindex="-1"></a><span class="fu">### 线性自编码器</span></span>
+<span id="cb4-199"><a href="#cb4-199" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-200"><a href="#cb4-200" aria-hidden="true" tabindex="-1"></a>可训练线性编码器与解码器在相同 MSE 下优化。复合映射而非单个因子与 PCA 投影器比较。</span>
+<span id="cb4-201"><a href="#cb4-201" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-202"><a href="#cb4-202" aria-hidden="true" tabindex="-1"></a><span class="fu">### 非线性自编码器</span></span>
+<span id="cb4-203"><a href="#cb4-203" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-204"><a href="#cb4-204" aria-hidden="true" tabindex="-1"></a>对隐藏宽度 $h$，编码器是 $\tanh(W_eu+b_e)$ 后接一个线性码；解码器应用一个 tanh 隐藏层与线性输出。所有可训练参数使用固定优化器规程。</span>
+<span id="cb4-205"><a href="#cb4-205" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-206"><a href="#cb4-206" aria-hidden="true" tabindex="-1"></a><span class="fu">### 冻结随机编码器</span></span>
+<span id="cb4-207"><a href="#cb4-207" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-208"><a href="#cb4-208" aria-hidden="true" tabindex="-1"></a>非线性编码器在训练前初始化并复制。只优化解码器。这控制通用冻结非线性特征是否充分。</span>
+<span id="cb4-209"><a href="#cb4-209" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-210"><a href="#cb4-210" aria-hidden="true" tabindex="-1"></a><span class="fu">## 候选分析方法</span></span>
+<span id="cb4-211"><a href="#cb4-211" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-212"><a href="#cb4-212" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>训练均值；</span>
+<span id="cb4-213"><a href="#cb4-213" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>秩一 PCA；</span>
+<span id="cb4-214"><a href="#cb4-214" aria-hidden="true" tabindex="-1"></a><span class="ss">3. </span>训练秩一线性 AE；</span>
+<span id="cb4-215"><a href="#cb4-215" aria-hidden="true" tabindex="-1"></a><span class="ss">4. </span>固定小非线性 tanh AE；</span>
+<span id="cb4-216"><a href="#cb4-216" aria-hidden="true" tabindex="-1"></a><span class="ss">5. </span>带训练解码器的冻结随机 tanh 编码器；以及</span>
+<span id="cb4-217"><a href="#cb4-217" aria-hidden="true" tabindex="-1"></a><span class="ss">6. </span>少样本压力中的更大非线性架构。</span>
+<span id="cb4-218"><a href="#cb4-218" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-219"><a href="#cb4-219" aria-hidden="true" tabindex="-1"></a>没有方法接收 $s$、无噪 $g(s)$、测试预处理统计量或测试选择轮次。</span>
+<span id="cb4-220"><a href="#cb4-220" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-221"><a href="#cb4-221" aria-hidden="true" tabindex="-1"></a><span class="fu">## 评估</span></span>
+<span id="cb4-222"><a href="#cb4-222" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-223"><a href="#cb4-223" aria-hidden="true" tabindex="-1"></a><span class="in">`metrics.csv`</span> 包含：</span>
+<span id="cb4-224"><a href="#cb4-224" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-225"><a href="#cb4-225" aria-hidden="true" tabindex="-1"></a><span class="in">```text</span></span>
+<span id="cb4-226"><a href="#cb4-226" aria-hidden="true" tabindex="-1"></a><span class="in">split,condition,preprocessing,method,seed,selection,target,metric,value</span></span>
+<span id="cb4-227"><a href="#cb4-227" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb4-228"><a href="#cb4-228" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-229"><a href="#cb4-229" aria-hidden="true" tabindex="-1"></a>它报告按划分的变换与原始单位 MSE、逐特征 MSE、训练–测试差距、参数数、所选种子/轮次、所有种子验证记录、码均值/方差/范围与塌缩/死指示器，以及条件特定结构/干扰或生成器诊断。</span>
+<span id="cb4-230"><a href="#cb4-230" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-231"><a href="#cb4-231" aria-hidden="true" tabindex="-1"></a><span class="fu">### 经验结果</span></span>
+<span id="cb4-232"><a href="#cb4-232" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-233"><a href="#cb4-233" aria-hidden="true" tabindex="-1"></a>所选模型测试原始单位 MSE：</span>
+<span id="cb4-234"><a href="#cb4-234" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-235"><a href="#cb4-235" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> 条件 <span class="pp">|</span> PCA <span class="pp">|</span> 线性 AE <span class="pp">|</span> 非线性 AE <span class="pp">|</span> 冻结编码器 <span class="pp">|</span></span>
+<span id="cb4-236"><a href="#cb4-236" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---:|---:|---:|---:|</span></span>
+<span id="cb4-237"><a href="#cb4-237" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> 名义弯曲 <span class="pp">|</span> 0.1082 <span class="pp">|</span> 0.1085 <span class="pp">|</span> **0.00958** <span class="pp">|</span> 0.1288 <span class="pp">|</span></span>
+<span id="cb4-238"><a href="#cb4-238" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> 矩匹配全维高斯 <span class="pp">|</span> 0.11245 <span class="pp">|</span> 0.11213 <span class="pp">|</span> 0.11318 <span class="pp">|</span> 0.15416 <span class="pp">|</span></span>
+<span id="cb4-239"><a href="#cb4-239" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> 高方差干扰 <span class="pp">|</span> 2.0780 <span class="pp">|</span> 2.0854 <span class="pp">|</span> 1.8351 <span class="pp">|</span> **1.7160** <span class="pp">|</span></span>
+<span id="cb4-240"><a href="#cb4-240" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> 少样本/高容量 <span class="pp">|</span> 0.1177 <span class="pp">|</span> 0.1175 <span class="pp">|</span> **0.00525** <span class="pp">|</span> 0.0389 <span class="pp">|</span></span>
+<span id="cb4-241"><a href="#cb4-241" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> 移位范围 <span class="pp">|</span> 2.1218 <span class="pp">|</span> 2.1228 <span class="pp">|</span> **0.9146** <span class="pp">|</span> 2.7996 <span class="pp">|</span></span>
+<span id="cb4-242"><a href="#cb4-242" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-243"><a href="#cb4-243" aria-hidden="true" tabindex="-1"></a>名义非线性码与仅评分 $s$ 的绝对 Pearson/Spearman 相关为 0.901/0.846。报告的碰撞诊断是非标准 LDG 阈值检查：在所有 $n(n-1)/2=28{,}680$ 个测试对中，用 $|\Delta z|\le0.05$ 的观测码范围定义近码分母；碰撞额外要求 $|\Delta s|&gt;0.5$。所选名义模型有 4,135 个近码对与 39 个碰撞，比例 0.00943。这些阈值与值不确立单射性或唯一坐标。在干扰方差下，非线性结构特征 MSE 为 0.0125，而干扰特征 MSE 为 5.48，显示聚合原始单位损失为何可以掩盖科学结构。少样本非线性训练/测试 MSE 为 0.00321/0.00525：更大网络拟合良好，但预先声明验证规程避免戏剧性记忆失败。移位非线性测试 MSE 用精确名义训练/验证捆绑、标准化器、候选历史、检查点、所选种子与拟合模型计算；只有外部支撑测试捆绑不同。其所选码有 13,390 个近码对与 1,852 个碰撞，比例 0.1383，暴露外推界限。</span>
+<span id="cb4-244"><a href="#cb4-244" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-245"><a href="#cb4-245" aria-hidden="true" tabindex="-1"></a>矩匹配高斯非线性结果在该实现中略差于 PCA/线性 AE，不是一维结构的证据。种子变异保留在完整度量表中，选择仅验证。</span>
+<span id="cb4-246"><a href="#cb4-246" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-247"><a href="#cb4-247" aria-hidden="true" tabindex="-1"></a><span class="fu">## 解读</span></span>
+<span id="cb4-248"><a href="#cb4-248" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-249"><a href="#cb4-249" aria-hidden="true" tabindex="-1"></a>名义结果只确立：所选有限非线性网络在声明标准化 MSE 下比秩一 PCA 更好地重构来自该弯曲模拟器的留出样本。全维、干扰、少样本、冻结特征与移位对照显示重构增益可以与一维真值缺失、无关方差、容量敏感性、有用随机特征或差外推共存。</span>
+<span id="cb4-250"><a href="#cb4-250" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-251"><a href="#cb4-251" aria-hidden="true" tabindex="-1"></a>::: {.callout-warning title="这并不蕴含"}</span>
+<span id="cb4-252"><a href="#cb4-252" aria-hidden="true" tabindex="-1"></a>低重构误差、活跃一维码或与已知模拟器参数的相关不证明流形、本征维数、唯一潜坐标、表示、因果变量、动力学或机制。</span>
+<span id="cb4-253"><a href="#cb4-253" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb4-254"><a href="#cb4-254" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-255"><a href="#cb4-255" aria-hidden="true" tabindex="-1"></a><span class="fu">## 这个玩具模型并不确立</span></span>
+<span id="cb4-256"><a href="#cb4-256" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-257"><a href="#cb4-257" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>与模型无关的本征维数；</span>
+<span id="cb4-258"><a href="#cb4-258" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>光滑或单射流形坐标卡；</span>
+<span id="cb4-259"><a href="#cb4-259" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>唯一编码器/解码器参数或码轴；</span>
+<span id="cb4-260"><a href="#cb4-260" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>概率模型、后验或不确定性分布；</span>
+<span id="cb4-261"><a href="#cb4-261" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>动力学、时间顺序、向量场或状态转移；</span>
+<span id="cb4-262"><a href="#cb4-262" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>因果、生物或物理机制；</span>
+<span id="cb4-263"><a href="#cb4-263" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>非线性对 PCA 的普遍优越性；或</span>
+<span id="cb4-264"><a href="#cb4-264" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>在测试范围之外的可靠外推。</span>
+<span id="cb4-265"><a href="#cb4-265" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-266"><a href="#cb4-266" aria-hidden="true" tabindex="-1"></a><span class="fu">## 向真实数据的扩展</span></span>
+<span id="cb4-267"><a href="#cb4-267" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-268"><a href="#cb4-268" aria-hidden="true" tabindex="-1"></a>真实数据使用必须定义独立单元、特征缩放、缺失、架构/容量搜索、嵌套验证、受试者/会话移位、干扰特征与逐特征错误的科学代价。重构基线应伴随 PCA、随机特征、容量、种子、泄漏与分布移位检查。码不应仅从几何获得语义或机制名称。</span>
+<span id="cb4-269"><a href="#cb4-269" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-270"><a href="#cb4-270" aria-hidden="true" tabindex="-1"></a><span class="fu">## 可复现性</span></span>
+<span id="cb4-271"><a href="#cb4-271" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-272"><a href="#cb4-272" aria-hidden="true" tabindex="-1"></a>有界产物集是：</span>
+<span id="cb4-273"><a href="#cb4-273" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-274"><a href="#cb4-274" aria-hidden="true" tabindex="-1"></a><span class="in">```text</span></span>
+<span id="cb4-275"><a href="#cb4-275" aria-hidden="true" tabindex="-1"></a><span class="in">toy-models/bounded-nonlinear-reconstruction.py</span></span>
+<span id="cb4-276"><a href="#cb4-276" aria-hidden="true" tabindex="-1"></a><span class="in">toy-models/artifacts/bounded-nonlinear-reconstruction/manifest.json</span></span>
+<span id="cb4-277"><a href="#cb4-277" aria-hidden="true" tabindex="-1"></a><span class="in">toy-models/artifacts/bounded-nonlinear-reconstruction/metrics.csv</span></span>
+<span id="cb4-278"><a href="#cb4-278" aria-hidden="true" tabindex="-1"></a><span class="in">toy-models/artifacts/bounded-nonlinear-reconstruction/diagnostics.json</span></span>
+<span id="cb4-279"><a href="#cb4-279" aria-hidden="true" tabindex="-1"></a><span class="in">toy-models/artifacts/bounded-nonlinear-reconstruction/summary.png</span></span>
+<span id="cb4-280"><a href="#cb4-280" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb4-281"><a href="#cb4-281" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-282"><a href="#cb4-282" aria-hidden="true" tabindex="-1"></a>捆绑运行时命令是：</span>
+<span id="cb4-283"><a href="#cb4-283" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-284"><a href="#cb4-284" aria-hidden="true" tabindex="-1"></a><span class="in">```bash</span></span>
+<span id="cb4-285"><a href="#cb4-285" aria-hidden="true" tabindex="-1"></a><span class="ex">/Users/bytedance/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3</span> toy-models/bounded-nonlinear-reconstruction.py</span>
+<span id="cb4-286"><a href="#cb4-286" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb4-287"><a href="#cb4-287" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-288"><a href="#cb4-288" aria-hidden="true" tabindex="-1"></a>默认执行生成并验证，包括临时逐字节相同再生。清单记录生成器与划分契约、预处理、架构、参数数、种子、优化器/检查点规则、适用性、运行时、命令与哈希。</span>
+<span id="cb4-289"><a href="#cb4-289" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-290"><a href="#cb4-290" aria-hidden="true" tabindex="-1"></a><span class="fu">### 经核查证据</span></span>
+<span id="cb4-291"><a href="#cb4-291" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-292"><a href="#cb4-292" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Bourlard 与 Kamp（1988）：** 完整四页文章经核查 SVD 解、中心化/偏置处理、线性隐单元关系、小信号 sigmoid 讨论、实验与结论 <span class="co">[</span><span class="ot">@BourlardKamp1988</span><span class="co">]</span>。</span>
+<span id="cb4-293"><a href="#cb4-293" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Baldi 与 Hornik（1989）：** 完整六页文章经核查平方误差景观、主子空间最优、因子非唯一性、边界情形、算法讨论与附录 <span class="co">[</span><span class="ot">@BaldiHornik1989</span><span class="co">]</span>。</span>
+<span id="cb4-294"><a href="#cb4-294" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Kramer（1991）：** 非线性自联想架构、重构目标、容量/过拟合讨论、训练规程、示例与结论经核查；序列因子与相关工作细节仅以概览深度阅读 <span class="co">[</span><span class="ot">@Kramer1991</span><span class="co">]</span>。</span>
+<span id="cb4-295"><a href="#cb4-295" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Goodfellow、Bengio 与 Courville（2016）第 14 章：** 引言、欠完整自编码器、容量与复制失败、相关实值/MSE 材料、流形学习解读界限与优化/泛化讨论经核查。被排除的自编码器变体未逐方程核查 <span class="co">[</span><span class="ot">@GoodfellowBengioCourville2016, chap. 14</span><span class="co">]</span>。</span>
+<span id="cb4-296"><a href="#cb4-296" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-297"><a href="#cb4-297" aria-hidden="true" tabindex="-1"></a>这些来源不提供该模拟器、架构、种子、优化器预算、阈值或产物格式；那些是 LDG 设计选择。</span>
+<span id="cb4-298"><a href="#cb4-298" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-299"><a href="#cb4-299" aria-hidden="true" tabindex="-1"></a><span class="fu">## 成熟度检查表</span></span>
+<span id="cb4-300"><a href="#cb4-300" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-301"><a href="#cb4-301" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> 完整 L1/stable 玩具模型 schema 与产物契约。</span>
+<span id="cb4-302"><a href="#cb4-302" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> 已知弯曲生成器、全维、干扰、少样本与移位对照显式。</span>
+<span id="cb4-303"><a href="#cb4-303" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> 均值、PCA、线性 AE、非线性 AE 与冻结编码器比较共享仅训练预处理与 MSE 几何。</span>
+<span id="cb4-304"><a href="#cb4-304" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> 架构、参数数、优化器、预算、耐心、种子、检查点与选择固定。</span>
+<span id="cb4-305"><a href="#cb4-305" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> 报告划分损失、特征误差、种子分布、码活动、生成器与外推诊断。</span>
+<span id="cb4-306"><a href="#cb4-306" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> 梯度、检查点、种子、泄漏、PCA/线性、架构与确定性神谕通过。</span>
+<span id="cb4-307"><a href="#cb4-307" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> 禁止流形、维数、坐标、动力学、机制、表示与因果过度宣称。</span>
+<span id="cb4-308"><a href="#cb4-308" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> 独立科学审查 PASS。</span>
+<span id="cb4-309"><a href="#cb4-309" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> 独立实现审查 PASS。</span>
+<span id="cb4-310"><a href="#cb4-310" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> 审查后仓库验证与渲染 PASS。</span>
+<span id="cb4-311"><a href="#cb4-311" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> 在记录的审查决定下机械 L1/stable 晋升。</span></code></pre></div><button title="复制到剪贴板" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></div>
+</div></div></div></div></div>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

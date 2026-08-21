@@ -1,0 +1,1462 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="zh-CN" xml:lang="zh-CN"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.10.18">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Isomap – Latent Dynamics &amp; Geometry</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="../../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../../">
+<script src="../../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../../site_libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../../site_libs/bootstrap/bootstrap-e3adbaa939bcd423dddc8c8a834270b4.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "没有结果",
+    "search-matching-documents-text": "匹配的文档",
+    "search-copy-link-title": "复制搜索链接",
+    "search-hide-matches-text": "隐藏其它匹配结果",
+    "search-more-match-text": "更多匹配结果",
+    "search-more-matches-text": "更多匹配结果",
+    "search-clear-button-title": "清除",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "取消",
+    "search-submit-button-title": "提交",
+    "search-label": "搜索"
+  }
+}</script>
+<style>
+.ldg-lang{position:fixed;top:72px;right:16px;z-index:2000;display:flex;gap:4px;font-family:system-ui,-apple-system,"Segoe UI",sans-serif;}
+.ldg-lang a{display:inline-block;padding:4px 10px;border:1px solid #c8c8c8;border-radius:999px;background:#fff;color:#333;text-decoration:none;font-size:13px;box-shadow:0 1px 3px rgba(0,0,0,.15);}
+.ldg-lang a.active{background:#2c3e50;color:#fff;border-color:#2c3e50;}
+</style>
+</head><body class="nav-fixed quarto-light"><div class="ldg-lang" id="ldg-lang">
+  <a href="#" id="ldg-lang-en">EN</a>
+  <a href="#" id="ldg-lang-zh">中文</a>
+</div>
+<script>
+(function () {
+  var BASE = '';
+  if (window.location.pathname.indexOf('/latent-dynamics-geometry-public/') === 0) {
+    BASE = 'latent-dynamics-geometry-public';
+  }
+  var IS_FILE = window.location.protocol === 'file:';
+  function pathSegs() {
+    return window.location.pathname.split('/').filter(Boolean);
+  }
+  function zhIdx() {
+    return pathSegs().indexOf('zh');
+  }
+  function segs() {
+    var s = window.location.pathname.split('/').filter(Boolean);
+    if (BASE && s[0] === BASE) s = s.slice(1);
+    return s;
+  }
+  function isZh() { return zhIdx() !== -1; }
+  function fileTarget(lang) {
+    var s = pathSegs();
+    var siteIdx = s.lastIndexOf('_site');
+    var root = siteIdx === -1 ? s.slice(0, -1) : s.slice(0, siteIdx + 1);
+    var page = siteIdx === -1 ? [s[s.length - 1]] : s.slice(siteIdx + 1);
+    if (page[0] === 'zh') page = page.slice(1);
+    if (lang === 'zh') page = ['zh'].concat(page);
+    var rel = page.join('/');
+    if (rel === '' || rel === 'zh') rel = 'index.html';
+    return '/' + root.join('/') + '/' + rel;
+  }
+  function target(lang) {
+    if (IS_FILE) return fileTarget(lang);
+    var s = segs();
+    if (s[0] === 'zh') s = s.slice(1);
+    if (lang === 'zh') s = ['zh'].concat(s);
+    var rel = s.join('/');
+    if (rel === '' || rel === 'zh') rel = (lang === 'zh' ? 'zh/index.html' : 'index.html');
+    return '/' + (BASE ? BASE + '/' : '') + rel;
+  }
+  function go(lang) {
+    try { localStorage.setItem('ldg-lang', lang); } catch (e) {}
+    window.location.href = target(lang);
+  }
+  function mark() {
+    var zh = isZh();
+    var a = document.getElementById('ldg-lang-en');
+    var b = document.getElementById('ldg-lang-zh');
+    if (a) a.className = zh ? '' : 'active';
+    if (b) b.className = zh ? 'active' : '';
+  }
+  function localizeNav() {
+    if (!isZh()) return;
+    var cur = pathSegs();
+    var czi = zhIdx();
+    var dir = (czi === -1 ? cur.slice(0, -1) : cur.slice(czi, -1)).join('/');
+    document.querySelectorAll('nav a').forEach(function (a) {
+      var h = a.getAttribute('href') || '';
+      if (/^(https?:|#|mailto:)/.test(h)) return;
+      if (/\.html?$/.test(h) || /\/$/.test(h) || h === '') {
+        var abs = new URL(h, window.location.href).pathname;
+        var s = abs.split('/').filter(Boolean);
+        if (BASE && s[0] === BASE) s = s.slice(1);
+        var zi = s.indexOf('zh');
+        var rel = zi !== -1 ? s.slice(zi + 1).join('/') : s.slice(czi).join('/');
+        var tgt = 'zh/' + rel;
+        var f = dir.split('/').filter(Boolean);
+        var t = tgt.split('/').filter(Boolean);
+        var i = 0;
+        while (i < f.length && i < t.length && f[i] === t[i]) i++;
+        var rel = '';
+        for (var j = i; j < f.length; j++) rel += '../';
+        rel += t.slice(i).join('/');
+        a.setAttribute('href', rel);
+      }
+    });
+  }
+  document.getElementById('ldg-lang-en').addEventListener('click', function (e) { e.preventDefault(); go('en'); });
+  document.getElementById('ldg-lang-zh').addEventListener('click', function (e) { e.preventDefault(); go('zh'); });
+  mark();
+  localizeNav();
+})();
+</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-chtml.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+
+
+
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../../../index.html">
+    <span class="navbar-title">Latent Dynamics &amp; Geometry</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="搜索"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="展开或折叠导航栏" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../../index.html"> 
+<span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../../knowledge/concepts/index.html"> 
+<span class="menu-text">Concepts</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../../knowledge/methods/index.html"> 
+<span class="menu-text">Methods</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../../knowledge/math/index.html"> 
+<span class="menu-text">Math</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../../knowledge/papers/index.html"> 
+<span class="menu-text">Papers</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../../toy-models/index.html"> 
+<span class="menu-text">Toy Models</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../../research-questions/index.html"> 
+<span class="menu-text">Research Questions</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../../benchmarks/index.html"> 
+<span class="menu-text">Benchmarks</span></a>
+  </li>  
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/AbelZheng/latent-dynamics-geometry-public"> <i class="bi bi-github" role="img" aria-label="GitHub repository">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="https://github.com/AbelZheng/latent-dynamics-geometry-public/discussions"> 
+<span class="menu-text">Discussions</span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">该页面内容</h2>
+   
+  <ul>
+  <li><a href="#isomap" id="toc-isomap" class="nav-link active" data-scroll-target="#isomap">Isomap</a>
+  <ul class="collapse">
+  <li><a href="#问题" id="toc-问题" class="nav-link" data-scroll-target="#问题">问题</a></li>
+  <li><a href="#输入" id="toc-输入" class="nav-link" data-scroll-target="#输入">输入</a></li>
+  <li><a href="#输出" id="toc-输出" class="nav-link" data-scroll-target="#输出">输出</a></li>
+  <li><a href="#核心思想" id="toc-核心思想" class="nav-link" data-scroll-target="#核心思想">核心思想</a></li>
+  <li><a href="#生成-建模假设" id="toc-生成-建模假设" class="nav-link" data-scroll-target="#生成-建模假设">生成 / 建模假设</a></li>
+  <li><a href="#数学表述" id="toc-数学表述" class="nav-link" data-scroll-target="#数学表述">数学表述</a>
+  <ul class="collapse">
+  <li><a href="#邻域图" id="toc-邻域图" class="nav-link" data-scroll-target="#邻域图">1. 邻域图</a></li>
+  <li><a href="#最短路径图距离" id="toc-最短路径图距离" class="nav-link" data-scroll-target="#最短路径图距离">2. 最短路径图距离</a></li>
+  <li><a href="#经典-mds" id="toc-经典-mds" class="nav-link" data-scroll-target="#经典-mds">3. 经典 MDS</a></li>
+  </ul></li>
+  <li><a href="#学习得到了什么" id="toc-学习得到了什么" class="nav-link" data-scroll-target="#学习得到了什么">学习得到了什么？</a></li>
+  <li><a href="#什么是固定的" id="toc-什么是固定的" class="nav-link" data-scroll-target="#什么是固定的">什么是固定的？</a></li>
+  <li><a href="#时序假设" id="toc-时序假设" class="nav-link" data-scroll-target="#时序假设">时序假设</a></li>
+  <li><a href="#几何假设" id="toc-几何假设" class="nav-link" data-scroll-target="#几何假设">几何假设</a></li>
+  <li><a href="#监督" id="toc-监督" class="nav-link" data-scroll-target="#监督">监督</a></li>
+  <li><a href="#优化-推断" id="toc-优化-推断" class="nav-link" data-scroll-target="#优化-推断">优化 / 推断</a></li>
+  <li><a href="#优点" id="toc-优点" class="nav-link" data-scroll-target="#优点">优点</a></li>
+  <li><a href="#失效模式" id="toc-失效模式" class="nav-link" data-scroll-target="#失效模式">失效模式</a></li>
+  <li><a href="#可辨识性问题" id="toc-可辨识性问题" class="nav-link" data-scroll-target="#可辨识性问题">可辨识性问题</a></li>
+  <li><a href="#与更简单方法的比较" id="toc-与更简单方法的比较" class="nav-link" data-scroll-target="#与更简单方法的比较">与更简单方法的比较</a></li>
+  <li><a href="#评估准则" id="toc-评估准则" class="nav-link" data-scroll-target="#评估准则">评估准则</a></li>
+  <li><a href="#最小玩具模型" id="toc-最小玩具模型" class="nav-link" data-scroll-target="#最小玩具模型">最小玩具模型</a></li>
+  <li><a href="#对-ldg-的意义" id="toc-对-ldg-的意义" class="nav-link" data-scroll-target="#对-ldg-的意义">对 LDG 的意义</a>
+  <ul class="collapse">
+  <li><a href="#小鼠轨迹" id="toc-小鼠轨迹" class="nav-link" data-scroll-target="#小鼠轨迹">小鼠轨迹</a></li>
+  <li><a href="#眼动" id="toc-眼动" class="nav-link" data-scroll-target="#眼动">眼动</a></li>
+  <li><a href="#eeg" id="toc-eeg" class="nav-link" data-scroll-target="#eeg">EEG</a></li>
+  <li><a href="#meg-神经群体数据" id="toc-meg-神经群体数据" class="nav-link" data-scroll-target="#meg-神经群体数据">MEG / 神经群体数据</a></li>
+  </ul></li>
+  <li><a href="#主要来源" id="toc-主要来源" class="nav-link" data-scroll-target="#主要来源">主要来源</a></li>
+  <li><a href="#综述-次级来源" id="toc-综述-次级来源" class="nav-link" data-scroll-target="#综述-次级来源">综述 / 次级来源</a></li>
+  <li><a href="#开放方法学问题" id="toc-开放方法学问题" class="nav-link" data-scroll-target="#开放方法学问题">开放方法学问题</a></li>
+  <li><a href="#成熟度检查表" id="toc-成熟度检查表" class="nav-link" data-scroll-target="#成熟度检查表">成熟度检查表</a></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<div class="quarto-title-block"><div><h1 class="title">Isomap</h1><button type="button" class="btn code-tools-button" id="quarto-code-tools-source"><i class="bi"></i> 代码</button></div></div>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="isomap" class="level1">
+<h1>Isomap</h1>
+<section id="问题" class="level2">
+<h2 class="anchored" data-anchor-id="问题">问题</h2>
+<p>Isomap 构造旨在保留从高维观测构建的邻域图中最短路径距离的低维欧氏坐标。它处理比通用非线性降维更窄的问题：当外围距离局部有意义且样本充分描出路径度量在某个全局坐标系中近似欧氏的结构时，图路径可以提供比直线外围弦更好的全局距离代理 <span class="citation" data-cites="TenenbaumDeSilvaLangford2000 BernsteinEtAl2000">(<a href="#ref-TenenbaumDeSilvaLangford2000" role="doc-biblioref">Tenenbaum 等 2000年</a>; <a href="#ref-BernsteinEtAl2000" role="doc-biblioref">Bernstein 等 2000年</a>)</span>。</p>
+<p>输出是拟合观测的嵌入，不是观测来自流形的证明。Isomap 分离三个不得混为一谈的操作：构造外围距离邻域图、在该有限图上计算最短路径距离、把这些图距离应用经典多维标度（MDS）。</p>
+</section>
+<section id="输入" class="level2">
+<h2 class="anchored" data-anchor-id="输入">输入</h2>
+<p>设 <span class="math inline">\(x_1,\ldots,x_n\in\mathbb R^p\)</span> 是声明特征构造与预处理管线之后的拟合观测。可复现分析必须指定：</p>
+<ul>
+<li>每行代表的观测单元以及行之间的任何依赖；</li>
+<li>中心化、特征缩放、排除、缺失数据与重复点策略；</li>
+<li>同时用于选择邻居且（除非显式分开）用于加权图边的外围相异度 <span class="math inline">\(\delta(x_i,x_j)\)</span>；</li>
+<li><span class="math inline">\(k\)</span> 最近邻规则或 <span class="math inline">\(\varepsilon\)</span> 半径规则；</li>
+<li>有向对对称化 <span class="math inline">\(k\)</span> 最近邻构造，包括是否使用互或并对称化；</li>
+<li>并列打破、零距离与重复处理；</li>
+<li>不连通分量的处理；</li>
+<li>目标坐标维数 <span class="math inline">\(d\)</span> 或仅训练的选择规则；以及</li>
+<li>新观测是否需要显式声明的样本外扩展。</li>
+</ul>
+<p>普通 Isomap 通常在预处理后使用欧氏距离，但该选择不是自动的。特征缩放可以改变邻居身份、边长、图连通性、最短路径与最终嵌入。</p>
+</section>
+<section id="输出" class="level2">
+<h2 class="anchored" data-anchor-id="输出">输出</h2>
+<p>对拟合观测，Isomap 返回：</p>
+<ul>
+<li>顶点对应观测的邻域图 <span class="math inline">\(G=(V,E)\)</span>；</li>
+<li>在所分析连通分量内的加权最短路径距离 <span class="math inline">\(d_G(i,j)\)</span>；</li>
+<li>由平方图距离推导的双中心化矩阵；</li>
+<li>诊断这些图距离在多大程度上允许所请求欧氏表示的特征值；以及</li>
+<li>拟合观测的中心化坐标 <span class="math inline">\(y_i\in\mathbb R^d\)</span>。</li>
+</ul>
+<p>标准 Isomap 不返回生成分布、坐标上的后验、从坐标到观测的唯一逆映射，或未包含在拟合图中的观测的自动有效坐标。</p>
+</section>
+<section id="核心思想" class="level2">
+<h2 class="anchored" data-anchor-id="核心思想">核心思想</h2>
+<p>Isomap 具有三个不同阶段 <span class="citation" data-cites="TenenbaumDeSilvaLangford2000">(<a href="#ref-TenenbaumDeSilvaLangford2000" role="doc-biblioref">Tenenbaum 等 2000年</a>)</span>：</p>
+<ol type="1">
+<li><strong>邻居图：</strong> 用固定 <span class="math inline">\(k\)</span> 或 <span class="math inline">\(\varepsilon\)</span> 规则连接被判定局部接近的观测，并按声明外围相异度加权每个保留边。</li>
+<li><strong>图距离：</strong> 用每对顶点之间最短局部边序列的长度近似长程路径距离。</li>
+<li><strong>经典 MDS：</strong> 把平方图距离转换为中心化内积矩阵，并用秩 <span class="math inline">\(d\)</span> 半正定 Gram 矩阵近似该矩阵。</li>
+</ol>
+<p>第一阶段提出哪些外围弦足够局部、可代替短路径段。第二阶段产生有限图度量。第三阶段询问该度量能否按所请求维数的欧氏坐标精确或近似表示。外观光滑的最终图不能追溯验证图假设或流形假设。</p>
+</section>
+<section id="生成-建模假设" class="level2">
+<h2 class="anchored" data-anchor-id="生成-建模假设">生成 / 建模假设</h2>
+<p>Isomap 不是概率生成模型。其解读仍依赖强近似假设：</p>
+<ul>
+<li>邻近外围观测沿候选结构接近，而非仅仅因为两条遥远分支彼此靠近；</li>
+<li>采样足够密，图路径可以沿相关路径通行而无大间隙；</li>
+<li>邻域尺度足够大以保持连通，但又足够小以避免捷径边；</li>
+<li>观测噪声与离群值不严重破坏邻居身份；</li>
+<li>相关连通区域由拟合样本表示；以及</li>
+<li>所得路径度量足够接近欧氏距离矩阵，经典 MDS 可以在维数 <span class="math inline">\(d\)</span> 表示它。</li>
+</ul>
+<p>Bernstein 等人证明充分条件下的图距离近似，条件包括测地线凸性（因此相关最小测地线存在）、足够细的样本覆盖，以及相对曲率半径与不同分支间距受控的边尺度。这些是条件性定理假设，不是有限数据集满足假设的检验 <span class="citation" data-cites="BernsteinEtAl2000">(<a href="#ref-BernsteinEtAl2000" role="doc-biblioref">Bernstein 等 2000年</a>)</span>。原始 Isomap 结果还强调本征几何等距于欧氏空间凸区域的有利情形；弯曲空间或非欧氏路径度量不必无畸变地全局展平 <span class="citation" data-cites="TenenbaumDeSilvaLangford2000">(<a href="#ref-TenenbaumDeSilvaLangford2000" role="doc-biblioref">Tenenbaum 等 2000年</a>)</span>。</p>
+</section>
+<section id="数学表述" class="level2">
+<h2 class="anchored" data-anchor-id="数学表述">数学表述</h2>
+<section id="邻域图" class="level3">
+<h3 class="anchored" data-anchor-id="邻域图">1. 邻域图</h3>
+<p>对对称图，当声明的 <span class="math inline">\(k\)</span> 最近邻或 <span class="math inline">\(\varepsilon\)</span> 半径关系经声明对称化后保留该对时，设</p>
+<p><span class="math display">\[
+(i,j)\in E
+\]</span></p>
+<p>赋予边权</p>
+<p><span class="math display">\[
+w_{ij}=\delta(x_i,x_j).
+\]</span></p>
+<p><span class="math inline">\(k\)</span> 最近邻规则固定邻居数，但在稀疏区域可以创建很长的边。<span class="math inline">\(\varepsilon\)</span> 规则固定外围尺度，但可以隔离低密度区域。互与并对称化通常产生不同图。</p>
+</section>
+<section id="最短路径图距离" class="level3">
+<h3 class="anchored" data-anchor-id="最短路径图距离">2. 最短路径图距离</h3>
+<p>对同一连通分量中的顶点，定义</p>
+<p><span class="math display">\[
+d_G(i,j)
+=
+\min_{i=v_0,\ldots,v_m=j}
+\sum_{r=0}^{m-1}w_{v_rv_{r+1}},
+\]</span></p>
+<p>其中最小值遍及图路径。如果 <span class="math inline">\(i\)</span> 与 <span class="math inline">\(j\)</span> 不连通，图距离是无穷大而非缺失的有限测地线估计。删除小分量、分别分析分量、添加桥接边或增大邻域是科学上不同的决定。</p>
+<p>如果邻域图包含遥远分支上邻近外围点之间的边，仅稠密采样不够。这样的边可以使许多对的 <span class="math inline">\(d_G\)</span> 远小于预期路径距离。相反，间隙或过小邻域可以使图路径远长于预期路径或使其断开 <span class="citation" data-cites="TenenbaumDeSilvaLangford2000 BernsteinEtAl2000 VanDerMaatenEtAl2009">(<a href="#ref-TenenbaumDeSilvaLangford2000" role="doc-biblioref">Tenenbaum 等 2000年</a>; <a href="#ref-BernsteinEtAl2000" role="doc-biblioref">Bernstein 等 2000年</a>; <a href="#ref-VanDerMaatenEtAl2009" role="doc-biblioref">Maaten 等 2009年</a>)</span>。</p>
+</section>
+<section id="经典-mds" class="level3">
+<h3 class="anchored" data-anchor-id="经典-mds">3. 经典 MDS</h3>
+<p>设 <span class="math inline">\(D_G^{(2)}\)</span> 表示对单个有限连通分量条目为 <span class="math inline">\(d_G(i,j)^2\)</span> 的矩阵，并设</p>
+<p><span class="math display">\[
+H=I_n-\frac{1}{n}\mathbf 1\mathbf 1^\top.
+\]</span></p>
+<p>经典 MDS 形成</p>
+<p><span class="math display">\[
+B=-\frac{1}{2}H D_G^{(2)}H.
+\]</span></p>
+<p>如果</p>
+<p><span class="math display">\[
+B=Q\Lambda Q^\top
+\]</span></p>
+<p>具有有序特征值 <span class="math inline">\(\lambda_1\geq\cdots\geq\lambda_n\)</span>，通常 <span class="math inline">\(d\)</span> 维坐标保留最大正特征值，</p>
+<p><span class="math display">\[
+Y_d=Q_d\Lambda_d^{1/2}.
+\]</span></p>
+<p>该谱构造最小化 <span class="math inline">\(B\)</span> 与秩 <span class="math inline">\(d\)</span> 半正定 Gram 矩阵之间的平方误差；它是双中心化平方距离上的<strong>应变</strong>准则，不是原始距离压力（stress）的直接最小化 <span class="citation" data-cites="TenenbaumDeSilvaLangford2000 BengioEtAl2003">(<a href="#ref-TenenbaumDeSilvaLangford2000" role="doc-biblioref">Tenenbaum 等 2000年</a>; <a href="#ref-BengioEtAl2003" role="doc-biblioref">Bengio 等 2003年</a>)</span>。大量负特征值表明所提供的图距离并非精确欧氏。它们不识别原因是本征几何非欧氏、采样、捷径、不连通分量处理、噪声还是其他误设。</p>
+<p>对普通欧氏输入距离，中心化经典 MDS 在刚性坐标约定下恢复与 PCA 相同的坐标子空间。Isomap 的不同在于向 MDS 阶段提供图最短路径距离 <span class="citation" data-cites="TenenbaumDeSilvaLangford2000">(<a href="#ref-TenenbaumDeSilvaLangford2000" role="doc-biblioref">Tenenbaum 等 2000年</a>)</span>。</p>
+</section>
+</section>
+<section id="学习得到了什么" class="level2">
+<h2 class="anchored" data-anchor-id="学习得到了什么">学习得到了什么？</h2>
+<p>给定所有分析者固定选择，Isomap 学习样本邻域图、其加权全对最短路径距离、双中心化矩阵 <span class="math inline">\(B\)</span>、其谱，以及拟合观测的一个代表性秩 <span class="math inline">\(d\)</span> 欧氏坐标系。</p>
+<p>算法不学习光滑流形图册、黎曼度量张量、拓扑、转移律、观测模型、噪声分布、本征维数或因果机制。图及其度量是依赖数据的估计，不是底层空间直接被观测的性质。</p>
+</section>
+<section id="什么是固定的" class="level2">
+<h2 class="anchored" data-anchor-id="什么是固定的">什么是固定的？</h2>
+<p>分析者固定观测与特征、预处理、外围相异度、邻居规则、邻域尺度、图方向/对称化、并列处理、边权、分量策略、目标维数或选择规程、正特征值策略以及任何样本外方法。评估划分与所有调参范围也由分析设计固定。</p>
+<p>这些选择相互影响。在查看所需可视化之后选择 <span class="math inline">\(k\)</span> 或 <span class="math inline">\(\varepsilon\)</span> 是依赖结果的调参，除非选择准则与验证规程被独立声明。</p>
+</section>
+<section id="时序假设" class="level2">
+<h2 class="anchored" data-anchor-id="时序假设">时序假设</h2>
+<p>普通 Isomap 对顺序无感：置换观测行只重标图顶点与嵌入点。如果观测是时间样本，方法不使用先后、方向、时滞、速度或转移概率，除非这些量被插入特征、距离或图约束。时间邻接图是修改后的方法，不得被解读为普通 Isomap 发现动力学。</p>
+<p>Isomap 坐标中可见的类轨迹排序可以来自静态相似结构。它不是物理时间、向量场、演化方程或潜动力系统的证据。</p>
+</section>
+<section id="几何假设" class="level2">
+<h2 class="anchored" data-anchor-id="几何假设">几何假设</h2>
+<p>Isomap 在局部使用声明外围度量、在全局使用图路径长度、在输出中使用欧氏几何。图最短路径度量是采样顶点上的组合度量。把它称为流形测地线距离的估计需要关于候选嵌入流形、相关最小测地线存在性、局部度量保真度、采样密度、曲率与分支间距的外部假设 <span class="citation" data-cites="BernsteinEtAl2000">(<a href="#ref-BernsteinEtAl2000" role="doc-biblioref">Bernstein 等 2000年</a>)</span>。</p>
+<p>经典 MDS 随后询问保留该图度量的欧氏坐标。如果候选空间具有非欧氏全局路径几何、洞、强曲率或不兼容拓扑，任何低维欧氏坐标系都可能无法保留所有图距离。Isomap 不估计黎曼度量张量，也不认证等距。</p>
+</section>
+<section id="监督" class="level2">
+<h2 class="anchored" data-anchor-id="监督">监督</h2>
+<p>标准 Isomap 对标签与结果无监督：图构造与 MDS 只使用声明观测与距离。标签仍可以通过特征选择、预处理、样本排除、超参数选择或视觉选择泄漏进结果。把邻域或维数调到最大化下游标签表现会创建有监督的模型选择层，必须用嵌套或以其他方式防泄漏的划分评估。</p>
+</section>
+<section id="优化-推断" class="level2">
+<h2 class="anchored" data-anchor-id="优化-推断">优化 / 推断</h2>
+<p>精确 Isomap 执行邻域搜索、所得加权图上的全对最短路径与 <span class="math inline">\(B\)</span> 的对称特征分解。MDS 步骤对其所述应变目标具有谱全局解，但这不使前面的图构造在统计上最优或在科学上被验证。</p>
+<p>拟合坐标是直推式的。添加新点可以添加图边并改变现有点之间的最短路径，因此重算 Isomap 可以移动整个嵌入。Nyström/特征函数与地标构造提供显式近似样本外扩展，但它们引入额外假设，且一般不必等于完整重拟合 <span class="citation" data-cites="BengioEtAl2003">(<a href="#ref-BengioEtAl2003" role="doc-biblioref">Bengio 等 2003年</a>)</span>。任何声称的部署规则必须陈述新点如何连接、如何获得到训练点的距离，以及其坐标如何与训练嵌入对齐。</p>
+</section>
+<section id="优点" class="level2">
+<h2 class="anchored" data-anchor-id="优点">优点</h2>
+<ul>
+<li>它通过可检查图使提出的局部到全局几何显式。</li>
+<li>它可以表示全局弯曲但近似本征欧氏、单个仿射 PCA 子空间无法展平的结构。</li>
+<li>其三个阶段具有清晰诊断：图连通性与边结构、图距离稳定性与 MDS 谱畸变。</li>
+<li>MDS 阶段具有透明谱解。</li>
+<li>它为非线性图测地线假设是否在 PCA 与外围距离 MDS 之上增加价值提供有用的压力检验。</li>
+</ul>
+</section>
+<section id="失效模式" class="level2">
+<h2 class="anchored" data-anchor-id="失效模式">失效模式</h2>
+<ul>
+<li><strong>邻域太小：</strong> 稀疏区域断开或图路径绕行，夸大距离。</li>
+<li><strong>邻域太大：</strong> 边桥接分离臂或折叠，制造使许多全对距离损坏的短路。</li>
+<li><strong>非均匀采样：</strong> 单个全局 <span class="math inline">\(k\)</span> 或 <span class="math inline">\(\varepsilon\)</span> 可以同时在稠密区域太大、在稀疏区域太小。</li>
+<li><strong>噪声与离群值：</strong> 外围扰动改变最近邻；离群值可以制造桥或孤立分量。</li>
+<li><strong>高维距离集中：</strong> 不可靠外围邻域使每个下游阶段不可靠。</li>
+<li><strong>不连通支撑：</strong> 无限图距离无法在没有声明分量或插补策略的情况下传给普通经典 MDS。</li>
+<li><strong>非欧氏图度量：</strong> 即使正确计算图，负特征值与残余应变仍存在。</li>
+<li><strong>边界与洞：</strong> 有限图路径与全局欧氏展平可以畸变非凸本征域或非平凡拓扑的结构。</li>
+<li><strong>超参数不稳定：</strong> 预处理、<span class="math inline">\(k\)</span>、<span class="math inline">\(\varepsilon\)</span>、对称化或目标维数的适度变化可以旋转、折叠、分裂或重连输出。</li>
+<li><strong>无原生逆：</strong> 低维坐标本身不重构观测。</li>
+<li><strong>无原生样本外映射：</strong> 扩展是额外算法，不是拟合嵌入的自动性质。</li>
+<li><strong>可视化越界：</strong> 令人信服的二维布局可以隐藏大的图距离误差或丢弃的负特征方向。</li>
+</ul>
+<p>van der Maaten 等人的比较综述强调短路敏感性、邻域图依赖、不连通分量限制，以及在更复杂自然数据上弱于有利合成示例的表现 <span class="citation" data-cites="VanDerMaatenEtAl2009">(<a href="#ref-VanDerMaatenEtAl2009" role="doc-biblioref">Maaten 等 2009年</a>)</span>。</p>
+</section>
+<section id="可辨识性问题" class="level2">
+<h2 class="anchored" data-anchor-id="可辨识性问题">可辨识性问题</h2>
+<p>对固定连通图距离矩阵与固定保留正特征空间，经典 MDS 坐标是中心化的，且在正交变换（包括旋转与反射）下不唯一。单个轴具有任意符号。重复保留特征值允许其特征空间内的任意旋转。如果截断边界穿过重复特征值，所选 <span class="math inline">\(d\)</span> 维坐标子空间本身不唯一。</p>
+<p>这些谱等价不穷尽实际歧义。不同邻域图可以从相同观测产生不同图度量与嵌入。绘图对齐或 Procrustes 变换选择坐标代表；它不辨识科学上有特权的潜轴。当负特征值被丢弃时，即使完整正坐标表示也只是所提供图距离的近似。</p>
+</section>
+<section id="与更简单方法的比较" class="level2">
+<h2 class="anchored" data-anchor-id="与更简单方法的比较">与更简单方法的比较</h2>
+<ul>
+<li><strong>PCA：</strong> 所需秩匹配线性欧氏基线。它检验图测地线构造是否在单个全局仿射子空间之上改善声明准则。</li>
+<li><strong>外围距离经典 MDS：</strong> 把相同最终谱阶段直接应用于逐对外围距离。使用欧氏距离时它与 PCA 密切相关，并隔离用图路径替换外围距离的贡献。</li>
+<li><strong>无嵌入的图距离诊断：</strong> 在把任何价值归因于 MDS 可视化之前检查连通性、边长、最短路径与跨邻域稳定性。</li>
+<li><strong>合成神谕比较：</strong> 只在未来生成玩具设定中，把图距离与已知曲线或流形路径距离比较。对普通经验数据，没有独立已知几何时这不可用。</li>
+</ul>
+<p>不应仅仅因为方法自身的样本内图距离目标更小而判定其更优。比较必须使用匹配维数、仅训练调参以及与预期科学或预测用途绑定的准则。</p>
+</section>
+<section id="评估准则" class="level2">
+<h2 class="anchored" data-anchor-id="评估准则">评估准则</h2>
+<p>评估应报告几层而非一张图：</p>
+<ol type="1">
+<li><strong>图诊断：</strong> 连通分量大小、度与边长分布、对并列处理与对称化的敏感性，以及长桥接边的出现或消失。</li>
+<li><strong>邻域稳定性：</strong> 在预先指定、科学上合理的 <span class="math inline">\(k\)</span> 或 <span class="math inline">\(\varepsilon\)</span> 范围以及重采样独立单元上重复分析。</li>
+<li><strong>距离保真度：</strong> 报告 <span class="math inline">\(d_G\)</span> 与嵌入欧氏距离之间的经典 MDS 应变或声明压力/相关度量。陈述负特征值是否被省略。</li>
+<li><strong>局部保真度：</strong> 相关时报告声明的邻域保持度量，而非从全局距离拟合推断局部正确性。</li>
+<li><strong>基线比较：</strong> 用相同拟合观测与预处理比较秩匹配 PCA 与外围距离经典 MDS。</li>
+<li><strong>留出行为：</strong> 在训练数据上拟合预处理、图超参数与维数；对留出观测使用预先声明扩展，并在不于测试集重拟合的情况下评估距离或下游表现。</li>
+<li><strong>科学稳定性：</strong> 评估结论是否在合理预处理、采样单元、受试者/会话与邻域选择下成立。</li>
+</ol>
+<p>原始残差方差曲线是距离保持的样本内摘要，可以辅助维数比较，但肘部不是与模型无关的本征维数估计 <span class="citation" data-cites="TenenbaumDeSilvaLangford2000">(<a href="#ref-TenenbaumDeSilvaLangford2000" role="doc-biblioref">Tenenbaum 等 2000年</a>)</span>。Isomap 没有原生观测空间重构，因此除非引入独立逆或解码器并将其作为额外方法评估，「重构误差」未定义。</p>
+<p>对依赖观测，划分必须按需要保持整条轨迹、受试者、会话或其他依赖单元在一起。随机拆分相邻时间样本会使邻域与样本外表现乐观。</p>
+</section>
+<section id="最小玩具模型" class="level2">
+<h2 class="anchored" data-anchor-id="最小玩具模型">最小玩具模型</h2>
+<p>未来的非可执行玩具模型应沿具有两条长且近似平行臂的已知平面发卡曲线采样点。生成记录应保留曲线参数与精确弧长距离作为真值，而拟合算法只接收带噪外围坐标。</p>
+<p>计划比较包括：</p>
+<ul>
+<li>秩一与秩二 PCA；</li>
+<li>外围欧氏距离上的经典 MDS；</li>
+<li>在预先指定邻域范围上的 Isomap；以及</li>
+<li>使用已知弧长距离、仅作为生成侧参考的神谕 MDS 嵌入。</li>
+</ul>
+<p>在足够局部邻域尺度下，图路径应跟随发卡并近似弧长。样本太少或邻域太小时，图应断开或绕行。邻域太大时，边应桥接两条臂并严重低估许多路径距离。阴性对照应从一端移除样本制造间隙。评估应比较图距离与已知弧长、检查连通分量与捷径，并仅为比较对齐坐标输出。该契约属于后续可执行研究；此处不创建数据、代码或结果。</p>
+</section>
+<section id="对-ldg-的意义" class="level2">
+<h2 class="anchored" data-anchor-id="对-ldg-的意义">对 LDG 的意义</h2>
+<p>Isomap 是 LDG 的规范示例，展示把局部度量假设变成全局图距离表示、再变成欧氏坐标的方法。它有用正是因为每次解读跳跃都可以被单独审计：局部外围邻近、有限图路径、欧氏 MDS 表示以及任何后续科学解读。</p>
+<div class="callout callout-style-default callout-warning callout-titled" title="这并不蕴含">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">警告</span>这并不蕴含
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>成功的 Isomap 可视化不证明流形存在、不恢复底层空间的拓扑、不估计黎曼度量张量、不确立本征维数、不发现物理动力学、不识别机制，也不恢复唯一潜坐标。图连通性不是拓扑恢复；图最短路径不自动是流形测地线；低应变不是模型验证。</p>
+</div>
+</div>
+<section id="小鼠轨迹" class="level3">
+<h3 class="anchored" data-anchor-id="小鼠轨迹">小鼠轨迹</h3>
+<p>不保留模态特定经验主张。把 Isomap 应用于小鼠轨迹需要独立论证的表示、距离、时间对齐策略、采样单元与留出扩展；弯曲嵌入不确立行为状态流形或运动动力学。</p>
+</section>
+<section id="眼动" class="level3">
+<h3 class="anchored" data-anchor-id="眼动">眼动</h3>
+<p>不保留模态特定经验主张。眼位样本、事件摘要与时间窗口定义不同度量空间，普通 Isomap 不把其静态邻近图变成动眼动力学的证据。</p>
+</section>
+<section id="eeg" class="level3">
+<h3 class="anchored" data-anchor-id="eeg">EEG</h3>
+<p>不保留模态特定经验主张。传感器缩放、重参考、伪迹处理与受试者/会话池化会决定邻域图；嵌入轴不自动表示神经源或皮层几何。</p>
+</section>
+<section id="meg-神经群体数据" class="level3">
+<h3 class="anchored" data-anchor-id="meg-神经群体数据">MEG / 神经群体数据</h3>
+<p>不保留模态特定经验主张。单元归一化、试次平均与采样依赖需要在图构造前固定，低维布局仍是图几何近似，而非神经流形、机制或动力学定律的证据。</p>
+</section>
+</section>
+<section id="主要来源" class="level2">
+<h2 class="anchored" data-anchor-id="主要来源">主要来源</h2>
+<ul>
+<li>Tenenbaum、de Silva 与 Langford 引入 Isomap，显式分离邻域构造、最短路径图距离与经典 MDS，并陈述有利的本征欧氏设定与有限样本图限制 <span class="citation" data-cites="TenenbaumDeSilvaLangford2000">(<a href="#ref-TenenbaumDeSilvaLangford2000" role="doc-biblioref">Tenenbaum 等 2000年</a>)</span>。</li>
+<li>Bernstein、de Silva、Langford 与 Tenenbaum 分析图距离在嵌入流形上近似路径距离的充分条件——包括测地线凸性/最小测地线存在性、采样覆盖、曲率与分支间距 <span class="citation" data-cites="BernsteinEtAl2000">(<a href="#ref-BernsteinEtAl2000" role="doc-biblioref">Bernstein 等 2000年</a>)</span>。</li>
+<li>Bengio 等人给出技术性双中心化/特征分解表述，并为 Isomap、MDS 与相关谱方法推导显式样本外扩展 <span class="citation" data-cites="BengioEtAl2003">(<a href="#ref-BengioEtAl2003" role="doc-biblioref">Bengio 等 2003年</a>)</span>。</li>
+</ul>
+</section>
+<section id="综述-次级来源" class="level2">
+<h2 class="anchored" data-anchor-id="综述-次级来源">综述 / 次级来源</h2>
+<ul>
+<li>Van der Maaten、Postma 与 van den Herik 提供经核查的非线性降维方法比较综述，并识别 Isomap 的邻域、断开、短路与泛化限制 <span class="citation" data-cites="VanDerMaatenEtAl2009">(<a href="#ref-VanDerMaatenEtAl2009" role="doc-biblioref">Maaten 等 2009年</a>)</span>。</li>
+</ul>
+</section>
+<section id="开放方法学问题" class="level2">
+<h2 class="anchored" data-anchor-id="开放方法学问题">开放方法学问题</h2>
+<ul>
+<li>应如何在不优化首选可视化的情况下选择邻域尺度？</li>
+<li>哪些诊断区分真正的局部度量保真度与距离集中或预处理伪迹？</li>
+<li>图边与最短路径中的不确定性应如何传播到坐标？</li>
+<li>何时应分别建模不连通分量，而非强迫进入单个嵌入？</li>
+<li>当添加点会实质改变拟合图时，哪种样本外扩展合适？</li>
+<li>哪些科学主张在刚性坐标变换与邻域扰动下不变？</li>
+</ul>
+</section>
+<section id="成熟度检查表" class="level2">
+<h2 class="anchored" data-anchor-id="成熟度检查表">成熟度检查表</h2>
+<ul class="task-list">
+<li><label><input type="checkbox" checked="">使用完整方法 schema 并陈述有界问题。</label></li>
+<li><label><input type="checkbox" checked="">分离邻居构造、图最短路径与经典 MDS。</label></li>
+<li><label><input type="checkbox" checked="">陈述测地线存在、采样、连通性、曲率、分支间距与捷径假设。</label></li>
+<li><label><input type="checkbox" checked="">声明学习得到与固定的量、时序处理、几何与监督。</label></li>
+<li><label><input type="checkbox" checked="">陈述谱与图构造歧义。</label></li>
+<li><label><input type="checkbox" checked="">包含 PCA、外围 MDS 与图诊断基线。</label></li>
+<li><label><input type="checkbox" checked="">定义评估与样本外界限，而不声称原生重构。</label></li>
+<li><label><input type="checkbox" checked="">包含带失效与阴性对照情形的仅散文未来玩具模型契约。</label></li>
+<li><label><input type="checkbox" checked="">避免未受支持的模态特定经验主张。</label></li>
+<li><label><input type="checkbox" checked="">包含显式流形、拓扑、几何、维数、动力学与机制非蕴含。</label></li>
+<li><label><input type="checkbox" checked="">基础、技术与综述来源经核查且书目元数据已验证。</label></li>
+<li><label><input type="checkbox" checked="">在一轮有界修正轮次后完成独立混合审查；聚焦复审返回 PASS。</label></li>
+<li><label><input type="checkbox" checked="">在发布站点审查后，人类所有者根据记录的审查决定授权稳定晋升。</label></li>
+</ul>
+
+
+<!-- -->
+
+
+</section>
+</section>
+
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography" id="quarto-bibliography"><h2 class="anchored quarto-appendix-heading">参考文献</h2><div id="refs" class="references csl-bib-body hanging-indent" role="list">
+<div id="ref-BengioEtAl2003" class="csl-entry" role="listitem">
+Bengio, Yoshua, Jean-François Paiement, Pascal Vincent, Olivier Delalleau, Nicolas Roux, 和 Marie Ouimet. 2003年. <span>《Out-of-Sample Extensions for <span>LLE</span>, <span>Isomap</span>, <span>MDS</span>, Eigenmaps, and Spectral Clustering》</span>. 收入 <em>Advances in Neural Information Processing Systems</em>, 编辑 Sebastian Thrun, Lawrence K. Saul, 和 Bernhard Schölkopf, 卷 16. MIT Press. <a href="https://proceedings.neurips.cc/paper/2003/hash/cf05968255451bdefe3c5bc64d550517-Abstract.html">https://proceedings.neurips.cc/paper/2003/hash/cf05968255451bdefe3c5bc64d550517-Abstract.html</a>.
+</div>
+<div id="ref-BernsteinEtAl2000" class="csl-entry" role="listitem">
+Bernstein, Mira, Vin de Silva, John C. Langford, 和 Joshua B. Tenenbaum. 2000年. <em>Graph Approximations to Geodesics on Embedded Manifolds</em>. Stanford University. <a href="https://www.cs.cmu.edu/~jcl/research/isofocs/isoproof.tex">https://www.cs.cmu.edu/~jcl/research/isofocs/isoproof.tex</a>.
+</div>
+<div id="ref-VanDerMaatenEtAl2009" class="csl-entry" role="listitem">
+Maaten, Laurens van der, Eric Postma, 和 Jaap van den Herik. 2009年. <em>Dimensionality Reduction: A Comparative Review</em>. TiCC-TR 2009-005. Tilburg Centre for Creative Computing, Tilburg University. <a href="https://lvdmaaten.github.io/publications/papers/TR_Dimensionality_Reduction_Review_2009.pdf">https://lvdmaaten.github.io/publications/papers/TR_Dimensionality_Reduction_Review_2009.pdf</a>.
+</div>
+<div id="ref-TenenbaumDeSilvaLangford2000" class="csl-entry" role="listitem">
+Tenenbaum, Joshua B., Vin de Silva, 和 John C. Langford. 2000年. <span>《A Global Geometric Framework for Nonlinear Dimensionality Reduction》</span>. <em>Science</em> 290 (5500): 2319～23. <a href="https://doi.org/10.1126/science.290.5500.2319">https://doi.org/10.1126/science.290.5500.2319</a>.
+</div>
+</div></section></div></main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "已复制");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "已复制");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+    const viewSource = window.document.getElementById('quarto-view-source') ||
+                       window.document.getElementById('quarto-code-tools-source');
+    if (viewSource) {
+      const sourceUrl = viewSource.getAttribute("data-quarto-source-url");
+      viewSource.addEventListener("click", function(e) {
+        if (sourceUrl) {
+          // rstudio viewer pane
+          if (/\bcapabilities=\b/.test(window.location)) {
+            window.open(sourceUrl);
+          } else {
+            window.location.href = sourceUrl;
+          }
+        } else {
+          const modal = new bootstrap.Modal(document.getElementById('quarto-embedded-source-code-modal'));
+          modal.show();
+        }
+        return false;
+      });
+    }
+    function toggleCodeHandler(show) {
+      return function(e) {
+        const cellDetails = window.document.querySelectorAll(".cell details.code-fold");
+        for (let i=0; i<cellDetails.length; i++) {
+          const details = cellDetails[i];
+          if (show) {
+            details.open = true;
+          } else {
+            details.removeAttribute("open");
+          }
+        }
+        const cellCodeDivs = window.document.querySelectorAll(".cell div.sourceCode.cell-code");
+        const fromCls = show ? "hidden" : "unhidden";
+        const toCls = show ? "unhidden" : "hidden";
+        for (let i=0; i<cellCodeDivs.length; i++) {
+          const codeDiv = cellCodeDivs[i];
+          if (codeDiv.classList.contains(fromCls)) {
+            codeDiv.classList.remove(fromCls);
+            codeDiv.classList.add(toCls);
+          } 
+        }
+        return false;
+      }
+    }
+    const hideAllCode = window.document.getElementById("quarto-hide-all-code");
+    if (hideAllCode) {
+      hideAllCode.addEventListener("click", toggleCodeHandler(false));
+    }
+    const showAllCode = window.document.getElementById("quarto-show-all-code");
+    if (showAllCode) {
+      showAllCode.addEventListener("click", toggleCodeHandler(true));
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/abelzheng\.github\.io\/latent-dynamics-geometry-public\/");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+            // target, if specified
+            link.setAttribute("target", "_blank");
+            if (link.getAttribute("rel") === null) {
+              link.setAttribute("rel", "noopener");
+            }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">源代码</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1" data-shortcodes="false"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="an">title:</span><span class="co"> "Isomap"</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="an">lang:</span><span class="co"> zh-CN</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="an">comments:</span><span class="co"> false</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="an">object_type:</span><span class="co"> method</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="an">maturity:</span><span class="co"> L2</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="an">status:</span><span class="co"> stable</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="an">domain:</span><span class="co"> [dimensionality-reduction, geometry, graph-methods]</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="an">tags:</span><span class="co"> [isomap, nonlinear-embedding, shortest-path, classical-mds]</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="an">prerequisites:</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="co">- knowledge/methods/principal-component-analysis.qmd</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="co">- knowledge/concepts/embedding.qmd</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="co">- knowledge/concepts/metric.qmd</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="co">- knowledge/concepts/geodesic.qmd</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="co">- knowledge/concepts/manifold.qmd</span></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="an">related:</span></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="co">- knowledge/concepts/intrinsic-dimension.qmd</span></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a><span class="co">- knowledge/concepts/topology.qmd</span></span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a><span class="co">- knowledge/concepts/identifiability.qmd</span></span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a><span class="an">created:</span><span class="co"> 2026-08-19</span></span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a><span class="an">updated:</span><span class="co"> 2026-08-19</span></span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a><span class="fu"># Isomap</span></span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a><span class="fu">## 问题</span></span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>Isomap 构造旨在保留从高维观测构建的邻域图中最短路径距离的低维欧氏坐标。它处理比通用非线性降维更窄的问题：当外围距离局部有意义且样本充分描出路径度量在某个全局坐标系中近似欧氏的结构时，图路径可以提供比直线外围弦更好的全局距离代理 <span class="co">[</span><span class="ot">@TenenbaumDeSilvaLangford2000; @BernsteinEtAl2000</span><span class="co">]</span>。</span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>输出是拟合观测的嵌入，不是观测来自流形的证明。Isomap 分离三个不得混为一谈的操作：构造外围距离邻域图、在该有限图上计算最短路径距离、把这些图距离应用经典多维标度（MDS）。</span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a><span class="fu">## 输入</span></span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a>设 $x_1,\ldots,x_n\in\mathbb R^p$ 是声明特征构造与预处理管线之后的拟合观测。可复现分析必须指定：</span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>每行代表的观测单元以及行之间的任何依赖；</span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>中心化、特征缩放、排除、缺失数据与重复点策略；</span>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>同时用于选择邻居且（除非显式分开）用于加权图边的外围相异度 $\delta(x_i,x_j)$；</span>
+<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>$k$ 最近邻规则或 $\varepsilon$ 半径规则；</span>
+<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>有向对对称化 $k$ 最近邻构造，包括是否使用互或并对称化；</span>
+<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>并列打破、零距离与重复处理；</span>
+<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>不连通分量的处理；</span>
+<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>目标坐标维数 $d$ 或仅训练的选择规则；以及</span>
+<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>新观测是否需要显式声明的样本外扩展。</span>
+<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a>普通 Isomap 通常在预处理后使用欧氏距离，但该选择不是自动的。特征缩放可以改变邻居身份、边长、图连通性、最短路径与最终嵌入。</span>
+<span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-48"><a href="#cb1-48" aria-hidden="true" tabindex="-1"></a><span class="fu">## 输出</span></span>
+<span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-50"><a href="#cb1-50" aria-hidden="true" tabindex="-1"></a>对拟合观测，Isomap 返回：</span>
+<span id="cb1-51"><a href="#cb1-51" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-52"><a href="#cb1-52" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>顶点对应观测的邻域图 $G=(V,E)$；</span>
+<span id="cb1-53"><a href="#cb1-53" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>在所分析连通分量内的加权最短路径距离 $d_G(i,j)$；</span>
+<span id="cb1-54"><a href="#cb1-54" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>由平方图距离推导的双中心化矩阵；</span>
+<span id="cb1-55"><a href="#cb1-55" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>诊断这些图距离在多大程度上允许所请求欧氏表示的特征值；以及</span>
+<span id="cb1-56"><a href="#cb1-56" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>拟合观测的中心化坐标 $y_i\in\mathbb R^d$。</span>
+<span id="cb1-57"><a href="#cb1-57" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-58"><a href="#cb1-58" aria-hidden="true" tabindex="-1"></a>标准 Isomap 不返回生成分布、坐标上的后验、从坐标到观测的唯一逆映射，或未包含在拟合图中的观测的自动有效坐标。</span>
+<span id="cb1-59"><a href="#cb1-59" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-60"><a href="#cb1-60" aria-hidden="true" tabindex="-1"></a><span class="fu">## 核心思想</span></span>
+<span id="cb1-61"><a href="#cb1-61" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-62"><a href="#cb1-62" aria-hidden="true" tabindex="-1"></a>Isomap 具有三个不同阶段 <span class="co">[</span><span class="ot">@TenenbaumDeSilvaLangford2000</span><span class="co">]</span>：</span>
+<span id="cb1-63"><a href="#cb1-63" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-64"><a href="#cb1-64" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>**邻居图：** 用固定 $k$ 或 $\varepsilon$ 规则连接被判定局部接近的观测，并按声明外围相异度加权每个保留边。</span>
+<span id="cb1-65"><a href="#cb1-65" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>**图距离：** 用每对顶点之间最短局部边序列的长度近似长程路径距离。</span>
+<span id="cb1-66"><a href="#cb1-66" aria-hidden="true" tabindex="-1"></a><span class="ss">3. </span>**经典 MDS：** 把平方图距离转换为中心化内积矩阵，并用秩 $d$ 半正定 Gram 矩阵近似该矩阵。</span>
+<span id="cb1-67"><a href="#cb1-67" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-68"><a href="#cb1-68" aria-hidden="true" tabindex="-1"></a>第一阶段提出哪些外围弦足够局部、可代替短路径段。第二阶段产生有限图度量。第三阶段询问该度量能否按所请求维数的欧氏坐标精确或近似表示。外观光滑的最终图不能追溯验证图假设或流形假设。</span>
+<span id="cb1-69"><a href="#cb1-69" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-70"><a href="#cb1-70" aria-hidden="true" tabindex="-1"></a><span class="fu">## 生成 / 建模假设</span></span>
+<span id="cb1-71"><a href="#cb1-71" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-72"><a href="#cb1-72" aria-hidden="true" tabindex="-1"></a>Isomap 不是概率生成模型。其解读仍依赖强近似假设：</span>
+<span id="cb1-73"><a href="#cb1-73" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-74"><a href="#cb1-74" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>邻近外围观测沿候选结构接近，而非仅仅因为两条遥远分支彼此靠近；</span>
+<span id="cb1-75"><a href="#cb1-75" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>采样足够密，图路径可以沿相关路径通行而无大间隙；</span>
+<span id="cb1-76"><a href="#cb1-76" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>邻域尺度足够大以保持连通，但又足够小以避免捷径边；</span>
+<span id="cb1-77"><a href="#cb1-77" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>观测噪声与离群值不严重破坏邻居身份；</span>
+<span id="cb1-78"><a href="#cb1-78" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>相关连通区域由拟合样本表示；以及</span>
+<span id="cb1-79"><a href="#cb1-79" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>所得路径度量足够接近欧氏距离矩阵，经典 MDS 可以在维数 $d$ 表示它。</span>
+<span id="cb1-80"><a href="#cb1-80" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-81"><a href="#cb1-81" aria-hidden="true" tabindex="-1"></a>Bernstein 等人证明充分条件下的图距离近似，条件包括测地线凸性（因此相关最小测地线存在）、足够细的样本覆盖，以及相对曲率半径与不同分支间距受控的边尺度。这些是条件性定理假设，不是有限数据集满足假设的检验 <span class="co">[</span><span class="ot">@BernsteinEtAl2000</span><span class="co">]</span>。原始 Isomap 结果还强调本征几何等距于欧氏空间凸区域的有利情形；弯曲空间或非欧氏路径度量不必无畸变地全局展平 <span class="co">[</span><span class="ot">@TenenbaumDeSilvaLangford2000</span><span class="co">]</span>。</span>
+<span id="cb1-82"><a href="#cb1-82" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-83"><a href="#cb1-83" aria-hidden="true" tabindex="-1"></a><span class="fu">## 数学表述</span></span>
+<span id="cb1-84"><a href="#cb1-84" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-85"><a href="#cb1-85" aria-hidden="true" tabindex="-1"></a><span class="fu">### 1. 邻域图</span></span>
+<span id="cb1-86"><a href="#cb1-86" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-87"><a href="#cb1-87" aria-hidden="true" tabindex="-1"></a>对对称图，当声明的 $k$ 最近邻或 $\varepsilon$ 半径关系经声明对称化后保留该对时，设</span>
+<span id="cb1-88"><a href="#cb1-88" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-89"><a href="#cb1-89" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-90"><a href="#cb1-90" aria-hidden="true" tabindex="-1"></a>(i,j)\in E</span>
+<span id="cb1-91"><a href="#cb1-91" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-92"><a href="#cb1-92" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-93"><a href="#cb1-93" aria-hidden="true" tabindex="-1"></a>赋予边权</span>
+<span id="cb1-94"><a href="#cb1-94" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-95"><a href="#cb1-95" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-96"><a href="#cb1-96" aria-hidden="true" tabindex="-1"></a>w_{ij}=\delta(x_i,x_j).</span>
+<span id="cb1-97"><a href="#cb1-97" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-98"><a href="#cb1-98" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-99"><a href="#cb1-99" aria-hidden="true" tabindex="-1"></a>$k$ 最近邻规则固定邻居数，但在稀疏区域可以创建很长的边。$\varepsilon$ 规则固定外围尺度，但可以隔离低密度区域。互与并对称化通常产生不同图。</span>
+<span id="cb1-100"><a href="#cb1-100" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-101"><a href="#cb1-101" aria-hidden="true" tabindex="-1"></a><span class="fu">### 2. 最短路径图距离</span></span>
+<span id="cb1-102"><a href="#cb1-102" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-103"><a href="#cb1-103" aria-hidden="true" tabindex="-1"></a>对同一连通分量中的顶点，定义</span>
+<span id="cb1-104"><a href="#cb1-104" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-105"><a href="#cb1-105" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-106"><a href="#cb1-106" aria-hidden="true" tabindex="-1"></a>d_G(i,j)</span>
+<span id="cb1-107"><a href="#cb1-107" aria-hidden="true" tabindex="-1"></a>=</span>
+<span id="cb1-108"><a href="#cb1-108" aria-hidden="true" tabindex="-1"></a>\min_{i=v_0,\ldots,v_m=j}</span>
+<span id="cb1-109"><a href="#cb1-109" aria-hidden="true" tabindex="-1"></a>\sum_{r=0}^{m-1}w_{v_rv_{r+1}},</span>
+<span id="cb1-110"><a href="#cb1-110" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-111"><a href="#cb1-111" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-112"><a href="#cb1-112" aria-hidden="true" tabindex="-1"></a>其中最小值遍及图路径。如果 $i$ 与 $j$ 不连通，图距离是无穷大而非缺失的有限测地线估计。删除小分量、分别分析分量、添加桥接边或增大邻域是科学上不同的决定。</span>
+<span id="cb1-113"><a href="#cb1-113" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-114"><a href="#cb1-114" aria-hidden="true" tabindex="-1"></a>如果邻域图包含遥远分支上邻近外围点之间的边，仅稠密采样不够。这样的边可以使许多对的 $d_G$ 远小于预期路径距离。相反，间隙或过小邻域可以使图路径远长于预期路径或使其断开 <span class="co">[</span><span class="ot">@TenenbaumDeSilvaLangford2000; @BernsteinEtAl2000; @VanDerMaatenEtAl2009</span><span class="co">]</span>。</span>
+<span id="cb1-115"><a href="#cb1-115" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-116"><a href="#cb1-116" aria-hidden="true" tabindex="-1"></a><span class="fu">### 3. 经典 MDS</span></span>
+<span id="cb1-117"><a href="#cb1-117" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-118"><a href="#cb1-118" aria-hidden="true" tabindex="-1"></a>设 $D_G^{(2)}$ 表示对单个有限连通分量条目为 $d_G(i,j)^2$ 的矩阵，并设</span>
+<span id="cb1-119"><a href="#cb1-119" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-120"><a href="#cb1-120" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-121"><a href="#cb1-121" aria-hidden="true" tabindex="-1"></a>H=I_n-\frac{1}{n}\mathbf 1\mathbf 1^\top.</span>
+<span id="cb1-122"><a href="#cb1-122" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-123"><a href="#cb1-123" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-124"><a href="#cb1-124" aria-hidden="true" tabindex="-1"></a>经典 MDS 形成</span>
+<span id="cb1-125"><a href="#cb1-125" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-126"><a href="#cb1-126" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-127"><a href="#cb1-127" aria-hidden="true" tabindex="-1"></a>B=-\frac{1}{2}H D_G^{(2)}H.</span>
+<span id="cb1-128"><a href="#cb1-128" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-129"><a href="#cb1-129" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-130"><a href="#cb1-130" aria-hidden="true" tabindex="-1"></a>如果</span>
+<span id="cb1-131"><a href="#cb1-131" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-132"><a href="#cb1-132" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-133"><a href="#cb1-133" aria-hidden="true" tabindex="-1"></a>B=Q\Lambda Q^\top</span>
+<span id="cb1-134"><a href="#cb1-134" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-135"><a href="#cb1-135" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-136"><a href="#cb1-136" aria-hidden="true" tabindex="-1"></a>具有有序特征值 $\lambda_1\geq\cdots\geq\lambda_n$，通常 $d$ 维坐标保留最大正特征值，</span>
+<span id="cb1-137"><a href="#cb1-137" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-138"><a href="#cb1-138" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-139"><a href="#cb1-139" aria-hidden="true" tabindex="-1"></a>Y_d=Q_d\Lambda_d^{1/2}.</span>
+<span id="cb1-140"><a href="#cb1-140" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-141"><a href="#cb1-141" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-142"><a href="#cb1-142" aria-hidden="true" tabindex="-1"></a>该谱构造最小化 $B$ 与秩 $d$ 半正定 Gram 矩阵之间的平方误差；它是双中心化平方距离上的**应变**准则，不是原始距离压力（stress）的直接最小化 <span class="co">[</span><span class="ot">@TenenbaumDeSilvaLangford2000; @BengioEtAl2003</span><span class="co">]</span>。大量负特征值表明所提供的图距离并非精确欧氏。它们不识别原因是本征几何非欧氏、采样、捷径、不连通分量处理、噪声还是其他误设。</span>
+<span id="cb1-143"><a href="#cb1-143" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-144"><a href="#cb1-144" aria-hidden="true" tabindex="-1"></a>对普通欧氏输入距离，中心化经典 MDS 在刚性坐标约定下恢复与 PCA 相同的坐标子空间。Isomap 的不同在于向 MDS 阶段提供图最短路径距离 <span class="co">[</span><span class="ot">@TenenbaumDeSilvaLangford2000</span><span class="co">]</span>。</span>
+<span id="cb1-145"><a href="#cb1-145" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-146"><a href="#cb1-146" aria-hidden="true" tabindex="-1"></a><span class="fu">## 学习得到了什么？</span></span>
+<span id="cb1-147"><a href="#cb1-147" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-148"><a href="#cb1-148" aria-hidden="true" tabindex="-1"></a>给定所有分析者固定选择，Isomap 学习样本邻域图、其加权全对最短路径距离、双中心化矩阵 $B$、其谱，以及拟合观测的一个代表性秩 $d$ 欧氏坐标系。</span>
+<span id="cb1-149"><a href="#cb1-149" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-150"><a href="#cb1-150" aria-hidden="true" tabindex="-1"></a>算法不学习光滑流形图册、黎曼度量张量、拓扑、转移律、观测模型、噪声分布、本征维数或因果机制。图及其度量是依赖数据的估计，不是底层空间直接被观测的性质。</span>
+<span id="cb1-151"><a href="#cb1-151" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-152"><a href="#cb1-152" aria-hidden="true" tabindex="-1"></a><span class="fu">## 什么是固定的？</span></span>
+<span id="cb1-153"><a href="#cb1-153" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-154"><a href="#cb1-154" aria-hidden="true" tabindex="-1"></a>分析者固定观测与特征、预处理、外围相异度、邻居规则、邻域尺度、图方向/对称化、并列处理、边权、分量策略、目标维数或选择规程、正特征值策略以及任何样本外方法。评估划分与所有调参范围也由分析设计固定。</span>
+<span id="cb1-155"><a href="#cb1-155" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-156"><a href="#cb1-156" aria-hidden="true" tabindex="-1"></a>这些选择相互影响。在查看所需可视化之后选择 $k$ 或 $\varepsilon$ 是依赖结果的调参，除非选择准则与验证规程被独立声明。</span>
+<span id="cb1-157"><a href="#cb1-157" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-158"><a href="#cb1-158" aria-hidden="true" tabindex="-1"></a><span class="fu">## 时序假设</span></span>
+<span id="cb1-159"><a href="#cb1-159" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-160"><a href="#cb1-160" aria-hidden="true" tabindex="-1"></a>普通 Isomap 对顺序无感：置换观测行只重标图顶点与嵌入点。如果观测是时间样本，方法不使用先后、方向、时滞、速度或转移概率，除非这些量被插入特征、距离或图约束。时间邻接图是修改后的方法，不得被解读为普通 Isomap 发现动力学。</span>
+<span id="cb1-161"><a href="#cb1-161" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-162"><a href="#cb1-162" aria-hidden="true" tabindex="-1"></a>Isomap 坐标中可见的类轨迹排序可以来自静态相似结构。它不是物理时间、向量场、演化方程或潜动力系统的证据。</span>
+<span id="cb1-163"><a href="#cb1-163" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-164"><a href="#cb1-164" aria-hidden="true" tabindex="-1"></a><span class="fu">## 几何假设</span></span>
+<span id="cb1-165"><a href="#cb1-165" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-166"><a href="#cb1-166" aria-hidden="true" tabindex="-1"></a>Isomap 在局部使用声明外围度量、在全局使用图路径长度、在输出中使用欧氏几何。图最短路径度量是采样顶点上的组合度量。把它称为流形测地线距离的估计需要关于候选嵌入流形、相关最小测地线存在性、局部度量保真度、采样密度、曲率与分支间距的外部假设 <span class="co">[</span><span class="ot">@BernsteinEtAl2000</span><span class="co">]</span>。</span>
+<span id="cb1-167"><a href="#cb1-167" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-168"><a href="#cb1-168" aria-hidden="true" tabindex="-1"></a>经典 MDS 随后询问保留该图度量的欧氏坐标。如果候选空间具有非欧氏全局路径几何、洞、强曲率或不兼容拓扑，任何低维欧氏坐标系都可能无法保留所有图距离。Isomap 不估计黎曼度量张量，也不认证等距。</span>
+<span id="cb1-169"><a href="#cb1-169" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-170"><a href="#cb1-170" aria-hidden="true" tabindex="-1"></a><span class="fu">## 监督</span></span>
+<span id="cb1-171"><a href="#cb1-171" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-172"><a href="#cb1-172" aria-hidden="true" tabindex="-1"></a>标准 Isomap 对标签与结果无监督：图构造与 MDS 只使用声明观测与距离。标签仍可以通过特征选择、预处理、样本排除、超参数选择或视觉选择泄漏进结果。把邻域或维数调到最大化下游标签表现会创建有监督的模型选择层，必须用嵌套或以其他方式防泄漏的划分评估。</span>
+<span id="cb1-173"><a href="#cb1-173" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-174"><a href="#cb1-174" aria-hidden="true" tabindex="-1"></a><span class="fu">## 优化 / 推断</span></span>
+<span id="cb1-175"><a href="#cb1-175" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-176"><a href="#cb1-176" aria-hidden="true" tabindex="-1"></a>精确 Isomap 执行邻域搜索、所得加权图上的全对最短路径与 $B$ 的对称特征分解。MDS 步骤对其所述应变目标具有谱全局解，但这不使前面的图构造在统计上最优或在科学上被验证。</span>
+<span id="cb1-177"><a href="#cb1-177" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-178"><a href="#cb1-178" aria-hidden="true" tabindex="-1"></a>拟合坐标是直推式的。添加新点可以添加图边并改变现有点之间的最短路径，因此重算 Isomap 可以移动整个嵌入。Nyström/特征函数与地标构造提供显式近似样本外扩展，但它们引入额外假设，且一般不必等于完整重拟合 <span class="co">[</span><span class="ot">@BengioEtAl2003</span><span class="co">]</span>。任何声称的部署规则必须陈述新点如何连接、如何获得到训练点的距离，以及其坐标如何与训练嵌入对齐。</span>
+<span id="cb1-179"><a href="#cb1-179" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-180"><a href="#cb1-180" aria-hidden="true" tabindex="-1"></a><span class="fu">## 优点</span></span>
+<span id="cb1-181"><a href="#cb1-181" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-182"><a href="#cb1-182" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>它通过可检查图使提出的局部到全局几何显式。</span>
+<span id="cb1-183"><a href="#cb1-183" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>它可以表示全局弯曲但近似本征欧氏、单个仿射 PCA 子空间无法展平的结构。</span>
+<span id="cb1-184"><a href="#cb1-184" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>其三个阶段具有清晰诊断：图连通性与边结构、图距离稳定性与 MDS 谱畸变。</span>
+<span id="cb1-185"><a href="#cb1-185" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>MDS 阶段具有透明谱解。</span>
+<span id="cb1-186"><a href="#cb1-186" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>它为非线性图测地线假设是否在 PCA 与外围距离 MDS 之上增加价值提供有用的压力检验。</span>
+<span id="cb1-187"><a href="#cb1-187" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-188"><a href="#cb1-188" aria-hidden="true" tabindex="-1"></a><span class="fu">## 失效模式</span></span>
+<span id="cb1-189"><a href="#cb1-189" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-190"><a href="#cb1-190" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**邻域太小：** 稀疏区域断开或图路径绕行，夸大距离。</span>
+<span id="cb1-191"><a href="#cb1-191" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**邻域太大：** 边桥接分离臂或折叠，制造使许多全对距离损坏的短路。</span>
+<span id="cb1-192"><a href="#cb1-192" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**非均匀采样：** 单个全局 $k$ 或 $\varepsilon$ 可以同时在稠密区域太大、在稀疏区域太小。</span>
+<span id="cb1-193"><a href="#cb1-193" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**噪声与离群值：** 外围扰动改变最近邻；离群值可以制造桥或孤立分量。</span>
+<span id="cb1-194"><a href="#cb1-194" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**高维距离集中：** 不可靠外围邻域使每个下游阶段不可靠。</span>
+<span id="cb1-195"><a href="#cb1-195" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**不连通支撑：** 无限图距离无法在没有声明分量或插补策略的情况下传给普通经典 MDS。</span>
+<span id="cb1-196"><a href="#cb1-196" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**非欧氏图度量：** 即使正确计算图，负特征值与残余应变仍存在。</span>
+<span id="cb1-197"><a href="#cb1-197" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**边界与洞：** 有限图路径与全局欧氏展平可以畸变非凸本征域或非平凡拓扑的结构。</span>
+<span id="cb1-198"><a href="#cb1-198" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**超参数不稳定：** 预处理、$k$、$\varepsilon$、对称化或目标维数的适度变化可以旋转、折叠、分裂或重连输出。</span>
+<span id="cb1-199"><a href="#cb1-199" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**无原生逆：** 低维坐标本身不重构观测。</span>
+<span id="cb1-200"><a href="#cb1-200" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**无原生样本外映射：** 扩展是额外算法，不是拟合嵌入的自动性质。</span>
+<span id="cb1-201"><a href="#cb1-201" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**可视化越界：** 令人信服的二维布局可以隐藏大的图距离误差或丢弃的负特征方向。</span>
+<span id="cb1-202"><a href="#cb1-202" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-203"><a href="#cb1-203" aria-hidden="true" tabindex="-1"></a>van der Maaten 等人的比较综述强调短路敏感性、邻域图依赖、不连通分量限制，以及在更复杂自然数据上弱于有利合成示例的表现 <span class="co">[</span><span class="ot">@VanDerMaatenEtAl2009</span><span class="co">]</span>。</span>
+<span id="cb1-204"><a href="#cb1-204" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-205"><a href="#cb1-205" aria-hidden="true" tabindex="-1"></a><span class="fu">## 可辨识性问题</span></span>
+<span id="cb1-206"><a href="#cb1-206" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-207"><a href="#cb1-207" aria-hidden="true" tabindex="-1"></a>对固定连通图距离矩阵与固定保留正特征空间，经典 MDS 坐标是中心化的，且在正交变换（包括旋转与反射）下不唯一。单个轴具有任意符号。重复保留特征值允许其特征空间内的任意旋转。如果截断边界穿过重复特征值，所选 $d$ 维坐标子空间本身不唯一。</span>
+<span id="cb1-208"><a href="#cb1-208" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-209"><a href="#cb1-209" aria-hidden="true" tabindex="-1"></a>这些谱等价不穷尽实际歧义。不同邻域图可以从相同观测产生不同图度量与嵌入。绘图对齐或 Procrustes 变换选择坐标代表；它不辨识科学上有特权的潜轴。当负特征值被丢弃时，即使完整正坐标表示也只是所提供图距离的近似。</span>
+<span id="cb1-210"><a href="#cb1-210" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-211"><a href="#cb1-211" aria-hidden="true" tabindex="-1"></a><span class="fu">## 与更简单方法的比较</span></span>
+<span id="cb1-212"><a href="#cb1-212" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-213"><a href="#cb1-213" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**PCA：** 所需秩匹配线性欧氏基线。它检验图测地线构造是否在单个全局仿射子空间之上改善声明准则。</span>
+<span id="cb1-214"><a href="#cb1-214" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**外围距离经典 MDS：** 把相同最终谱阶段直接应用于逐对外围距离。使用欧氏距离时它与 PCA 密切相关，并隔离用图路径替换外围距离的贡献。</span>
+<span id="cb1-215"><a href="#cb1-215" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**无嵌入的图距离诊断：** 在把任何价值归因于 MDS 可视化之前检查连通性、边长、最短路径与跨邻域稳定性。</span>
+<span id="cb1-216"><a href="#cb1-216" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**合成神谕比较：** 只在未来生成玩具设定中，把图距离与已知曲线或流形路径距离比较。对普通经验数据，没有独立已知几何时这不可用。</span>
+<span id="cb1-217"><a href="#cb1-217" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-218"><a href="#cb1-218" aria-hidden="true" tabindex="-1"></a>不应仅仅因为方法自身的样本内图距离目标更小而判定其更优。比较必须使用匹配维数、仅训练调参以及与预期科学或预测用途绑定的准则。</span>
+<span id="cb1-219"><a href="#cb1-219" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-220"><a href="#cb1-220" aria-hidden="true" tabindex="-1"></a><span class="fu">## 评估准则</span></span>
+<span id="cb1-221"><a href="#cb1-221" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-222"><a href="#cb1-222" aria-hidden="true" tabindex="-1"></a>评估应报告几层而非一张图：</span>
+<span id="cb1-223"><a href="#cb1-223" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-224"><a href="#cb1-224" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>**图诊断：** 连通分量大小、度与边长分布、对并列处理与对称化的敏感性，以及长桥接边的出现或消失。</span>
+<span id="cb1-225"><a href="#cb1-225" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>**邻域稳定性：** 在预先指定、科学上合理的 $k$ 或 $\varepsilon$ 范围以及重采样独立单元上重复分析。</span>
+<span id="cb1-226"><a href="#cb1-226" aria-hidden="true" tabindex="-1"></a><span class="ss">3. </span>**距离保真度：** 报告 $d_G$ 与嵌入欧氏距离之间的经典 MDS 应变或声明压力/相关度量。陈述负特征值是否被省略。</span>
+<span id="cb1-227"><a href="#cb1-227" aria-hidden="true" tabindex="-1"></a><span class="ss">4. </span>**局部保真度：** 相关时报告声明的邻域保持度量，而非从全局距离拟合推断局部正确性。</span>
+<span id="cb1-228"><a href="#cb1-228" aria-hidden="true" tabindex="-1"></a><span class="ss">5. </span>**基线比较：** 用相同拟合观测与预处理比较秩匹配 PCA 与外围距离经典 MDS。</span>
+<span id="cb1-229"><a href="#cb1-229" aria-hidden="true" tabindex="-1"></a><span class="ss">6. </span>**留出行为：** 在训练数据上拟合预处理、图超参数与维数；对留出观测使用预先声明扩展，并在不于测试集重拟合的情况下评估距离或下游表现。</span>
+<span id="cb1-230"><a href="#cb1-230" aria-hidden="true" tabindex="-1"></a><span class="ss">7. </span>**科学稳定性：** 评估结论是否在合理预处理、采样单元、受试者/会话与邻域选择下成立。</span>
+<span id="cb1-231"><a href="#cb1-231" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-232"><a href="#cb1-232" aria-hidden="true" tabindex="-1"></a>原始残差方差曲线是距离保持的样本内摘要，可以辅助维数比较，但肘部不是与模型无关的本征维数估计 <span class="co">[</span><span class="ot">@TenenbaumDeSilvaLangford2000</span><span class="co">]</span>。Isomap 没有原生观测空间重构，因此除非引入独立逆或解码器并将其作为额外方法评估，「重构误差」未定义。</span>
+<span id="cb1-233"><a href="#cb1-233" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-234"><a href="#cb1-234" aria-hidden="true" tabindex="-1"></a>对依赖观测，划分必须按需要保持整条轨迹、受试者、会话或其他依赖单元在一起。随机拆分相邻时间样本会使邻域与样本外表现乐观。</span>
+<span id="cb1-235"><a href="#cb1-235" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-236"><a href="#cb1-236" aria-hidden="true" tabindex="-1"></a><span class="fu">## 最小玩具模型</span></span>
+<span id="cb1-237"><a href="#cb1-237" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-238"><a href="#cb1-238" aria-hidden="true" tabindex="-1"></a>未来的非可执行玩具模型应沿具有两条长且近似平行臂的已知平面发卡曲线采样点。生成记录应保留曲线参数与精确弧长距离作为真值，而拟合算法只接收带噪外围坐标。</span>
+<span id="cb1-239"><a href="#cb1-239" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-240"><a href="#cb1-240" aria-hidden="true" tabindex="-1"></a>计划比较包括：</span>
+<span id="cb1-241"><a href="#cb1-241" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-242"><a href="#cb1-242" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>秩一与秩二 PCA；</span>
+<span id="cb1-243"><a href="#cb1-243" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>外围欧氏距离上的经典 MDS；</span>
+<span id="cb1-244"><a href="#cb1-244" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>在预先指定邻域范围上的 Isomap；以及</span>
+<span id="cb1-245"><a href="#cb1-245" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>使用已知弧长距离、仅作为生成侧参考的神谕 MDS 嵌入。</span>
+<span id="cb1-246"><a href="#cb1-246" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-247"><a href="#cb1-247" aria-hidden="true" tabindex="-1"></a>在足够局部邻域尺度下，图路径应跟随发卡并近似弧长。样本太少或邻域太小时，图应断开或绕行。邻域太大时，边应桥接两条臂并严重低估许多路径距离。阴性对照应从一端移除样本制造间隙。评估应比较图距离与已知弧长、检查连通分量与捷径，并仅为比较对齐坐标输出。该契约属于后续可执行研究；此处不创建数据、代码或结果。</span>
+<span id="cb1-248"><a href="#cb1-248" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-249"><a href="#cb1-249" aria-hidden="true" tabindex="-1"></a><span class="fu">## 对 LDG 的意义</span></span>
+<span id="cb1-250"><a href="#cb1-250" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-251"><a href="#cb1-251" aria-hidden="true" tabindex="-1"></a>Isomap 是 LDG 的规范示例，展示把局部度量假设变成全局图距离表示、再变成欧氏坐标的方法。它有用正是因为每次解读跳跃都可以被单独审计：局部外围邻近、有限图路径、欧氏 MDS 表示以及任何后续科学解读。</span>
+<span id="cb1-252"><a href="#cb1-252" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-253"><a href="#cb1-253" aria-hidden="true" tabindex="-1"></a>::: {.callout-warning title="这并不蕴含"}</span>
+<span id="cb1-254"><a href="#cb1-254" aria-hidden="true" tabindex="-1"></a>成功的 Isomap 可视化不证明流形存在、不恢复底层空间的拓扑、不估计黎曼度量张量、不确立本征维数、不发现物理动力学、不识别机制，也不恢复唯一潜坐标。图连通性不是拓扑恢复；图最短路径不自动是流形测地线；低应变不是模型验证。</span>
+<span id="cb1-255"><a href="#cb1-255" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb1-256"><a href="#cb1-256" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-257"><a href="#cb1-257" aria-hidden="true" tabindex="-1"></a><span class="fu">### 小鼠轨迹</span></span>
+<span id="cb1-258"><a href="#cb1-258" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-259"><a href="#cb1-259" aria-hidden="true" tabindex="-1"></a>不保留模态特定经验主张。把 Isomap 应用于小鼠轨迹需要独立论证的表示、距离、时间对齐策略、采样单元与留出扩展；弯曲嵌入不确立行为状态流形或运动动力学。</span>
+<span id="cb1-260"><a href="#cb1-260" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-261"><a href="#cb1-261" aria-hidden="true" tabindex="-1"></a><span class="fu">### 眼动</span></span>
+<span id="cb1-262"><a href="#cb1-262" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-263"><a href="#cb1-263" aria-hidden="true" tabindex="-1"></a>不保留模态特定经验主张。眼位样本、事件摘要与时间窗口定义不同度量空间，普通 Isomap 不把其静态邻近图变成动眼动力学的证据。</span>
+<span id="cb1-264"><a href="#cb1-264" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-265"><a href="#cb1-265" aria-hidden="true" tabindex="-1"></a><span class="fu">### EEG</span></span>
+<span id="cb1-266"><a href="#cb1-266" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-267"><a href="#cb1-267" aria-hidden="true" tabindex="-1"></a>不保留模态特定经验主张。传感器缩放、重参考、伪迹处理与受试者/会话池化会决定邻域图；嵌入轴不自动表示神经源或皮层几何。</span>
+<span id="cb1-268"><a href="#cb1-268" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-269"><a href="#cb1-269" aria-hidden="true" tabindex="-1"></a><span class="fu">### MEG / 神经群体数据</span></span>
+<span id="cb1-270"><a href="#cb1-270" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-271"><a href="#cb1-271" aria-hidden="true" tabindex="-1"></a>不保留模态特定经验主张。单元归一化、试次平均与采样依赖需要在图构造前固定，低维布局仍是图几何近似，而非神经流形、机制或动力学定律的证据。</span>
+<span id="cb1-272"><a href="#cb1-272" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-273"><a href="#cb1-273" aria-hidden="true" tabindex="-1"></a><span class="fu">## 主要来源</span></span>
+<span id="cb1-274"><a href="#cb1-274" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-275"><a href="#cb1-275" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Tenenbaum、de Silva 与 Langford 引入 Isomap，显式分离邻域构造、最短路径图距离与经典 MDS，并陈述有利的本征欧氏设定与有限样本图限制 <span class="co">[</span><span class="ot">@TenenbaumDeSilvaLangford2000</span><span class="co">]</span>。</span>
+<span id="cb1-276"><a href="#cb1-276" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Bernstein、de Silva、Langford 与 Tenenbaum 分析图距离在嵌入流形上近似路径距离的充分条件——包括测地线凸性/最小测地线存在性、采样覆盖、曲率与分支间距 <span class="co">[</span><span class="ot">@BernsteinEtAl2000</span><span class="co">]</span>。</span>
+<span id="cb1-277"><a href="#cb1-277" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Bengio 等人给出技术性双中心化/特征分解表述，并为 Isomap、MDS 与相关谱方法推导显式样本外扩展 <span class="co">[</span><span class="ot">@BengioEtAl2003</span><span class="co">]</span>。</span>
+<span id="cb1-278"><a href="#cb1-278" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-279"><a href="#cb1-279" aria-hidden="true" tabindex="-1"></a><span class="fu">## 综述 / 次级来源</span></span>
+<span id="cb1-280"><a href="#cb1-280" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-281"><a href="#cb1-281" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Van der Maaten、Postma 与 van den Herik 提供经核查的非线性降维方法比较综述，并识别 Isomap 的邻域、断开、短路与泛化限制 <span class="co">[</span><span class="ot">@VanDerMaatenEtAl2009</span><span class="co">]</span>。</span>
+<span id="cb1-282"><a href="#cb1-282" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-283"><a href="#cb1-283" aria-hidden="true" tabindex="-1"></a><span class="fu">## 开放方法学问题</span></span>
+<span id="cb1-284"><a href="#cb1-284" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-285"><a href="#cb1-285" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>应如何在不优化首选可视化的情况下选择邻域尺度？</span>
+<span id="cb1-286"><a href="#cb1-286" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>哪些诊断区分真正的局部度量保真度与距离集中或预处理伪迹？</span>
+<span id="cb1-287"><a href="#cb1-287" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>图边与最短路径中的不确定性应如何传播到坐标？</span>
+<span id="cb1-288"><a href="#cb1-288" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>何时应分别建模不连通分量，而非强迫进入单个嵌入？</span>
+<span id="cb1-289"><a href="#cb1-289" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>当添加点会实质改变拟合图时，哪种样本外扩展合适？</span>
+<span id="cb1-290"><a href="#cb1-290" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>哪些科学主张在刚性坐标变换与邻域扰动下不变？</span>
+<span id="cb1-291"><a href="#cb1-291" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-292"><a href="#cb1-292" aria-hidden="true" tabindex="-1"></a><span class="fu">## 成熟度检查表</span></span>
+<span id="cb1-293"><a href="#cb1-293" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-294"><a href="#cb1-294" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> 使用完整方法 schema 并陈述有界问题。</span>
+<span id="cb1-295"><a href="#cb1-295" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> 分离邻居构造、图最短路径与经典 MDS。</span>
+<span id="cb1-296"><a href="#cb1-296" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> 陈述测地线存在、采样、连通性、曲率、分支间距与捷径假设。</span>
+<span id="cb1-297"><a href="#cb1-297" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> 声明学习得到与固定的量、时序处理、几何与监督。</span>
+<span id="cb1-298"><a href="#cb1-298" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> 陈述谱与图构造歧义。</span>
+<span id="cb1-299"><a href="#cb1-299" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> 包含 PCA、外围 MDS 与图诊断基线。</span>
+<span id="cb1-300"><a href="#cb1-300" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> 定义评估与样本外界限，而不声称原生重构。</span>
+<span id="cb1-301"><a href="#cb1-301" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> 包含带失效与阴性对照情形的仅散文未来玩具模型契约。</span>
+<span id="cb1-302"><a href="#cb1-302" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> 避免未受支持的模态特定经验主张。</span>
+<span id="cb1-303"><a href="#cb1-303" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> 包含显式流形、拓扑、几何、维数、动力学与机制非蕴含。</span>
+<span id="cb1-304"><a href="#cb1-304" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> 基础、技术与综述来源经核查且书目元数据已验证。</span>
+<span id="cb1-305"><a href="#cb1-305" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> 在一轮有界修正轮次后完成独立混合审查；聚焦复审返回 PASS。</span>
+<span id="cb1-306"><a href="#cb1-306" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> 在发布站点审查后，人类所有者根据记录的审查决定授权稳定晋升。</span></code></pre></div><button title="复制到剪贴板" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></div>
+</div></div></div></div></div>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

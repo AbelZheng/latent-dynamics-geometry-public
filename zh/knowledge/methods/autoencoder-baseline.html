@@ -1,0 +1,1605 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="zh-CN" xml:lang="zh-CN"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.10.18">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>有界自编码器基线 – Latent Dynamics &amp; Geometry</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="../../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../../">
+<script src="../../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../../site_libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../../site_libs/bootstrap/bootstrap-e3adbaa939bcd423dddc8c8a834270b4.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "没有结果",
+    "search-matching-documents-text": "匹配的文档",
+    "search-copy-link-title": "复制搜索链接",
+    "search-hide-matches-text": "隐藏其它匹配结果",
+    "search-more-match-text": "更多匹配结果",
+    "search-more-matches-text": "更多匹配结果",
+    "search-clear-button-title": "清除",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "取消",
+    "search-submit-button-title": "提交",
+    "search-label": "搜索"
+  }
+}</script>
+<style>
+.ldg-lang{position:fixed;top:72px;right:16px;z-index:2000;display:flex;gap:4px;font-family:system-ui,-apple-system,"Segoe UI",sans-serif;}
+.ldg-lang a{display:inline-block;padding:4px 10px;border:1px solid #c8c8c8;border-radius:999px;background:#fff;color:#333;text-decoration:none;font-size:13px;box-shadow:0 1px 3px rgba(0,0,0,.15);}
+.ldg-lang a.active{background:#2c3e50;color:#fff;border-color:#2c3e50;}
+</style>
+</head><body class="nav-fixed quarto-light"><div class="ldg-lang" id="ldg-lang">
+  <a href="#" id="ldg-lang-en">EN</a>
+  <a href="#" id="ldg-lang-zh">中文</a>
+</div>
+<script>
+(function () {
+  var BASE = '';
+  if (window.location.pathname.indexOf('/latent-dynamics-geometry-public/') === 0) {
+    BASE = 'latent-dynamics-geometry-public';
+  }
+  var IS_FILE = window.location.protocol === 'file:';
+  function pathSegs() {
+    return window.location.pathname.split('/').filter(Boolean);
+  }
+  function zhIdx() {
+    return pathSegs().indexOf('zh');
+  }
+  function segs() {
+    var s = window.location.pathname.split('/').filter(Boolean);
+    if (BASE && s[0] === BASE) s = s.slice(1);
+    return s;
+  }
+  function isZh() { return zhIdx() !== -1; }
+  function fileTarget(lang) {
+    var s = pathSegs();
+    var siteIdx = s.lastIndexOf('_site');
+    var root = siteIdx === -1 ? s.slice(0, -1) : s.slice(0, siteIdx + 1);
+    var page = siteIdx === -1 ? [s[s.length - 1]] : s.slice(siteIdx + 1);
+    if (page[0] === 'zh') page = page.slice(1);
+    if (lang === 'zh') page = ['zh'].concat(page);
+    var rel = page.join('/');
+    if (rel === '' || rel === 'zh') rel = 'index.html';
+    return '/' + root.join('/') + '/' + rel;
+  }
+  function target(lang) {
+    if (IS_FILE) return fileTarget(lang);
+    var s = segs();
+    if (s[0] === 'zh') s = s.slice(1);
+    if (lang === 'zh') s = ['zh'].concat(s);
+    var rel = s.join('/');
+    if (rel === '' || rel === 'zh') rel = (lang === 'zh' ? 'zh/index.html' : 'index.html');
+    return '/' + (BASE ? BASE + '/' : '') + rel;
+  }
+  function go(lang) {
+    try { localStorage.setItem('ldg-lang', lang); } catch (e) {}
+    window.location.href = target(lang);
+  }
+  function mark() {
+    var zh = isZh();
+    var a = document.getElementById('ldg-lang-en');
+    var b = document.getElementById('ldg-lang-zh');
+    if (a) a.className = zh ? '' : 'active';
+    if (b) b.className = zh ? 'active' : '';
+  }
+  function localizeNav() {
+    if (!isZh()) return;
+    var cur = pathSegs();
+    var czi = zhIdx();
+    var dir = (czi === -1 ? cur.slice(0, -1) : cur.slice(czi, -1)).join('/');
+    document.querySelectorAll('nav a').forEach(function (a) {
+      var h = a.getAttribute('href') || '';
+      if (/^(https?:|#|mailto:)/.test(h)) return;
+      if (/\.html?$/.test(h) || /\/$/.test(h) || h === '') {
+        var abs = new URL(h, window.location.href).pathname;
+        var s = abs.split('/').filter(Boolean);
+        if (BASE && s[0] === BASE) s = s.slice(1);
+        var zi = s.indexOf('zh');
+        var rel = zi !== -1 ? s.slice(zi + 1).join('/') : s.slice(czi).join('/');
+        var tgt = 'zh/' + rel;
+        var f = dir.split('/').filter(Boolean);
+        var t = tgt.split('/').filter(Boolean);
+        var i = 0;
+        while (i < f.length && i < t.length && f[i] === t[i]) i++;
+        var rel = '';
+        for (var j = i; j < f.length; j++) rel += '../';
+        rel += t.slice(i).join('/');
+        a.setAttribute('href', rel);
+      }
+    });
+  }
+  document.getElementById('ldg-lang-en').addEventListener('click', function (e) { e.preventDefault(); go('en'); });
+  document.getElementById('ldg-lang-zh').addEventListener('click', function (e) { e.preventDefault(); go('zh'); });
+  mark();
+  localizeNav();
+})();
+</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-chtml.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+
+
+
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../../../index.html">
+    <span class="navbar-title">Latent Dynamics &amp; Geometry</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="搜索"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="展开或折叠导航栏" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../../index.html"> 
+<span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../../knowledge/concepts/index.html"> 
+<span class="menu-text">Concepts</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../../knowledge/methods/index.html"> 
+<span class="menu-text">Methods</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../../knowledge/math/index.html"> 
+<span class="menu-text">Math</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../../knowledge/papers/index.html"> 
+<span class="menu-text">Papers</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../../toy-models/index.html"> 
+<span class="menu-text">Toy Models</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../../research-questions/index.html"> 
+<span class="menu-text">Research Questions</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../../benchmarks/index.html"> 
+<span class="menu-text">Benchmarks</span></a>
+  </li>  
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/AbelZheng/latent-dynamics-geometry-public"> <i class="bi bi-github" role="img" aria-label="GitHub repository">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="https://github.com/AbelZheng/latent-dynamics-geometry-public/discussions"> 
+<span class="menu-text">Discussions</span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">该页面内容</h2>
+   
+  <ul>
+  <li><a href="#有界自编码器基线" id="toc-有界自编码器基线" class="nav-link active" data-scroll-target="#有界自编码器基线">有界自编码器基线</a>
+  <ul class="collapse">
+  <li><a href="#问题" id="toc-问题" class="nav-link" data-scroll-target="#问题">问题</a></li>
+  <li><a href="#输入" id="toc-输入" class="nav-link" data-scroll-target="#输入">输入</a></li>
+  <li><a href="#输出" id="toc-输出" class="nav-link" data-scroll-target="#输出">输出</a></li>
+  <li><a href="#核心思想" id="toc-核心思想" class="nav-link" data-scroll-target="#核心思想">核心思想</a></li>
+  <li><a href="#生成-建模假设" id="toc-生成-建模假设" class="nav-link" data-scroll-target="#生成-建模假设">生成 / 建模假设</a></li>
+  <li><a href="#数学表述" id="toc-数学表述" class="nav-link" data-scroll-target="#数学表述">数学表述</a>
+  <ul class="collapse">
+  <li><a href="#编码器与解码器" id="toc-编码器与解码器" class="nav-link" data-scroll-target="#编码器与解码器">编码器与解码器</a></li>
+  <li><a href="#经验风险" id="toc-经验风险" class="nav-link" data-scroll-target="#经验风险">经验风险</a></li>
+  <li><a href="#线性自编码器边界" id="toc-线性自编码器边界" class="nav-link" data-scroll-target="#线性自编码器边界">线性自编码器边界</a></li>
+  </ul></li>
+  <li><a href="#学习得到了什么" id="toc-学习得到了什么" class="nav-link" data-scroll-target="#学习得到了什么">学习得到了什么？</a></li>
+  <li><a href="#什么是固定的" id="toc-什么是固定的" class="nav-link" data-scroll-target="#什么是固定的">什么是固定的？</a></li>
+  <li><a href="#时序假设" id="toc-时序假设" class="nav-link" data-scroll-target="#时序假设">时序假设</a></li>
+  <li><a href="#几何假设" id="toc-几何假设" class="nav-link" data-scroll-target="#几何假设">几何假设</a></li>
+  <li><a href="#监督" id="toc-监督" class="nav-link" data-scroll-target="#监督">监督</a></li>
+  <li><a href="#优化-推断" id="toc-优化-推断" class="nav-link" data-scroll-target="#优化-推断">优化 / 推断</a></li>
+  <li><a href="#优点" id="toc-优点" class="nav-link" data-scroll-target="#优点">优点</a></li>
+  <li><a href="#失效模式" id="toc-失效模式" class="nav-link" data-scroll-target="#失效模式">失效模式</a></li>
+  <li><a href="#可辨识性问题" id="toc-可辨识性问题" class="nav-link" data-scroll-target="#可辨识性问题">可辨识性问题</a></li>
+  <li><a href="#与更简单方法的比较" id="toc-与更简单方法的比较" class="nav-link" data-scroll-target="#与更简单方法的比较">与更简单方法的比较</a></li>
+  <li><a href="#评估准则" id="toc-评估准则" class="nav-link" data-scroll-target="#评估准则">评估准则</a></li>
+  <li><a href="#最小玩具模型" id="toc-最小玩具模型" class="nav-link" data-scroll-target="#最小玩具模型">最小玩具模型</a></li>
+  <li><a href="#对-ldg-的意义" id="toc-对-ldg-的意义" class="nav-link" data-scroll-target="#对-ldg-的意义">对 LDG 的意义</a>
+  <ul class="collapse">
+  <li><a href="#小鼠轨迹" id="toc-小鼠轨迹" class="nav-link" data-scroll-target="#小鼠轨迹">小鼠轨迹</a></li>
+  <li><a href="#眼动" id="toc-眼动" class="nav-link" data-scroll-target="#眼动">眼动</a></li>
+  <li><a href="#eeg" id="toc-eeg" class="nav-link" data-scroll-target="#eeg">EEG</a></li>
+  <li><a href="#meg-神经群体数据" id="toc-meg-神经群体数据" class="nav-link" data-scroll-target="#meg-神经群体数据">MEG / 神经群体数据</a></li>
+  </ul></li>
+  <li><a href="#主要来源" id="toc-主要来源" class="nav-link" data-scroll-target="#主要来源">主要来源</a></li>
+  <li><a href="#综述-次级来源" id="toc-综述-次级来源" class="nav-link" data-scroll-target="#综述-次级来源">综述 / 次级来源</a></li>
+  <li><a href="#开放方法学问题" id="toc-开放方法学问题" class="nav-link" data-scroll-target="#开放方法学问题">开放方法学问题</a></li>
+  <li><a href="#成熟度检查表" id="toc-成熟度检查表" class="nav-link" data-scroll-target="#成熟度检查表">成熟度检查表</a></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<div class="quarto-title-block"><div><h1 class="title">有界自编码器基线</h1><button type="button" class="btn code-tools-button" id="quarto-code-tools-source"><i class="bi"></i> 代码</button></div></div>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="有界自编码器基线" class="level1">
+<h1>有界自编码器基线</h1>
+<section id="问题" class="level2">
+<h2 class="anchored" data-anchor-id="问题">问题</h2>
+<p>有界自编码器学习从观测到固定宽度瓶颈再回到观测空间的确定性前馈映射。它在 LDG 中的目的是克制的：检验预先指定的有限非线性编码器–解码器架构在相同预处理与损失下是否比线性基线改善留出重构。</p>
+<p>有界方法排除变分自编码器、随机潜变量模型、递归或序列自编码器、动力学自编码器、对比目标、去噪训练、稀疏或收缩惩罚，以及宽泛生成模型主张。这些是目标与假设不同的相关族，不是该基线的静默扩展。</p>
+</section>
+<section id="输入" class="level2">
+<h2 class="anchored" data-anchor-id="输入">输入</h2>
+<p>设 <span class="math inline">\(x_1,\ldots,x_n\in\mathbb R^p\)</span> 是观测。数据定义必须陈述行是试次、受试者、会话、时间点、条件平均、轨迹窗口还是其他单元。只在训练划分上拟合训练预处理参数。用训练均值 <span class="math inline">\(\mu\)</span> 与声明非奇异对角缩放矩阵 <span class="math inline">\(S\)</span>，定义</p>
+<p><span class="math display">\[
+u_i=S^{-1}(x_i-\mu).
+\]</span></p>
+<p>可复现有界自编码器必须在测试评估前声明：</p>
+<ul>
+<li>训练、验证与测试划分单元；</li>
+<li>缺失数据与排除策略；</li>
+<li>中心化、缩放与任何特征变换；</li>
+<li>瓶颈宽度 <span class="math inline">\(d&lt;p\)</span>；</li>
+<li>精确有限编码器与解码器层宽；</li>
+<li>激活函数、输出激活与偏置的存在或缺失；</li>
+<li>不存在绕过瓶颈的跳跃连接；</li>
+<li>参数初始化、优化器、学习率调度与批大小；</li>
+<li>最大轮数、验证度量、早停规则与检查点选择；</li>
+<li>权重衰减或其他允许的普通训练正则化；以及</li>
+<li>随机初始化次数与模型选择规则。</li>
+</ul>
+<p>核心损失是变换坐标中的均方重构误差。如果特征因其支撑或科学意义需要其他损失，那定义的是另一个有界变体，必须单独比较，而不是称为相同 MSE 基线。</p>
+</section>
+<section id="输出" class="level2">
+<h2 class="anchored" data-anchor-id="输出">输出</h2>
+<p>对拟合参数对 <span class="math inline">\((\hat\theta,\hat\phi)\)</span>，方法返回：</p>
+<ul>
+<li>编码器 <span class="math display">\[
+f_{\hat\theta}:\mathbb R^p\to\mathbb R^d;
+\]</span></li>
+<li>瓶颈码 <span class="math display">\[
+z=f_{\hat\theta}(u);
+\]</span></li>
+<li>解码器 <span class="math display">\[
+g_{\hat\phi}:\mathbb R^d\to\mathbb R^p;
+\]</span></li>
+<li>变换坐标重构 <span class="math display">\[
+\widehat u=g_{\hat\phi}(f_{\hat\theta}(u));
+\]</span></li>
+<li>以及原始单位重构 <span class="math display">\[
+\widehat x=\mu+S\widehat u.
+\]</span></li>
+</ul>
+<p>码 <span class="math inline">\(z\)</span> 是学习得到的确定性特征向量。称其为「潜」描述其在网络中的内部未观测角色；它不使其成为后验潜变量、唯一隐藏原因或动力学状态。</p>
+</section>
+<section id="核心思想" class="level2">
+<h2 class="anchored" data-anchor-id="核心思想">核心思想</h2>
+<p>训练复合</p>
+<p><span class="math display">\[
+h_{\theta,\phi}=g_\phi\circ f_\theta
+\]</span></p>
+<p>近似训练分布上的恒等映射，同时强制所有信息穿过欠完整瓶颈。自联想网络与非线性主成分构造使用该恒等目标安排来学习紧凑内部表示 <span class="citation" data-cites="BourlardKamp1988 Kramer1991">(<a href="#ref-BourlardKamp1988" role="doc-biblioref">Bourlard 和 Kamp 1988年</a>; <a href="#ref-Kramer1991" role="doc-biblioref">Kramer 1991年</a>)</span>。</p>
+<p>仅压缩不保证有用结构。足够有表现力的编码器与解码器即使通过窄码也能记忆有限训练集，而过完整或旁路架构可以在无有意义约简的情况下学习恒等映射。因此容量、验证与显式基线是科学方法的一部分，而不仅是实现细节 <span class="citation" data-cites="GoodfellowBengioCourville2016">(<a href="#ref-GoodfellowBengioCourville2016" role="doc-biblioref">Goodfellow 等 2016年</a>, chap.&nbsp;14)</span>。</p>
+</section>
+<section id="生成-建模假设" class="level2">
+<h2 class="anchored" data-anchor-id="生成-建模假设">生成 / 建模假设</h2>
+<p>此自编码器不是概率生成模型。它不指定先验 <span class="math inline">\(p(z)\)</span>、观测似然 <span class="math inline">\(p(x\mid z)\)</span>、后验、观测噪声协方差或采样规程。其假设是近似与训练选择：</p>
+<ul>
+<li>固定网络类包含有用的编码器–解码器复合；</li>
+<li>变换特征坐标中的 MSE 反映重要的重构误差；</li>
+<li>训练与评估样本代表预期部署分布；</li>
+<li>瓶颈与有限架构充分约束拟合以泛化；</li>
+<li>优化器与初始化可以找到有用解；以及</li>
+<li>基于验证的停止与超参数选择在声明样本量下充分控制过拟合。</li>
+</ul>
+<p>非线性自编码器可以拟合弯曲重构映射，但该拟合不是数据生成支撑是光滑流形或瓶颈是本征坐标卡的证据。</p>
+</section>
+<section id="数学表述" class="level2">
+<h2 class="anchored" data-anchor-id="数学表述">数学表述</h2>
+<section id="编码器与解码器" class="level3">
+<h3 class="anchored" data-anchor-id="编码器与解码器">编码器与解码器</h3>
+<p>对具有 <span class="math inline">\(L_e\)</span> 个编码器层与 <span class="math inline">\(L_d\)</span> 个解码器层的固定前馈架构，示意性地写</p>
+<p><span class="math display">\[
+f_\theta(u)
+=
+\rho_{L_e}\!\left(
+W^{(e)}_{L_e}
+\rho_{L_e-1}(\cdots \rho_1(W^{(e)}_1u+b^{(e)}_1)\cdots)
++b^{(e)}_{L_e}
+\right),
+\]</span></p>
+<p>并类似地</p>
+<p><span class="math display">\[
+g_\phi(z)
+=
+\eta_{L_d}\!\left(
+W^{(d)}_{L_d}
+\eta_{L_d-1}(\cdots \eta_1(W^{(d)}_1z+b^{(d)}_1)\cdots)
++b^{(d)}_{L_d}
+\right).
+\]</span></p>
+<p>瓶颈输出维数恰好为 <span class="math inline">\(d\)</span>。隐藏激活函数与输出激活是固定架构选择。对无约束实值标准化特征，线性输出层是普通 MSE 选择；有界输出激活改变可表示范围，应与声明预处理匹配。</p>
+</section>
+<section id="经验风险" class="level3">
+<h3 class="anchored" data-anchor-id="经验风险">经验风险</h3>
+<p>设 <span class="math inline">\(I_{\mathrm{tr}}\)</span> 索引训练观测。有界目标是</p>
+<p><span class="math display">\[
+\widehat R_{\mathrm{tr}}(\theta,\phi)
+=
+\frac{1}{|I_{\mathrm{tr}}|}
+\sum_{i\in I_{\mathrm{tr}}}
+\left\lVert
+u_i-g_\phi(f_\theta(u_i))
+\right\rVert_2^2
++
+\lambda_e\Omega_e(\theta)
++
+\lambda_d\Omega_d(\phi),
+\]</span></p>
+<p>其中可以通过声明惩罚 <span class="math inline">\(\Omega_e,\Omega_d\)</span> 使用普通权重衰减；允许把两个系数都设为零。稀疏、去噪、收缩、对抗、对比或概率项在此有界目标之外。</p>
+<p>训练返回依赖优化器的候选，而非保证的全局最小化者。验证损失选择轮次以及任何架构、瓶颈、正则化或优化超参数。未触碰测试集用于最终比较一次。</p>
+</section>
+<section id="线性自编码器边界" class="level3">
+<h3 class="anchored" data-anchor-id="线性自编码器边界">线性自编码器边界</h3>
+<p>如果编码器与解码器线性、偏置与中心化一致处理、瓶颈宽度为 <span class="math inline">\(d\)</span> 且平方重构误差被全局优化，复合秩 <span class="math inline">\(d\)</span> 映射在普通中心化等权重欧氏表述下恢复主 PCA 子空间。单个编码器与解码器矩阵不必等于 PCA 载荷矩阵且不唯一；具有 PCA 关系的是重构子空间或复合映射 <span class="citation" data-cites="BourlardKamp1988 BaldiHornik1989">(<a href="#ref-BourlardKamp1988" role="doc-biblioref">Bourlard 和 Kamp 1988年</a>; <a href="#ref-BaldiHornik1989" role="doc-biblioref">Baldi 和 Hornik 1989年</a>)</span>。</p>
+<p>非线性激活移除该闭式等价并引入非凸优化。因此非线性自编码器应既与解析 PCA 比较，也与架构匹配的线性自编码器比较。训练线性网络未接近 PCA 表现是实现或优化警告，不是反对 PCA 的证据。</p>
+</section>
+</section>
+<section id="学习得到了什么" class="level2">
+<h2 class="anchored" data-anchor-id="学习得到了什么">学习得到了什么？</h2>
+<p>训练规程学习所有声明编码器与解码器权重和偏置，产生复合重构映射与所提供观测的瓶颈码。如果验证在候选中选择，它还按声明规则选择一个轮次、种子或超参数配置。</p>
+<p>它不学习概率分布、本征维数、转移模型、向量场、因果图、物理测量过程或唯一潜坐标系。</p>
+</section>
+<section id="什么是固定的" class="level2">
+<h2 class="anchored" data-anchor-id="什么是固定的">什么是固定的？</h2>
+<p>分析者固定观测与特征定义、预处理族、划分单元、架构搜索空间或单一架构、瓶颈候选、激活、损失、正则化族、优化器族、种子数、训练预算、早停规则、选择度量与基线。验证只能在这些预先声明候选中选择。</p>
+<p>参数数是方法的一部分。把高容量非线性网络与线性基线比较而不报告容量与训练预算，会把非线性与灵活性和优化努力混淆。</p>
+</section>
+<section id="时序假设" class="level2">
+<h2 class="anchored" data-anchor-id="时序假设">时序假设</h2>
+<p>有界自编码器对顺序无感。置换观测行使经验目标不变，除了随机小批量顺序。如果行是时间样本，网络看到特征向量集合，但没有时间先后、时滞、导数或转移关系。</p>
+<p>时间可以编码在每个输入向量内部，例如通过固定窗口，但那时自编码器重构的是该工程化窗口。它仍不学习动力学。递归、时序卷积、预测与序列到序列自编码器显式不在范围内。</p>
+</section>
+<section id="几何假设" class="level2">
+<h2 class="anchored" data-anchor-id="几何假设">几何假设</h2>
+<p>MSE 在声明缩放 <span class="math inline">\(S\)</span> 后施加欧氏平方重构几何。改变特征单位或权重会改变哪个差异主导。解码器像</p>
+<p><span class="math display">\[
+\{g_{\hat\phi}(z):z\in\mathbb R^d\}
+\]</span></p>
+<p>可以是弯曲、折叠、自相交或在远离训练码处约束不良的。低重构误差与光滑插值都不证明该像是流形、编码器单射，或码空间中的欧氏距离对应科学上有意义的度量。</p>
+<p>因此「嵌入」一词除非单射性与结构保持被独立支持，否则只能用作算法标签。瓶颈映射可以把不同观测送到相同码，并只能通过重构不完美地补偿。</p>
+</section>
+<section id="监督" class="level2">
+<h2 class="anchored" data-anchor-id="监督">监督</h2>
+<p>没有外部类别或行为标签进入核心目标。恒等重构目标提供训练目标，因此按约定方法常被描述为无监督或自监督。标签引导架构选择、基于结果的分量选择或下游任务调优会增加监督，且必须发生在防泄漏验证规程内。</p>
+<p>没有标签不使学习表示无目标：MSE、架构、预处理、瓶颈与采样分布提供强归纳偏置。</p>
+</section>
+<section id="优化-推断" class="level2">
+<h2 class="anchored" data-anchor-id="优化-推断">优化 / 推断</h2>
+<p>训练使用声明优化器进行基于梯度的经验风险最小化。对非线性网络目标非凸，因此不同初始化可以产生不同损失、重构与码坐标。早停使用验证数据选择优化轨迹上的点；它不是收敛或全局最优性的证明。</p>
+<p>报告优化器、学习率、批大小、轮次上限、停止耐心、检查点准则、初始化与种子分布。多个种子应被当作重复候选拟合：选择最佳验证种子是模型选择，测试结果不得指导该选择。</p>
+<p>没有后验推断。编码新观测是通过 <span class="math inline">\(f_{\hat\theta}\)</span> 的确定性前向传递。</p>
+</section>
+<section id="优点" class="level2">
+<h2 class="anchored" data-anchor-id="优点">优点</h2>
+<ul>
+<li>它是具有显式留出目标的瓶颈重构的直接非线性扩展。</li>
+<li>固定前馈架构易于陈述、训练并与 PCA 比较。</li>
+<li>编码器与解码器映射允许确定性样本外应用，而无需重建图。</li>
+<li>重构残差可以在原始特征单位与变换单位中检查。</li>
+<li>架构、容量与优化可以通过匹配对照与多种子压力检验。</li>
+<li>它在引入概率、时序或生成主张之前提供刻意弱神经基线。</li>
+</ul>
+</section>
+<section id="失效模式" class="level2">
+<h2 class="anchored" data-anchor-id="失效模式">失效模式</h2>
+<ul>
+<li><strong>记忆：</strong> 灵活网络可以赋予样本特定码并重构训练观测，而不学习可复用结构。</li>
+<li><strong>过拟合：</strong> 训练损失下降而验证或测试损失变差。</li>
+<li><strong>恒等捷径：</strong> 过完整层、跳跃连接或预处理泄漏可以允许平凡复制；本有界方法禁止绕过瓶颈的跳跃。</li>
+<li><strong>死单元：</strong> 饱和或整流激活可以使瓶颈或隐藏单元在数据范围内不活动。</li>
+<li><strong>码塌缩：</strong> 优化可以把大多数观测映射到几乎相同码，常产生类似均值的重构与差的保留变异。</li>
+<li><strong>尺度依赖：</strong> 高方差或缩放不良特征主导 MSE。</li>
+<li><strong>离群值敏感性：</strong> 平方误差可以把容量投入非典型观测。</li>
+<li><strong>优化不稳定：</strong> 种子、学习率、批量顺序与停止轮次可以改变解。</li>
+<li><strong>分布移位：</strong> 训练分布上的准确重构不必跨受试者、会话、条件或采集系统泛化。</li>
+<li><strong>插值伪迹：</strong> 观测码之间的解码器输出即使训练重构准确也可能不合理。</li>
+<li><strong>非单射编码：</strong> 不同输入可以共享码，阻止忠实恢复。</li>
+<li><strong>未用容量：</strong> 某些瓶颈坐标可以是常值或冗余；名义宽度不是独立使用坐标数。</li>
+<li><strong>干扰保留：</strong> MSE 像奖励科学信号一样奖励伪迹与无关方差的重构。</li>
+<li><strong>评估泄漏：</strong> 用测试观测拟合缩放、架构、瓶颈、早停或种子选择会使表现乐观。</li>
+<li><strong>解读越界：</strong> 视觉有序码可能被误认为流形坐标、动力学、机制或因果变量。</li>
+</ul>
+<p>Kramer 明确指出非线性自联想重构中网络容量不足与过拟合之间的权衡 <span class="citation" data-cites="Kramer1991">(<a href="#ref-Kramer1991" role="doc-biblioref">Kramer 1991年</a>)</span>。Goodfellow、Bengio 与 Courville 同样强调当模型容量过大时复制目标可以学到很少关于数据分布的内容 <span class="citation" data-cites="GoodfellowBengioCourville2016">(<a href="#ref-GoodfellowBengioCourville2016" role="doc-biblioref">Goodfellow 等 2016年</a>, chap.&nbsp;14)</span>。</p>
+</section>
+<section id="可辨识性问题" class="level2">
+<h2 class="anchored" data-anchor-id="可辨识性问题">可辨识性问题</h2>
+<p>自编码器参数与码一般不可辨识。如果可逆变换</p>
+<p><span class="math display">\[
+r:\mathbb R^d\to\mathbb R^d
+\]</span></p>
+<p>及其逆可以被所选网络类在相关码集上表示，则</p>
+<p><span class="math display">\[
+f'(u)=r(f(u)),
+\qquad
+g'(z')=g(r^{-1}(z'))
+\]</span></p>
+<p>产生相同复合重构。没有额外约束，观测重构目标无法偏爱这样一种坐标系。</p>
+<p>有限网络还承认更特定对称性：</p>
+<ul>
+<li>隐藏单元可以被置换并在相邻权重矩阵中补偿；</li>
+<li>符号变化可以对兼容奇或线性激活补偿；</li>
+<li>正缩放可以跨正齐次层（如 ReLU 层）移动；</li>
+<li>冗余或死单元可以改变参数而不改变实现映射；以及</li>
+<li>等函数参数化可以来自多条优化路径。</li>
+</ul>
+<p>对线性自编码器，即使主重构子空间唯一确定，编码器与解码器因子也不唯一 <span class="citation" data-cites="BaldiHornik1989">(<a href="#ref-BaldiHornik1989" role="doc-biblioref">Baldi 和 Hornik 1989年</a>)</span>。对非线性自编码器，等价可以超出旋转与缩放，延伸到架构支持的非线性瓶颈重参数化。</p>
+<p>因此轴名、排序与码空间中的欧氏距离不被本征辨识。跨种子对齐可以辅助比较，但不确立唯一生物坐标。</p>
+</section>
+<section id="与更简单方法的比较" class="level2">
+<h2 class="anchored" data-anchor-id="与更简单方法的比较">与更简单方法的比较</h2>
+<ul>
+<li><strong>训练均值：</strong> 用训练均值重构每个观测。这是 <span class="math inline">\(d=0\)</span> 参考。</li>
+<li><strong>PCA：</strong> 使用相同训练预处理与 MSE 几何的所需秩 <span class="math inline">\(d\)</span> 解析线性重构基线。</li>
+<li><strong>线性自编码器：</strong> 使用相同瓶颈与可比层布局、恒等激活。在良好优化的全局解下应接近 PCA 主子空间重构，提供实现对照。</li>
+<li><strong>因子分析：</strong> 具有潜分布、对角特征特定残差协方差、似然与条件潜推断的静态概率潜变量比较。确定性自编码器没有这些概率量，不应继承其解读。</li>
+<li><strong>冻结随机编码器：</strong> 保持架构匹配随机编码器固定，只训练解码器，并跨种子重复。这检验学习编码是否优于通用非线性特征。</li>
+<li><strong>容量匹配替代：</strong> 比较声明宽度、参数数、优化预算与正则化，而非把每个增益归因于非线性。</li>
+</ul>
+<p>只击败均值而未击败 PCA 的自编码器没有演示有用非线性重构。对 PCA 的非线性增益是所述架构与分布下留出 MSE 的证据，不是流形或机制的证据。</p>
+</section>
+<section id="评估准则" class="level2">
+<h2 class="anchored" data-anchor-id="评估准则">评估准则</h2>
+<p>防泄漏评估应包括：</p>
+<ol type="1">
+<li><strong>独立划分单元：</strong> 按需要留出完整试次、轨迹、受试者、会话或条件。依赖重要时，不应把一条轨迹的相邻时间点散落到折叠中。</li>
+<li><strong>仅训练预处理：</strong> 在训练划分内拟合中心化、缩放、插补与特征选择。</li>
+<li><strong>仅验证选择：</strong> 用验证数据选择瓶颈、宽度、激活、正则化、轮次与种子，最好在探索许多候选时使用嵌套评估。</li>
+<li><strong>未触碰测试重构：</strong> 报告 <span class="math display">\[
+\operatorname{MSE}_{\mathrm{test}}
+=
+\frac{1}{|I_{\mathrm{test}}|}
+\sum_{i\in I_{\mathrm{test}}}
+\left\lVert
+u_i-g_{\hat\phi}(f_{\hat\theta}(u_i))
+\right\rVert_2^2,
+\]</span> 连同逐特征与原始单位残差摘要。</li>
+<li><strong>泛化差距：</strong> 报告训练、验证与测试损失，而不仅是所选测试得分。</li>
+<li><strong>种子稳定性：</strong> 报告跨预先声明随机种子的分布，并区分最佳验证选择与平均表现。</li>
+<li><strong>基线与对照：</strong> 比较均值、秩匹配 PCA、线性自编码器、冻结随机编码器与容量匹配变体。</li>
+<li><strong>码诊断：</strong> 报告活跃坐标方差、重复/死单元与对预处理的敏感性。码图是诊断性的，其本身不是证据。</li>
+<li><strong>分布移位：</strong> 在科学相关时执行受试者、会话、条件或采集留出检验，而不仅是分布内随机划分。</li>
+<li><strong>次级任务：</strong> 在嵌套训练规程内拟合下游预测器。解码表现是单独准则，不把重构表示验证为机制。</li>
+</ol>
+<p>PCA 与自编码器损失必须在相同变换度量中计算。因子分析应主要用留出似然或预测分布评判；其条件均值重构可以次要报告，但它是依赖模型的，且不等价于确定性 MSE 训练。</p>
+</section>
+<section id="最小玩具模型" class="level2">
+<h2 class="anchored" data-anchor-id="最小玩具模型">最小玩具模型</h2>
+<p>未来的非可执行玩具模型应采样标量参数 <span class="math inline">\(s\)</span> 并通过</p>
+<p><span class="math display">\[
+x(s)
+=
+\begin{pmatrix}
+s\\
+s^2\\
+0.3\sin(2s)
+\end{pmatrix}
++
+\varepsilon,
+\]</span></p>
+<p>在 <span class="math inline">\(\mathbb R^3\)</span> 中生成观测，具有声明有界 <span class="math inline">\(s\)</span> 范围与各向同性观测噪声。生成记录应保留 <span class="math inline">\(s\)</span>，但 PCA 与自编码器在拟合期间都不得使用它。</p>
+<p>比较均值预测器、秩一 PCA、秩一线性自编码器、带一维瓶颈的固定小非线性自编码器与冻结随机编码器对照。用验证观测选择轮次与正则化，并在独立采样的 <span class="math inline">\(s\)</span> 值上评估留出 MSE。记录多个种子、死码频率与码随 <span class="math inline">\(s\)</span> 的单调性，仅作为生成侧诊断。</p>
+<p>必需阴性对照包括：独立全维高斯数据（一维弯曲解释在其中为假）；在极少数点上训练的高容量架构以暴露记忆；以及移位测试 <span class="math inline">\(s\)</span> 范围以暴露外推失败。即使非线性自编码器比 PCA 更好地重构弯曲示例，有效结论也限于该模拟器与损失。本方法对象不创建数据、代码或结果。</p>
+</section>
+<section id="对-ldg-的意义" class="level2">
+<h2 class="anchored" data-anchor-id="对-ldg-的意义">对 LDG 的意义</h2>
+<p>有界自编码器是 LDG 的规范确定性非线性重构基线。它询问有限非线性函数类是否在考虑关于几何、概率或动力学的更强主张之前改善留出重构。</p>
+<div class="callout callout-style-default callout-warning callout-titled" title="这并不蕴含">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">警告</span>这并不蕴含
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>低重构误差或吸引人的瓶颈可视化不证明流形、不确立本征维数、不识别唯一潜坐标、不发现动力学、不恢复机制，也不支持因果解读。窄码是架构选择；非线性解码器像是拟合函数；两者都不自动是系统的真实状态空间。</p>
+</div>
+</div>
+<section id="小鼠轨迹" class="level3">
+<h3 class="anchored" data-anchor-id="小鼠轨迹">小鼠轨迹</h3>
+<p>不保留模态特定经验主张。前馈自编码器可以重构固定轨迹摘要或窗口，但它会忽略时间先后，不确立行为状态、运动动力学或机制。</p>
+</section>
+<section id="眼动" class="level3">
+<h3 class="anchored" data-anchor-id="眼动">眼动</h3>
+<p>不保留模态特定经验主张。注视样本、事件摘要与对齐窗口定义不同重构问题；有序码不识别动眼坐标或因果控制变量。</p>
+</section>
+<section id="eeg" class="level3">
+<h3 class="anchored" data-anchor-id="eeg">EEG</h3>
+<p>不保留模态特定经验主张。通道缩放、重参考、伪迹处理、受试者划分与传感器几何将决定损失；瓶颈坐标不自动是神经源。</p>
+</section>
+<section id="meg-神经群体数据" class="level3">
+<h3 class="anchored" data-anchor-id="meg-神经群体数据">MEG / 神经群体数据</h3>
+<p>不保留模态特定经验主张。确定性重构基线可以检验声明传感器或单元特征的非线性压缩，但留出单元、试次、条件与会话是不同泛化问题。重构单独不确立神经流形或动力学。</p>
+</section>
+</section>
+<section id="主要来源" class="level2">
+<h2 class="anchored" data-anchor-id="主要来源">主要来源</h2>
+<ul>
+<li>Bourlard 与 Kamp 分析多层感知机自联想及其与奇异值分解的联系，为瓶颈重构提供早期技术基础 <span class="citation" data-cites="BourlardKamp1988">(<a href="#ref-BourlardKamp1988" role="doc-biblioref">Bourlard 和 Kamp 1988年</a>)</span>。</li>
+<li>Baldi 与 Hornik 刻画分层线性网络的平方误差景观，展示自联想主子空间解，同时指出编码器/解码器因子非唯一性 <span class="citation" data-cites="BaldiHornik1989">(<a href="#ref-BaldiHornik1989" role="doc-biblioref">Baldi 和 Hornik 1989年</a>)</span>。</li>
+<li>Kramer 用带平方重构误差的前馈自联想瓶颈网络表述非线性主成分分析，并讨论架构容量与过拟合 <span class="citation" data-cites="Kramer1991">(<a href="#ref-Kramer1991" role="doc-biblioref">Kramer 1991年</a>)</span>。</li>
+</ul>
+</section>
+<section id="综述-次级来源" class="level2">
+<h2 class="anchored" data-anchor-id="综述-次级来源">综述 / 次级来源</h2>
+<ul>
+<li>Goodfellow、Bengio 与 Courville 提供经核查的欠完整与正则化自编码器、编码器/解码器记号、重构目标、容量与恒等复制失败的权威综合 <span class="citation" data-cites="GoodfellowBengioCourville2016">(<a href="#ref-GoodfellowBengioCourville2016" role="doc-biblioref">Goodfellow 等 2016年</a>, chap.&nbsp;14)</span>。其中讨论的去噪、稀疏、收缩与变分扩展在此有界方法之外。</li>
+</ul>
+</section>
+<section id="开放方法学问题" class="level2">
+<h2 class="anchored" data-anchor-id="开放方法学问题">开放方法学问题</h2>
+<ul>
+<li>哪个架构匹配对照最好地把非线性收益与参数数和优化效应分开？</li>
+<li>当非线性重参数化保留重构时，应如何比较潜码稳定性？</li>
+<li>哪个留出划分反映预期科学用途：试次、条件、受试者、会话还是采集系统？</li>
+<li>何时即使特征缩放后 MSE 在科学上也不合适？</li>
+<li>应如何在不断言把方法变成概率模型的情况下评估确定性重构的不确定性？</li>
+<li>哪些阴性对照在下游解读之前揭示记忆或干扰重构？</li>
+</ul>
+</section>
+<section id="成熟度检查表" class="level2">
+<h2 class="anchored" data-anchor-id="成熟度检查表">成熟度检查表</h2>
+<ul class="task-list">
+<li><label><input type="checkbox" checked="">使用完整方法 schema 并定义有界确定性前馈方法。</label></li>
+<li><label><input type="checkbox" checked="">声明编码器、瓶颈、解码器、有限架构与 MSE 经验风险。</label></li>
+<li><label><input type="checkbox" checked="">覆盖验证、早停、正则化、初始化与种子选择。</label></li>
+<li><label><input type="checkbox" checked="">排除变分、递归、动力学、对比、去噪与稀疏族。</label></li>
+<li><label><input type="checkbox" checked="">陈述学习/固定量、顺序无感时间处理与欧氏重构几何。</label></li>
+<li><label><input type="checkbox" checked="">覆盖非凸优化、记忆、过拟合、死单元、塌缩与分布移位。</label></li>
+<li><label><input type="checkbox" checked="">陈述置换、缩放、符号与非线性重参数化歧义。</label></li>
+<li><label><input type="checkbox" checked="">包含 PCA、线性自编码器、FA、随机特征与容量对照。</label></li>
+<li><label><input type="checkbox" checked="">提供防泄漏留出评估与非可执行玩具契约。</label></li>
+<li><label><input type="checkbox" checked="">显式拒绝流形、维数、唯一坐标、动力学、机制与因果过度宣称。</label></li>
+<li><label><input type="checkbox" checked="">基础、线性理论、非线性与综述来源经核查与验证。</label></li>
+<li><label><input type="checkbox" checked="">独立混合审查返回 PASS，无需修正轮次。</label></li>
+<li><label><input type="checkbox" checked="">在发布站点审查后，人类所有者根据记录的审查决定授权稳定晋升。</label></li>
+</ul>
+
+
+<!-- -->
+
+
+</section>
+</section>
+
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography" id="quarto-bibliography"><h2 class="anchored quarto-appendix-heading">参考文献</h2><div id="refs" class="references csl-bib-body hanging-indent" role="list">
+<div id="ref-BaldiHornik1989" class="csl-entry" role="listitem">
+Baldi, Pierre, 和 Kurt Hornik. 1989年. <span>《Neural Networks and Principal Component Analysis: Learning from Examples without Local Minima》</span>. <em>Neural Networks</em> 2 (1): 53～58. <a href="https://doi.org/10.1016/0893-6080(89)90014-2">https://doi.org/10.1016/0893-6080(89)90014-2</a>.
+</div>
+<div id="ref-BourlardKamp1988" class="csl-entry" role="listitem">
+Bourlard, Hervé, 和 Yves Kamp. 1988年. <span>《Auto-Association by Multilayer Perceptrons and Singular Value Decomposition》</span>. <em>Biological Cybernetics</em> 59 (4–5): 291～94. <a href="https://doi.org/10.1007/BF00332918">https://doi.org/10.1007/BF00332918</a>.
+</div>
+<div id="ref-GoodfellowBengioCourville2016" class="csl-entry" role="listitem">
+Goodfellow, Ian, Yoshua Bengio, 和 Aaron Courville. 2016年. <em>Deep Learning</em>. MIT Press. <a href="https://www.deeplearningbook.org/">https://www.deeplearningbook.org/</a>.
+</div>
+<div id="ref-Kramer1991" class="csl-entry" role="listitem">
+Kramer, Mark A. 1991年. <span>《Nonlinear Principal Component Analysis Using Autoassociative Neural Networks》</span>. <em>AIChE Journal</em> 37 (2): 233～43. <a href="https://doi.org/10.1002/aic.690370209">https://doi.org/10.1002/aic.690370209</a>.
+</div>
+</div></section></div></main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "已复制");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "已复制");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+    const viewSource = window.document.getElementById('quarto-view-source') ||
+                       window.document.getElementById('quarto-code-tools-source');
+    if (viewSource) {
+      const sourceUrl = viewSource.getAttribute("data-quarto-source-url");
+      viewSource.addEventListener("click", function(e) {
+        if (sourceUrl) {
+          // rstudio viewer pane
+          if (/\bcapabilities=\b/.test(window.location)) {
+            window.open(sourceUrl);
+          } else {
+            window.location.href = sourceUrl;
+          }
+        } else {
+          const modal = new bootstrap.Modal(document.getElementById('quarto-embedded-source-code-modal'));
+          modal.show();
+        }
+        return false;
+      });
+    }
+    function toggleCodeHandler(show) {
+      return function(e) {
+        const cellDetails = window.document.querySelectorAll(".cell details.code-fold");
+        for (let i=0; i<cellDetails.length; i++) {
+          const details = cellDetails[i];
+          if (show) {
+            details.open = true;
+          } else {
+            details.removeAttribute("open");
+          }
+        }
+        const cellCodeDivs = window.document.querySelectorAll(".cell div.sourceCode.cell-code");
+        const fromCls = show ? "hidden" : "unhidden";
+        const toCls = show ? "unhidden" : "hidden";
+        for (let i=0; i<cellCodeDivs.length; i++) {
+          const codeDiv = cellCodeDivs[i];
+          if (codeDiv.classList.contains(fromCls)) {
+            codeDiv.classList.remove(fromCls);
+            codeDiv.classList.add(toCls);
+          } 
+        }
+        return false;
+      }
+    }
+    const hideAllCode = window.document.getElementById("quarto-hide-all-code");
+    if (hideAllCode) {
+      hideAllCode.addEventListener("click", toggleCodeHandler(false));
+    }
+    const showAllCode = window.document.getElementById("quarto-show-all-code");
+    if (showAllCode) {
+      showAllCode.addEventListener("click", toggleCodeHandler(true));
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/abelzheng\.github\.io\/latent-dynamics-geometry-public\/");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+            // target, if specified
+            link.setAttribute("target", "_blank");
+            if (link.getAttribute("rel") === null) {
+              link.setAttribute("rel", "noopener");
+            }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">源代码</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1" data-shortcodes="false"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="an">title:</span><span class="co"> "有界自编码器基线"</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="an">lang:</span><span class="co"> zh-CN</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="an">comments:</span><span class="co"> false</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="an">object_type:</span><span class="co"> method</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="an">maturity:</span><span class="co"> L2</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="an">status:</span><span class="co"> stable</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="an">domain:</span><span class="co"> [dimensionality-reduction, neural-networks, representation-learning]</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="an">tags:</span><span class="co"> [autoencoder, bottleneck, reconstruction, nonlinear-baseline]</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="an">prerequisites:</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="co">- knowledge/methods/principal-component-analysis.qmd</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="co">- knowledge/methods/factor-analysis.qmd</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="co">- knowledge/concepts/latent-variable.qmd</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="an">related:</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="co">- knowledge/concepts/embedding.qmd</span></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="co">- knowledge/concepts/identifiability.qmd</span></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="co">- knowledge/concepts/intrinsic-dimension.qmd</span></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a><span class="an">created:</span><span class="co"> 2026-08-19</span></span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a><span class="an">updated:</span><span class="co"> 2026-08-19</span></span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a><span class="fu"># 有界自编码器基线</span></span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a><span class="fu">## 问题</span></span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>有界自编码器学习从观测到固定宽度瓶颈再回到观测空间的确定性前馈映射。它在 LDG 中的目的是克制的：检验预先指定的有限非线性编码器–解码器架构在相同预处理与损失下是否比线性基线改善留出重构。</span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>有界方法排除变分自编码器、随机潜变量模型、递归或序列自编码器、动力学自编码器、对比目标、去噪训练、稀疏或收缩惩罚，以及宽泛生成模型主张。这些是目标与假设不同的相关族，不是该基线的静默扩展。</span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a><span class="fu">## 输入</span></span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>设 $x_1,\ldots,x_n\in\mathbb R^p$ 是观测。数据定义必须陈述行是试次、受试者、会话、时间点、条件平均、轨迹窗口还是其他单元。只在训练划分上拟合训练预处理参数。用训练均值 $\mu$ 与声明非奇异对角缩放矩阵 $S$，定义</span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a>u_i=S^{-1}(x_i-\mu).</span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a>可复现有界自编码器必须在测试评估前声明：</span>
+<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>训练、验证与测试划分单元；</span>
+<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>缺失数据与排除策略；</span>
+<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>中心化、缩放与任何特征变换；</span>
+<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>瓶颈宽度 $d&lt;p$；</span>
+<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>精确有限编码器与解码器层宽；</span>
+<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>激活函数、输出激活与偏置的存在或缺失；</span>
+<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>不存在绕过瓶颈的跳跃连接；</span>
+<span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>参数初始化、优化器、学习率调度与批大小；</span>
+<span id="cb1-48"><a href="#cb1-48" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>最大轮数、验证度量、早停规则与检查点选择；</span>
+<span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>权重衰减或其他允许的普通训练正则化；以及</span>
+<span id="cb1-50"><a href="#cb1-50" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>随机初始化次数与模型选择规则。</span>
+<span id="cb1-51"><a href="#cb1-51" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-52"><a href="#cb1-52" aria-hidden="true" tabindex="-1"></a>核心损失是变换坐标中的均方重构误差。如果特征因其支撑或科学意义需要其他损失，那定义的是另一个有界变体，必须单独比较，而不是称为相同 MSE 基线。</span>
+<span id="cb1-53"><a href="#cb1-53" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-54"><a href="#cb1-54" aria-hidden="true" tabindex="-1"></a><span class="fu">## 输出</span></span>
+<span id="cb1-55"><a href="#cb1-55" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-56"><a href="#cb1-56" aria-hidden="true" tabindex="-1"></a>对拟合参数对 $(\hat\theta,\hat\phi)$，方法返回：</span>
+<span id="cb1-57"><a href="#cb1-57" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-58"><a href="#cb1-58" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>编码器</span>
+<span id="cb1-59"><a href="#cb1-59" aria-hidden="true" tabindex="-1"></a>  $$</span>
+<span id="cb1-60"><a href="#cb1-60" aria-hidden="true" tabindex="-1"></a>  f_{\hat\theta}:\mathbb R^p\to\mathbb R^d;</span>
+<span id="cb1-61"><a href="#cb1-61" aria-hidden="true" tabindex="-1"></a>  $$</span>
+<span id="cb1-62"><a href="#cb1-62" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>瓶颈码</span>
+<span id="cb1-63"><a href="#cb1-63" aria-hidden="true" tabindex="-1"></a>  $$</span>
+<span id="cb1-64"><a href="#cb1-64" aria-hidden="true" tabindex="-1"></a>  z=f_{\hat\theta}(u);</span>
+<span id="cb1-65"><a href="#cb1-65" aria-hidden="true" tabindex="-1"></a>  $$</span>
+<span id="cb1-66"><a href="#cb1-66" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>解码器</span>
+<span id="cb1-67"><a href="#cb1-67" aria-hidden="true" tabindex="-1"></a>  $$</span>
+<span id="cb1-68"><a href="#cb1-68" aria-hidden="true" tabindex="-1"></a>  g_{\hat\phi}:\mathbb R^d\to\mathbb R^p;</span>
+<span id="cb1-69"><a href="#cb1-69" aria-hidden="true" tabindex="-1"></a>  $$</span>
+<span id="cb1-70"><a href="#cb1-70" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>变换坐标重构</span>
+<span id="cb1-71"><a href="#cb1-71" aria-hidden="true" tabindex="-1"></a>  $$</span>
+<span id="cb1-72"><a href="#cb1-72" aria-hidden="true" tabindex="-1"></a>  \widehat u=g_{\hat\phi}(f_{\hat\theta}(u));</span>
+<span id="cb1-73"><a href="#cb1-73" aria-hidden="true" tabindex="-1"></a>  $$</span>
+<span id="cb1-74"><a href="#cb1-74" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>以及原始单位重构</span>
+<span id="cb1-75"><a href="#cb1-75" aria-hidden="true" tabindex="-1"></a>  $$</span>
+<span id="cb1-76"><a href="#cb1-76" aria-hidden="true" tabindex="-1"></a>  \widehat x=\mu+S\widehat u.</span>
+<span id="cb1-77"><a href="#cb1-77" aria-hidden="true" tabindex="-1"></a>  $$</span>
+<span id="cb1-78"><a href="#cb1-78" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-79"><a href="#cb1-79" aria-hidden="true" tabindex="-1"></a>码 $z$ 是学习得到的确定性特征向量。称其为「潜」描述其在网络中的内部未观测角色；它不使其成为后验潜变量、唯一隐藏原因或动力学状态。</span>
+<span id="cb1-80"><a href="#cb1-80" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-81"><a href="#cb1-81" aria-hidden="true" tabindex="-1"></a><span class="fu">## 核心思想</span></span>
+<span id="cb1-82"><a href="#cb1-82" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-83"><a href="#cb1-83" aria-hidden="true" tabindex="-1"></a>训练复合</span>
+<span id="cb1-84"><a href="#cb1-84" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-85"><a href="#cb1-85" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-86"><a href="#cb1-86" aria-hidden="true" tabindex="-1"></a>h_{\theta,\phi}=g_\phi\circ f_\theta</span>
+<span id="cb1-87"><a href="#cb1-87" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-88"><a href="#cb1-88" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-89"><a href="#cb1-89" aria-hidden="true" tabindex="-1"></a>近似训练分布上的恒等映射，同时强制所有信息穿过欠完整瓶颈。自联想网络与非线性主成分构造使用该恒等目标安排来学习紧凑内部表示 <span class="co">[</span><span class="ot">@BourlardKamp1988; @Kramer1991</span><span class="co">]</span>。</span>
+<span id="cb1-90"><a href="#cb1-90" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-91"><a href="#cb1-91" aria-hidden="true" tabindex="-1"></a>仅压缩不保证有用结构。足够有表现力的编码器与解码器即使通过窄码也能记忆有限训练集，而过完整或旁路架构可以在无有意义约简的情况下学习恒等映射。因此容量、验证与显式基线是科学方法的一部分，而不仅是实现细节 <span class="co">[</span><span class="ot">@GoodfellowBengioCourville2016, chap. 14</span><span class="co">]</span>。</span>
+<span id="cb1-92"><a href="#cb1-92" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-93"><a href="#cb1-93" aria-hidden="true" tabindex="-1"></a><span class="fu">## 生成 / 建模假设</span></span>
+<span id="cb1-94"><a href="#cb1-94" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-95"><a href="#cb1-95" aria-hidden="true" tabindex="-1"></a>此自编码器不是概率生成模型。它不指定先验 $p(z)$、观测似然 $p(x\mid z)$、后验、观测噪声协方差或采样规程。其假设是近似与训练选择：</span>
+<span id="cb1-96"><a href="#cb1-96" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-97"><a href="#cb1-97" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>固定网络类包含有用的编码器–解码器复合；</span>
+<span id="cb1-98"><a href="#cb1-98" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>变换特征坐标中的 MSE 反映重要的重构误差；</span>
+<span id="cb1-99"><a href="#cb1-99" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>训练与评估样本代表预期部署分布；</span>
+<span id="cb1-100"><a href="#cb1-100" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>瓶颈与有限架构充分约束拟合以泛化；</span>
+<span id="cb1-101"><a href="#cb1-101" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>优化器与初始化可以找到有用解；以及</span>
+<span id="cb1-102"><a href="#cb1-102" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>基于验证的停止与超参数选择在声明样本量下充分控制过拟合。</span>
+<span id="cb1-103"><a href="#cb1-103" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-104"><a href="#cb1-104" aria-hidden="true" tabindex="-1"></a>非线性自编码器可以拟合弯曲重构映射，但该拟合不是数据生成支撑是光滑流形或瓶颈是本征坐标卡的证据。</span>
+<span id="cb1-105"><a href="#cb1-105" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-106"><a href="#cb1-106" aria-hidden="true" tabindex="-1"></a><span class="fu">## 数学表述</span></span>
+<span id="cb1-107"><a href="#cb1-107" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-108"><a href="#cb1-108" aria-hidden="true" tabindex="-1"></a><span class="fu">### 编码器与解码器</span></span>
+<span id="cb1-109"><a href="#cb1-109" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-110"><a href="#cb1-110" aria-hidden="true" tabindex="-1"></a>对具有 $L_e$ 个编码器层与 $L_d$ 个解码器层的固定前馈架构，示意性地写</span>
+<span id="cb1-111"><a href="#cb1-111" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-112"><a href="#cb1-112" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-113"><a href="#cb1-113" aria-hidden="true" tabindex="-1"></a>f_\theta(u)</span>
+<span id="cb1-114"><a href="#cb1-114" aria-hidden="true" tabindex="-1"></a>=</span>
+<span id="cb1-115"><a href="#cb1-115" aria-hidden="true" tabindex="-1"></a>\rho_{L_e}<span class="sc">\!</span>\left(</span>
+<span id="cb1-116"><a href="#cb1-116" aria-hidden="true" tabindex="-1"></a>W^{(e)}_{L_e}</span>
+<span id="cb1-117"><a href="#cb1-117" aria-hidden="true" tabindex="-1"></a>\rho_{L_e-1}(\cdots \rho_1(W^{(e)}_1u+b^{(e)}_1)\cdots)</span>
+<span id="cb1-118"><a href="#cb1-118" aria-hidden="true" tabindex="-1"></a>+b^{(e)}_{L_e}</span>
+<span id="cb1-119"><a href="#cb1-119" aria-hidden="true" tabindex="-1"></a>\right),</span>
+<span id="cb1-120"><a href="#cb1-120" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-121"><a href="#cb1-121" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-122"><a href="#cb1-122" aria-hidden="true" tabindex="-1"></a>并类似地</span>
+<span id="cb1-123"><a href="#cb1-123" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-124"><a href="#cb1-124" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-125"><a href="#cb1-125" aria-hidden="true" tabindex="-1"></a>g_\phi(z)</span>
+<span id="cb1-126"><a href="#cb1-126" aria-hidden="true" tabindex="-1"></a>=</span>
+<span id="cb1-127"><a href="#cb1-127" aria-hidden="true" tabindex="-1"></a>\eta_{L_d}<span class="sc">\!</span>\left(</span>
+<span id="cb1-128"><a href="#cb1-128" aria-hidden="true" tabindex="-1"></a>W^{(d)}_{L_d}</span>
+<span id="cb1-129"><a href="#cb1-129" aria-hidden="true" tabindex="-1"></a>\eta_{L_d-1}(\cdots \eta_1(W^{(d)}_1z+b^{(d)}_1)\cdots)</span>
+<span id="cb1-130"><a href="#cb1-130" aria-hidden="true" tabindex="-1"></a>+b^{(d)}_{L_d}</span>
+<span id="cb1-131"><a href="#cb1-131" aria-hidden="true" tabindex="-1"></a>\right).</span>
+<span id="cb1-132"><a href="#cb1-132" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-133"><a href="#cb1-133" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-134"><a href="#cb1-134" aria-hidden="true" tabindex="-1"></a>瓶颈输出维数恰好为 $d$。隐藏激活函数与输出激活是固定架构选择。对无约束实值标准化特征，线性输出层是普通 MSE 选择；有界输出激活改变可表示范围，应与声明预处理匹配。</span>
+<span id="cb1-135"><a href="#cb1-135" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-136"><a href="#cb1-136" aria-hidden="true" tabindex="-1"></a><span class="fu">### 经验风险</span></span>
+<span id="cb1-137"><a href="#cb1-137" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-138"><a href="#cb1-138" aria-hidden="true" tabindex="-1"></a>设 $I_{\mathrm{tr}}$ 索引训练观测。有界目标是</span>
+<span id="cb1-139"><a href="#cb1-139" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-140"><a href="#cb1-140" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-141"><a href="#cb1-141" aria-hidden="true" tabindex="-1"></a>\widehat R_{\mathrm{tr}}(\theta,\phi)</span>
+<span id="cb1-142"><a href="#cb1-142" aria-hidden="true" tabindex="-1"></a>=</span>
+<span id="cb1-143"><a href="#cb1-143" aria-hidden="true" tabindex="-1"></a>\frac{1}{|I_{\mathrm{tr}}|}</span>
+<span id="cb1-144"><a href="#cb1-144" aria-hidden="true" tabindex="-1"></a>\sum_{i\in I_{\mathrm{tr}}}</span>
+<span id="cb1-145"><a href="#cb1-145" aria-hidden="true" tabindex="-1"></a>\left\lVert</span>
+<span id="cb1-146"><a href="#cb1-146" aria-hidden="true" tabindex="-1"></a>u_i-g_\phi(f_\theta(u_i))</span>
+<span id="cb1-147"><a href="#cb1-147" aria-hidden="true" tabindex="-1"></a>\right\rVert_2^2</span>
+<span id="cb1-148"><a href="#cb1-148" aria-hidden="true" tabindex="-1"></a>+</span>
+<span id="cb1-149"><a href="#cb1-149" aria-hidden="true" tabindex="-1"></a>\lambda_e\Omega_e(\theta)</span>
+<span id="cb1-150"><a href="#cb1-150" aria-hidden="true" tabindex="-1"></a>+</span>
+<span id="cb1-151"><a href="#cb1-151" aria-hidden="true" tabindex="-1"></a>\lambda_d\Omega_d(\phi),</span>
+<span id="cb1-152"><a href="#cb1-152" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-153"><a href="#cb1-153" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-154"><a href="#cb1-154" aria-hidden="true" tabindex="-1"></a>其中可以通过声明惩罚 $\Omega_e,\Omega_d$ 使用普通权重衰减；允许把两个系数都设为零。稀疏、去噪、收缩、对抗、对比或概率项在此有界目标之外。</span>
+<span id="cb1-155"><a href="#cb1-155" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-156"><a href="#cb1-156" aria-hidden="true" tabindex="-1"></a>训练返回依赖优化器的候选，而非保证的全局最小化者。验证损失选择轮次以及任何架构、瓶颈、正则化或优化超参数。未触碰测试集用于最终比较一次。</span>
+<span id="cb1-157"><a href="#cb1-157" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-158"><a href="#cb1-158" aria-hidden="true" tabindex="-1"></a><span class="fu">### 线性自编码器边界</span></span>
+<span id="cb1-159"><a href="#cb1-159" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-160"><a href="#cb1-160" aria-hidden="true" tabindex="-1"></a>如果编码器与解码器线性、偏置与中心化一致处理、瓶颈宽度为 $d$ 且平方重构误差被全局优化，复合秩 $d$ 映射在普通中心化等权重欧氏表述下恢复主 PCA 子空间。单个编码器与解码器矩阵不必等于 PCA 载荷矩阵且不唯一；具有 PCA 关系的是重构子空间或复合映射 <span class="co">[</span><span class="ot">@BourlardKamp1988; @BaldiHornik1989</span><span class="co">]</span>。</span>
+<span id="cb1-161"><a href="#cb1-161" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-162"><a href="#cb1-162" aria-hidden="true" tabindex="-1"></a>非线性激活移除该闭式等价并引入非凸优化。因此非线性自编码器应既与解析 PCA 比较，也与架构匹配的线性自编码器比较。训练线性网络未接近 PCA 表现是实现或优化警告，不是反对 PCA 的证据。</span>
+<span id="cb1-163"><a href="#cb1-163" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-164"><a href="#cb1-164" aria-hidden="true" tabindex="-1"></a><span class="fu">## 学习得到了什么？</span></span>
+<span id="cb1-165"><a href="#cb1-165" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-166"><a href="#cb1-166" aria-hidden="true" tabindex="-1"></a>训练规程学习所有声明编码器与解码器权重和偏置，产生复合重构映射与所提供观测的瓶颈码。如果验证在候选中选择，它还按声明规则选择一个轮次、种子或超参数配置。</span>
+<span id="cb1-167"><a href="#cb1-167" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-168"><a href="#cb1-168" aria-hidden="true" tabindex="-1"></a>它不学习概率分布、本征维数、转移模型、向量场、因果图、物理测量过程或唯一潜坐标系。</span>
+<span id="cb1-169"><a href="#cb1-169" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-170"><a href="#cb1-170" aria-hidden="true" tabindex="-1"></a><span class="fu">## 什么是固定的？</span></span>
+<span id="cb1-171"><a href="#cb1-171" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-172"><a href="#cb1-172" aria-hidden="true" tabindex="-1"></a>分析者固定观测与特征定义、预处理族、划分单元、架构搜索空间或单一架构、瓶颈候选、激活、损失、正则化族、优化器族、种子数、训练预算、早停规则、选择度量与基线。验证只能在这些预先声明候选中选择。</span>
+<span id="cb1-173"><a href="#cb1-173" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-174"><a href="#cb1-174" aria-hidden="true" tabindex="-1"></a>参数数是方法的一部分。把高容量非线性网络与线性基线比较而不报告容量与训练预算，会把非线性与灵活性和优化努力混淆。</span>
+<span id="cb1-175"><a href="#cb1-175" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-176"><a href="#cb1-176" aria-hidden="true" tabindex="-1"></a><span class="fu">## 时序假设</span></span>
+<span id="cb1-177"><a href="#cb1-177" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-178"><a href="#cb1-178" aria-hidden="true" tabindex="-1"></a>有界自编码器对顺序无感。置换观测行使经验目标不变，除了随机小批量顺序。如果行是时间样本，网络看到特征向量集合，但没有时间先后、时滞、导数或转移关系。</span>
+<span id="cb1-179"><a href="#cb1-179" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-180"><a href="#cb1-180" aria-hidden="true" tabindex="-1"></a>时间可以编码在每个输入向量内部，例如通过固定窗口，但那时自编码器重构的是该工程化窗口。它仍不学习动力学。递归、时序卷积、预测与序列到序列自编码器显式不在范围内。</span>
+<span id="cb1-181"><a href="#cb1-181" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-182"><a href="#cb1-182" aria-hidden="true" tabindex="-1"></a><span class="fu">## 几何假设</span></span>
+<span id="cb1-183"><a href="#cb1-183" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-184"><a href="#cb1-184" aria-hidden="true" tabindex="-1"></a>MSE 在声明缩放 $S$ 后施加欧氏平方重构几何。改变特征单位或权重会改变哪个差异主导。解码器像</span>
+<span id="cb1-185"><a href="#cb1-185" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-186"><a href="#cb1-186" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-187"><a href="#cb1-187" aria-hidden="true" tabindex="-1"></a><span class="sc">\{</span>g_{\hat\phi}(z):z\in\mathbb R^d<span class="sc">\}</span></span>
+<span id="cb1-188"><a href="#cb1-188" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-189"><a href="#cb1-189" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-190"><a href="#cb1-190" aria-hidden="true" tabindex="-1"></a>可以是弯曲、折叠、自相交或在远离训练码处约束不良的。低重构误差与光滑插值都不证明该像是流形、编码器单射，或码空间中的欧氏距离对应科学上有意义的度量。</span>
+<span id="cb1-191"><a href="#cb1-191" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-192"><a href="#cb1-192" aria-hidden="true" tabindex="-1"></a>因此「嵌入」一词除非单射性与结构保持被独立支持，否则只能用作算法标签。瓶颈映射可以把不同观测送到相同码，并只能通过重构不完美地补偿。</span>
+<span id="cb1-193"><a href="#cb1-193" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-194"><a href="#cb1-194" aria-hidden="true" tabindex="-1"></a><span class="fu">## 监督</span></span>
+<span id="cb1-195"><a href="#cb1-195" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-196"><a href="#cb1-196" aria-hidden="true" tabindex="-1"></a>没有外部类别或行为标签进入核心目标。恒等重构目标提供训练目标，因此按约定方法常被描述为无监督或自监督。标签引导架构选择、基于结果的分量选择或下游任务调优会增加监督，且必须发生在防泄漏验证规程内。</span>
+<span id="cb1-197"><a href="#cb1-197" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-198"><a href="#cb1-198" aria-hidden="true" tabindex="-1"></a>没有标签不使学习表示无目标：MSE、架构、预处理、瓶颈与采样分布提供强归纳偏置。</span>
+<span id="cb1-199"><a href="#cb1-199" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-200"><a href="#cb1-200" aria-hidden="true" tabindex="-1"></a><span class="fu">## 优化 / 推断</span></span>
+<span id="cb1-201"><a href="#cb1-201" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-202"><a href="#cb1-202" aria-hidden="true" tabindex="-1"></a>训练使用声明优化器进行基于梯度的经验风险最小化。对非线性网络目标非凸，因此不同初始化可以产生不同损失、重构与码坐标。早停使用验证数据选择优化轨迹上的点；它不是收敛或全局最优性的证明。</span>
+<span id="cb1-203"><a href="#cb1-203" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-204"><a href="#cb1-204" aria-hidden="true" tabindex="-1"></a>报告优化器、学习率、批大小、轮次上限、停止耐心、检查点准则、初始化与种子分布。多个种子应被当作重复候选拟合：选择最佳验证种子是模型选择，测试结果不得指导该选择。</span>
+<span id="cb1-205"><a href="#cb1-205" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-206"><a href="#cb1-206" aria-hidden="true" tabindex="-1"></a>没有后验推断。编码新观测是通过 $f_{\hat\theta}$ 的确定性前向传递。</span>
+<span id="cb1-207"><a href="#cb1-207" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-208"><a href="#cb1-208" aria-hidden="true" tabindex="-1"></a><span class="fu">## 优点</span></span>
+<span id="cb1-209"><a href="#cb1-209" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-210"><a href="#cb1-210" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>它是具有显式留出目标的瓶颈重构的直接非线性扩展。</span>
+<span id="cb1-211"><a href="#cb1-211" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>固定前馈架构易于陈述、训练并与 PCA 比较。</span>
+<span id="cb1-212"><a href="#cb1-212" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>编码器与解码器映射允许确定性样本外应用，而无需重建图。</span>
+<span id="cb1-213"><a href="#cb1-213" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>重构残差可以在原始特征单位与变换单位中检查。</span>
+<span id="cb1-214"><a href="#cb1-214" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>架构、容量与优化可以通过匹配对照与多种子压力检验。</span>
+<span id="cb1-215"><a href="#cb1-215" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>它在引入概率、时序或生成主张之前提供刻意弱神经基线。</span>
+<span id="cb1-216"><a href="#cb1-216" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-217"><a href="#cb1-217" aria-hidden="true" tabindex="-1"></a><span class="fu">## 失效模式</span></span>
+<span id="cb1-218"><a href="#cb1-218" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-219"><a href="#cb1-219" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**记忆：** 灵活网络可以赋予样本特定码并重构训练观测，而不学习可复用结构。</span>
+<span id="cb1-220"><a href="#cb1-220" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**过拟合：** 训练损失下降而验证或测试损失变差。</span>
+<span id="cb1-221"><a href="#cb1-221" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**恒等捷径：** 过完整层、跳跃连接或预处理泄漏可以允许平凡复制；本有界方法禁止绕过瓶颈的跳跃。</span>
+<span id="cb1-222"><a href="#cb1-222" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**死单元：** 饱和或整流激活可以使瓶颈或隐藏单元在数据范围内不活动。</span>
+<span id="cb1-223"><a href="#cb1-223" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**码塌缩：** 优化可以把大多数观测映射到几乎相同码，常产生类似均值的重构与差的保留变异。</span>
+<span id="cb1-224"><a href="#cb1-224" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**尺度依赖：** 高方差或缩放不良特征主导 MSE。</span>
+<span id="cb1-225"><a href="#cb1-225" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**离群值敏感性：** 平方误差可以把容量投入非典型观测。</span>
+<span id="cb1-226"><a href="#cb1-226" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**优化不稳定：** 种子、学习率、批量顺序与停止轮次可以改变解。</span>
+<span id="cb1-227"><a href="#cb1-227" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**分布移位：** 训练分布上的准确重构不必跨受试者、会话、条件或采集系统泛化。</span>
+<span id="cb1-228"><a href="#cb1-228" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**插值伪迹：** 观测码之间的解码器输出即使训练重构准确也可能不合理。</span>
+<span id="cb1-229"><a href="#cb1-229" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**非单射编码：** 不同输入可以共享码，阻止忠实恢复。</span>
+<span id="cb1-230"><a href="#cb1-230" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**未用容量：** 某些瓶颈坐标可以是常值或冗余；名义宽度不是独立使用坐标数。</span>
+<span id="cb1-231"><a href="#cb1-231" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**干扰保留：** MSE 像奖励科学信号一样奖励伪迹与无关方差的重构。</span>
+<span id="cb1-232"><a href="#cb1-232" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**评估泄漏：** 用测试观测拟合缩放、架构、瓶颈、早停或种子选择会使表现乐观。</span>
+<span id="cb1-233"><a href="#cb1-233" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**解读越界：** 视觉有序码可能被误认为流形坐标、动力学、机制或因果变量。</span>
+<span id="cb1-234"><a href="#cb1-234" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-235"><a href="#cb1-235" aria-hidden="true" tabindex="-1"></a>Kramer 明确指出非线性自联想重构中网络容量不足与过拟合之间的权衡 <span class="co">[</span><span class="ot">@Kramer1991</span><span class="co">]</span>。Goodfellow、Bengio 与 Courville 同样强调当模型容量过大时复制目标可以学到很少关于数据分布的内容 <span class="co">[</span><span class="ot">@GoodfellowBengioCourville2016, chap. 14</span><span class="co">]</span>。</span>
+<span id="cb1-236"><a href="#cb1-236" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-237"><a href="#cb1-237" aria-hidden="true" tabindex="-1"></a><span class="fu">## 可辨识性问题</span></span>
+<span id="cb1-238"><a href="#cb1-238" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-239"><a href="#cb1-239" aria-hidden="true" tabindex="-1"></a>自编码器参数与码一般不可辨识。如果可逆变换</span>
+<span id="cb1-240"><a href="#cb1-240" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-241"><a href="#cb1-241" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-242"><a href="#cb1-242" aria-hidden="true" tabindex="-1"></a>r:\mathbb R^d\to\mathbb R^d</span>
+<span id="cb1-243"><a href="#cb1-243" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-244"><a href="#cb1-244" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-245"><a href="#cb1-245" aria-hidden="true" tabindex="-1"></a>及其逆可以被所选网络类在相关码集上表示，则</span>
+<span id="cb1-246"><a href="#cb1-246" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-247"><a href="#cb1-247" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-248"><a href="#cb1-248" aria-hidden="true" tabindex="-1"></a>f'(u)=r(f(u)),</span>
+<span id="cb1-249"><a href="#cb1-249" aria-hidden="true" tabindex="-1"></a>\qquad</span>
+<span id="cb1-250"><a href="#cb1-250" aria-hidden="true" tabindex="-1"></a>g'(z')=g(r^{-1}(z'))</span>
+<span id="cb1-251"><a href="#cb1-251" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-252"><a href="#cb1-252" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-253"><a href="#cb1-253" aria-hidden="true" tabindex="-1"></a>产生相同复合重构。没有额外约束，观测重构目标无法偏爱这样一种坐标系。</span>
+<span id="cb1-254"><a href="#cb1-254" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-255"><a href="#cb1-255" aria-hidden="true" tabindex="-1"></a>有限网络还承认更特定对称性：</span>
+<span id="cb1-256"><a href="#cb1-256" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-257"><a href="#cb1-257" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>隐藏单元可以被置换并在相邻权重矩阵中补偿；</span>
+<span id="cb1-258"><a href="#cb1-258" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>符号变化可以对兼容奇或线性激活补偿；</span>
+<span id="cb1-259"><a href="#cb1-259" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>正缩放可以跨正齐次层（如 ReLU 层）移动；</span>
+<span id="cb1-260"><a href="#cb1-260" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>冗余或死单元可以改变参数而不改变实现映射；以及</span>
+<span id="cb1-261"><a href="#cb1-261" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>等函数参数化可以来自多条优化路径。</span>
+<span id="cb1-262"><a href="#cb1-262" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-263"><a href="#cb1-263" aria-hidden="true" tabindex="-1"></a>对线性自编码器，即使主重构子空间唯一确定，编码器与解码器因子也不唯一 <span class="co">[</span><span class="ot">@BaldiHornik1989</span><span class="co">]</span>。对非线性自编码器，等价可以超出旋转与缩放，延伸到架构支持的非线性瓶颈重参数化。</span>
+<span id="cb1-264"><a href="#cb1-264" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-265"><a href="#cb1-265" aria-hidden="true" tabindex="-1"></a>因此轴名、排序与码空间中的欧氏距离不被本征辨识。跨种子对齐可以辅助比较，但不确立唯一生物坐标。</span>
+<span id="cb1-266"><a href="#cb1-266" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-267"><a href="#cb1-267" aria-hidden="true" tabindex="-1"></a><span class="fu">## 与更简单方法的比较</span></span>
+<span id="cb1-268"><a href="#cb1-268" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-269"><a href="#cb1-269" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**训练均值：** 用训练均值重构每个观测。这是 $d=0$ 参考。</span>
+<span id="cb1-270"><a href="#cb1-270" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**PCA：** 使用相同训练预处理与 MSE 几何的所需秩 $d$ 解析线性重构基线。</span>
+<span id="cb1-271"><a href="#cb1-271" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**线性自编码器：** 使用相同瓶颈与可比层布局、恒等激活。在良好优化的全局解下应接近 PCA 主子空间重构，提供实现对照。</span>
+<span id="cb1-272"><a href="#cb1-272" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**因子分析：** 具有潜分布、对角特征特定残差协方差、似然与条件潜推断的静态概率潜变量比较。确定性自编码器没有这些概率量，不应继承其解读。</span>
+<span id="cb1-273"><a href="#cb1-273" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**冻结随机编码器：** 保持架构匹配随机编码器固定，只训练解码器，并跨种子重复。这检验学习编码是否优于通用非线性特征。</span>
+<span id="cb1-274"><a href="#cb1-274" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**容量匹配替代：** 比较声明宽度、参数数、优化预算与正则化，而非把每个增益归因于非线性。</span>
+<span id="cb1-275"><a href="#cb1-275" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-276"><a href="#cb1-276" aria-hidden="true" tabindex="-1"></a>只击败均值而未击败 PCA 的自编码器没有演示有用非线性重构。对 PCA 的非线性增益是所述架构与分布下留出 MSE 的证据，不是流形或机制的证据。</span>
+<span id="cb1-277"><a href="#cb1-277" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-278"><a href="#cb1-278" aria-hidden="true" tabindex="-1"></a><span class="fu">## 评估准则</span></span>
+<span id="cb1-279"><a href="#cb1-279" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-280"><a href="#cb1-280" aria-hidden="true" tabindex="-1"></a>防泄漏评估应包括：</span>
+<span id="cb1-281"><a href="#cb1-281" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-282"><a href="#cb1-282" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>**独立划分单元：** 按需要留出完整试次、轨迹、受试者、会话或条件。依赖重要时，不应把一条轨迹的相邻时间点散落到折叠中。</span>
+<span id="cb1-283"><a href="#cb1-283" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>**仅训练预处理：** 在训练划分内拟合中心化、缩放、插补与特征选择。</span>
+<span id="cb1-284"><a href="#cb1-284" aria-hidden="true" tabindex="-1"></a><span class="ss">3. </span>**仅验证选择：** 用验证数据选择瓶颈、宽度、激活、正则化、轮次与种子，最好在探索许多候选时使用嵌套评估。</span>
+<span id="cb1-285"><a href="#cb1-285" aria-hidden="true" tabindex="-1"></a><span class="ss">4. </span>**未触碰测试重构：** 报告</span>
+<span id="cb1-286"><a href="#cb1-286" aria-hidden="true" tabindex="-1"></a>   $$</span>
+<span id="cb1-287"><a href="#cb1-287" aria-hidden="true" tabindex="-1"></a>   \operatorname{MSE}_{\mathrm{test}}</span>
+<span id="cb1-288"><a href="#cb1-288" aria-hidden="true" tabindex="-1"></a>   =</span>
+<span id="cb1-289"><a href="#cb1-289" aria-hidden="true" tabindex="-1"></a>   \frac{1}{|I_{\mathrm{test}}|}</span>
+<span id="cb1-290"><a href="#cb1-290" aria-hidden="true" tabindex="-1"></a>   \sum_{i\in I_{\mathrm{test}}}</span>
+<span id="cb1-291"><a href="#cb1-291" aria-hidden="true" tabindex="-1"></a>   \left\lVert</span>
+<span id="cb1-292"><a href="#cb1-292" aria-hidden="true" tabindex="-1"></a>   u_i-g_{\hat\phi}(f_{\hat\theta}(u_i))</span>
+<span id="cb1-293"><a href="#cb1-293" aria-hidden="true" tabindex="-1"></a>   \right\rVert_2^2,</span>
+<span id="cb1-294"><a href="#cb1-294" aria-hidden="true" tabindex="-1"></a>   $$</span>
+<span id="cb1-295"><a href="#cb1-295" aria-hidden="true" tabindex="-1"></a>   连同逐特征与原始单位残差摘要。</span>
+<span id="cb1-296"><a href="#cb1-296" aria-hidden="true" tabindex="-1"></a><span class="ss">5. </span>**泛化差距：** 报告训练、验证与测试损失，而不仅是所选测试得分。</span>
+<span id="cb1-297"><a href="#cb1-297" aria-hidden="true" tabindex="-1"></a><span class="ss">6. </span>**种子稳定性：** 报告跨预先声明随机种子的分布，并区分最佳验证选择与平均表现。</span>
+<span id="cb1-298"><a href="#cb1-298" aria-hidden="true" tabindex="-1"></a><span class="ss">7. </span>**基线与对照：** 比较均值、秩匹配 PCA、线性自编码器、冻结随机编码器与容量匹配变体。</span>
+<span id="cb1-299"><a href="#cb1-299" aria-hidden="true" tabindex="-1"></a><span class="ss">8. </span>**码诊断：** 报告活跃坐标方差、重复/死单元与对预处理的敏感性。码图是诊断性的，其本身不是证据。</span>
+<span id="cb1-300"><a href="#cb1-300" aria-hidden="true" tabindex="-1"></a><span class="ss">9. </span>**分布移位：** 在科学相关时执行受试者、会话、条件或采集留出检验，而不仅是分布内随机划分。</span>
+<span id="cb1-301"><a href="#cb1-301" aria-hidden="true" tabindex="-1"></a><span class="ss">10. </span>**次级任务：** 在嵌套训练规程内拟合下游预测器。解码表现是单独准则，不把重构表示验证为机制。</span>
+<span id="cb1-302"><a href="#cb1-302" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-303"><a href="#cb1-303" aria-hidden="true" tabindex="-1"></a>PCA 与自编码器损失必须在相同变换度量中计算。因子分析应主要用留出似然或预测分布评判；其条件均值重构可以次要报告，但它是依赖模型的，且不等价于确定性 MSE 训练。</span>
+<span id="cb1-304"><a href="#cb1-304" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-305"><a href="#cb1-305" aria-hidden="true" tabindex="-1"></a><span class="fu">## 最小玩具模型</span></span>
+<span id="cb1-306"><a href="#cb1-306" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-307"><a href="#cb1-307" aria-hidden="true" tabindex="-1"></a>未来的非可执行玩具模型应采样标量参数 $s$ 并通过</span>
+<span id="cb1-308"><a href="#cb1-308" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-309"><a href="#cb1-309" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-310"><a href="#cb1-310" aria-hidden="true" tabindex="-1"></a>x(s)</span>
+<span id="cb1-311"><a href="#cb1-311" aria-hidden="true" tabindex="-1"></a>=</span>
+<span id="cb1-312"><a href="#cb1-312" aria-hidden="true" tabindex="-1"></a>\begin{pmatrix}</span>
+<span id="cb1-313"><a href="#cb1-313" aria-hidden="true" tabindex="-1"></a>s<span class="sc">\\</span></span>
+<span id="cb1-314"><a href="#cb1-314" aria-hidden="true" tabindex="-1"></a>s^2<span class="sc">\\</span></span>
+<span id="cb1-315"><a href="#cb1-315" aria-hidden="true" tabindex="-1"></a>0.3\sin(2s)</span>
+<span id="cb1-316"><a href="#cb1-316" aria-hidden="true" tabindex="-1"></a>\end{pmatrix}</span>
+<span id="cb1-317"><a href="#cb1-317" aria-hidden="true" tabindex="-1"></a>+</span>
+<span id="cb1-318"><a href="#cb1-318" aria-hidden="true" tabindex="-1"></a>\varepsilon,</span>
+<span id="cb1-319"><a href="#cb1-319" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-320"><a href="#cb1-320" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-321"><a href="#cb1-321" aria-hidden="true" tabindex="-1"></a>在 $\mathbb R^3$ 中生成观测，具有声明有界 $s$ 范围与各向同性观测噪声。生成记录应保留 $s$，但 PCA 与自编码器在拟合期间都不得使用它。</span>
+<span id="cb1-322"><a href="#cb1-322" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-323"><a href="#cb1-323" aria-hidden="true" tabindex="-1"></a>比较均值预测器、秩一 PCA、秩一线性自编码器、带一维瓶颈的固定小非线性自编码器与冻结随机编码器对照。用验证观测选择轮次与正则化，并在独立采样的 $s$ 值上评估留出 MSE。记录多个种子、死码频率与码随 $s$ 的单调性，仅作为生成侧诊断。</span>
+<span id="cb1-324"><a href="#cb1-324" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-325"><a href="#cb1-325" aria-hidden="true" tabindex="-1"></a>必需阴性对照包括：独立全维高斯数据（一维弯曲解释在其中为假）；在极少数点上训练的高容量架构以暴露记忆；以及移位测试 $s$ 范围以暴露外推失败。即使非线性自编码器比 PCA 更好地重构弯曲示例，有效结论也限于该模拟器与损失。本方法对象不创建数据、代码或结果。</span>
+<span id="cb1-326"><a href="#cb1-326" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-327"><a href="#cb1-327" aria-hidden="true" tabindex="-1"></a><span class="fu">## 对 LDG 的意义</span></span>
+<span id="cb1-328"><a href="#cb1-328" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-329"><a href="#cb1-329" aria-hidden="true" tabindex="-1"></a>有界自编码器是 LDG 的规范确定性非线性重构基线。它询问有限非线性函数类是否在考虑关于几何、概率或动力学的更强主张之前改善留出重构。</span>
+<span id="cb1-330"><a href="#cb1-330" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-331"><a href="#cb1-331" aria-hidden="true" tabindex="-1"></a>::: {.callout-warning title="这并不蕴含"}</span>
+<span id="cb1-332"><a href="#cb1-332" aria-hidden="true" tabindex="-1"></a>低重构误差或吸引人的瓶颈可视化不证明流形、不确立本征维数、不识别唯一潜坐标、不发现动力学、不恢复机制，也不支持因果解读。窄码是架构选择；非线性解码器像是拟合函数；两者都不自动是系统的真实状态空间。</span>
+<span id="cb1-333"><a href="#cb1-333" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb1-334"><a href="#cb1-334" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-335"><a href="#cb1-335" aria-hidden="true" tabindex="-1"></a><span class="fu">### 小鼠轨迹</span></span>
+<span id="cb1-336"><a href="#cb1-336" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-337"><a href="#cb1-337" aria-hidden="true" tabindex="-1"></a>不保留模态特定经验主张。前馈自编码器可以重构固定轨迹摘要或窗口，但它会忽略时间先后，不确立行为状态、运动动力学或机制。</span>
+<span id="cb1-338"><a href="#cb1-338" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-339"><a href="#cb1-339" aria-hidden="true" tabindex="-1"></a><span class="fu">### 眼动</span></span>
+<span id="cb1-340"><a href="#cb1-340" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-341"><a href="#cb1-341" aria-hidden="true" tabindex="-1"></a>不保留模态特定经验主张。注视样本、事件摘要与对齐窗口定义不同重构问题；有序码不识别动眼坐标或因果控制变量。</span>
+<span id="cb1-342"><a href="#cb1-342" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-343"><a href="#cb1-343" aria-hidden="true" tabindex="-1"></a><span class="fu">### EEG</span></span>
+<span id="cb1-344"><a href="#cb1-344" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-345"><a href="#cb1-345" aria-hidden="true" tabindex="-1"></a>不保留模态特定经验主张。通道缩放、重参考、伪迹处理、受试者划分与传感器几何将决定损失；瓶颈坐标不自动是神经源。</span>
+<span id="cb1-346"><a href="#cb1-346" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-347"><a href="#cb1-347" aria-hidden="true" tabindex="-1"></a><span class="fu">### MEG / 神经群体数据</span></span>
+<span id="cb1-348"><a href="#cb1-348" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-349"><a href="#cb1-349" aria-hidden="true" tabindex="-1"></a>不保留模态特定经验主张。确定性重构基线可以检验声明传感器或单元特征的非线性压缩，但留出单元、试次、条件与会话是不同泛化问题。重构单独不确立神经流形或动力学。</span>
+<span id="cb1-350"><a href="#cb1-350" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-351"><a href="#cb1-351" aria-hidden="true" tabindex="-1"></a><span class="fu">## 主要来源</span></span>
+<span id="cb1-352"><a href="#cb1-352" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-353"><a href="#cb1-353" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Bourlard 与 Kamp 分析多层感知机自联想及其与奇异值分解的联系，为瓶颈重构提供早期技术基础 <span class="co">[</span><span class="ot">@BourlardKamp1988</span><span class="co">]</span>。</span>
+<span id="cb1-354"><a href="#cb1-354" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Baldi 与 Hornik 刻画分层线性网络的平方误差景观，展示自联想主子空间解，同时指出编码器/解码器因子非唯一性 <span class="co">[</span><span class="ot">@BaldiHornik1989</span><span class="co">]</span>。</span>
+<span id="cb1-355"><a href="#cb1-355" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Kramer 用带平方重构误差的前馈自联想瓶颈网络表述非线性主成分分析，并讨论架构容量与过拟合 <span class="co">[</span><span class="ot">@Kramer1991</span><span class="co">]</span>。</span>
+<span id="cb1-356"><a href="#cb1-356" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-357"><a href="#cb1-357" aria-hidden="true" tabindex="-1"></a><span class="fu">## 综述 / 次级来源</span></span>
+<span id="cb1-358"><a href="#cb1-358" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-359"><a href="#cb1-359" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Goodfellow、Bengio 与 Courville 提供经核查的欠完整与正则化自编码器、编码器/解码器记号、重构目标、容量与恒等复制失败的权威综合 <span class="co">[</span><span class="ot">@GoodfellowBengioCourville2016, chap. 14</span><span class="co">]</span>。其中讨论的去噪、稀疏、收缩与变分扩展在此有界方法之外。</span>
+<span id="cb1-360"><a href="#cb1-360" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-361"><a href="#cb1-361" aria-hidden="true" tabindex="-1"></a><span class="fu">## 开放方法学问题</span></span>
+<span id="cb1-362"><a href="#cb1-362" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-363"><a href="#cb1-363" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>哪个架构匹配对照最好地把非线性收益与参数数和优化效应分开？</span>
+<span id="cb1-364"><a href="#cb1-364" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>当非线性重参数化保留重构时，应如何比较潜码稳定性？</span>
+<span id="cb1-365"><a href="#cb1-365" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>哪个留出划分反映预期科学用途：试次、条件、受试者、会话还是采集系统？</span>
+<span id="cb1-366"><a href="#cb1-366" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>何时即使特征缩放后 MSE 在科学上也不合适？</span>
+<span id="cb1-367"><a href="#cb1-367" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>应如何在不断言把方法变成概率模型的情况下评估确定性重构的不确定性？</span>
+<span id="cb1-368"><a href="#cb1-368" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>哪些阴性对照在下游解读之前揭示记忆或干扰重构？</span>
+<span id="cb1-369"><a href="#cb1-369" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-370"><a href="#cb1-370" aria-hidden="true" tabindex="-1"></a><span class="fu">## 成熟度检查表</span></span>
+<span id="cb1-371"><a href="#cb1-371" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-372"><a href="#cb1-372" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> 使用完整方法 schema 并定义有界确定性前馈方法。</span>
+<span id="cb1-373"><a href="#cb1-373" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> 声明编码器、瓶颈、解码器、有限架构与 MSE 经验风险。</span>
+<span id="cb1-374"><a href="#cb1-374" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> 覆盖验证、早停、正则化、初始化与种子选择。</span>
+<span id="cb1-375"><a href="#cb1-375" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> 排除变分、递归、动力学、对比、去噪与稀疏族。</span>
+<span id="cb1-376"><a href="#cb1-376" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> 陈述学习/固定量、顺序无感时间处理与欧氏重构几何。</span>
+<span id="cb1-377"><a href="#cb1-377" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> 覆盖非凸优化、记忆、过拟合、死单元、塌缩与分布移位。</span>
+<span id="cb1-378"><a href="#cb1-378" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> 陈述置换、缩放、符号与非线性重参数化歧义。</span>
+<span id="cb1-379"><a href="#cb1-379" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> 包含 PCA、线性自编码器、FA、随机特征与容量对照。</span>
+<span id="cb1-380"><a href="#cb1-380" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> 提供防泄漏留出评估与非可执行玩具契约。</span>
+<span id="cb1-381"><a href="#cb1-381" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> 显式拒绝流形、维数、唯一坐标、动力学、机制与因果过度宣称。</span>
+<span id="cb1-382"><a href="#cb1-382" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> 基础、线性理论、非线性与综述来源经核查与验证。</span>
+<span id="cb1-383"><a href="#cb1-383" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> 独立混合审查返回 PASS，无需修正轮次。</span>
+<span id="cb1-384"><a href="#cb1-384" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> 在发布站点审查后，人类所有者根据记录的审查决定授权稳定晋升。</span></code></pre></div><button title="复制到剪贴板" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></div>
+</div></div></div></div></div>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

@@ -1,0 +1,1288 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="zh-CN" xml:lang="zh-CN"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.10.18">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>潜轨迹 – Latent Dynamics &amp; Geometry</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="../../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../../">
+<script src="../../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../../site_libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../../site_libs/bootstrap/bootstrap-e3adbaa939bcd423dddc8c8a834270b4.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "没有结果",
+    "search-matching-documents-text": "匹配的文档",
+    "search-copy-link-title": "复制搜索链接",
+    "search-hide-matches-text": "隐藏其它匹配结果",
+    "search-more-match-text": "更多匹配结果",
+    "search-more-matches-text": "更多匹配结果",
+    "search-clear-button-title": "清除",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "取消",
+    "search-submit-button-title": "提交",
+    "search-label": "搜索"
+  }
+}</script>
+<style>
+.ldg-lang{position:fixed;top:72px;right:16px;z-index:2000;display:flex;gap:4px;font-family:system-ui,-apple-system,"Segoe UI",sans-serif;}
+.ldg-lang a{display:inline-block;padding:4px 10px;border:1px solid #c8c8c8;border-radius:999px;background:#fff;color:#333;text-decoration:none;font-size:13px;box-shadow:0 1px 3px rgba(0,0,0,.15);}
+.ldg-lang a.active{background:#2c3e50;color:#fff;border-color:#2c3e50;}
+</style>
+</head><body class="nav-fixed quarto-light"><div class="ldg-lang" id="ldg-lang">
+  <a href="#" id="ldg-lang-en">EN</a>
+  <a href="#" id="ldg-lang-zh">中文</a>
+</div>
+<script>
+(function () {
+  var BASE = '';
+  if (window.location.pathname.indexOf('/latent-dynamics-geometry-public/') === 0) {
+    BASE = 'latent-dynamics-geometry-public';
+  }
+  var IS_FILE = window.location.protocol === 'file:';
+  function pathSegs() {
+    return window.location.pathname.split('/').filter(Boolean);
+  }
+  function zhIdx() {
+    return pathSegs().indexOf('zh');
+  }
+  function segs() {
+    var s = window.location.pathname.split('/').filter(Boolean);
+    if (BASE && s[0] === BASE) s = s.slice(1);
+    return s;
+  }
+  function isZh() { return zhIdx() !== -1; }
+  function fileTarget(lang) {
+    var s = pathSegs();
+    var siteIdx = s.lastIndexOf('_site');
+    var root = siteIdx === -1 ? s.slice(0, -1) : s.slice(0, siteIdx + 1);
+    var page = siteIdx === -1 ? [s[s.length - 1]] : s.slice(siteIdx + 1);
+    if (page[0] === 'zh') page = page.slice(1);
+    if (lang === 'zh') page = ['zh'].concat(page);
+    var rel = page.join('/');
+    if (rel === '' || rel === 'zh') rel = 'index.html';
+    return '/' + root.join('/') + '/' + rel;
+  }
+  function target(lang) {
+    if (IS_FILE) return fileTarget(lang);
+    var s = segs();
+    if (s[0] === 'zh') s = s.slice(1);
+    if (lang === 'zh') s = ['zh'].concat(s);
+    var rel = s.join('/');
+    if (rel === '' || rel === 'zh') rel = (lang === 'zh' ? 'zh/index.html' : 'index.html');
+    return '/' + (BASE ? BASE + '/' : '') + rel;
+  }
+  function go(lang) {
+    try { localStorage.setItem('ldg-lang', lang); } catch (e) {}
+    window.location.href = target(lang);
+  }
+  function mark() {
+    var zh = isZh();
+    var a = document.getElementById('ldg-lang-en');
+    var b = document.getElementById('ldg-lang-zh');
+    if (a) a.className = zh ? '' : 'active';
+    if (b) b.className = zh ? 'active' : '';
+  }
+  function localizeNav() {
+    if (!isZh()) return;
+    var cur = pathSegs();
+    var czi = zhIdx();
+    var dir = (czi === -1 ? cur.slice(0, -1) : cur.slice(czi, -1)).join('/');
+    document.querySelectorAll('nav a').forEach(function (a) {
+      var h = a.getAttribute('href') || '';
+      if (/^(https?:|#|mailto:)/.test(h)) return;
+      if (/\.html?$/.test(h) || /\/$/.test(h) || h === '') {
+        var abs = new URL(h, window.location.href).pathname;
+        var s = abs.split('/').filter(Boolean);
+        if (BASE && s[0] === BASE) s = s.slice(1);
+        var zi = s.indexOf('zh');
+        var rel = zi !== -1 ? s.slice(zi + 1).join('/') : s.slice(czi).join('/');
+        var tgt = 'zh/' + rel;
+        var f = dir.split('/').filter(Boolean);
+        var t = tgt.split('/').filter(Boolean);
+        var i = 0;
+        while (i < f.length && i < t.length && f[i] === t[i]) i++;
+        var rel = '';
+        for (var j = i; j < f.length; j++) rel += '../';
+        rel += t.slice(i).join('/');
+        a.setAttribute('href', rel);
+      }
+    });
+  }
+  document.getElementById('ldg-lang-en').addEventListener('click', function (e) { e.preventDefault(); go('en'); });
+  document.getElementById('ldg-lang-zh').addEventListener('click', function (e) { e.preventDefault(); go('zh'); });
+  mark();
+  localizeNav();
+})();
+</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-chtml.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+
+
+
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../../../index.html">
+    <span class="navbar-title">Latent Dynamics &amp; Geometry</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="搜索"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="展开或折叠导航栏" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../../index.html"> 
+<span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../../knowledge/concepts/index.html"> 
+<span class="menu-text">Concepts</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../../knowledge/methods/index.html"> 
+<span class="menu-text">Methods</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../../knowledge/math/index.html"> 
+<span class="menu-text">Math</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../../knowledge/papers/index.html"> 
+<span class="menu-text">Papers</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../../toy-models/index.html"> 
+<span class="menu-text">Toy Models</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../../research-questions/index.html"> 
+<span class="menu-text">Research Questions</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../../benchmarks/index.html"> 
+<span class="menu-text">Benchmarks</span></a>
+  </li>  
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/AbelZheng/latent-dynamics-geometry-public"> <i class="bi bi-github" role="img" aria-label="GitHub repository">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="https://github.com/AbelZheng/latent-dynamics-geometry-public/discussions"> 
+<span class="menu-text">Discussions</span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">该页面内容</h2>
+   
+  <ul>
+  <li><a href="#潜轨迹" id="toc-潜轨迹" class="nav-link active" data-scroll-target="#潜轨迹">潜轨迹</a>
+  <ul class="collapse">
+  <li><a href="#一句话定义" id="toc-一句话定义" class="nav-link" data-scroll-target="#一句话定义">一句话定义</a></li>
+  <li><a href="#为什么这个概念重要" id="toc-为什么这个概念重要" class="nav-link" data-scroll-target="#为什么这个概念重要">为什么这个概念重要</a></li>
+  <li><a href="#直觉" id="toc-直觉" class="nav-link" data-scroll-target="#直觉">直觉</a></li>
+  <li><a href="#形式化定义" id="toc-形式化定义" class="nav-link" data-scroll-target="#形式化定义">形式化定义</a>
+  <ul class="collapse">
+  <li><a href="#生成律与推断目标" id="toc-生成律与推断目标" class="nav-link" data-scroll-target="#生成律与推断目标">生成律与推断目标</a></li>
+  <li><a href="#坐标重参数化" id="toc-坐标重参数化" class="nav-link" data-scroll-target="#坐标重参数化">坐标重参数化</a></li>
+  <li><a href="#带已知真值的不确定性感知评估" id="toc-带已知真值的不确定性感知评估" class="nav-link" data-scroll-target="#带已知真值的不确定性感知评估">带已知真值的不确定性感知评估</a></li>
+  </ul></li>
+  <li><a href="#核心记号" id="toc-核心记号" class="nav-link" data-scroll-target="#核心记号">核心记号</a></li>
+  <li><a href="#前置知识" id="toc-前置知识" class="nav-link" data-scroll-target="#前置知识">前置知识</a></li>
+  <li><a href="#与相邻概念的关系" id="toc-与相邻概念的关系" class="nav-link" data-scroll-target="#与相邻概念的关系">与相邻概念的关系</a></li>
+  <li><a href="#这并不蕴含" id="toc-这并不蕴含" class="nav-link" data-scroll-target="#这并不蕴含">这并不蕴含</a></li>
+  <li><a href="#最小示例" id="toc-最小示例" class="nav-link" data-scroll-target="#最小示例">最小示例</a></li>
+  <li><a href="#神经科学-行为相关性" id="toc-神经科学-行为相关性" class="nav-link" data-scroll-target="#神经科学-行为相关性">神经科学 / 行为相关性</a></li>
+  <li><a href="#对-ldg-的意义" id="toc-对-ldg-的意义" class="nav-link" data-scroll-target="#对-ldg-的意义">对 LDG 的意义</a></li>
+  <li><a href="#开放问题" id="toc-开放问题" class="nav-link" data-scroll-target="#开放问题">开放问题</a></li>
+  <li><a href="#参考文献" id="toc-参考文献" class="nav-link" data-scroll-target="#参考文献">参考文献</a></li>
+  <li><a href="#成熟度检查表" id="toc-成熟度检查表" class="nav-link" data-scroll-target="#成熟度检查表">成熟度检查表</a></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<div class="quarto-title-block"><div><h1 class="title">潜轨迹</h1><button type="button" class="btn code-tools-button" id="quarto-code-tools-source"><i class="bi"></i> 代码</button></div></div>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="潜轨迹" class="level1">
+<h1>潜轨迹</h1>
+<section id="一句话定义" class="level2">
+<h2 class="anchored" data-anchor-id="一句话定义">一句话定义</h2>
+<p><strong>潜轨迹</strong>是以时间为索引的潜随机元素或该元素的一条实现路径，区别于观测以及用于估计它的任何点摘要。</p>
+</section>
+<section id="为什么这个概念重要" class="level2">
+<h2 class="anchored" data-anchor-id="为什么这个概念重要">为什么这个概念重要</h2>
+<p>潜轨迹语言被用于几个不同对象：模型指定的潜过程、观测数据后它的后验分布、后验抽样，以及绘制的点估计。保持这些对象分开，可以防止把光滑估计误认为唯一恢复的状态演化或动力学机制的证据。</p>
+</section>
+<section id="直觉" class="level2">
+<h2 class="anchored" data-anchor-id="直觉">直觉</h2>
+<p>观测序列可以支持许多隐藏路径。模型为这些路径赋予相对概率，推断用数据更新该分布。绘制单个后验均值或单条最大后验路径会抑制这种不确定性，也可能隐藏潜坐标对称性。</p>
+</section>
+<section id="形式化定义" class="level2">
+<h2 class="anchored" data-anchor-id="形式化定义">形式化定义</h2>
+<p>设 <span class="math inline">\((\mathcal Z,\Sigma_{\mathcal Z})\)</span> 是潜空间，离散时间中 <span class="math inline">\(I=\{0,\ldots,T\}\)</span>。潜轨迹随机元素是可测映射</p>
+<p><span class="math display">\[
+Z_{0:T}:\Omega\to\mathcal Z^{T+1}.
+\]</span></p>
+<p>一个实现是路径 <span class="math inline">\(z_{0:T}=(z_0,\ldots,z_T)\)</span>。在连续时间中，必须声明路径空间 <span class="math inline">\(\mathcal P(I,\mathcal Z)\)</span>——例如带指定可测结构的连续或 càdlàg 路径——并写 <span class="math inline">\(Z:\Omega\to\mathcal P(I,\mathcal Z)\)</span>。时间索引本身不使 <span class="math inline">\(Z_t\)</span> 成为充分的动力学状态，也不指定转移律。</p>
+<p>假设合适的正则条件分布存在，给定观测 <span class="math inline">\(Y_{0:T}=y_{0:T}\)</span> 与生成模型，推断目标一般是完整路径上的条件概率测度，</p>
+<p><span class="math display">\[
+\Pi(A\mid y_{0:T})
+=
+\Pr(Z_{0:T}\in A\mid Y_{0:T}=y_{0:T}),
+\qquad A\in\Sigma_{\mathcal Z}^{\otimes(T+1)},
+\]</span></p>
+<p>或在存在合适参考测度时的条件密度 <span class="math inline">\(p(z_{0:T}\mid y_{0:T})\)</span>。该后验律不等于任何单条绘制的路径。</p>
+<section id="生成律与推断目标" class="level3">
+<h3 class="anchored" data-anchor-id="生成律与推断目标">生成律与推断目标</h3>
+<p>在 <a href="../../../zh/knowledge/concepts/state-space-model.html">State-Space Model</a> 声明的一阶状态空间假设下，路径律可以通过初始律与转移核分解，</p>
+<p><span class="math display">\[
+p(z_{0:T},y_{0:T})
+=
+p(z_0)
+\prod_{k=0}^{T-1}p(z_{k+1}\mid z_k)
+\prod_{k=0}^{T}p(y_k\mid z_k).
+\]</span></p>
+<p>该分解是模型假设，不是「潜轨迹」一词的推论。常见推断对象包括：</p>
+<ul>
+<li><strong>滤波分布：</strong> <span class="math inline">\(p(z_k\mid y_{0:k})\)</span>，使用到时间 <span class="math inline">\(k\)</span> 为止可用的观测；</li>
+<li><strong>固定区间平滑分布：</strong> <span class="math inline">\(p(z_{0:T}\mid y_{0:T})\)</span>，或其边际 <span class="math inline">\(p(z_k\mid y_{0:T})\)</span>，同样使用后续观测；</li>
+<li><strong>后验样本：</strong> 随机抽样 <span class="math inline">\(\tilde z_{0:T}\sim p(z_{0:T}\mid y_{0:T})\)</span>；</li>
+<li><strong>联合 MAP 路径：</strong> 当声明路径密度与最大化者存在时，值 <span class="math inline">\(\hat z^{\mathrm{MAP}}_{0:T}\in\arg\max p(z_{0:T}\mid y_{0:T})\)</span>；</li>
+<li><strong>边际 MAP 序列：</strong> 独立选择的 <span class="math inline">\(p(z_k\mid y_{0:T})\)</span> 最大化者，不必等于联合 MAP 路径，也不必形成受支持的转移序列；</li>
+<li><strong>后验均值路径：</strong> 当 <span class="math inline">\(\mathcal Z\)</span> 在向量空间中表示且期望存在时，<span class="math inline">\(\hat z^{\mathrm{mean}}_k=\mathbb E[Z_k\mid y_{0:T}]\)</span>。</li>
+</ul>
+<p>Kalman 根据目标时间等于、早于还是晚于最后观测时间区分平滑、滤波与预测，并把估计视为条件分布与损失的函数 <span class="citation" data-cites="Kalman1960">(<a href="#ref-Kalman1960" role="doc-biblioref">Kalman 1960年</a>)</span>。因此后验均值与声明坐标中的平方误差损失绑定；它不是「恢复轨迹」的与表示无关定义。基于密度的 MAP 值也可能依赖参考测度与坐标参数化。</p>
+<p>点摘要不自动是可许实现路径。逐点边际均值或众数可能离开离散或非线性状态空间、违反硬路径约束，或组合在后验抽样中从未同时出现的特征。即使摘要位于路径空间中，它在后验下也不必典型，也不必满足无强迫确定性演化律。精确后验样本尊重被建模后验支撑，但那只确立与拟合模型的兼容性。</p>
+</section>
+<section id="坐标重参数化" class="level3">
+<h3 class="anchored" data-anchor-id="坐标重参数化">坐标重参数化</h3>
+<p>设 <span class="math inline">\(h:\mathcal Z\to\mathcal Z'\)</span> 是双可测双射，并定义 <span class="math inline">\(Z'_k=h(Z_k)\)</span>。变换路径律是逐分量路径映射 <span class="math inline">\(h^{0:T}\)</span> 下的前推。保持相同可观测模型要求每个受影响分量一致变换：</p>
+<p><span class="math display">\[
+\mu'=h_\#\mu,
+\]</span></p>
+<p><span class="math display">\[
+Q'_k(z',A')
+=
+Q_k\!\left(h^{-1}(z'),h^{-1}(A')\right),
+\]</span></p>
+<p><span class="math display">\[
+G'_k(z',B)
+=
+G_k\!\left(h^{-1}(z'),B\right).
+\]</span></p>
+<p>对确定性动力学 <span class="math inline">\(z_{k+1}=f_k(z_k)\)</span>，这给出 <span class="math inline">\(f'_k=h\circ f_k\circ h^{-1}\)</span>。变换路径上的后验同样必须是前推 <span class="math inline">\((h^{0:T})_\#\Pi\)</span>。只变换报告的轨迹而不变换潜律、转移模型与观测模型，通常改变生成规格而非仅仅改变坐标。</p>
+<p>因此诸如欧氏 RMSE 的逐坐标轨迹误差只有在声明坐标、单位、度量、时间对应与任何允许对齐后才具有意义。如果已知群 <span class="math inline">\(G\)</span> 生成观测对称性，评估可以转而瞄准轨道或等价类，例如</p>
+<p><span class="math display">\[
+\inf_{g\in G}
+\frac{1}{T+1}\sum_{k=0}^{T}
+d_{\mathcal Z}\!\left(z_k^\star,g\cdot\hat z_k\right)^2,
+\]</span></p>
+<p>并陈述群、度量、拟合数据与对齐的留出使用。当潜坐标本身未被辨识时，也可以比较可观测预测或其他可辨识函数。例如在 PPCA 中，载荷矩阵与潜坐标架具有正交旋转歧义 <span class="citation" data-cites="TippingBishop1999">(<a href="#ref-TippingBishop1999" role="doc-biblioref">Tipping 和 Bishop 1999年</a>, sec.&nbsp;3.2)</span>。这一精确对称性不授权对每个潜模型进行任意非线性对齐。</p>
+</section>
+<section id="带已知真值的不确定性感知评估" class="level3">
+<h3 class="anchored" data-anchor-id="带已知真值的不确定性感知评估">带已知真值的不确定性感知评估</h3>
+<div class="callout callout-style-default callout-tip callout-titled" title="LDG 操作综合">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">提示</span>LDG 操作综合
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>以下规程把上述后验、可辨识性与状态空间区分连接成有界评估设计。它是提出的 LDG 实践，不是归因于经核查来源的定理。</p>
+</div>
+</div>
+<p>在模拟或其他声明潜真值 <span class="math inline">\(z_{0:T}^\star\)</span> 的设定中，评估应报告多于一条视觉对齐路径：</p>
+<ol type="1">
+<li><strong>状态或轨迹误差：</strong> 使用声明度量，并在必要时使用被论证的对称性/对齐约定；</li>
+<li><strong>时间泛化：</strong> 评估留出时间、试次、初始条件或参数条件，而不仅是拟合序列；</li>
+<li><strong>不确定性覆盖：</strong> 跨重复数据集，检查边际状态区域或同时路径区域是否以它们广告的比率包含合适对齐的真值，并且不要把这两个覆盖目标混为一谈；</li>
+<li><strong>校准或评分：</strong> 用正确评分规则或重复模拟校准比较后验或预测分布，而不仅是单个区间的宽度；</li>
+<li><strong>模型比较：</strong> 对照更简单的静态或弱动力学基线检验，确定转移模型是否改善留出预测或恢复。</li>
+</ol>
+<p>如果对齐是用用于评分的同一真值估计的，必须报告该依赖与任何由此产生的乐观偏差。覆盖是声明数据生成过程下重复规程的性质；一条视觉上合理的可信带不是校准结果。模拟真值只相对模拟器与声明等价约定确立恢复，而非唯一物理或生物真值。</p>
+</section>
+</section>
+<section id="核心记号" class="level2">
+<h2 class="anchored" data-anchor-id="核心记号">核心记号</h2>
+<ul>
+<li><span class="math inline">\(Z_{0:T}\)</span>：潜轨迹随机元素。</li>
+<li><span class="math inline">\(z_{0:T}\)</span>：一条实现潜路径。</li>
+<li><span class="math inline">\(Y_{0:T}=y_{0:T}\)</span>：观测随机变量与实现数据。</li>
+<li><span class="math inline">\(\Pi(\mathrm dz_{0:T}\mid y_{0:T})\)</span>：路径上的后验概率测度。</li>
+<li><span class="math inline">\(p(z_k\mid y_{0:k})\)</span>：滤波分布。</li>
+<li><span class="math inline">\(p(z_{0:T}\mid y_{0:T})\)</span>：固定区间平滑分布。</li>
+<li><span class="math inline">\(\tilde z_{0:T}\)</span>：后验样本。</li>
+<li><span class="math inline">\(\hat z^{\mathrm{MAP}}_{0:T}\)</span>、<span class="math inline">\(\hat z^{\mathrm{mean}}_{0:T}\)</span>：声明的点摘要。</li>
+<li><span class="math inline">\(h\)</span> 与 <span class="math inline">\(h^{0:T}\)</span>：潜坐标与逐分量路径重参数化。</li>
+<li><span class="math inline">\(G\)</span>：当科学目标是轨道或等价类时声明的对称群。</li>
+</ul>
+</section>
+<section id="前置知识" class="level2">
+<h2 class="anchored" data-anchor-id="前置知识">前置知识</h2>
+<p><a href="../../../zh/knowledge/concepts/trajectory.html">Trajectory</a> 提供类型化时间索引路径。<a href="../../../zh/knowledge/concepts/latent-variable.html">Latent Variable</a> 提供模型隐藏量。<a href="../../../zh/knowledge/concepts/observation-model.html">Observation Model</a> 与 <a href="../../../zh/knowledge/concepts/state-space-model.html">State-Space Model</a> 分离前向测量关系、转移律与后验推断任务。</p>
+</section>
+<section id="与相邻概念的关系" class="level2">
+<h2 class="anchored" data-anchor-id="与相邻概念的关系">与相邻概念的关系</h2>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>概念</th>
+<th>区别</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>观测轨迹</strong></td>
+<td>直接从测得变量构造的路径。它可以作为潜推断的输入，但不是隐藏路径本身。</td>
+</tr>
+<tr class="even">
+<td><strong>确定性嵌入路径</strong></td>
+<td>由数据的固定变换产生的序列 <span class="math inline">\(e(y_k)\)</span>。它不必定义潜概率律、后验不确定性或充分动力学状态。</td>
+</tr>
+<tr class="odd">
+<td><strong>潜状态轨迹</strong></td>
+<td>更强的建模角色，其中每个潜值被处理为对指定演化与系统边界充分的状态。</td>
+</tr>
+<tr class="even">
+<td><strong>轨迹上的后验分布</strong></td>
+<td>可能路径上的条件概率律；它不是单个后验均值、MAP 路径或样本。</td>
+</tr>
+<tr class="odd">
+<td><strong>向量场 / 转移律</strong></td>
+<td>在受支持状态上赋予局部变化或转移分布的规则。一条推断路径不决定访问状态之外的此类规则。</td>
+</tr>
+<tr class="even">
+<td><strong>流</strong></td>
+<td>在受支持初始状态上的兼容有限时间演化映射族。一条潜轨迹只是流下的一条轨道/路径，当这样的流存在时。</td>
+</tr>
+<tr class="odd">
+<td><strong>可辨识性</strong></td>
+<td>决定潜路径、参数或只是等价类/函数是否被可观测律唯一约束。</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="这并不蕴含" class="level2">
+<h2 class="anchored" data-anchor-id="这并不蕴含">这并不蕴含</h2>
+<p>潜轨迹并不蕴含可辨识坐标、低本征维数、光滑性、自治动力学、流形结构、马尔可夫充分性、因果或机制意义，或来自观测的唯一逆。低重构误差或准确解码并不确立潜路径是真实状态。光滑后验均值并不确立光滑真实动力学。</p>
+</section>
+<section id="最小示例" class="level2">
+<h2 class="anchored" data-anchor-id="最小示例">最小示例</h2>
+<p>设潜状态空间为 <span class="math inline">\(\mathcal Z=\{-1,+1\}\)</span>，并假设后验以概率 <span class="math inline">\(1/2\)</span> 赋予常值路径 <span class="math inline">\((-1,\ldots,-1)\)</span>，以概率 <span class="math inline">\(1/2\)</span> 赋予 <span class="math inline">\((+1,\ldots,+1)\)</span>。两个后验样本都是可许路径，但逐点后验均值是 <span class="math inline">\((0,\ldots,0)\)</span>，它不在 <span class="math inline">\(\mathcal Z^{T+1}\)</span> 中。这显示后验均值为何可以是损失最优的摘要，却未必是可能的潜实现。</p>
+<p>在线性高斯状态空间模型中，</p>
+<p><span class="math display">\[
+z_{k+1}=Az_k+w_k,
+\qquad
+y_k=Cz_k+v_k,
+\]</span></p>
+<p>滤波与平滑返回状态或路径上的条件分布，而不仅是单条线。在一致变换 <span class="math inline">\(A\)</span>、<span class="math inline">\(C\)</span>、潜律与后验的同时旋转潜坐标，可以在相关对称性下保留相同可观测模型；只旋转绘制估计则不确立等价。</p>
+</section>
+<section id="神经科学-行为相关性" class="level2">
+<h2 class="anchored" data-anchor-id="神经科学-行为相关性">神经科学 / 行为相关性</h2>
+<p>Cunningham 与 Yu 描述 HMM、GPFA、LDS 与非线性动力系统方法返回低维潜神经轨迹，但明确告诫提取的轨迹反映带噪数据与拟合动力学模型之间的统计权衡 <span class="citation" data-cites="CunninghamYu2014">(<a href="#ref-CunninghamYu2014" role="doc-biblioref">Cunningham 和 Yu 2014年</a>)</span>。因此 GPFA 光滑性与 LDS/NLDS 动力学母题可以由模型假设促成，而非在数据中被独立发现。行为潜路径需要在测量、模型隐藏变量、后验摘要与状态主张之间进行同样分离。</p>
+</section>
+<section id="对-ldg-的意义" class="level2">
+<h2 class="anchored" data-anchor-id="对-ldg-的意义">对 LDG 的意义</h2>
+<p>在 L2 阶段，潜轨迹连接路径空间概率、状态空间推断、坐标对称性与已知真值评估。它提供比较生成与恢复方法所需的护栏，而不把可视化、后验均值或对齐重构当作机制性证据。</p>
+</section>
+<section id="开放问题" class="level2">
+<h2 class="anchored" data-anchor-id="开放问题">开放问题</h2>
+<ul>
+<li>对不规则采样或不连续轨迹，哪种路径空间拓扑与不确定性表示合适？</li>
+<li>给定模型中哪些潜对称性保留科学主张？</li>
+<li>对齐不确定性应如何传播到轨迹误差与覆盖估计中？</li>
+<li>何时转移模型在独立潜因子或平滑观测之上改善留出恢复？</li>
+</ul>
+</section>
+<section id="参考文献" class="level2">
+<h2 class="anchored" data-anchor-id="参考文献">参考文献</h2>
+<ul>
+<li>Kalman 提供经核查的平滑、滤波与预测主区分，并在线性随机设定中把条件分布、损失、估计与估计误差协方差联系起来 <span class="citation" data-cites="Kalman1960">(<a href="#ref-Kalman1960" role="doc-biblioref">Kalman 1960年</a>)</span>。</li>
+<li>Cunningham 与 Yu 提供经核查的神经群体轨迹语境，以及提取的光滑性或动力学母题可以既反映拟合模型又反映带噪数据的告诫 <span class="citation" data-cites="CunninghamYu2014">(<a href="#ref-CunninghamYu2014" role="doc-biblioref">Cunningham 和 Yu 2014年</a>)</span>。</li>
+<li>Tipping 与 Bishop 提供经核查的概率潜变量观测模型、条件潜分布、条件均值摘要与 PPCA 正交旋转歧义 <span class="citation" data-cites="TippingBishop1999">(<a href="#ref-TippingBishop1999" role="doc-biblioref">Tipping 和 Bishop 1999年</a>, secs. 3.1–3.4)</span>。</li>
+<li>一般路径空间测度论、非线性滤波/平滑算法、后验一致性定理与校准定理被有意推迟。</li>
+</ul>
+</section>
+<section id="成熟度检查表" class="level2">
+<h2 class="anchored" data-anchor-id="成熟度检查表">成熟度检查表</h2>
+<ul class="task-list">
+<li><label><input type="checkbox" checked="">把潜轨迹类型化为随机元素，并区分实现路径与其后验律。</label></li>
+<li><label><input type="checkbox" checked="">区分滤波、平滑、后验样本、联合 MAP 路径与后验均值。</label></li>
+<li><label><input type="checkbox" checked="">显示点摘要为何不必是可许或典型的潜路径。</label></li>
+<li><label><input type="checkbox" checked="">在坐标变换下一致变换潜律、转移模型、观测模型与后验。</label></li>
+<li><label><input type="checkbox" checked="">把依赖坐标的误差与声明对称性/等价类目标分开。</label></li>
+<li><label><input type="checkbox" checked="">把模型诱导的光滑性当作推断假设，而非真实动力学证据。</label></li>
+<li><label><input type="checkbox" checked="">规定带已知真值的不确定性感知评估与对齐警示。</label></li>
+<li><label><input type="checkbox" checked="">区分观测路径、确定性嵌入、潜状态、向量场与流。</label></li>
+<li><label><input type="checkbox" checked="">独立 L2 科学审查在记录的审查决定下完成；有界审查无实质发现通过。</label></li>
+</ul>
+
+
+<!-- -->
+
+
+</section>
+</section>
+
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography" id="quarto-bibliography"><h2 class="anchored quarto-appendix-heading">参考文献</h2><div id="refs" class="references csl-bib-body hanging-indent" role="list">
+<div id="ref-CunninghamYu2014" class="csl-entry" role="listitem">
+Cunningham, John P., 和 Byron M. Yu. 2014年. <span>《Dimensionality Reduction for Large-Scale Neural Recordings》</span>. <em>Nature Neuroscience</em> 17 (11): 1500～1509. <a href="https://doi.org/10.1038/nn.3776">https://doi.org/10.1038/nn.3776</a>.
+</div>
+<div id="ref-Kalman1960" class="csl-entry" role="listitem">
+Kalman, Rudolf E. 1960年. <span>《A New Approach to Linear Filtering and Prediction Problems》</span>. <em>Journal of Basic Engineering</em> 82 (1): 35～45. <a href="https://doi.org/10.1115/1.3662552">https://doi.org/10.1115/1.3662552</a>.
+</div>
+<div id="ref-TippingBishop1999" class="csl-entry" role="listitem">
+Tipping, Michael E., 和 Christopher M. Bishop. 1999年. <span>《Probabilistic Principal Component Analysis》</span>. <em>Journal of the Royal Statistical Society: Series B (Statistical Methodology)</em> 61 (3): 611～22. <a href="https://doi.org/10.1111/1467-9868.00196">https://doi.org/10.1111/1467-9868.00196</a>.
+</div>
+</div></section></div></main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "已复制");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "已复制");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+    const viewSource = window.document.getElementById('quarto-view-source') ||
+                       window.document.getElementById('quarto-code-tools-source');
+    if (viewSource) {
+      const sourceUrl = viewSource.getAttribute("data-quarto-source-url");
+      viewSource.addEventListener("click", function(e) {
+        if (sourceUrl) {
+          // rstudio viewer pane
+          if (/\bcapabilities=\b/.test(window.location)) {
+            window.open(sourceUrl);
+          } else {
+            window.location.href = sourceUrl;
+          }
+        } else {
+          const modal = new bootstrap.Modal(document.getElementById('quarto-embedded-source-code-modal'));
+          modal.show();
+        }
+        return false;
+      });
+    }
+    function toggleCodeHandler(show) {
+      return function(e) {
+        const cellDetails = window.document.querySelectorAll(".cell details.code-fold");
+        for (let i=0; i<cellDetails.length; i++) {
+          const details = cellDetails[i];
+          if (show) {
+            details.open = true;
+          } else {
+            details.removeAttribute("open");
+          }
+        }
+        const cellCodeDivs = window.document.querySelectorAll(".cell div.sourceCode.cell-code");
+        const fromCls = show ? "hidden" : "unhidden";
+        const toCls = show ? "unhidden" : "hidden";
+        for (let i=0; i<cellCodeDivs.length; i++) {
+          const codeDiv = cellCodeDivs[i];
+          if (codeDiv.classList.contains(fromCls)) {
+            codeDiv.classList.remove(fromCls);
+            codeDiv.classList.add(toCls);
+          } 
+        }
+        return false;
+      }
+    }
+    const hideAllCode = window.document.getElementById("quarto-hide-all-code");
+    if (hideAllCode) {
+      hideAllCode.addEventListener("click", toggleCodeHandler(false));
+    }
+    const showAllCode = window.document.getElementById("quarto-show-all-code");
+    if (showAllCode) {
+      showAllCode.addEventListener("click", toggleCodeHandler(true));
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/abelzheng\.github\.io\/latent-dynamics-geometry-public\/");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+            // target, if specified
+            link.setAttribute("target", "_blank");
+            if (link.getAttribute("rel") === null) {
+              link.setAttribute("rel", "noopener");
+            }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">源代码</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1" data-shortcodes="false"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="an">title:</span><span class="co"> "潜轨迹"</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="an">lang:</span><span class="co"> zh-CN</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="an">comments:</span><span class="co"> false</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="an">object_type:</span><span class="co"> concept</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="an">maturity:</span><span class="co"> L2</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="an">status:</span><span class="co"> stable</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="an">domain:</span><span class="co"> [latent-modeling, dynamics]</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="an">tags:</span><span class="co"> [latent-trajectory, latent-state, time-series, posterior-inference]</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="an">prerequisites:</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="co">- knowledge/concepts/trajectory.qmd</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="co">- knowledge/concepts/latent-variable.qmd</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="an">related:</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="co">- knowledge/concepts/observation-model.qmd</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="co">- knowledge/concepts/state-space-model.qmd</span></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="co">- knowledge/concepts/identifiability.qmd</span></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="co">- knowledge/concepts/vector-field.qmd</span></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a><span class="co">- knowledge/concepts/flow.qmd</span></span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a><span class="an">created:</span><span class="co"> 2026-08-18</span></span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a><span class="an">updated:</span><span class="co"> 2026-08-18</span></span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a><span class="fu"># 潜轨迹</span></span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a><span class="fu">## 一句话定义</span></span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>**潜轨迹**是以时间为索引的潜随机元素或该元素的一条实现路径，区别于观测以及用于估计它的任何点摘要。</span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a><span class="fu">## 为什么这个概念重要</span></span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>潜轨迹语言被用于几个不同对象：模型指定的潜过程、观测数据后它的后验分布、后验抽样，以及绘制的点估计。保持这些对象分开，可以防止把光滑估计误认为唯一恢复的状态演化或动力学机制的证据。</span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a><span class="fu">## 直觉</span></span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a>观测序列可以支持许多隐藏路径。模型为这些路径赋予相对概率，推断用数据更新该分布。绘制单个后验均值或单条最大后验路径会抑制这种不确定性，也可能隐藏潜坐标对称性。</span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a><span class="fu">## 形式化定义</span></span>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a>设 $(\mathcal Z,\Sigma_{\mathcal Z})$ 是潜空间，离散时间中 $I=<span class="sc">\{</span>0,\ldots,T<span class="sc">\}</span>$。潜轨迹随机元素是可测映射</span>
+<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a>Z_{0:T}:\Omega\to\mathcal Z^{T+1}.</span>
+<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a>一个实现是路径 $z_{0:T}=(z_0,\ldots,z_T)$。在连续时间中，必须声明路径空间 $\mathcal P(I,\mathcal Z)$——例如带指定可测结构的连续或 càdlàg 路径——并写 $Z:\Omega\to\mathcal P(I,\mathcal Z)$。时间索引本身不使 $Z_t$ 成为充分的动力学状态，也不指定转移律。</span>
+<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a>假设合适的正则条件分布存在，给定观测 $Y_{0:T}=y_{0:T}$ 与生成模型，推断目标一般是完整路径上的条件概率测度，</span>
+<span id="cb1-48"><a href="#cb1-48" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-50"><a href="#cb1-50" aria-hidden="true" tabindex="-1"></a>\Pi(A\mid y_{0:T})</span>
+<span id="cb1-51"><a href="#cb1-51" aria-hidden="true" tabindex="-1"></a>=</span>
+<span id="cb1-52"><a href="#cb1-52" aria-hidden="true" tabindex="-1"></a>\Pr(Z_{0:T}\in A\mid Y_{0:T}=y_{0:T}),</span>
+<span id="cb1-53"><a href="#cb1-53" aria-hidden="true" tabindex="-1"></a>\qquad A\in\Sigma_{\mathcal Z}^{\otimes(T+1)},</span>
+<span id="cb1-54"><a href="#cb1-54" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-55"><a href="#cb1-55" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-56"><a href="#cb1-56" aria-hidden="true" tabindex="-1"></a>或在存在合适参考测度时的条件密度 $p(z_{0:T}\mid y_{0:T})$。该后验律不等于任何单条绘制的路径。</span>
+<span id="cb1-57"><a href="#cb1-57" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-58"><a href="#cb1-58" aria-hidden="true" tabindex="-1"></a><span class="fu">### 生成律与推断目标</span></span>
+<span id="cb1-59"><a href="#cb1-59" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-60"><a href="#cb1-60" aria-hidden="true" tabindex="-1"></a>在 <span class="co">[</span><span class="ot">State-Space Model</span><span class="co">](state-space-model.qmd)</span> 声明的一阶状态空间假设下，路径律可以通过初始律与转移核分解，</span>
+<span id="cb1-61"><a href="#cb1-61" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-62"><a href="#cb1-62" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-63"><a href="#cb1-63" aria-hidden="true" tabindex="-1"></a>p(z_{0:T},y_{0:T})</span>
+<span id="cb1-64"><a href="#cb1-64" aria-hidden="true" tabindex="-1"></a>=</span>
+<span id="cb1-65"><a href="#cb1-65" aria-hidden="true" tabindex="-1"></a>p(z_0)</span>
+<span id="cb1-66"><a href="#cb1-66" aria-hidden="true" tabindex="-1"></a>\prod_{k=0}^{T-1}p(z_{k+1}\mid z_k)</span>
+<span id="cb1-67"><a href="#cb1-67" aria-hidden="true" tabindex="-1"></a>\prod_{k=0}^{T}p(y_k\mid z_k).</span>
+<span id="cb1-68"><a href="#cb1-68" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-69"><a href="#cb1-69" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-70"><a href="#cb1-70" aria-hidden="true" tabindex="-1"></a>该分解是模型假设，不是「潜轨迹」一词的推论。常见推断对象包括：</span>
+<span id="cb1-71"><a href="#cb1-71" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-72"><a href="#cb1-72" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**滤波分布：** $p(z_k\mid y_{0:k})$，使用到时间 $k$ 为止可用的观测；</span>
+<span id="cb1-73"><a href="#cb1-73" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**固定区间平滑分布：** $p(z_{0:T}\mid y_{0:T})$，或其边际 $p(z_k\mid y_{0:T})$，同样使用后续观测；</span>
+<span id="cb1-74"><a href="#cb1-74" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**后验样本：** 随机抽样 $\tilde z_{0:T}\sim p(z_{0:T}\mid y_{0:T})$；</span>
+<span id="cb1-75"><a href="#cb1-75" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**联合 MAP 路径：** 当声明路径密度与最大化者存在时，值 $\hat z^{\mathrm{MAP}}_{0:T}\in\arg\max p(z_{0:T}\mid y_{0:T})$；</span>
+<span id="cb1-76"><a href="#cb1-76" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**边际 MAP 序列：** 独立选择的 $p(z_k\mid y_{0:T})$ 最大化者，不必等于联合 MAP 路径，也不必形成受支持的转移序列；</span>
+<span id="cb1-77"><a href="#cb1-77" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**后验均值路径：** 当 $\mathcal Z$ 在向量空间中表示且期望存在时，$\hat z^{\mathrm{mean}}_k=\mathbb E[Z_k\mid y_{0:T}]$。</span>
+<span id="cb1-78"><a href="#cb1-78" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-79"><a href="#cb1-79" aria-hidden="true" tabindex="-1"></a>Kalman 根据目标时间等于、早于还是晚于最后观测时间区分平滑、滤波与预测，并把估计视为条件分布与损失的函数 <span class="co">[</span><span class="ot">@Kalman1960</span><span class="co">]</span>。因此后验均值与声明坐标中的平方误差损失绑定；它不是「恢复轨迹」的与表示无关定义。基于密度的 MAP 值也可能依赖参考测度与坐标参数化。</span>
+<span id="cb1-80"><a href="#cb1-80" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-81"><a href="#cb1-81" aria-hidden="true" tabindex="-1"></a>点摘要不自动是可许实现路径。逐点边际均值或众数可能离开离散或非线性状态空间、违反硬路径约束，或组合在后验抽样中从未同时出现的特征。即使摘要位于路径空间中，它在后验下也不必典型，也不必满足无强迫确定性演化律。精确后验样本尊重被建模后验支撑，但那只确立与拟合模型的兼容性。</span>
+<span id="cb1-82"><a href="#cb1-82" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-83"><a href="#cb1-83" aria-hidden="true" tabindex="-1"></a><span class="fu">### 坐标重参数化</span></span>
+<span id="cb1-84"><a href="#cb1-84" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-85"><a href="#cb1-85" aria-hidden="true" tabindex="-1"></a>设 $h:\mathcal Z\to\mathcal Z'$ 是双可测双射，并定义 $Z'_k=h(Z_k)$。变换路径律是逐分量路径映射 $h^{0:T}$ 下的前推。保持相同可观测模型要求每个受影响分量一致变换：</span>
+<span id="cb1-86"><a href="#cb1-86" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-87"><a href="#cb1-87" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-88"><a href="#cb1-88" aria-hidden="true" tabindex="-1"></a>\mu'=h_<span class="sc">\#</span>\mu,</span>
+<span id="cb1-89"><a href="#cb1-89" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-90"><a href="#cb1-90" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-91"><a href="#cb1-91" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-92"><a href="#cb1-92" aria-hidden="true" tabindex="-1"></a>Q'_k(z',A')</span>
+<span id="cb1-93"><a href="#cb1-93" aria-hidden="true" tabindex="-1"></a>=</span>
+<span id="cb1-94"><a href="#cb1-94" aria-hidden="true" tabindex="-1"></a>Q_k<span class="sc">\!</span>\left(h^{-1}(z'),h^{-1}(A')\right),</span>
+<span id="cb1-95"><a href="#cb1-95" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-96"><a href="#cb1-96" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-97"><a href="#cb1-97" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-98"><a href="#cb1-98" aria-hidden="true" tabindex="-1"></a>G'_k(z',B)</span>
+<span id="cb1-99"><a href="#cb1-99" aria-hidden="true" tabindex="-1"></a>=</span>
+<span id="cb1-100"><a href="#cb1-100" aria-hidden="true" tabindex="-1"></a>G_k<span class="sc">\!</span>\left(h^{-1}(z'),B\right).</span>
+<span id="cb1-101"><a href="#cb1-101" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-102"><a href="#cb1-102" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-103"><a href="#cb1-103" aria-hidden="true" tabindex="-1"></a>对确定性动力学 $z_{k+1}=f_k(z_k)$，这给出 $f'_k=h\circ f_k\circ h^{-1}$。变换路径上的后验同样必须是前推 $(h^{0:T})_<span class="sc">\#</span>\Pi$。只变换报告的轨迹而不变换潜律、转移模型与观测模型，通常改变生成规格而非仅仅改变坐标。</span>
+<span id="cb1-104"><a href="#cb1-104" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-105"><a href="#cb1-105" aria-hidden="true" tabindex="-1"></a>因此诸如欧氏 RMSE 的逐坐标轨迹误差只有在声明坐标、单位、度量、时间对应与任何允许对齐后才具有意义。如果已知群 $G$ 生成观测对称性，评估可以转而瞄准轨道或等价类，例如</span>
+<span id="cb1-106"><a href="#cb1-106" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-107"><a href="#cb1-107" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-108"><a href="#cb1-108" aria-hidden="true" tabindex="-1"></a>\inf_{g\in G}</span>
+<span id="cb1-109"><a href="#cb1-109" aria-hidden="true" tabindex="-1"></a>\frac{1}{T+1}\sum_{k=0}^{T}</span>
+<span id="cb1-110"><a href="#cb1-110" aria-hidden="true" tabindex="-1"></a>d_{\mathcal Z}<span class="sc">\!</span>\left(z_k^\star,g\cdot\hat z_k\right)^2,</span>
+<span id="cb1-111"><a href="#cb1-111" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-112"><a href="#cb1-112" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-113"><a href="#cb1-113" aria-hidden="true" tabindex="-1"></a>并陈述群、度量、拟合数据与对齐的留出使用。当潜坐标本身未被辨识时，也可以比较可观测预测或其他可辨识函数。例如在 PPCA 中，载荷矩阵与潜坐标架具有正交旋转歧义 <span class="co">[</span><span class="ot">@TippingBishop1999, sec. 3.2</span><span class="co">]</span>。这一精确对称性不授权对每个潜模型进行任意非线性对齐。</span>
+<span id="cb1-114"><a href="#cb1-114" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-115"><a href="#cb1-115" aria-hidden="true" tabindex="-1"></a><span class="fu">### 带已知真值的不确定性感知评估</span></span>
+<span id="cb1-116"><a href="#cb1-116" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-117"><a href="#cb1-117" aria-hidden="true" tabindex="-1"></a>::: {.callout-tip title="LDG 操作综合"}</span>
+<span id="cb1-118"><a href="#cb1-118" aria-hidden="true" tabindex="-1"></a>以下规程把上述后验、可辨识性与状态空间区分连接成有界评估设计。它是提出的 LDG 实践，不是归因于经核查来源的定理。</span>
+<span id="cb1-119"><a href="#cb1-119" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb1-120"><a href="#cb1-120" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-121"><a href="#cb1-121" aria-hidden="true" tabindex="-1"></a>在模拟或其他声明潜真值 $z_{0:T}^\star$ 的设定中，评估应报告多于一条视觉对齐路径：</span>
+<span id="cb1-122"><a href="#cb1-122" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-123"><a href="#cb1-123" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>**状态或轨迹误差：** 使用声明度量，并在必要时使用被论证的对称性/对齐约定；</span>
+<span id="cb1-124"><a href="#cb1-124" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>**时间泛化：** 评估留出时间、试次、初始条件或参数条件，而不仅是拟合序列；</span>
+<span id="cb1-125"><a href="#cb1-125" aria-hidden="true" tabindex="-1"></a><span class="ss">3. </span>**不确定性覆盖：** 跨重复数据集，检查边际状态区域或同时路径区域是否以它们广告的比率包含合适对齐的真值，并且不要把这两个覆盖目标混为一谈；</span>
+<span id="cb1-126"><a href="#cb1-126" aria-hidden="true" tabindex="-1"></a><span class="ss">4. </span>**校准或评分：** 用正确评分规则或重复模拟校准比较后验或预测分布，而不仅是单个区间的宽度；</span>
+<span id="cb1-127"><a href="#cb1-127" aria-hidden="true" tabindex="-1"></a><span class="ss">5. </span>**模型比较：** 对照更简单的静态或弱动力学基线检验，确定转移模型是否改善留出预测或恢复。</span>
+<span id="cb1-128"><a href="#cb1-128" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-129"><a href="#cb1-129" aria-hidden="true" tabindex="-1"></a>如果对齐是用用于评分的同一真值估计的，必须报告该依赖与任何由此产生的乐观偏差。覆盖是声明数据生成过程下重复规程的性质；一条视觉上合理的可信带不是校准结果。模拟真值只相对模拟器与声明等价约定确立恢复，而非唯一物理或生物真值。</span>
+<span id="cb1-130"><a href="#cb1-130" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-131"><a href="#cb1-131" aria-hidden="true" tabindex="-1"></a><span class="fu">## 核心记号</span></span>
+<span id="cb1-132"><a href="#cb1-132" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-133"><a href="#cb1-133" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>$Z_{0:T}$：潜轨迹随机元素。</span>
+<span id="cb1-134"><a href="#cb1-134" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>$z_{0:T}$：一条实现潜路径。</span>
+<span id="cb1-135"><a href="#cb1-135" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>$Y_{0:T}=y_{0:T}$：观测随机变量与实现数据。</span>
+<span id="cb1-136"><a href="#cb1-136" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>$\Pi(\mathrm dz_{0:T}\mid y_{0:T})$：路径上的后验概率测度。</span>
+<span id="cb1-137"><a href="#cb1-137" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>$p(z_k\mid y_{0:k})$：滤波分布。</span>
+<span id="cb1-138"><a href="#cb1-138" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>$p(z_{0:T}\mid y_{0:T})$：固定区间平滑分布。</span>
+<span id="cb1-139"><a href="#cb1-139" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>$\tilde z_{0:T}$：后验样本。</span>
+<span id="cb1-140"><a href="#cb1-140" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>$\hat z^{\mathrm{MAP}}_{0:T}$、$\hat z^{\mathrm{mean}}_{0:T}$：声明的点摘要。</span>
+<span id="cb1-141"><a href="#cb1-141" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>$h$ 与 $h^{0:T}$：潜坐标与逐分量路径重参数化。</span>
+<span id="cb1-142"><a href="#cb1-142" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>$G$：当科学目标是轨道或等价类时声明的对称群。</span>
+<span id="cb1-143"><a href="#cb1-143" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-144"><a href="#cb1-144" aria-hidden="true" tabindex="-1"></a><span class="fu">## 前置知识</span></span>
+<span id="cb1-145"><a href="#cb1-145" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-146"><a href="#cb1-146" aria-hidden="true" tabindex="-1"></a><span class="co">[</span><span class="ot">Trajectory</span><span class="co">](trajectory.qmd)</span> 提供类型化时间索引路径。<span class="co">[</span><span class="ot">Latent Variable</span><span class="co">](latent-variable.qmd)</span> 提供模型隐藏量。<span class="co">[</span><span class="ot">Observation Model</span><span class="co">](observation-model.qmd)</span> 与 <span class="co">[</span><span class="ot">State-Space Model</span><span class="co">](state-space-model.qmd)</span> 分离前向测量关系、转移律与后验推断任务。</span>
+<span id="cb1-147"><a href="#cb1-147" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-148"><a href="#cb1-148" aria-hidden="true" tabindex="-1"></a><span class="fu">## 与相邻概念的关系</span></span>
+<span id="cb1-149"><a href="#cb1-149" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-150"><a href="#cb1-150" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> 概念 <span class="pp">|</span> 区别 <span class="pp">|</span></span>
+<span id="cb1-151"><a href="#cb1-151" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|</span></span>
+<span id="cb1-152"><a href="#cb1-152" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **观测轨迹** <span class="pp">|</span> 直接从测得变量构造的路径。它可以作为潜推断的输入，但不是隐藏路径本身。 <span class="pp">|</span></span>
+<span id="cb1-153"><a href="#cb1-153" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **确定性嵌入路径** <span class="pp">|</span> 由数据的固定变换产生的序列 $e(y_k)$。它不必定义潜概率律、后验不确定性或充分动力学状态。 <span class="pp">|</span></span>
+<span id="cb1-154"><a href="#cb1-154" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **潜状态轨迹** <span class="pp">|</span> 更强的建模角色，其中每个潜值被处理为对指定演化与系统边界充分的状态。 <span class="pp">|</span></span>
+<span id="cb1-155"><a href="#cb1-155" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **轨迹上的后验分布** <span class="pp">|</span> 可能路径上的条件概率律；它不是单个后验均值、MAP 路径或样本。 <span class="pp">|</span></span>
+<span id="cb1-156"><a href="#cb1-156" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **向量场 / 转移律** <span class="pp">|</span> 在受支持状态上赋予局部变化或转移分布的规则。一条推断路径不决定访问状态之外的此类规则。 <span class="pp">|</span></span>
+<span id="cb1-157"><a href="#cb1-157" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **流** <span class="pp">|</span> 在受支持初始状态上的兼容有限时间演化映射族。一条潜轨迹只是流下的一条轨道/路径，当这样的流存在时。 <span class="pp">|</span></span>
+<span id="cb1-158"><a href="#cb1-158" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **可辨识性** <span class="pp">|</span> 决定潜路径、参数或只是等价类/函数是否被可观测律唯一约束。 <span class="pp">|</span></span>
+<span id="cb1-159"><a href="#cb1-159" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-160"><a href="#cb1-160" aria-hidden="true" tabindex="-1"></a><span class="fu">## 这并不蕴含</span></span>
+<span id="cb1-161"><a href="#cb1-161" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-162"><a href="#cb1-162" aria-hidden="true" tabindex="-1"></a>潜轨迹并不蕴含可辨识坐标、低本征维数、光滑性、自治动力学、流形结构、马尔可夫充分性、因果或机制意义，或来自观测的唯一逆。低重构误差或准确解码并不确立潜路径是真实状态。光滑后验均值并不确立光滑真实动力学。</span>
+<span id="cb1-163"><a href="#cb1-163" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-164"><a href="#cb1-164" aria-hidden="true" tabindex="-1"></a><span class="fu">## 最小示例</span></span>
+<span id="cb1-165"><a href="#cb1-165" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-166"><a href="#cb1-166" aria-hidden="true" tabindex="-1"></a>设潜状态空间为 $\mathcal Z=<span class="sc">\{</span>-1,+1<span class="sc">\}</span>$，并假设后验以概率 $1/2$ 赋予常值路径 $(-1,\ldots,-1)$，以概率 $1/2$ 赋予 $(+1,\ldots,+1)$。两个后验样本都是可许路径，但逐点后验均值是 $(0,\ldots,0)$，它不在 $\mathcal Z^{T+1}$ 中。这显示后验均值为何可以是损失最优的摘要，却未必是可能的潜实现。</span>
+<span id="cb1-167"><a href="#cb1-167" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-168"><a href="#cb1-168" aria-hidden="true" tabindex="-1"></a>在线性高斯状态空间模型中，</span>
+<span id="cb1-169"><a href="#cb1-169" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-170"><a href="#cb1-170" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-171"><a href="#cb1-171" aria-hidden="true" tabindex="-1"></a>z_{k+1}=Az_k+w_k,</span>
+<span id="cb1-172"><a href="#cb1-172" aria-hidden="true" tabindex="-1"></a>\qquad</span>
+<span id="cb1-173"><a href="#cb1-173" aria-hidden="true" tabindex="-1"></a>y_k=Cz_k+v_k,</span>
+<span id="cb1-174"><a href="#cb1-174" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-175"><a href="#cb1-175" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-176"><a href="#cb1-176" aria-hidden="true" tabindex="-1"></a>滤波与平滑返回状态或路径上的条件分布，而不仅是单条线。在一致变换 $A$、$C$、潜律与后验的同时旋转潜坐标，可以在相关对称性下保留相同可观测模型；只旋转绘制估计则不确立等价。</span>
+<span id="cb1-177"><a href="#cb1-177" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-178"><a href="#cb1-178" aria-hidden="true" tabindex="-1"></a><span class="fu">## 神经科学 / 行为相关性</span></span>
+<span id="cb1-179"><a href="#cb1-179" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-180"><a href="#cb1-180" aria-hidden="true" tabindex="-1"></a>Cunningham 与 Yu 描述 HMM、GPFA、LDS 与非线性动力系统方法返回低维潜神经轨迹，但明确告诫提取的轨迹反映带噪数据与拟合动力学模型之间的统计权衡 <span class="co">[</span><span class="ot">@CunninghamYu2014</span><span class="co">]</span>。因此 GPFA 光滑性与 LDS/NLDS 动力学母题可以由模型假设促成，而非在数据中被独立发现。行为潜路径需要在测量、模型隐藏变量、后验摘要与状态主张之间进行同样分离。</span>
+<span id="cb1-181"><a href="#cb1-181" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-182"><a href="#cb1-182" aria-hidden="true" tabindex="-1"></a><span class="fu">## 对 LDG 的意义</span></span>
+<span id="cb1-183"><a href="#cb1-183" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-184"><a href="#cb1-184" aria-hidden="true" tabindex="-1"></a>在 L2 阶段，潜轨迹连接路径空间概率、状态空间推断、坐标对称性与已知真值评估。它提供比较生成与恢复方法所需的护栏，而不把可视化、后验均值或对齐重构当作机制性证据。</span>
+<span id="cb1-185"><a href="#cb1-185" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-186"><a href="#cb1-186" aria-hidden="true" tabindex="-1"></a><span class="fu">## 开放问题</span></span>
+<span id="cb1-187"><a href="#cb1-187" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-188"><a href="#cb1-188" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>对不规则采样或不连续轨迹，哪种路径空间拓扑与不确定性表示合适？</span>
+<span id="cb1-189"><a href="#cb1-189" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>给定模型中哪些潜对称性保留科学主张？</span>
+<span id="cb1-190"><a href="#cb1-190" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>对齐不确定性应如何传播到轨迹误差与覆盖估计中？</span>
+<span id="cb1-191"><a href="#cb1-191" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>何时转移模型在独立潜因子或平滑观测之上改善留出恢复？</span>
+<span id="cb1-192"><a href="#cb1-192" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-193"><a href="#cb1-193" aria-hidden="true" tabindex="-1"></a><span class="fu">## 参考文献</span></span>
+<span id="cb1-194"><a href="#cb1-194" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-195"><a href="#cb1-195" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Kalman 提供经核查的平滑、滤波与预测主区分，并在线性随机设定中把条件分布、损失、估计与估计误差协方差联系起来 <span class="co">[</span><span class="ot">@Kalman1960</span><span class="co">]</span>。</span>
+<span id="cb1-196"><a href="#cb1-196" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Cunningham 与 Yu 提供经核查的神经群体轨迹语境，以及提取的光滑性或动力学母题可以既反映拟合模型又反映带噪数据的告诫 <span class="co">[</span><span class="ot">@CunninghamYu2014</span><span class="co">]</span>。</span>
+<span id="cb1-197"><a href="#cb1-197" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Tipping 与 Bishop 提供经核查的概率潜变量观测模型、条件潜分布、条件均值摘要与 PPCA 正交旋转歧义 <span class="co">[</span><span class="ot">@TippingBishop1999, secs. 3.1--3.4</span><span class="co">]</span>。</span>
+<span id="cb1-198"><a href="#cb1-198" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>一般路径空间测度论、非线性滤波/平滑算法、后验一致性定理与校准定理被有意推迟。</span>
+<span id="cb1-199"><a href="#cb1-199" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-200"><a href="#cb1-200" aria-hidden="true" tabindex="-1"></a><span class="fu">## 成熟度检查表</span></span>
+<span id="cb1-201"><a href="#cb1-201" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-202"><a href="#cb1-202" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> 把潜轨迹类型化为随机元素，并区分实现路径与其后验律。</span>
+<span id="cb1-203"><a href="#cb1-203" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> 区分滤波、平滑、后验样本、联合 MAP 路径与后验均值。</span>
+<span id="cb1-204"><a href="#cb1-204" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> 显示点摘要为何不必是可许或典型的潜路径。</span>
+<span id="cb1-205"><a href="#cb1-205" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> 在坐标变换下一致变换潜律、转移模型、观测模型与后验。</span>
+<span id="cb1-206"><a href="#cb1-206" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> 把依赖坐标的误差与声明对称性/等价类目标分开。</span>
+<span id="cb1-207"><a href="#cb1-207" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> 把模型诱导的光滑性当作推断假设，而非真实动力学证据。</span>
+<span id="cb1-208"><a href="#cb1-208" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> 规定带已知真值的不确定性感知评估与对齐警示。</span>
+<span id="cb1-209"><a href="#cb1-209" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> 区分观测路径、确定性嵌入、潜状态、向量场与流。</span>
+<span id="cb1-210"><a href="#cb1-210" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> 独立 L2 科学审查在记录的审查决定下完成；有界审查无实质发现通过。</span></code></pre></div><button title="复制到剪贴板" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></div>
+</div></div></div></div></div>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

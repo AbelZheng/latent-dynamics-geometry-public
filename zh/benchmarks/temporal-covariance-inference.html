@@ -1,0 +1,1648 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="zh-CN" xml:lang="zh-CN"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.10.18">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>P4-U03 — 时序协方差与推断基准测试 – Latent Dynamics &amp; Geometry</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-e3adbaa939bcd423dddc8c8a834270b4.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "没有结果",
+    "search-matching-documents-text": "匹配的文档",
+    "search-copy-link-title": "复制搜索链接",
+    "search-hide-matches-text": "隐藏其它匹配结果",
+    "search-more-match-text": "更多匹配结果",
+    "search-more-matches-text": "更多匹配结果",
+    "search-clear-button-title": "清除",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "取消",
+    "search-submit-button-title": "提交",
+    "search-label": "搜索"
+  }
+}</script>
+<style>
+.ldg-lang{position:fixed;top:72px;right:16px;z-index:2000;display:flex;gap:4px;font-family:system-ui,-apple-system,"Segoe UI",sans-serif;}
+.ldg-lang a{display:inline-block;padding:4px 10px;border:1px solid #c8c8c8;border-radius:999px;background:#fff;color:#333;text-decoration:none;font-size:13px;box-shadow:0 1px 3px rgba(0,0,0,.15);}
+.ldg-lang a.active{background:#2c3e50;color:#fff;border-color:#2c3e50;}
+</style>
+</head><body class="nav-fixed quarto-light"><div class="ldg-lang" id="ldg-lang">
+  <a href="#" id="ldg-lang-en">EN</a>
+  <a href="#" id="ldg-lang-zh">中文</a>
+</div>
+<script>
+(function () {
+  var BASE = '';
+  if (window.location.pathname.indexOf('/latent-dynamics-geometry-public/') === 0) {
+    BASE = 'latent-dynamics-geometry-public';
+  }
+  var IS_FILE = window.location.protocol === 'file:';
+  function pathSegs() {
+    return window.location.pathname.split('/').filter(Boolean);
+  }
+  function zhIdx() {
+    return pathSegs().indexOf('zh');
+  }
+  function segs() {
+    var s = window.location.pathname.split('/').filter(Boolean);
+    if (BASE && s[0] === BASE) s = s.slice(1);
+    return s;
+  }
+  function isZh() { return zhIdx() !== -1; }
+  function fileTarget(lang) {
+    var s = pathSegs();
+    var siteIdx = s.lastIndexOf('_site');
+    var root = siteIdx === -1 ? s.slice(0, -1) : s.slice(0, siteIdx + 1);
+    var page = siteIdx === -1 ? [s[s.length - 1]] : s.slice(siteIdx + 1);
+    if (page[0] === 'zh') page = page.slice(1);
+    if (lang === 'zh') page = ['zh'].concat(page);
+    var rel = page.join('/');
+    if (rel === '' || rel === 'zh') rel = 'index.html';
+    return '/' + root.join('/') + '/' + rel;
+  }
+  function target(lang) {
+    if (IS_FILE) return fileTarget(lang);
+    var s = segs();
+    if (s[0] === 'zh') s = s.slice(1);
+    if (lang === 'zh') s = ['zh'].concat(s);
+    var rel = s.join('/');
+    if (rel === '' || rel === 'zh') rel = (lang === 'zh' ? 'zh/index.html' : 'index.html');
+    return '/' + (BASE ? BASE + '/' : '') + rel;
+  }
+  function go(lang) {
+    try { localStorage.setItem('ldg-lang', lang); } catch (e) {}
+    window.location.href = target(lang);
+  }
+  function mark() {
+    var zh = isZh();
+    var a = document.getElementById('ldg-lang-en');
+    var b = document.getElementById('ldg-lang-zh');
+    if (a) a.className = zh ? '' : 'active';
+    if (b) b.className = zh ? 'active' : '';
+  }
+  function localizeNav() {
+    if (!isZh()) return;
+    var cur = pathSegs();
+    var czi = zhIdx();
+    var dir = (czi === -1 ? cur.slice(0, -1) : cur.slice(czi, -1)).join('/');
+    document.querySelectorAll('nav a').forEach(function (a) {
+      var h = a.getAttribute('href') || '';
+      if (/^(https?:|#|mailto:)/.test(h)) return;
+      if (/\.html?$/.test(h) || /\/$/.test(h) || h === '') {
+        var abs = new URL(h, window.location.href).pathname;
+        var s = abs.split('/').filter(Boolean);
+        if (BASE && s[0] === BASE) s = s.slice(1);
+        var zi = s.indexOf('zh');
+        var rel = zi !== -1 ? s.slice(zi + 1).join('/') : s.slice(czi).join('/');
+        var tgt = 'zh/' + rel;
+        var f = dir.split('/').filter(Boolean);
+        var t = tgt.split('/').filter(Boolean);
+        var i = 0;
+        while (i < f.length && i < t.length && f[i] === t[i]) i++;
+        var rel = '';
+        for (var j = i; j < f.length; j++) rel += '../';
+        rel += t.slice(i).join('/');
+        a.setAttribute('href', rel);
+      }
+    });
+  }
+  document.getElementById('ldg-lang-en').addEventListener('click', function (e) { e.preventDefault(); go('en'); });
+  document.getElementById('ldg-lang-zh').addEventListener('click', function (e) { e.preventDefault(); go('zh'); });
+  mark();
+  localizeNav();
+})();
+</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-chtml.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+
+
+
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">Latent Dynamics &amp; Geometry</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="搜索"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="展开或折叠导航栏" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../index.html"> 
+<span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../knowledge/concepts/index.html"> 
+<span class="menu-text">Concepts</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../knowledge/methods/index.html"> 
+<span class="menu-text">Methods</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../knowledge/math/index.html"> 
+<span class="menu-text">Math</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../knowledge/papers/index.html"> 
+<span class="menu-text">Papers</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../toy-models/index.html"> 
+<span class="menu-text">Toy Models</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../research-questions/index.html"> 
+<span class="menu-text">Research Questions</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../benchmarks/index.html"> 
+<span class="menu-text">Benchmarks</span></a>
+  </li>  
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/AbelZheng/latent-dynamics-geometry-public"> <i class="bi bi-github" role="img" aria-label="GitHub repository">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="https://github.com/AbelZheng/latent-dynamics-geometry-public/discussions"> 
+<span class="menu-text">Discussions</span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">该页面内容</h2>
+   
+  <ul>
+  <li><a href="#p4-u03-时序协方差与推断基准测试" id="toc-p4-u03-时序协方差与推断基准测试" class="nav-link active" data-scroll-target="#p4-u03-时序协方差与推断基准测试">P4-U03 — 时序协方差与推断基准测试</a>
+  <ul class="collapse">
+  <li><a href="#科学问题" id="toc-科学问题" class="nav-link" data-scroll-target="#科学问题">科学问题</a></li>
+  <li><a href="#真值" id="toc-真值" class="nav-link" data-scroll-target="#真值">真值</a></li>
+  <li><a href="#生成" id="toc-生成" class="nav-link" data-scroll-target="#生成">生成</a></li>
+  <li><a href="#场景网格" id="toc-场景网格" class="nav-link" data-scroll-target="#场景网格">场景网格</a></li>
+  <li><a href="#阴性对照与压力情形" id="toc-阴性对照与压力情形" class="nav-link" data-scroll-target="#阴性对照与压力情形">阴性对照与压力情形</a></li>
+  <li><a href="#重复与确定性种子" id="toc-重复与确定性种子" class="nav-link" data-scroll-target="#重复与确定性种子">重复与确定性种子</a></li>
+  <li><a href="#划分纪律" id="toc-划分纪律" class="nav-link" data-scroll-target="#划分纪律">划分纪律</a></li>
+  <li><a href="#方法与信息集" id="toc-方法与信息集" class="nav-link" data-scroll-target="#方法与信息集">方法与信息集</a></li>
+  <li><a href="#参数选择" id="toc-参数选择" class="nav-link" data-scroll-target="#参数选择">参数选择</a></li>
+  <li><a href="#推断" id="toc-推断" class="nav-link" data-scroll-target="#推断">推断</a></li>
+  <li><a href="#评分" id="toc-评分" class="nav-link" data-scroll-target="#评分">评分</a></li>
+  <li><a href="#失效与适用性标签" id="toc-失效与适用性标签" class="nav-link" data-scroll-target="#失效与适用性标签">失效与适用性标签</a></li>
+  <li><a href="#产物契约" id="toc-产物契约" class="nav-link" data-scroll-target="#产物契约">产物契约</a></li>
+  <li><a href="#结果" id="toc-结果" class="nav-link" data-scroll-target="#结果">结果</a></li>
+  <li><a href="#解读界限" id="toc-解读界限" class="nav-link" data-scroll-target="#解读界限">解读界限</a></li>
+  <li><a href="#可复现性" id="toc-可复现性" class="nav-link" data-scroll-target="#可复现性">可复现性</a></li>
+  <li><a href="#审查记录" id="toc-审查记录" class="nav-link" data-scroll-target="#审查记录">审查记录</a></li>
+  <li><a href="#成熟度检查表" id="toc-成熟度检查表" class="nav-link" data-scroll-target="#成熟度检查表">成熟度检查表</a></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<div class="quarto-title-block"><div><h1 class="title">P4-U03 — 时序协方差与推断基准测试</h1><button type="button" class="btn code-tools-button" id="quarto-code-tools-source"><i class="bi"></i> 代码</button></div></div>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="p4-u03-时序协方差与推断基准测试" class="level1">
+<h1>P4-U03 — 时序协方差与推断基准测试</h1>
+<section id="科学问题" class="level2">
+<h2 class="anchored" data-anchor-id="科学问题">科学问题</h2>
+<p>在一组有界双潜、六通道合成轨迹问题中，静态参考、两阶段平滑、已知与验证选择高斯过程因子分析（GPFA）、刻意错误时间协方差、单时滞匹配线性高斯状态空间推断与精确有限高斯神谕在声明信息集下何处适用、鲁棒或可观测地误设？</p>
+<p>基准分离观测似然、掩蔽观测预测、潜路径评分、载荷子空间恢复、时间尺度选择、协方差拟合、后验校准与数值神谕一致。它不把它们组合为总分。光滑后验均值是协方差先验与观测模型下的条件估计；它不是学习转移律、向量场、物理轨迹、因果机制或动力学证明。</p>
+</section>
+<section id="真值" class="level2">
+<h2 class="anchored" data-anchor-id="真值">真值</h2>
+<p>每个试次在 <span class="math inline">\([0,1]\)</span> 等距网格上有 <span class="math inline">\(T=16\)</span> 个点、潜维数 <span class="math inline">\(q=2\)</span>、观测维数 <span class="math inline">\(p=6\)</span>。在名义高斯族下，时间主序潜向量具有零均值与块对角坐标协方差。对坐标 <span class="math inline">\(j\)</span>，</p>
+<p><span class="math display">\[
+k_j(t,t')=(1-0.02)\exp\left[-\frac{(t-t')^2}{2\tau_j^2}\right]
++0.02\,\mathbf 1[t=t'].
+\]</span></p>
+<p>名义不同时间尺度对是 <span class="math inline">\((\tau_1,\tau_2)=(0.10,0.32)\)</span>。观测层是</p>
+<p><span class="math display">\[
+y_t=Cz_t+d+\epsilon_t,
+\qquad \epsilon_t\sim\mathcal N(0,R),
+\]</span></p>
+<p>使用稳定协方差先验轨迹载荷矩阵、偏移与对角残差协方差：</p>
+<p><span class="math display">\[
+C=
+\begin{pmatrix}
+1.00&amp;0.25\\
+0.70&amp;-0.45\\
+0.30&amp;0.90\\
+-0.65&amp;0.40\\
+0.80&amp;0.55\\
+-0.25&amp;-0.75
+\end{pmatrix},
+\quad
+d=(0.30,-0.20,0.15,0.05,-0.10,0.25)^\top,
+\]</span></p>
+<p><span class="math display">\[
+R=\operatorname{diag}(0.10,0.16,0.22,0.30,0.38,0.48).
+\]</span></p>
+<p>整试次独立。没有潜先验、滤波状态、平滑器状态或拟合统计量跨试次边界。潜路径与完整隐藏观测保留在仅评分载荷中。稳定 <code>toy-models/covariance-prior-trajectories.py</code> 对象为本基准提供科学与设计出处，其 SHA-256 摘要被记录并验证。基准不导入或调用该可执行源；其生成器、拟合、条件化、滤波、平滑、评分、产物与验证例程是基准本地的。它不编辑稳定 Phase 3 源，也不把其示例结果提升为一般主张。</p>
+<p>压力生成器改变该真值的特定部分：</p>
+<ul>
+<li><code>latent_changepoint</code> 把每个潜坐标前半与后半之间的互协方差设为零，创建两个独立高斯时间段；精确神谕知道该块协方差，而名义 GPFA 不知道；</li>
+<li><code>correlated_residuals</code> 保留名义残差方差，并给每个非对角对残差相关 <span class="math inline">\(0.12\)</span>；</li>
+<li><code>low_rate_poisson</code> 用 <span class="math inline">\(\lambda_{tj}=\exp[-2+0.35(Cz_t+d)_j]\)</span> 抽取原始计数，然后应用有界高斯分析而不假装高斯观测律正确；</li>
+<li><code>alignment_jitter</code> 把每个采样潜路径移位 <span class="math inline">\(-1\)</span>、<span class="math inline">\(0\)</span> 或 <span class="math inline">\(1\)</span> 箱，用最近保留值填充暴露边，仍分析名义网格；评分使用移位保留路径，因此这是有界先验/对齐扰动，而非关于未观测事件相对路径的恢复主张；以及</li>
+<li><code>informative_missingness</code> 隐藏每个测试试次经验第 72 百分位之上的条目。普通推断路径忽略掩码中的信息。</li>
+</ul>
+</section>
+<section id="生成" class="level2">
+<h2 class="anchored" data-anchor-id="生成">生成</h2>
+<p>生成只接收场景、重复、划分、试次索引与确定性种子流。它抽取潜路径、应用场景特定观测族，并返回单独训练、验证与测试试次集合。掩码构造是后一阶段，永不变更冻结完整实现。</p>
+<p>名义、接近时间尺度、样本量、变点、相关残差、泊松、相等核与抖动场景使用混合掩蔽预测设计，除非掩码被显式命名：交替测试试次隐藏一个完整通道或序列中间三分之一的所有通道。<code>channel_mask</code> 场景在每个测试试次隐藏一个完整通道；<code>time_block_mask</code> 场景在索引 5–9 隐藏所有通道；<code>informative_missingness</code> 使用上述依赖值规则。</p>
+</section>
+<section id="场景网格" class="level2">
+<h2 class="anchored" data-anchor-id="场景网格">场景网格</h2>
+<p>核心加压力网格有 12 个预先声明场景，每场景三个独立重复。划分大小是独立试次数，写作训练/验证/测试。</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 23%">
+<col style="width: 23%">
+<col style="width: 30%">
+<col style="width: 23%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>场景</th>
+<th>类</th>
+<th style="text-align: right;">划分大小</th>
+<th>声明变化</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>reference_distinct</code></td>
+<td>时间尺度分离</td>
+<td style="text-align: right;">5/3/3</td>
+<td>平方指数 <span class="math inline">\((0.10,0.32)\)</span></td>
+</tr>
+<tr class="even">
+<td><code>close_timescales</code></td>
+<td>时间尺度分离</td>
+<td style="text-align: right;">5/3/3</td>
+<td><span class="math inline">\((0.18,0.24)\)</span></td>
+</tr>
+<tr class="odd">
+<td><code>low_trial_count</code></td>
+<td>试次/样本量</td>
+<td style="text-align: right;">2/1/2</td>
+<td>更少独立试次</td>
+</tr>
+<tr class="even">
+<td><code>high_trial_count</code></td>
+<td>试次/样本量</td>
+<td style="text-align: right;">8/4/4</td>
+<td>更多独立试次</td>
+</tr>
+<tr class="odd">
+<td><code>channel_mask</code></td>
+<td>缺失通道</td>
+<td style="text-align: right;">5/3/3</td>
+<td>每个测试试次隐藏一个完整通道</td>
+</tr>
+<tr class="even">
+<td><code>time_block_mask</code></td>
+<td>缺失时间块</td>
+<td style="text-align: right;">5/3/3</td>
+<td>索引 5–9 隐藏所有通道</td>
+</tr>
+<tr class="odd">
+<td><code>latent_changepoint</code></td>
+<td>时间非平稳性</td>
+<td style="text-align: right;">5/3/3</td>
+<td>独立前后高斯协方差块</td>
+</tr>
+<tr class="even">
+<td><code>correlated_residuals</code></td>
+<td>观测协方差</td>
+<td style="text-align: right;">5/3/3</td>
+<td>非对角高斯残差协方差</td>
+</tr>
+<tr class="odd">
+<td><code>low_rate_poisson</code></td>
+<td>观测族误设</td>
+<td style="text-align: right;">5/3/3</td>
+<td>原始低率泊松计数</td>
+</tr>
+<tr class="even">
+<td><code>equal_kernels</code></td>
+<td>时间可辨识性</td>
+<td style="text-align: right;">5/3/3</td>
+<td><span class="math inline">\((0.20,0.20)\)</span></td>
+</tr>
+<tr class="odd">
+<td><code>alignment_jitter</code></td>
+<td>对齐压力</td>
+<td style="text-align: right;">5/3/3</td>
+<td>种子推导 <span class="math inline">\(-1/0/1\)</span> 箱移位与边填充</td>
+</tr>
+<tr class="even">
+<td><code>informative_missingness</code></td>
+<td>不可忽略掩码</td>
+<td style="text-align: right;">5/3/3</td>
+<td>隐藏上尾观测值</td>
+</tr>
+</tbody>
+</table>
+<p>这不是因子设计。时间尺度、划分大小、观测律、残差协方差与掩码几何的变化是场景级干预；场景摘要之间差异不隔离单一因素的因果效应。</p>
+</section>
+<section id="阴性对照与压力情形" class="level2">
+<h2 class="anchored" data-anchor-id="阴性对照与压力情形">阴性对照与压力情形</h2>
+<p>两个协方差误设保留在每个场景中：</p>
+<ol type="1">
+<li><code>wrong_timescale_gpfa</code> 固定公共平方指数对 <span class="math inline">\((0.06,0.06)\)</span>；以及</li>
+<li><code>wrong_ar_gpfa</code> 用单时滞系数从每个声明时间尺度推导的 AR(1) 协方差替换平方指数族。</li>
+</ol>
+<p>相同 AR 族提供在线卡尔曼滤波器与回顾性 RTS 平滑器。匹配单时滞协方差不使其更长时滞衰减等于平方指数核。变点、相关残差、泊松、相等核、抖动与有信息掩码场景也作为结构化假设失败保留。没有场景在看到结果后被调走。</p>
+<p>精确高斯神谕只在场景具有有限高斯观测律、无抖动构造与可忽略掩码时发出。它适用处使用真实相关残差或变点协方差。对泊松、抖动与有信息缺失场景，它缺失——而非被赋予捏造得分。</p>
+</section>
+<section id="重复与确定性种子" class="level2">
+<h2 class="anchored" data-anchor-id="重复与确定性种子">重复与确定性种子</h2>
+<p>每个场景三个独立重复。试次抽取在训练、验证与测试内与之间独立。随机流使用 <code>PCG64(SeedSequence(...))</code>，带主种子 <code>20260820</code>、SHA-256 推导场景代码、重复、阶段、划分代码与试次索引。映射独立于遍历顺序。</p>
+<p>三个重复只支持有界描述性摘要。报告 q10 与 q90 是三个重复级值的插值分位数，不是置信区间、不确定性带或稳定尾部估计。</p>
+</section>
+<section id="划分纪律" class="level2">
+<h2 class="anchored" data-anchor-id="划分纪律">划分纪律</h2>
+<p>合法拟合接口只接受训练与验证观测元组。训练观测拟合静态因子/PCA 状态与通道均值和方差。每个预先声明时间尺度候选由<strong>组合总训练加验证边际 NLL</strong> 评分；仅验证分量也作为诊断保留。选择与拟合接口没有测试或潜真值参数。</p>
+<p>第二接口接收冻结状态加测试观测与掩码。它在不访问训练/验证数组或真值的情况下执行测试时间滤波、平滑、条件化或确定性恢复。只有评分阶段加入潜路径、完整隐藏观测、场景协方差或载荷真值。投毒检查要求被排除测试观测与潜真值使拟合状态与固定观测恢复不变，而允许的训练扰动必须改变拟合状态。</p>
+</section>
+<section id="方法与信息集" class="level2">
+<h2 class="anchored" data-anchor-id="方法与信息集">方法与信息集</h2>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>方法</th>
+<th>角色</th>
+<th>参数</th>
+<th>信息集</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>mean_diagonal</code></td>
+<td>独立观测参考</td>
+<td>训练均值/方差</td>
+<td>静态观测</td>
+</tr>
+<tr class="even">
+<td><code>static_factor</code></td>
+<td>池化箱秩二 PCA/因子参考</td>
+<td>训练</td>
+<td>静态观测</td>
+</tr>
+<tr class="odd">
+<td><code>two_stage_pca_smooth</code></td>
+<td>静态 PCA 得分后接逐坐标 GP 平滑</td>
+<td>训练状态加所选时间尺度</td>
+<td>回顾性</td>
+</tr>
+<tr class="even">
+<td><code>independent_channel_gp</code></td>
+<td>无跨通道借用的逐通道时间插值</td>
+<td>训练均值/方差加均值所选时间尺度</td>
+<td>回顾性</td>
+</tr>
+<tr class="odd">
+<td><code>known_gpfa</code></td>
+<td>声明场景时间尺度但名义 <span class="math inline">\(C,d,R\)</span> 的名义 GPFA</td>
+<td>已知名义</td>
+<td>回顾性</td>
+</tr>
+<tr class="even">
+<td><code>selected_gpfa</code></td>
+<td>已知名义 <span class="math inline">\(C,d,R\)</span> 与有限网格所选时间尺度的 GPFA</td>
+<td>训练/验证</td>
+<td>回顾性</td>
+</tr>
+<tr class="odd">
+<td><code>wrong_timescale_gpfa</code></td>
+<td>公共短时间尺度平方指数对照</td>
+<td>固定错误</td>
+<td>回顾性</td>
+</tr>
+<tr class="even">
+<td><code>wrong_ar_gpfa</code></td>
+<td>单时滞匹配 AR 协方差下的批量高斯条件化</td>
+<td>固定错误族</td>
+<td>回顾性</td>
+</tr>
+<tr class="odd">
+<td><code>ar_kalman_filter</code></td>
+<td>递归 AR 状态估计</td>
+<td>已知名义 AR 近似</td>
+<td>在线</td>
+</tr>
+<tr class="even">
+<td><code>ar_rts_smoother</code></td>
+<td>相同 AR 近似下的固定区间平滑器</td>
+<td>已知名义 AR 近似</td>
+<td>回顾性</td>
+</tr>
+<tr class="odd">
+<td><code>exact_gaussian_oracle</code></td>
+<td>直接真场景有限高斯参考</td>
+<td>真场景</td>
+<td>神谕回顾性</td>
+</tr>
+</tbody>
+</table>
+<p>在线、回顾性、静态与神谕信息集保持分离。特别地，RTS 平滑器与所有 GP 路径后验使用保留试次内的未来观测，不是卡尔曼滤波器的在线竞争者。<code>wrong_ar_gpfa</code> 与 <code>ar_rts_smoother</code> 共享相同 AR 协方差目标，但分别使用批量与递归计算；其一致是实现关系，不是 AR 族生成数据的证据。</p>
+<p>已知与所选 GPFA 变体保持观测载荷、偏移与名义对角残差协方差固定。因此它们检验时间协方差与推断，而非完整 GPFA 参数学习。在相关残差与变点下，<code>known_gpfa</code> 指已知<strong>名义</strong>参数，而 <code>exact_gaussian_oracle</code> 包含真实场景协方差。</p>
+</section>
+<section id="参数选择" class="level2">
+<h2 class="anchored" data-anchor-id="参数选择">参数选择</h2>
+<p>所选 GPFA 从七个有序对选择：</p>
+<p><span class="math display">\[
+(0.07,0.22), (0.07,0.32), (0.10,0.22), (0.10,0.32),
+(0.10,0.45), (0.16,0.32), (0.16,0.45).
+\]</span></p>
+<p>每个候选由总训练加验证边际高斯 NLL 评分；并列按有序对打破。所选状态与其验证 NLL 在测试推断前冻结。网格包含名义不同对，但不包含每个场景真值：例如 <span class="math inline">\((0.18,0.24)\)</span> 与 <span class="math inline">\((0.20,0.20)\)</span> 都不可用。<code>timescale_l1</code> 是外部固定载荷坐标约定下的未归一化诊断 <span class="math inline">\(|\hat\tau_1-\tau_1|+|\hat\tau_2-\tau_2|\)</span>。它不是生物时间尺度误差、优化器一致性主张或相等核下的坐标辨识结果。</p>
+</section>
+<section id="推断" class="level2">
+<h2 class="anchored" data-anchor-id="推断">推断</h2>
+<p>对掩蔽观测预测，<code>static_factor</code> 把时间箱当作独立，并在每个箱用可见通道条件化训练拟合秩二高斯观测模型。它可以借用同箱跨通道协方差，但没有跨时间插值。其潜输出同样是仅从可见通道计算的独立箱因子后验均值；它不使用隐藏目标，不是时间平滑路径后验。</p>
+<p>两阶段方法用训练均值填充掩蔽条目、投影到两个静态得分，并用所选平方指数协方差平滑每个得分。其隐藏观测预测方差是训练拟合静态残差协方差的对角，在测试评分前冻结。独立通道方法只在其自身可见时间条件化每个通道，因此无法借用其他通道恢复完全隐藏通道。</p>
+<p>GPFA 式方法使用有限稠密高斯条件化。AR 滤波器只使用到当前时间为止的观测，而 RTS 与批量 AR 条件化使用完整声明区间。每个试次从其自身先验开始；没有状态跨试次携带。</p>
+<p>对 <code>static_factor</code> 与 <code>two_stage_pca_smooth</code>，在每个场景重复内从所有训练试次估计与训练潜真值拟合一个正交评分旋转。该重复级旋转随后被冻结并原样应用于每个测试试次。它永不在测试真值上重拟合。已知层 GPFA 与 AR 方法保留其声明坐标，不接收拟合旋转。该评分约定处理学习静态/两阶段估计的更宽坐标歧义，但不对推断可用，也不确立唯一潜坐标。报告逐点覆盖使用原模型提供的插件边际方差；它省略参数选择不确定性，只是有界诊断，尤其相等核或误设下。</p>
+</section>
+<section id="评分" class="level2">
+<h2 class="anchored" data-anchor-id="评分">评分</h2>
+<p>每个原始行具有度量特定 <code>provenance</code> 与 <code>target</code> 元数据。产物精确发出以下十个度量：</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>度量</th>
+<th>出处</th>
+<th>目标与定义</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>marginal_nll_per_entry</code></td>
+<td><code>test</code></td>
+<td>留出观测分布。联合高斯方法评分完整测试试次；在线 AR 滤波器使用顺序可见条目创新 NLL。这些不同信息/规程行不被并入一个排名</td>
+</tr>
+<tr class="even">
+<td><code>masked_prediction_rmse</code></td>
+<td><code>test</code></td>
+<td>被声明掩码从推断隐藏的完整观测上的 RMSE</td>
+</tr>
+<tr class="odd">
+<td><code>masked_prediction_nll_per_entry</code></td>
+<td><code>test</code></td>
+<td>方法提供条件尺度时隐藏观测上的高斯得分。两阶段方法使用训练拟合静态残差协方差对角，在测试前冻结；它不从隐藏测试残差估计其尺度</td>
+</tr>
+<tr class="even">
+<td><code>latent_rmse</code></td>
+<td><code>test</code></td>
+<td>仅评分正交对齐后验/得分均值对照保留潜路径的 RMSE</td>
+</tr>
+<tr class="odd">
+<td><code>latent_90_coverage</code></td>
+<td><code>test</code></td>
+<td>对具有声明后验方差方法的逐点边际 90% 插件区间覆盖</td>
+</tr>
+<tr class="even">
+<td><code>loading_subspace_angle_degrees</code></td>
+<td><code>fit_diagnostic</code></td>
+<td>训练拟合静态/两阶段秩二基与 <span class="math inline">\(\operatorname{col}(C)\)</span> 之间的最大主角度；已知层方法不接收零值恢复行</td>
+</tr>
+<tr class="odd">
+<td><code>timescale_l1</code></td>
+<td><code>fit_diagnostic</code></td>
+<td>固定坐标约定下所选对的 L1 差异</td>
+</tr>
+<tr class="even">
+<td><code>selected_combined_nll_per_entry</code></td>
+<td><code>fit_diagnostic</code></td>
+<td>所选时间尺度候选的每条目组合训练加验证高斯 NLL；这是实际选择准则，不是仅验证得分</td>
+</tr>
+<tr class="odd">
+<td><code>covariance_relative_frobenius</code></td>
+<td><code>fit_diagnostic</code></td>
+<td>候选有限观测协方差对声明有限高斯场景协方差。它对泊松与抖动场景不适用，而非与捏造协方差真值比较</td>
+</tr>
+<tr class="even">
+<td><code>posterior_mean_oracle_max_abs</code></td>
+<td><code>oracle_diagnostic</code></td>
+<td>已知 GPFA 协方差形式对精度形式后验均值的最大差异，只在名义已知 GPFA 是精确场景模型处</td>
+</tr>
+</tbody>
+</table>
+<p>对每个场景-重复-方法-度量键，相关留出试次、隐藏条目、时间点或拟合诊断先组合为一个重复级值。<code>diagnostics.json</code> 随后为每个场景 <span class="math inline">\(\times\)</span> 方法 <span class="math inline">\(\times\)</span> 度量组跨三个独立重复报告中位数、q10、q90、<code>ok</code> 率、失败率与适用性率。试次、时间箱、通道与隐藏条目不被当作独立重复。不同度量和不同信息集不被归一化、平均或一起排名。</p>
+</section>
+<section id="失效与适用性标签" class="level2">
+<h2 class="anchored" data-anchor-id="失效与适用性标签">失效与适用性标签</h2>
+<p><code>results.csv</code> 保留 12 场景、三重复、11 方法与十度量的完整笛卡尔积：3,960 个规范行。适用性在推断或评分失败前解决。每行恰好一个状态：</p>
+<ul>
+<li><code>ok</code>：声明计算下适用且有限；</li>
+<li><code>nonconvergence</code>：线性代数或有界数值规程失败；</li>
+<li><code>invalid</code>：畸形、缺失、非有限或其他无效输出；</li>
+<li><code>inapplicable</code>：方法或场景不定义目标。</li>
+</ul>
+<p>每个非 <code>ok</code> 行具有机器可读原因且无数值。自然执行产生 2,049 <code>ok</code>、1,911 <code>inapplicable</code>、零 <code>nonconvergence</code> 与零 <code>invalid</code> 行。该缺失不是数值失败不可能的证据；验证器单独故障注入线性代数与非有限失败并检查其标签。</p>
+<p>有原则不适用示例包括：均值或独立通道参考无潜轨迹、确定性静态/两阶段估计无潜覆盖、已知层方法无学习载荷目标、泊松/抖动/有信息掩码无精确高斯神谕，以及泊松或抖动无有限高斯协方差目标。</p>
+</section>
+<section id="产物契约" class="level2">
+<h2 class="anchored" data-anchor-id="产物契约">产物契约</h2>
+<p><code>benchmarks/artifacts/temporal-covariance-inference/</code> 精确包含：</p>
+<pre class="text"><code>manifest.json
+results.csv
+diagnostics.json
+summary.png</code></pre>
+<p>清单冻结生成器、场景、方法、度量、划分大小、种子映射、选择网格、能力边界、状态词汇、规范行排序、严格恢复语义、命令、运行时、Phase 3 源摘要与 SHA-256 哈希。图是目标分离诊断视图，不是验收证据或排行榜。</p>
+</section>
+<section id="结果" class="level2">
+<h2 class="anchored" data-anchor-id="结果">结果</h2>
+<p>以下是有界 q10/中位数/q90 摘要，跨三个重复。它们描述该模拟器，不能确立一般方法顺序。</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>场景与目标</th>
+<th>方法</th>
+<th style="text-align: right;">q10</th>
+<th style="text-align: right;">中位数</th>
+<th style="text-align: right;">q90</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>参考掩蔽观测 RMSE</td>
+<td>均值对角</td>
+<td style="text-align: right;">0.7530</td>
+<td style="text-align: right;">0.8646</td>
+<td style="text-align: right;">0.9850</td>
+</tr>
+<tr class="even">
+<td>参考掩蔽观测 RMSE</td>
+<td>静态因子</td>
+<td style="text-align: right;">0.6091</td>
+<td style="text-align: right;">0.6261</td>
+<td style="text-align: right;">0.7862</td>
+</tr>
+<tr class="odd">
+<td>参考掩蔽观测 RMSE</td>
+<td>已知 GPFA</td>
+<td style="text-align: right;">0.5058</td>
+<td style="text-align: right;">0.5226</td>
+<td style="text-align: right;">0.5577</td>
+</tr>
+<tr class="even">
+<td>参考掩蔽观测 RMSE</td>
+<td>所选 GPFA</td>
+<td style="text-align: right;">0.5058</td>
+<td style="text-align: right;">0.5226</td>
+<td style="text-align: right;">0.5577</td>
+</tr>
+<tr class="odd">
+<td>参考掩蔽观测 RMSE</td>
+<td>错误公共时间尺度</td>
+<td style="text-align: right;">0.5754</td>
+<td style="text-align: right;">0.5868</td>
+<td style="text-align: right;">0.6102</td>
+</tr>
+<tr class="even">
+<td>参考掩蔽观测 RMSE</td>
+<td>错误 AR 协方差</td>
+<td style="text-align: right;">0.5161</td>
+<td style="text-align: right;">0.5666</td>
+<td style="text-align: right;">0.5795</td>
+</tr>
+<tr class="odd">
+<td>参考潜 RMSE，回顾性</td>
+<td>已知 GPFA</td>
+<td style="text-align: right;">0.2338</td>
+<td style="text-align: right;">0.2572</td>
+<td style="text-align: right;">0.2711</td>
+</tr>
+<tr class="even">
+<td>参考潜 RMSE，回顾性</td>
+<td>RTS 平滑器</td>
+<td style="text-align: right;">0.2580</td>
+<td style="text-align: right;">0.2741</td>
+<td style="text-align: right;">0.2796</td>
+</tr>
+<tr class="odd">
+<td>参考潜 RMSE，回顾性</td>
+<td>两阶段 PCA + 平滑</td>
+<td style="text-align: right;">0.5243</td>
+<td style="text-align: right;">0.5455</td>
+<td style="text-align: right;">0.6454</td>
+</tr>
+<tr class="even">
+<td>参考潜 RMSE，在线</td>
+<td>AR 卡尔曼滤波器</td>
+<td style="text-align: right;">0.3289</td>
+<td style="text-align: right;">0.3359</td>
+<td style="text-align: right;">0.4239</td>
+</tr>
+</tbody>
+</table>
+<p>在线与回顾性行带显式标签显示，不是同一排名。在参考场景中，所有三个所选 GPFA 重复选择名义对 <span class="math inline">\((0.10,0.32)\)</span>，因此所选与已知结果重合。这是一个有限网格结果，不是一般超参数恢复。</p>
+<p>掩码特定边界保持可见。对完全隐藏通道，已知 GPFA 中位预测 RMSE 为 0.4768，而无跨通道独立 GP 中位为 0.9267。对完全隐藏时间块，已知 GPFA 为 0.6892，回顾性 AR 平滑器为 0.7597。这些差异以其协方差族与声明掩码为条件。</p>
+<p>选择在其他网格下变得不那么精确：中位 <code>timescale_l1</code> 对接近时间尺度为 0.10、低试次数为 0.10、高试次数为 0.00、相等核为 0.16。相等核值主要记录固定候选网格与 <span class="math inline">\((0.20,0.20)\)</span> 的失配；它不辨识有序潜轴。</p>
+<p>压力场景区分名义与场景感知参考。在协方差变点下，名义已知 GPFA 中位潜 RMSE 为 0.3814，而真实块协方差高斯神谕为 0.3189。在相关残差下，名义已知 GPFA 中位留出高斯 NLL 为每条目 0.9550，真实残差协方差神谕为 0.9364。这些是场景特定误设诊断。</p>
+<p>原始低率泊松计数是更严重观测族违反：名义已知 GPFA 中位潜 RMSE 为 1.0815，其名义逐点 90% 覆盖为 0.3750。这些高斯数是近似诊断，不是校准计数模型评估。在有信息缺失下，已知 GPFA 中位隐藏观测 RMSE 为 0.7129，独立通道 GP 为 1.3320；掩码不可忽略，因此两个值都不验证普通随机缺失条件化。</p>
+<p>最大适用已知 GPFA 协方差形式对精度形式后验均值差异约为 <span class="math inline">\(3.12\times10^{-10}\)</span>。独立 AR 递归对批量检查均值低于 <span class="math inline">\(1.0\times10^{-10}\)</span>、边际方差低于 <span class="math inline">\(4.0\times10^{-11}\)</span>。这些是实现检查，不是科学表现得分。</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="../../benchmarks/artifacts/temporal-covariance-inference/summary.png" class="img-fluid figure-img"></p>
+<figcaption>目标特定时序协方差摘要</figcaption>
+</figure>
+</div>
+<p>图有六个分离面板：静态信息集参考掩蔽预测；回顾性参考掩蔽预测；在线参考潜 RMSE；回顾性参考潜 RMSE；神谕回顾性参考掩蔽预测；以及接近时间尺度选择诊断。它不显示有信息缺失、不组合在线与回顾性方法，也不构造池化总分。</p>
+</section>
+<section id="解读界限" class="level2">
+<h2 class="anchored" data-anchor-id="解读界限">解读界限</h2>
+<p>该基准只确立场景、目标、信息集、度量与实现条件行为。</p>
+<ul>
+<li>光滑 GPFA 或 RTS 后验均值不是学习转移方程、向量场、流或测量机制。</li>
+<li>GPFA 协方差核与 AR/LGSSM 转移可以产生视觉相似估计，同时作出不同时间假设。</li>
+<li>在线滤波器不能像拥有平滑器未来观测那样排名；精确神谕不能被当作可部署。</li>
+<li>已知/所选 GPFA 保持观测层固定，因此不检验一般全参数 GPFA 学习。</li>
+<li>在训练真值上拟合一次并冻结用于测试评分的重复级 Procrustes 旋转不辨识潜坐标。相等核保留特别重要的旋转歧义。</li>
+<li>插件区间省略参数与模型选择不确定性。泊松、残差相关、变点、抖动或有信息掩码误设下的覆盖是描述性的，不是校准保证。</li>
+<li>原始泊松计数上的高斯 NLL 不是计数似然。有信息缺失下的普通条件化不建模缺失过程。</li>
+<li>更低预测或潜误差不证明表示、机制、因果性、本征维数、流形结构、生物有效性或真实数据迁移。</li>
+</ul>
+<p>没有结果授权跨任务总分、普遍胜者、P4-U04 工作、Phase 5 工作或真实数据主张。</p>
+</section>
+<section id="可复现性" class="level2">
+<h2 class="anchored" data-anchor-id="可复现性">可复现性</h2>
+<p>用捆绑工作区 Python 运行时生成与验证：</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">/Users/bytedance/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3</span> benchmarks/temporal-covariance-inference.py <span class="at">--generate</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="ex">/Users/bytedance/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3</span> benchmarks/temporal-covariance-inference.py <span class="at">--verify</span></span></code></pre></div><button title="复制到剪贴板" class="code-copy-button"><i class="bi"></i></button></div>
+<p>验证器检查：</p>
+<ul>
+<li>精确四文件产物清单与 SHA-256 哈希；</li>
+<li>全部 3,960 预期唯一行、规范排序与重算摘要；</li>
+<li>逐字节相同干净再生与反转场景/重复遍历；</li>
+<li>逐字节相同有效部分恢复，并拒绝损坏、陈旧、重复、未知键或不完整部分行；</li>
+<li>拟合/选择与冻结推断能力边界；</li>
+<li>测试观测与潜真值投毒不可变性；</li>
+<li>协方差形式对精度形式 GP 后验一致；</li>
+<li>递归 RTS 对直接 AR 批量一致与真场景神谕协方差接线；以及</li>
+<li>非有限与线性代数故障注入下的显式 <code>invalid</code>/<code>nonconvergence</code> 标签。</li>
+</ul>
+<p>系统 <code>python3</code> 不是记录数值运行时；可复现命令刻意使用写入 <code>manifest.json</code> 的捆绑可执行。</p>
+</section>
+<section id="审查记录" class="level2">
+<h2 class="anchored" data-anchor-id="审查记录">审查记录</h2>
+<p>独立科学与实现审查员是只读且独立于执行者。其初始审查在静态因子隐藏掩码公平性、产物调和、冻结训练对齐、选择语义、源出处、扩展场景神谕与真实路径故障路由上返回 <code>REVISE</code>。有界修正轮次只处理那些发现；聚焦科学与实现复审都返回 <code>PASS</code>，无未解决发现。</p>
+<p>已接受验证记录包括 60 对象结构验证、33 仓库测试、完整产物验证器、目标/索引渲染、工作流验证与 <code>git diff --check</code>。记录的审查决定随后授权机械晋升到 <code>L1/stable</code>。稳定状态记录该声明合成基准对象的有界验收；它不扩大其证据、信息集、目标或解读边界。</p>
+</section>
+<section id="成熟度检查表" class="level2">
+<h2 class="anchored" data-anchor-id="成熟度检查表">成熟度检查表</h2>
+<ul class="task-list">
+<li><label><input type="checkbox" checked="">时序生成器与全部 12 场景有界且显式。</label></li>
+<li><label><input type="checkbox" checked="">高斯、相关高斯与原始泊松观测族被区分。</label></li>
+<li><label><input type="checkbox" checked="">训练、验证、测试、静态、在线、回顾性与神谕信息集被标记。</label></li>
+<li><label><input type="checkbox" checked="">已知、所选、名义错误、错误族与真场景参数被区分。</label></li>
+<li><label><input type="checkbox" checked="">生成、拟合/选择、推断、掩蔽与评分具有单独能力契约。</label></li>
+<li><label><input type="checkbox" checked="">声明度量特定出处、目标、适用性与两级摘要，无池化得分。</label></li>
+<li><label><input type="checkbox" checked="">保留全部 3,960 原始行与精确四个字节可验证产物。</label></li>
+<li><label><input type="checkbox" checked="">完整产物验证通过。</label></li>
+<li><label><input type="checkbox" checked="">记录验证有界结果与解读界限。</label></li>
+<li><label><input type="checkbox" checked="">记录聚焦科学复审 PASS。</label></li>
+<li><label><input type="checkbox" checked="">记录独立实现审查 PASS。</label></li>
+<li><label><input type="checkbox" checked="">审查授权机械晋升到 <code>L1/stable</code> 完成。</label></li>
+</ul>
+
+
+<!-- -->
+
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "已复制");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "已复制");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+    const viewSource = window.document.getElementById('quarto-view-source') ||
+                       window.document.getElementById('quarto-code-tools-source');
+    if (viewSource) {
+      const sourceUrl = viewSource.getAttribute("data-quarto-source-url");
+      viewSource.addEventListener("click", function(e) {
+        if (sourceUrl) {
+          // rstudio viewer pane
+          if (/\bcapabilities=\b/.test(window.location)) {
+            window.open(sourceUrl);
+          } else {
+            window.location.href = sourceUrl;
+          }
+        } else {
+          const modal = new bootstrap.Modal(document.getElementById('quarto-embedded-source-code-modal'));
+          modal.show();
+        }
+        return false;
+      });
+    }
+    function toggleCodeHandler(show) {
+      return function(e) {
+        const cellDetails = window.document.querySelectorAll(".cell details.code-fold");
+        for (let i=0; i<cellDetails.length; i++) {
+          const details = cellDetails[i];
+          if (show) {
+            details.open = true;
+          } else {
+            details.removeAttribute("open");
+          }
+        }
+        const cellCodeDivs = window.document.querySelectorAll(".cell div.sourceCode.cell-code");
+        const fromCls = show ? "hidden" : "unhidden";
+        const toCls = show ? "unhidden" : "hidden";
+        for (let i=0; i<cellCodeDivs.length; i++) {
+          const codeDiv = cellCodeDivs[i];
+          if (codeDiv.classList.contains(fromCls)) {
+            codeDiv.classList.remove(fromCls);
+            codeDiv.classList.add(toCls);
+          } 
+        }
+        return false;
+      }
+    }
+    const hideAllCode = window.document.getElementById("quarto-hide-all-code");
+    if (hideAllCode) {
+      hideAllCode.addEventListener("click", toggleCodeHandler(false));
+    }
+    const showAllCode = window.document.getElementById("quarto-show-all-code");
+    if (showAllCode) {
+      showAllCode.addEventListener("click", toggleCodeHandler(true));
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/abelzheng\.github\.io\/latent-dynamics-geometry-public\/");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+            // target, if specified
+            link.setAttribute("target", "_blank");
+            if (link.getAttribute("rel") === null) {
+              link.setAttribute("rel", "noopener");
+            }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">源代码</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3" data-shortcodes="false"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="an">title:</span><span class="co"> "P4-U03 — 时序协方差与推断基准测试"</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="an">lang:</span><span class="co"> zh-CN</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="an">comments:</span><span class="co"> false</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="an">object_type:</span><span class="co"> benchmark</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="an">maturity:</span><span class="co"> L1</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="an">status:</span><span class="co"> stable</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="an">domain:</span><span class="co"> [latent-modeling, temporal-modeling, gaussian-processes, state-space-models, benchmarking]</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="an">tags:</span><span class="co"> [gpfa, temporal-covariance, kalman-filter, rts-smoother, missing-data, misspecification, synthetic-ground-truth]</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="an">prerequisites:</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a><span class="co">- knowledge/methods/gaussian-process-factor-analysis.qmd</span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a><span class="co">- knowledge/methods/linear-gaussian-state-space-model.qmd</span></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a><span class="co">- knowledge/methods/kalman-filtering.qmd</span></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a><span class="co">- knowledge/methods/kalman-smoothing.qmd</span></span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a><span class="co">- toy-models/covariance-prior-trajectories.qmd</span></span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a><span class="an">related:</span></span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a><span class="co">- benchmarks/linear-gaussian-robustness.qmd</span></span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a><span class="co">- benchmarks/static-linear-latent-robustness.qmd</span></span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a><span class="an">created:</span><span class="co"> 2026-08-20</span></span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a><span class="an">updated:</span><span class="co"> 2026-08-20</span></span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a><span class="fu"># P4-U03 — 时序协方差与推断基准测试</span></span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a><span class="fu">## 科学问题</span></span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a>在一组有界双潜、六通道合成轨迹问题中，静态参考、两阶段平滑、已知与验证选择高斯过程因子分析（GPFA）、刻意错误时间协方差、单时滞匹配线性高斯状态空间推断与精确有限高斯神谕在声明信息集下何处适用、鲁棒或可观测地误设？</span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a>基准分离观测似然、掩蔽观测预测、潜路径评分、载荷子空间恢复、时间尺度选择、协方差拟合、后验校准与数值神谕一致。它不把它们组合为总分。光滑后验均值是协方差先验与观测模型下的条件估计；它不是学习转移律、向量场、物理轨迹、因果机制或动力学证明。</span>
+<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a><span class="fu">## 真值</span></span>
+<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a>每个试次在 $<span class="co">[</span><span class="ot">0,1</span><span class="co">]</span>$ 等距网格上有 $T=16$ 个点、潜维数 $q=2$、观测维数 $p=6$。在名义高斯族下，时间主序潜向量具有零均值与块对角坐标协方差。对坐标 $j$，</span>
+<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb3-36"><a href="#cb3-36" aria-hidden="true" tabindex="-1"></a>k_j(t,t')=(1-0.02)\exp\left<span class="co">[</span><span class="ot">-\frac{(t-t')^2}{2\tau_j^2}\right</span><span class="co">]</span></span>
+<span id="cb3-37"><a href="#cb3-37" aria-hidden="true" tabindex="-1"></a>+0.02\,\mathbf 1<span class="co">[</span><span class="ot">t=t'</span><span class="co">]</span>.</span>
+<span id="cb3-38"><a href="#cb3-38" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb3-39"><a href="#cb3-39" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-40"><a href="#cb3-40" aria-hidden="true" tabindex="-1"></a>名义不同时间尺度对是 $(\tau_1,\tau_2)=(0.10,0.32)$。观测层是</span>
+<span id="cb3-41"><a href="#cb3-41" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-42"><a href="#cb3-42" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb3-43"><a href="#cb3-43" aria-hidden="true" tabindex="-1"></a>y_t=Cz_t+d+\epsilon_t,</span>
+<span id="cb3-44"><a href="#cb3-44" aria-hidden="true" tabindex="-1"></a>\qquad \epsilon_t\sim\mathcal N(0,R),</span>
+<span id="cb3-45"><a href="#cb3-45" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb3-46"><a href="#cb3-46" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-47"><a href="#cb3-47" aria-hidden="true" tabindex="-1"></a>使用稳定协方差先验轨迹载荷矩阵、偏移与对角残差协方差：</span>
+<span id="cb3-48"><a href="#cb3-48" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-49"><a href="#cb3-49" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb3-50"><a href="#cb3-50" aria-hidden="true" tabindex="-1"></a>C=</span>
+<span id="cb3-51"><a href="#cb3-51" aria-hidden="true" tabindex="-1"></a>\begin{pmatrix}</span>
+<span id="cb3-52"><a href="#cb3-52" aria-hidden="true" tabindex="-1"></a>1.00&amp;0.25<span class="sc">\\</span></span>
+<span id="cb3-53"><a href="#cb3-53" aria-hidden="true" tabindex="-1"></a>0.70&amp;-0.45<span class="sc">\\</span></span>
+<span id="cb3-54"><a href="#cb3-54" aria-hidden="true" tabindex="-1"></a>0.30&amp;0.90<span class="sc">\\</span></span>
+<span id="cb3-55"><a href="#cb3-55" aria-hidden="true" tabindex="-1"></a>-0.65&amp;0.40<span class="sc">\\</span></span>
+<span id="cb3-56"><a href="#cb3-56" aria-hidden="true" tabindex="-1"></a>0.80&amp;0.55<span class="sc">\\</span></span>
+<span id="cb3-57"><a href="#cb3-57" aria-hidden="true" tabindex="-1"></a>-0.25&amp;-0.75</span>
+<span id="cb3-58"><a href="#cb3-58" aria-hidden="true" tabindex="-1"></a>\end{pmatrix},</span>
+<span id="cb3-59"><a href="#cb3-59" aria-hidden="true" tabindex="-1"></a>\quad</span>
+<span id="cb3-60"><a href="#cb3-60" aria-hidden="true" tabindex="-1"></a>d=(0.30,-0.20,0.15,0.05,-0.10,0.25)^\top,</span>
+<span id="cb3-61"><a href="#cb3-61" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb3-62"><a href="#cb3-62" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-63"><a href="#cb3-63" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb3-64"><a href="#cb3-64" aria-hidden="true" tabindex="-1"></a>R=\operatorname{diag}(0.10,0.16,0.22,0.30,0.38,0.48).</span>
+<span id="cb3-65"><a href="#cb3-65" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb3-66"><a href="#cb3-66" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-67"><a href="#cb3-67" aria-hidden="true" tabindex="-1"></a>整试次独立。没有潜先验、滤波状态、平滑器状态或拟合统计量跨试次边界。潜路径与完整隐藏观测保留在仅评分载荷中。稳定 <span class="in">`toy-models/covariance-prior-trajectories.py`</span> 对象为本基准提供科学与设计出处，其 SHA-256 摘要被记录并验证。基准不导入或调用该可执行源；其生成器、拟合、条件化、滤波、平滑、评分、产物与验证例程是基准本地的。它不编辑稳定 Phase 3 源，也不把其示例结果提升为一般主张。</span>
+<span id="cb3-68"><a href="#cb3-68" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-69"><a href="#cb3-69" aria-hidden="true" tabindex="-1"></a>压力生成器改变该真值的特定部分：</span>
+<span id="cb3-70"><a href="#cb3-70" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-71"><a href="#cb3-71" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`latent_changepoint`</span> 把每个潜坐标前半与后半之间的互协方差设为零，创建两个独立高斯时间段；精确神谕知道该块协方差，而名义 GPFA 不知道；</span>
+<span id="cb3-72"><a href="#cb3-72" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`correlated_residuals`</span> 保留名义残差方差，并给每个非对角对残差相关 $0.12$；</span>
+<span id="cb3-73"><a href="#cb3-73" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`low_rate_poisson`</span> 用 $\lambda_{tj}=\exp<span class="co">[</span><span class="ot">-2+0.35(Cz_t+d)_j</span><span class="co">]</span>$ 抽取原始计数，然后应用有界高斯分析而不假装高斯观测律正确；</span>
+<span id="cb3-74"><a href="#cb3-74" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`alignment_jitter`</span> 把每个采样潜路径移位 $-1$、$0$ 或 $1$ 箱，用最近保留值填充暴露边，仍分析名义网格；评分使用移位保留路径，因此这是有界先验/对齐扰动，而非关于未观测事件相对路径的恢复主张；以及</span>
+<span id="cb3-75"><a href="#cb3-75" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`informative_missingness`</span> 隐藏每个测试试次经验第 72 百分位之上的条目。普通推断路径忽略掩码中的信息。</span>
+<span id="cb3-76"><a href="#cb3-76" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-77"><a href="#cb3-77" aria-hidden="true" tabindex="-1"></a><span class="fu">## 生成</span></span>
+<span id="cb3-78"><a href="#cb3-78" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-79"><a href="#cb3-79" aria-hidden="true" tabindex="-1"></a>生成只接收场景、重复、划分、试次索引与确定性种子流。它抽取潜路径、应用场景特定观测族，并返回单独训练、验证与测试试次集合。掩码构造是后一阶段，永不变更冻结完整实现。</span>
+<span id="cb3-80"><a href="#cb3-80" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-81"><a href="#cb3-81" aria-hidden="true" tabindex="-1"></a>名义、接近时间尺度、样本量、变点、相关残差、泊松、相等核与抖动场景使用混合掩蔽预测设计，除非掩码被显式命名：交替测试试次隐藏一个完整通道或序列中间三分之一的所有通道。<span class="in">`channel_mask`</span> 场景在每个测试试次隐藏一个完整通道；<span class="in">`time_block_mask`</span> 场景在索引 5–9 隐藏所有通道；<span class="in">`informative_missingness`</span> 使用上述依赖值规则。</span>
+<span id="cb3-82"><a href="#cb3-82" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-83"><a href="#cb3-83" aria-hidden="true" tabindex="-1"></a><span class="fu">## 场景网格</span></span>
+<span id="cb3-84"><a href="#cb3-84" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-85"><a href="#cb3-85" aria-hidden="true" tabindex="-1"></a>核心加压力网格有 12 个预先声明场景，每场景三个独立重复。划分大小是独立试次数，写作训练/验证/测试。</span>
+<span id="cb3-86"><a href="#cb3-86" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-87"><a href="#cb3-87" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> 场景 <span class="pp">|</span> 类 <span class="pp">|</span> 划分大小 <span class="pp">|</span> 声明变化 <span class="pp">|</span></span>
+<span id="cb3-88"><a href="#cb3-88" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|---:|---|</span></span>
+<span id="cb3-89"><a href="#cb3-89" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`reference_distinct`</span> <span class="pp">|</span> 时间尺度分离 <span class="pp">|</span> 5/3/3 <span class="pp">|</span> 平方指数 $(0.10,0.32)$ <span class="pp">|</span></span>
+<span id="cb3-90"><a href="#cb3-90" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`close_timescales`</span> <span class="pp">|</span> 时间尺度分离 <span class="pp">|</span> 5/3/3 <span class="pp">|</span> $(0.18,0.24)$ <span class="pp">|</span></span>
+<span id="cb3-91"><a href="#cb3-91" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`low_trial_count`</span> <span class="pp">|</span> 试次/样本量 <span class="pp">|</span> 2/1/2 <span class="pp">|</span> 更少独立试次 <span class="pp">|</span></span>
+<span id="cb3-92"><a href="#cb3-92" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`high_trial_count`</span> <span class="pp">|</span> 试次/样本量 <span class="pp">|</span> 8/4/4 <span class="pp">|</span> 更多独立试次 <span class="pp">|</span></span>
+<span id="cb3-93"><a href="#cb3-93" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`channel_mask`</span> <span class="pp">|</span> 缺失通道 <span class="pp">|</span> 5/3/3 <span class="pp">|</span> 每个测试试次隐藏一个完整通道 <span class="pp">|</span></span>
+<span id="cb3-94"><a href="#cb3-94" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`time_block_mask`</span> <span class="pp">|</span> 缺失时间块 <span class="pp">|</span> 5/3/3 <span class="pp">|</span> 索引 5–9 隐藏所有通道 <span class="pp">|</span></span>
+<span id="cb3-95"><a href="#cb3-95" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`latent_changepoint`</span> <span class="pp">|</span> 时间非平稳性 <span class="pp">|</span> 5/3/3 <span class="pp">|</span> 独立前后高斯协方差块 <span class="pp">|</span></span>
+<span id="cb3-96"><a href="#cb3-96" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`correlated_residuals`</span> <span class="pp">|</span> 观测协方差 <span class="pp">|</span> 5/3/3 <span class="pp">|</span> 非对角高斯残差协方差 <span class="pp">|</span></span>
+<span id="cb3-97"><a href="#cb3-97" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`low_rate_poisson`</span> <span class="pp">|</span> 观测族误设 <span class="pp">|</span> 5/3/3 <span class="pp">|</span> 原始低率泊松计数 <span class="pp">|</span></span>
+<span id="cb3-98"><a href="#cb3-98" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`equal_kernels`</span> <span class="pp">|</span> 时间可辨识性 <span class="pp">|</span> 5/3/3 <span class="pp">|</span> $(0.20,0.20)$ <span class="pp">|</span></span>
+<span id="cb3-99"><a href="#cb3-99" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`alignment_jitter`</span> <span class="pp">|</span> 对齐压力 <span class="pp">|</span> 5/3/3 <span class="pp">|</span> 种子推导 $-1/0/1$ 箱移位与边填充 <span class="pp">|</span></span>
+<span id="cb3-100"><a href="#cb3-100" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`informative_missingness`</span> <span class="pp">|</span> 不可忽略掩码 <span class="pp">|</span> 5/3/3 <span class="pp">|</span> 隐藏上尾观测值 <span class="pp">|</span></span>
+<span id="cb3-101"><a href="#cb3-101" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-102"><a href="#cb3-102" aria-hidden="true" tabindex="-1"></a>这不是因子设计。时间尺度、划分大小、观测律、残差协方差与掩码几何的变化是场景级干预；场景摘要之间差异不隔离单一因素的因果效应。</span>
+<span id="cb3-103"><a href="#cb3-103" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-104"><a href="#cb3-104" aria-hidden="true" tabindex="-1"></a><span class="fu">## 阴性对照与压力情形</span></span>
+<span id="cb3-105"><a href="#cb3-105" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-106"><a href="#cb3-106" aria-hidden="true" tabindex="-1"></a>两个协方差误设保留在每个场景中：</span>
+<span id="cb3-107"><a href="#cb3-107" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-108"><a href="#cb3-108" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span><span class="in">`wrong_timescale_gpfa`</span> 固定公共平方指数对 $(0.06,0.06)$；以及</span>
+<span id="cb3-109"><a href="#cb3-109" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span><span class="in">`wrong_ar_gpfa`</span> 用单时滞系数从每个声明时间尺度推导的 AR(1) 协方差替换平方指数族。</span>
+<span id="cb3-110"><a href="#cb3-110" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-111"><a href="#cb3-111" aria-hidden="true" tabindex="-1"></a>相同 AR 族提供在线卡尔曼滤波器与回顾性 RTS 平滑器。匹配单时滞协方差不使其更长时滞衰减等于平方指数核。变点、相关残差、泊松、相等核、抖动与有信息掩码场景也作为结构化假设失败保留。没有场景在看到结果后被调走。</span>
+<span id="cb3-112"><a href="#cb3-112" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-113"><a href="#cb3-113" aria-hidden="true" tabindex="-1"></a>精确高斯神谕只在场景具有有限高斯观测律、无抖动构造与可忽略掩码时发出。它适用处使用真实相关残差或变点协方差。对泊松、抖动与有信息缺失场景，它缺失——而非被赋予捏造得分。</span>
+<span id="cb3-114"><a href="#cb3-114" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-115"><a href="#cb3-115" aria-hidden="true" tabindex="-1"></a><span class="fu">## 重复与确定性种子</span></span>
+<span id="cb3-116"><a href="#cb3-116" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-117"><a href="#cb3-117" aria-hidden="true" tabindex="-1"></a>每个场景三个独立重复。试次抽取在训练、验证与测试内与之间独立。随机流使用 <span class="in">`PCG64(SeedSequence(...))`</span>，带主种子 <span class="in">`20260820`</span>、SHA-256 推导场景代码、重复、阶段、划分代码与试次索引。映射独立于遍历顺序。</span>
+<span id="cb3-118"><a href="#cb3-118" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-119"><a href="#cb3-119" aria-hidden="true" tabindex="-1"></a>三个重复只支持有界描述性摘要。报告 q10 与 q90 是三个重复级值的插值分位数，不是置信区间、不确定性带或稳定尾部估计。</span>
+<span id="cb3-120"><a href="#cb3-120" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-121"><a href="#cb3-121" aria-hidden="true" tabindex="-1"></a><span class="fu">## 划分纪律</span></span>
+<span id="cb3-122"><a href="#cb3-122" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-123"><a href="#cb3-123" aria-hidden="true" tabindex="-1"></a>合法拟合接口只接受训练与验证观测元组。训练观测拟合静态因子/PCA 状态与通道均值和方差。每个预先声明时间尺度候选由**组合总训练加验证边际 NLL** 评分；仅验证分量也作为诊断保留。选择与拟合接口没有测试或潜真值参数。</span>
+<span id="cb3-124"><a href="#cb3-124" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-125"><a href="#cb3-125" aria-hidden="true" tabindex="-1"></a>第二接口接收冻结状态加测试观测与掩码。它在不访问训练/验证数组或真值的情况下执行测试时间滤波、平滑、条件化或确定性恢复。只有评分阶段加入潜路径、完整隐藏观测、场景协方差或载荷真值。投毒检查要求被排除测试观测与潜真值使拟合状态与固定观测恢复不变，而允许的训练扰动必须改变拟合状态。</span>
+<span id="cb3-126"><a href="#cb3-126" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-127"><a href="#cb3-127" aria-hidden="true" tabindex="-1"></a><span class="fu">## 方法与信息集</span></span>
+<span id="cb3-128"><a href="#cb3-128" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-129"><a href="#cb3-129" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> 方法 <span class="pp">|</span> 角色 <span class="pp">|</span> 参数 <span class="pp">|</span> 信息集 <span class="pp">|</span></span>
+<span id="cb3-130"><a href="#cb3-130" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|---|---|</span></span>
+<span id="cb3-131"><a href="#cb3-131" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`mean_diagonal`</span> <span class="pp">|</span> 独立观测参考 <span class="pp">|</span> 训练均值/方差 <span class="pp">|</span> 静态观测 <span class="pp">|</span></span>
+<span id="cb3-132"><a href="#cb3-132" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`static_factor`</span> <span class="pp">|</span> 池化箱秩二 PCA/因子参考 <span class="pp">|</span> 训练 <span class="pp">|</span> 静态观测 <span class="pp">|</span></span>
+<span id="cb3-133"><a href="#cb3-133" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`two_stage_pca_smooth`</span> <span class="pp">|</span> 静态 PCA 得分后接逐坐标 GP 平滑 <span class="pp">|</span> 训练状态加所选时间尺度 <span class="pp">|</span> 回顾性 <span class="pp">|</span></span>
+<span id="cb3-134"><a href="#cb3-134" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`independent_channel_gp`</span> <span class="pp">|</span> 无跨通道借用的逐通道时间插值 <span class="pp">|</span> 训练均值/方差加均值所选时间尺度 <span class="pp">|</span> 回顾性 <span class="pp">|</span></span>
+<span id="cb3-135"><a href="#cb3-135" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`known_gpfa`</span> <span class="pp">|</span> 声明场景时间尺度但名义 $C,d,R$ 的名义 GPFA <span class="pp">|</span> 已知名义 <span class="pp">|</span> 回顾性 <span class="pp">|</span></span>
+<span id="cb3-136"><a href="#cb3-136" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`selected_gpfa`</span> <span class="pp">|</span> 已知名义 $C,d,R$ 与有限网格所选时间尺度的 GPFA <span class="pp">|</span> 训练/验证 <span class="pp">|</span> 回顾性 <span class="pp">|</span></span>
+<span id="cb3-137"><a href="#cb3-137" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`wrong_timescale_gpfa`</span> <span class="pp">|</span> 公共短时间尺度平方指数对照 <span class="pp">|</span> 固定错误 <span class="pp">|</span> 回顾性 <span class="pp">|</span></span>
+<span id="cb3-138"><a href="#cb3-138" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`wrong_ar_gpfa`</span> <span class="pp">|</span> 单时滞匹配 AR 协方差下的批量高斯条件化 <span class="pp">|</span> 固定错误族 <span class="pp">|</span> 回顾性 <span class="pp">|</span></span>
+<span id="cb3-139"><a href="#cb3-139" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`ar_kalman_filter`</span> <span class="pp">|</span> 递归 AR 状态估计 <span class="pp">|</span> 已知名义 AR 近似 <span class="pp">|</span> 在线 <span class="pp">|</span></span>
+<span id="cb3-140"><a href="#cb3-140" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`ar_rts_smoother`</span> <span class="pp">|</span> 相同 AR 近似下的固定区间平滑器 <span class="pp">|</span> 已知名义 AR 近似 <span class="pp">|</span> 回顾性 <span class="pp">|</span></span>
+<span id="cb3-141"><a href="#cb3-141" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`exact_gaussian_oracle`</span> <span class="pp">|</span> 直接真场景有限高斯参考 <span class="pp">|</span> 真场景 <span class="pp">|</span> 神谕回顾性 <span class="pp">|</span></span>
+<span id="cb3-142"><a href="#cb3-142" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-143"><a href="#cb3-143" aria-hidden="true" tabindex="-1"></a>在线、回顾性、静态与神谕信息集保持分离。特别地，RTS 平滑器与所有 GP 路径后验使用保留试次内的未来观测，不是卡尔曼滤波器的在线竞争者。<span class="in">`wrong_ar_gpfa`</span> 与 <span class="in">`ar_rts_smoother`</span> 共享相同 AR 协方差目标，但分别使用批量与递归计算；其一致是实现关系，不是 AR 族生成数据的证据。</span>
+<span id="cb3-144"><a href="#cb3-144" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-145"><a href="#cb3-145" aria-hidden="true" tabindex="-1"></a>已知与所选 GPFA 变体保持观测载荷、偏移与名义对角残差协方差固定。因此它们检验时间协方差与推断，而非完整 GPFA 参数学习。在相关残差与变点下，<span class="in">`known_gpfa`</span> 指已知**名义**参数，而 <span class="in">`exact_gaussian_oracle`</span> 包含真实场景协方差。</span>
+<span id="cb3-146"><a href="#cb3-146" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-147"><a href="#cb3-147" aria-hidden="true" tabindex="-1"></a><span class="fu">## 参数选择</span></span>
+<span id="cb3-148"><a href="#cb3-148" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-149"><a href="#cb3-149" aria-hidden="true" tabindex="-1"></a>所选 GPFA 从七个有序对选择：</span>
+<span id="cb3-150"><a href="#cb3-150" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-151"><a href="#cb3-151" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb3-152"><a href="#cb3-152" aria-hidden="true" tabindex="-1"></a>(0.07,0.22), (0.07,0.32), (0.10,0.22), (0.10,0.32),</span>
+<span id="cb3-153"><a href="#cb3-153" aria-hidden="true" tabindex="-1"></a>(0.10,0.45), (0.16,0.32), (0.16,0.45).</span>
+<span id="cb3-154"><a href="#cb3-154" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb3-155"><a href="#cb3-155" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-156"><a href="#cb3-156" aria-hidden="true" tabindex="-1"></a>每个候选由总训练加验证边际高斯 NLL 评分；并列按有序对打破。所选状态与其验证 NLL 在测试推断前冻结。网格包含名义不同对，但不包含每个场景真值：例如 $(0.18,0.24)$ 与 $(0.20,0.20)$ 都不可用。<span class="in">`timescale_l1`</span> 是外部固定载荷坐标约定下的未归一化诊断 $|\hat\tau_1-\tau_1|+|\hat\tau_2-\tau_2|$。它不是生物时间尺度误差、优化器一致性主张或相等核下的坐标辨识结果。</span>
+<span id="cb3-157"><a href="#cb3-157" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-158"><a href="#cb3-158" aria-hidden="true" tabindex="-1"></a><span class="fu">## 推断</span></span>
+<span id="cb3-159"><a href="#cb3-159" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-160"><a href="#cb3-160" aria-hidden="true" tabindex="-1"></a>对掩蔽观测预测，<span class="in">`static_factor`</span> 把时间箱当作独立，并在每个箱用可见通道条件化训练拟合秩二高斯观测模型。它可以借用同箱跨通道协方差，但没有跨时间插值。其潜输出同样是仅从可见通道计算的独立箱因子后验均值；它不使用隐藏目标，不是时间平滑路径后验。</span>
+<span id="cb3-161"><a href="#cb3-161" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-162"><a href="#cb3-162" aria-hidden="true" tabindex="-1"></a>两阶段方法用训练均值填充掩蔽条目、投影到两个静态得分，并用所选平方指数协方差平滑每个得分。其隐藏观测预测方差是训练拟合静态残差协方差的对角，在测试评分前冻结。独立通道方法只在其自身可见时间条件化每个通道，因此无法借用其他通道恢复完全隐藏通道。</span>
+<span id="cb3-163"><a href="#cb3-163" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-164"><a href="#cb3-164" aria-hidden="true" tabindex="-1"></a>GPFA 式方法使用有限稠密高斯条件化。AR 滤波器只使用到当前时间为止的观测，而 RTS 与批量 AR 条件化使用完整声明区间。每个试次从其自身先验开始；没有状态跨试次携带。</span>
+<span id="cb3-165"><a href="#cb3-165" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-166"><a href="#cb3-166" aria-hidden="true" tabindex="-1"></a>对 <span class="in">`static_factor`</span> 与 <span class="in">`two_stage_pca_smooth`</span>，在每个场景重复内从所有训练试次估计与训练潜真值拟合一个正交评分旋转。该重复级旋转随后被冻结并原样应用于每个测试试次。它永不在测试真值上重拟合。已知层 GPFA 与 AR 方法保留其声明坐标，不接收拟合旋转。该评分约定处理学习静态/两阶段估计的更宽坐标歧义，但不对推断可用，也不确立唯一潜坐标。报告逐点覆盖使用原模型提供的插件边际方差；它省略参数选择不确定性，只是有界诊断，尤其相等核或误设下。</span>
+<span id="cb3-167"><a href="#cb3-167" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-168"><a href="#cb3-168" aria-hidden="true" tabindex="-1"></a><span class="fu">## 评分</span></span>
+<span id="cb3-169"><a href="#cb3-169" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-170"><a href="#cb3-170" aria-hidden="true" tabindex="-1"></a>每个原始行具有度量特定 <span class="in">`provenance`</span> 与 <span class="in">`target`</span> 元数据。产物精确发出以下十个度量：</span>
+<span id="cb3-171"><a href="#cb3-171" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-172"><a href="#cb3-172" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> 度量 <span class="pp">|</span> 出处 <span class="pp">|</span> 目标与定义 <span class="pp">|</span></span>
+<span id="cb3-173"><a href="#cb3-173" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|---|</span></span>
+<span id="cb3-174"><a href="#cb3-174" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`marginal_nll_per_entry`</span> <span class="pp">|</span> <span class="in">`test`</span> <span class="pp">|</span> 留出观测分布。联合高斯方法评分完整测试试次；在线 AR 滤波器使用顺序可见条目创新 NLL。这些不同信息/规程行不被并入一个排名 <span class="pp">|</span></span>
+<span id="cb3-175"><a href="#cb3-175" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`masked_prediction_rmse`</span> <span class="pp">|</span> <span class="in">`test`</span> <span class="pp">|</span> 被声明掩码从推断隐藏的完整观测上的 RMSE <span class="pp">|</span></span>
+<span id="cb3-176"><a href="#cb3-176" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`masked_prediction_nll_per_entry`</span> <span class="pp">|</span> <span class="in">`test`</span> <span class="pp">|</span> 方法提供条件尺度时隐藏观测上的高斯得分。两阶段方法使用训练拟合静态残差协方差对角，在测试前冻结；它不从隐藏测试残差估计其尺度 <span class="pp">|</span></span>
+<span id="cb3-177"><a href="#cb3-177" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`latent_rmse`</span> <span class="pp">|</span> <span class="in">`test`</span> <span class="pp">|</span> 仅评分正交对齐后验/得分均值对照保留潜路径的 RMSE <span class="pp">|</span></span>
+<span id="cb3-178"><a href="#cb3-178" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`latent_90_coverage`</span> <span class="pp">|</span> <span class="in">`test`</span> <span class="pp">|</span> 对具有声明后验方差方法的逐点边际 90% 插件区间覆盖 <span class="pp">|</span></span>
+<span id="cb3-179"><a href="#cb3-179" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`loading_subspace_angle_degrees`</span> <span class="pp">|</span> <span class="in">`fit_diagnostic`</span> <span class="pp">|</span> 训练拟合静态/两阶段秩二基与 $\operatorname{col}(C)$ 之间的最大主角度；已知层方法不接收零值恢复行 <span class="pp">|</span></span>
+<span id="cb3-180"><a href="#cb3-180" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`timescale_l1`</span> <span class="pp">|</span> <span class="in">`fit_diagnostic`</span> <span class="pp">|</span> 固定坐标约定下所选对的 L1 差异 <span class="pp">|</span></span>
+<span id="cb3-181"><a href="#cb3-181" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`selected_combined_nll_per_entry`</span> <span class="pp">|</span> <span class="in">`fit_diagnostic`</span> <span class="pp">|</span> 所选时间尺度候选的每条目组合训练加验证高斯 NLL；这是实际选择准则，不是仅验证得分 <span class="pp">|</span></span>
+<span id="cb3-182"><a href="#cb3-182" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`covariance_relative_frobenius`</span> <span class="pp">|</span> <span class="in">`fit_diagnostic`</span> <span class="pp">|</span> 候选有限观测协方差对声明有限高斯场景协方差。它对泊松与抖动场景不适用，而非与捏造协方差真值比较 <span class="pp">|</span></span>
+<span id="cb3-183"><a href="#cb3-183" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`posterior_mean_oracle_max_abs`</span> <span class="pp">|</span> <span class="in">`oracle_diagnostic`</span> <span class="pp">|</span> 已知 GPFA 协方差形式对精度形式后验均值的最大差异，只在名义已知 GPFA 是精确场景模型处 <span class="pp">|</span></span>
+<span id="cb3-184"><a href="#cb3-184" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-185"><a href="#cb3-185" aria-hidden="true" tabindex="-1"></a>对每个场景-重复-方法-度量键，相关留出试次、隐藏条目、时间点或拟合诊断先组合为一个重复级值。<span class="in">`diagnostics.json`</span> 随后为每个场景 $\times$ 方法 $\times$ 度量组跨三个独立重复报告中位数、q10、q90、<span class="in">`ok`</span> 率、失败率与适用性率。试次、时间箱、通道与隐藏条目不被当作独立重复。不同度量和不同信息集不被归一化、平均或一起排名。</span>
+<span id="cb3-186"><a href="#cb3-186" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-187"><a href="#cb3-187" aria-hidden="true" tabindex="-1"></a><span class="fu">## 失效与适用性标签</span></span>
+<span id="cb3-188"><a href="#cb3-188" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-189"><a href="#cb3-189" aria-hidden="true" tabindex="-1"></a><span class="in">`results.csv`</span> 保留 12 场景、三重复、11 方法与十度量的完整笛卡尔积：3,960 个规范行。适用性在推断或评分失败前解决。每行恰好一个状态：</span>
+<span id="cb3-190"><a href="#cb3-190" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-191"><a href="#cb3-191" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`ok`</span>：声明计算下适用且有限；</span>
+<span id="cb3-192"><a href="#cb3-192" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`nonconvergence`</span>：线性代数或有界数值规程失败；</span>
+<span id="cb3-193"><a href="#cb3-193" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`invalid`</span>：畸形、缺失、非有限或其他无效输出；</span>
+<span id="cb3-194"><a href="#cb3-194" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`inapplicable`</span>：方法或场景不定义目标。</span>
+<span id="cb3-195"><a href="#cb3-195" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-196"><a href="#cb3-196" aria-hidden="true" tabindex="-1"></a>每个非 <span class="in">`ok`</span> 行具有机器可读原因且无数值。自然执行产生 2,049 <span class="in">`ok`</span>、1,911 <span class="in">`inapplicable`</span>、零 <span class="in">`nonconvergence`</span> 与零 <span class="in">`invalid`</span> 行。该缺失不是数值失败不可能的证据；验证器单独故障注入线性代数与非有限失败并检查其标签。</span>
+<span id="cb3-197"><a href="#cb3-197" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-198"><a href="#cb3-198" aria-hidden="true" tabindex="-1"></a>有原则不适用示例包括：均值或独立通道参考无潜轨迹、确定性静态/两阶段估计无潜覆盖、已知层方法无学习载荷目标、泊松/抖动/有信息掩码无精确高斯神谕，以及泊松或抖动无有限高斯协方差目标。</span>
+<span id="cb3-199"><a href="#cb3-199" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-200"><a href="#cb3-200" aria-hidden="true" tabindex="-1"></a><span class="fu">## 产物契约</span></span>
+<span id="cb3-201"><a href="#cb3-201" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-202"><a href="#cb3-202" aria-hidden="true" tabindex="-1"></a><span class="in">`benchmarks/artifacts/temporal-covariance-inference/`</span> 精确包含：</span>
+<span id="cb3-203"><a href="#cb3-203" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-204"><a href="#cb3-204" aria-hidden="true" tabindex="-1"></a><span class="in">```text</span></span>
+<span id="cb3-205"><a href="#cb3-205" aria-hidden="true" tabindex="-1"></a><span class="in">manifest.json</span></span>
+<span id="cb3-206"><a href="#cb3-206" aria-hidden="true" tabindex="-1"></a><span class="in">results.csv</span></span>
+<span id="cb3-207"><a href="#cb3-207" aria-hidden="true" tabindex="-1"></a><span class="in">diagnostics.json</span></span>
+<span id="cb3-208"><a href="#cb3-208" aria-hidden="true" tabindex="-1"></a><span class="in">summary.png</span></span>
+<span id="cb3-209"><a href="#cb3-209" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb3-210"><a href="#cb3-210" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-211"><a href="#cb3-211" aria-hidden="true" tabindex="-1"></a>清单冻结生成器、场景、方法、度量、划分大小、种子映射、选择网格、能力边界、状态词汇、规范行排序、严格恢复语义、命令、运行时、Phase 3 源摘要与 SHA-256 哈希。图是目标分离诊断视图，不是验收证据或排行榜。</span>
+<span id="cb3-212"><a href="#cb3-212" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-213"><a href="#cb3-213" aria-hidden="true" tabindex="-1"></a><span class="fu">## 结果</span></span>
+<span id="cb3-214"><a href="#cb3-214" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-215"><a href="#cb3-215" aria-hidden="true" tabindex="-1"></a>以下是有界 q10/中位数/q90 摘要，跨三个重复。它们描述该模拟器，不能确立一般方法顺序。</span>
+<span id="cb3-216"><a href="#cb3-216" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-217"><a href="#cb3-217" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> 场景与目标 <span class="pp">|</span> 方法 <span class="pp">|</span> q10 <span class="pp">|</span> 中位数 <span class="pp">|</span> q90 <span class="pp">|</span></span>
+<span id="cb3-218"><a href="#cb3-218" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|---:|---:|---:|</span></span>
+<span id="cb3-219"><a href="#cb3-219" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> 参考掩蔽观测 RMSE <span class="pp">|</span> 均值对角 <span class="pp">|</span> 0.7530 <span class="pp">|</span> 0.8646 <span class="pp">|</span> 0.9850 <span class="pp">|</span></span>
+<span id="cb3-220"><a href="#cb3-220" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> 参考掩蔽观测 RMSE <span class="pp">|</span> 静态因子 <span class="pp">|</span> 0.6091 <span class="pp">|</span> 0.6261 <span class="pp">|</span> 0.7862 <span class="pp">|</span></span>
+<span id="cb3-221"><a href="#cb3-221" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> 参考掩蔽观测 RMSE <span class="pp">|</span> 已知 GPFA <span class="pp">|</span> 0.5058 <span class="pp">|</span> 0.5226 <span class="pp">|</span> 0.5577 <span class="pp">|</span></span>
+<span id="cb3-222"><a href="#cb3-222" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> 参考掩蔽观测 RMSE <span class="pp">|</span> 所选 GPFA <span class="pp">|</span> 0.5058 <span class="pp">|</span> 0.5226 <span class="pp">|</span> 0.5577 <span class="pp">|</span></span>
+<span id="cb3-223"><a href="#cb3-223" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> 参考掩蔽观测 RMSE <span class="pp">|</span> 错误公共时间尺度 <span class="pp">|</span> 0.5754 <span class="pp">|</span> 0.5868 <span class="pp">|</span> 0.6102 <span class="pp">|</span></span>
+<span id="cb3-224"><a href="#cb3-224" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> 参考掩蔽观测 RMSE <span class="pp">|</span> 错误 AR 协方差 <span class="pp">|</span> 0.5161 <span class="pp">|</span> 0.5666 <span class="pp">|</span> 0.5795 <span class="pp">|</span></span>
+<span id="cb3-225"><a href="#cb3-225" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> 参考潜 RMSE，回顾性 <span class="pp">|</span> 已知 GPFA <span class="pp">|</span> 0.2338 <span class="pp">|</span> 0.2572 <span class="pp">|</span> 0.2711 <span class="pp">|</span></span>
+<span id="cb3-226"><a href="#cb3-226" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> 参考潜 RMSE，回顾性 <span class="pp">|</span> RTS 平滑器 <span class="pp">|</span> 0.2580 <span class="pp">|</span> 0.2741 <span class="pp">|</span> 0.2796 <span class="pp">|</span></span>
+<span id="cb3-227"><a href="#cb3-227" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> 参考潜 RMSE，回顾性 <span class="pp">|</span> 两阶段 PCA + 平滑 <span class="pp">|</span> 0.5243 <span class="pp">|</span> 0.5455 <span class="pp">|</span> 0.6454 <span class="pp">|</span></span>
+<span id="cb3-228"><a href="#cb3-228" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> 参考潜 RMSE，在线 <span class="pp">|</span> AR 卡尔曼滤波器 <span class="pp">|</span> 0.3289 <span class="pp">|</span> 0.3359 <span class="pp">|</span> 0.4239 <span class="pp">|</span></span>
+<span id="cb3-229"><a href="#cb3-229" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-230"><a href="#cb3-230" aria-hidden="true" tabindex="-1"></a>在线与回顾性行带显式标签显示，不是同一排名。在参考场景中，所有三个所选 GPFA 重复选择名义对 $(0.10,0.32)$，因此所选与已知结果重合。这是一个有限网格结果，不是一般超参数恢复。</span>
+<span id="cb3-231"><a href="#cb3-231" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-232"><a href="#cb3-232" aria-hidden="true" tabindex="-1"></a>掩码特定边界保持可见。对完全隐藏通道，已知 GPFA 中位预测 RMSE 为 0.4768，而无跨通道独立 GP 中位为 0.9267。对完全隐藏时间块，已知 GPFA 为 0.6892，回顾性 AR 平滑器为 0.7597。这些差异以其协方差族与声明掩码为条件。</span>
+<span id="cb3-233"><a href="#cb3-233" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-234"><a href="#cb3-234" aria-hidden="true" tabindex="-1"></a>选择在其他网格下变得不那么精确：中位 <span class="in">`timescale_l1`</span> 对接近时间尺度为 0.10、低试次数为 0.10、高试次数为 0.00、相等核为 0.16。相等核值主要记录固定候选网格与 $(0.20,0.20)$ 的失配；它不辨识有序潜轴。</span>
+<span id="cb3-235"><a href="#cb3-235" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-236"><a href="#cb3-236" aria-hidden="true" tabindex="-1"></a>压力场景区分名义与场景感知参考。在协方差变点下，名义已知 GPFA 中位潜 RMSE 为 0.3814，而真实块协方差高斯神谕为 0.3189。在相关残差下，名义已知 GPFA 中位留出高斯 NLL 为每条目 0.9550，真实残差协方差神谕为 0.9364。这些是场景特定误设诊断。</span>
+<span id="cb3-237"><a href="#cb3-237" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-238"><a href="#cb3-238" aria-hidden="true" tabindex="-1"></a>原始低率泊松计数是更严重观测族违反：名义已知 GPFA 中位潜 RMSE 为 1.0815，其名义逐点 90% 覆盖为 0.3750。这些高斯数是近似诊断，不是校准计数模型评估。在有信息缺失下，已知 GPFA 中位隐藏观测 RMSE 为 0.7129，独立通道 GP 为 1.3320；掩码不可忽略，因此两个值都不验证普通随机缺失条件化。</span>
+<span id="cb3-239"><a href="#cb3-239" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-240"><a href="#cb3-240" aria-hidden="true" tabindex="-1"></a>最大适用已知 GPFA 协方差形式对精度形式后验均值差异约为 $3.12\times10^{-10}$。独立 AR 递归对批量检查均值低于 $1.0\times10^{-10}$、边际方差低于 $4.0\times10^{-11}$。这些是实现检查，不是科学表现得分。</span>
+<span id="cb3-241"><a href="#cb3-241" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-242"><a href="#cb3-242" aria-hidden="true" tabindex="-1"></a><span class="al">![目标特定时序协方差摘要](../../benchmarks/artifacts/temporal-covariance-inference/summary.png)</span></span>
+<span id="cb3-243"><a href="#cb3-243" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-244"><a href="#cb3-244" aria-hidden="true" tabindex="-1"></a>图有六个分离面板：静态信息集参考掩蔽预测；回顾性参考掩蔽预测；在线参考潜 RMSE；回顾性参考潜 RMSE；神谕回顾性参考掩蔽预测；以及接近时间尺度选择诊断。它不显示有信息缺失、不组合在线与回顾性方法，也不构造池化总分。</span>
+<span id="cb3-245"><a href="#cb3-245" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-246"><a href="#cb3-246" aria-hidden="true" tabindex="-1"></a><span class="fu">## 解读界限</span></span>
+<span id="cb3-247"><a href="#cb3-247" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-248"><a href="#cb3-248" aria-hidden="true" tabindex="-1"></a>该基准只确立场景、目标、信息集、度量与实现条件行为。</span>
+<span id="cb3-249"><a href="#cb3-249" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-250"><a href="#cb3-250" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>光滑 GPFA 或 RTS 后验均值不是学习转移方程、向量场、流或测量机制。</span>
+<span id="cb3-251"><a href="#cb3-251" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>GPFA 协方差核与 AR/LGSSM 转移可以产生视觉相似估计，同时作出不同时间假设。</span>
+<span id="cb3-252"><a href="#cb3-252" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>在线滤波器不能像拥有平滑器未来观测那样排名；精确神谕不能被当作可部署。</span>
+<span id="cb3-253"><a href="#cb3-253" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>已知/所选 GPFA 保持观测层固定，因此不检验一般全参数 GPFA 学习。</span>
+<span id="cb3-254"><a href="#cb3-254" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>在训练真值上拟合一次并冻结用于测试评分的重复级 Procrustes 旋转不辨识潜坐标。相等核保留特别重要的旋转歧义。</span>
+<span id="cb3-255"><a href="#cb3-255" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>插件区间省略参数与模型选择不确定性。泊松、残差相关、变点、抖动或有信息掩码误设下的覆盖是描述性的，不是校准保证。</span>
+<span id="cb3-256"><a href="#cb3-256" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>原始泊松计数上的高斯 NLL 不是计数似然。有信息缺失下的普通条件化不建模缺失过程。</span>
+<span id="cb3-257"><a href="#cb3-257" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>更低预测或潜误差不证明表示、机制、因果性、本征维数、流形结构、生物有效性或真实数据迁移。</span>
+<span id="cb3-258"><a href="#cb3-258" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-259"><a href="#cb3-259" aria-hidden="true" tabindex="-1"></a>没有结果授权跨任务总分、普遍胜者、P4-U04 工作、Phase 5 工作或真实数据主张。</span>
+<span id="cb3-260"><a href="#cb3-260" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-261"><a href="#cb3-261" aria-hidden="true" tabindex="-1"></a><span class="fu">## 可复现性</span></span>
+<span id="cb3-262"><a href="#cb3-262" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-263"><a href="#cb3-263" aria-hidden="true" tabindex="-1"></a>用捆绑工作区 Python 运行时生成与验证：</span>
+<span id="cb3-264"><a href="#cb3-264" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-265"><a href="#cb3-265" aria-hidden="true" tabindex="-1"></a><span class="in">```bash</span></span>
+<span id="cb3-266"><a href="#cb3-266" aria-hidden="true" tabindex="-1"></a><span class="ex">/Users/bytedance/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3</span> benchmarks/temporal-covariance-inference.py <span class="at">--generate</span></span>
+<span id="cb3-267"><a href="#cb3-267" aria-hidden="true" tabindex="-1"></a><span class="ex">/Users/bytedance/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3</span> benchmarks/temporal-covariance-inference.py <span class="at">--verify</span></span>
+<span id="cb3-268"><a href="#cb3-268" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb3-269"><a href="#cb3-269" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-270"><a href="#cb3-270" aria-hidden="true" tabindex="-1"></a>验证器检查：</span>
+<span id="cb3-271"><a href="#cb3-271" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-272"><a href="#cb3-272" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>精确四文件产物清单与 SHA-256 哈希；</span>
+<span id="cb3-273"><a href="#cb3-273" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>全部 3,960 预期唯一行、规范排序与重算摘要；</span>
+<span id="cb3-274"><a href="#cb3-274" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>逐字节相同干净再生与反转场景/重复遍历；</span>
+<span id="cb3-275"><a href="#cb3-275" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>逐字节相同有效部分恢复，并拒绝损坏、陈旧、重复、未知键或不完整部分行；</span>
+<span id="cb3-276"><a href="#cb3-276" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>拟合/选择与冻结推断能力边界；</span>
+<span id="cb3-277"><a href="#cb3-277" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>测试观测与潜真值投毒不可变性；</span>
+<span id="cb3-278"><a href="#cb3-278" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>协方差形式对精度形式 GP 后验一致；</span>
+<span id="cb3-279"><a href="#cb3-279" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>递归 RTS 对直接 AR 批量一致与真场景神谕协方差接线；以及</span>
+<span id="cb3-280"><a href="#cb3-280" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>非有限与线性代数故障注入下的显式 <span class="in">`invalid`</span>/<span class="in">`nonconvergence`</span> 标签。</span>
+<span id="cb3-281"><a href="#cb3-281" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-282"><a href="#cb3-282" aria-hidden="true" tabindex="-1"></a>系统 <span class="in">`python3`</span> 不是记录数值运行时；可复现命令刻意使用写入 <span class="in">`manifest.json`</span> 的捆绑可执行。</span>
+<span id="cb3-283"><a href="#cb3-283" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-284"><a href="#cb3-284" aria-hidden="true" tabindex="-1"></a><span class="fu">## 审查记录</span></span>
+<span id="cb3-285"><a href="#cb3-285" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-286"><a href="#cb3-286" aria-hidden="true" tabindex="-1"></a>独立科学与实现审查员是只读且独立于执行者。其初始审查在静态因子隐藏掩码公平性、产物调和、冻结训练对齐、选择语义、源出处、扩展场景神谕与真实路径故障路由上返回 <span class="in">`REVISE`</span>。有界修正轮次只处理那些发现；聚焦科学与实现复审都返回 <span class="in">`PASS`</span>，无未解决发现。</span>
+<span id="cb3-287"><a href="#cb3-287" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-288"><a href="#cb3-288" aria-hidden="true" tabindex="-1"></a>已接受验证记录包括 60 对象结构验证、33 仓库测试、完整产物验证器、目标/索引渲染、工作流验证与 <span class="in">`git diff --check`</span>。记录的审查决定随后授权机械晋升到 <span class="in">`L1/stable`</span>。稳定状态记录该声明合成基准对象的有界验收；它不扩大其证据、信息集、目标或解读边界。</span>
+<span id="cb3-289"><a href="#cb3-289" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-290"><a href="#cb3-290" aria-hidden="true" tabindex="-1"></a><span class="fu">## 成熟度检查表</span></span>
+<span id="cb3-291"><a href="#cb3-291" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-292"><a href="#cb3-292" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> 时序生成器与全部 12 场景有界且显式。</span>
+<span id="cb3-293"><a href="#cb3-293" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> 高斯、相关高斯与原始泊松观测族被区分。</span>
+<span id="cb3-294"><a href="#cb3-294" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> 训练、验证、测试、静态、在线、回顾性与神谕信息集被标记。</span>
+<span id="cb3-295"><a href="#cb3-295" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> 已知、所选、名义错误、错误族与真场景参数被区分。</span>
+<span id="cb3-296"><a href="#cb3-296" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> 生成、拟合/选择、推断、掩蔽与评分具有单独能力契约。</span>
+<span id="cb3-297"><a href="#cb3-297" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> 声明度量特定出处、目标、适用性与两级摘要，无池化得分。</span>
+<span id="cb3-298"><a href="#cb3-298" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> 保留全部 3,960 原始行与精确四个字节可验证产物。</span>
+<span id="cb3-299"><a href="#cb3-299" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> 完整产物验证通过。</span>
+<span id="cb3-300"><a href="#cb3-300" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> 记录验证有界结果与解读界限。</span>
+<span id="cb3-301"><a href="#cb3-301" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> 记录聚焦科学复审 PASS。</span>
+<span id="cb3-302"><a href="#cb3-302" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> 记录独立实现审查 PASS。</span>
+<span id="cb3-303"><a href="#cb3-303" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> 审查授权机械晋升到 <span class="in">`L1/stable`</span> 完成。</span></code></pre></div><button title="复制到剪贴板" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></div>
+</div></div></div></div></div>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

@@ -1,0 +1,1826 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="zh-CN" xml:lang="zh-CN"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.10.18">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>高斯过程因子分析 – Latent Dynamics &amp; Geometry</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="../../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../../">
+<script src="../../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../../site_libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../../site_libs/bootstrap/bootstrap-e3adbaa939bcd423dddc8c8a834270b4.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "没有结果",
+    "search-matching-documents-text": "匹配的文档",
+    "search-copy-link-title": "复制搜索链接",
+    "search-hide-matches-text": "隐藏其它匹配结果",
+    "search-more-match-text": "更多匹配结果",
+    "search-more-matches-text": "更多匹配结果",
+    "search-clear-button-title": "清除",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "取消",
+    "search-submit-button-title": "提交",
+    "search-label": "搜索"
+  }
+}</script>
+<style>
+.ldg-lang{position:fixed;top:72px;right:16px;z-index:2000;display:flex;gap:4px;font-family:system-ui,-apple-system,"Segoe UI",sans-serif;}
+.ldg-lang a{display:inline-block;padding:4px 10px;border:1px solid #c8c8c8;border-radius:999px;background:#fff;color:#333;text-decoration:none;font-size:13px;box-shadow:0 1px 3px rgba(0,0,0,.15);}
+.ldg-lang a.active{background:#2c3e50;color:#fff;border-color:#2c3e50;}
+</style>
+</head><body class="nav-fixed quarto-light"><div class="ldg-lang" id="ldg-lang">
+  <a href="#" id="ldg-lang-en">EN</a>
+  <a href="#" id="ldg-lang-zh">中文</a>
+</div>
+<script>
+(function () {
+  var BASE = '';
+  if (window.location.pathname.indexOf('/latent-dynamics-geometry-public/') === 0) {
+    BASE = 'latent-dynamics-geometry-public';
+  }
+  var IS_FILE = window.location.protocol === 'file:';
+  function pathSegs() {
+    return window.location.pathname.split('/').filter(Boolean);
+  }
+  function zhIdx() {
+    return pathSegs().indexOf('zh');
+  }
+  function segs() {
+    var s = window.location.pathname.split('/').filter(Boolean);
+    if (BASE && s[0] === BASE) s = s.slice(1);
+    return s;
+  }
+  function isZh() { return zhIdx() !== -1; }
+  function fileTarget(lang) {
+    var s = pathSegs();
+    var siteIdx = s.lastIndexOf('_site');
+    var root = siteIdx === -1 ? s.slice(0, -1) : s.slice(0, siteIdx + 1);
+    var page = siteIdx === -1 ? [s[s.length - 1]] : s.slice(siteIdx + 1);
+    if (page[0] === 'zh') page = page.slice(1);
+    if (lang === 'zh') page = ['zh'].concat(page);
+    var rel = page.join('/');
+    if (rel === '' || rel === 'zh') rel = 'index.html';
+    return '/' + root.join('/') + '/' + rel;
+  }
+  function target(lang) {
+    if (IS_FILE) return fileTarget(lang);
+    var s = segs();
+    if (s[0] === 'zh') s = s.slice(1);
+    if (lang === 'zh') s = ['zh'].concat(s);
+    var rel = s.join('/');
+    if (rel === '' || rel === 'zh') rel = (lang === 'zh' ? 'zh/index.html' : 'index.html');
+    return '/' + (BASE ? BASE + '/' : '') + rel;
+  }
+  function go(lang) {
+    try { localStorage.setItem('ldg-lang', lang); } catch (e) {}
+    window.location.href = target(lang);
+  }
+  function mark() {
+    var zh = isZh();
+    var a = document.getElementById('ldg-lang-en');
+    var b = document.getElementById('ldg-lang-zh');
+    if (a) a.className = zh ? '' : 'active';
+    if (b) b.className = zh ? 'active' : '';
+  }
+  function localizeNav() {
+    if (!isZh()) return;
+    var cur = pathSegs();
+    var czi = zhIdx();
+    var dir = (czi === -1 ? cur.slice(0, -1) : cur.slice(czi, -1)).join('/');
+    document.querySelectorAll('nav a').forEach(function (a) {
+      var h = a.getAttribute('href') || '';
+      if (/^(https?:|#|mailto:)/.test(h)) return;
+      if (/\.html?$/.test(h) || /\/$/.test(h) || h === '') {
+        var abs = new URL(h, window.location.href).pathname;
+        var s = abs.split('/').filter(Boolean);
+        if (BASE && s[0] === BASE) s = s.slice(1);
+        var zi = s.indexOf('zh');
+        var rel = zi !== -1 ? s.slice(zi + 1).join('/') : s.slice(czi).join('/');
+        var tgt = 'zh/' + rel;
+        var f = dir.split('/').filter(Boolean);
+        var t = tgt.split('/').filter(Boolean);
+        var i = 0;
+        while (i < f.length && i < t.length && f[i] === t[i]) i++;
+        var rel = '';
+        for (var j = i; j < f.length; j++) rel += '../';
+        rel += t.slice(i).join('/');
+        a.setAttribute('href', rel);
+      }
+    });
+  }
+  document.getElementById('ldg-lang-en').addEventListener('click', function (e) { e.preventDefault(); go('en'); });
+  document.getElementById('ldg-lang-zh').addEventListener('click', function (e) { e.preventDefault(); go('zh'); });
+  mark();
+  localizeNav();
+})();
+</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-chtml.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+
+
+
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../../../index.html">
+    <span class="navbar-title">Latent Dynamics &amp; Geometry</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="搜索"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="展开或折叠导航栏" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../../index.html"> 
+<span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../../knowledge/concepts/index.html"> 
+<span class="menu-text">Concepts</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../../knowledge/methods/index.html"> 
+<span class="menu-text">Methods</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../../knowledge/math/index.html"> 
+<span class="menu-text">Math</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../../knowledge/papers/index.html"> 
+<span class="menu-text">Papers</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../../toy-models/index.html"> 
+<span class="menu-text">Toy Models</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../../research-questions/index.html"> 
+<span class="menu-text">Research Questions</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../../benchmarks/index.html"> 
+<span class="menu-text">Benchmarks</span></a>
+  </li>  
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/AbelZheng/latent-dynamics-geometry-public"> <i class="bi bi-github" role="img" aria-label="GitHub repository">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="https://github.com/AbelZheng/latent-dynamics-geometry-public/discussions"> 
+<span class="menu-text">Discussions</span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">该页面内容</h2>
+   
+  <ul>
+  <li><a href="#高斯过程因子分析" id="toc-高斯过程因子分析" class="nav-link active" data-scroll-target="#高斯过程因子分析">高斯过程因子分析</a>
+  <ul class="collapse">
+  <li><a href="#问题" id="toc-问题" class="nav-link" data-scroll-target="#问题">问题</a></li>
+  <li><a href="#输入" id="toc-输入" class="nav-link" data-scroll-target="#输入">输入</a></li>
+  <li><a href="#输出" id="toc-输出" class="nav-link" data-scroll-target="#输出">输出</a></li>
+  <li><a href="#核心思想" id="toc-核心思想" class="nav-link" data-scroll-target="#核心思想">核心思想</a></li>
+  <li><a href="#生成-建模假设" id="toc-生成-建模假设" class="nav-link" data-scroll-target="#生成-建模假设">生成 / 建模假设</a></li>
+  <li><a href="#数学表述" id="toc-数学表述" class="nav-link" data-scroll-target="#数学表述">数学表述</a>
+  <ul class="collapse">
+  <li><a href="#有限网格-gp-先验" id="toc-有限网格-gp-先验" class="nav-link" data-scroll-target="#有限网格-gp-先验">有限网格 GP 先验</a></li>
+  <li><a href="#边际观测分布" id="toc-边际观测分布" class="nav-link" data-scroll-target="#边际观测分布">边际观测分布</a></li>
+  <li><a href="#全区间潜后验" id="toc-全区间潜后验" class="nav-link" data-scroll-target="#全区间潜后验">全区间潜后验</a></li>
+  <li><a href="#缺失观测" id="toc-缺失观测" class="nav-link" data-scroll-target="#缺失观测">缺失观测</a></li>
+  <li><a href="#现有试次内新时间" id="toc-现有试次内新时间" class="nav-link" data-scroll-target="#现有试次内新时间">现有试次内新时间</a></li>
+  </ul></li>
+  <li><a href="#学习得到了什么" id="toc-学习得到了什么" class="nav-link" data-scroll-target="#学习得到了什么">学习得到了什么？</a></li>
+  <li><a href="#什么是固定的" id="toc-什么是固定的" class="nav-link" data-scroll-target="#什么是固定的">什么是固定的？</a></li>
+  <li><a href="#时序假设" id="toc-时序假设" class="nav-link" data-scroll-target="#时序假设">时序假设</a></li>
+  <li><a href="#几何假设" id="toc-几何假设" class="nav-link" data-scroll-target="#几何假设">几何假设</a></li>
+  <li><a href="#监督" id="toc-监督" class="nav-link" data-scroll-target="#监督">监督</a></li>
+  <li><a href="#优化-推断" id="toc-优化-推断" class="nav-link" data-scroll-target="#优化-推断">优化 / 推断</a></li>
+  <li><a href="#优点" id="toc-优点" class="nav-link" data-scroll-target="#优点">优点</a></li>
+  <li><a href="#失效模式" id="toc-失效模式" class="nav-link" data-scroll-target="#失效模式">失效模式</a></li>
+  <li><a href="#可辨识性问题" id="toc-可辨识性问题" class="nav-link" data-scroll-target="#可辨识性问题">可辨识性问题</a></li>
+  <li><a href="#与更简单方法的比较" id="toc-与更简单方法的比较" class="nav-link" data-scroll-target="#与更简单方法的比较">与更简单方法的比较</a></li>
+  <li><a href="#评估准则" id="toc-评估准则" class="nav-link" data-scroll-target="#评估准则">评估准则</a></li>
+  <li><a href="#最小玩具模型" id="toc-最小玩具模型" class="nav-link" data-scroll-target="#最小玩具模型">最小玩具模型</a></li>
+  <li><a href="#对-ldg-的意义" id="toc-对-ldg-的意义" class="nav-link" data-scroll-target="#对-ldg-的意义">对 LDG 的意义</a>
+  <ul class="collapse">
+  <li><a href="#小鼠轨迹" id="toc-小鼠轨迹" class="nav-link" data-scroll-target="#小鼠轨迹">小鼠轨迹</a></li>
+  <li><a href="#眼动" id="toc-眼动" class="nav-link" data-scroll-target="#眼动">眼动</a></li>
+  <li><a href="#eeg" id="toc-eeg" class="nav-link" data-scroll-target="#eeg">EEG</a></li>
+  <li><a href="#meg-神经群体数据" id="toc-meg-神经群体数据" class="nav-link" data-scroll-target="#meg-神经群体数据">MEG / 神经群体数据</a></li>
+  </ul></li>
+  <li><a href="#主要来源" id="toc-主要来源" class="nav-link" data-scroll-target="#主要来源">主要来源</a></li>
+  <li><a href="#综述-次级来源" id="toc-综述-次级来源" class="nav-link" data-scroll-target="#综述-次级来源">综述 / 次级来源</a></li>
+  <li><a href="#开放方法学问题" id="toc-开放方法学问题" class="nav-link" data-scroll-target="#开放方法学问题">开放方法学问题</a></li>
+  <li><a href="#成熟度检查表" id="toc-成熟度检查表" class="nav-link" data-scroll-target="#成熟度检查表">成熟度检查表</a></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<div class="quarto-title-block"><div><h1 class="title">高斯过程因子分析</h1><button type="button" class="btn code-tools-button" id="quarto-code-tools-source"><i class="bi"></i> 代码</button></div></div>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="高斯过程因子分析" class="level1">
+<h1>高斯过程因子分析</h1>
+<section id="问题" class="level2">
+<h2 class="anchored" data-anchor-id="问题">问题</h2>
+<p>高斯过程因子分析（GPFA）通过组合因子分析式线性高斯观测模型与潜坐标上的高斯过程先验，从高维时间序列推断光滑、低维潜轨迹。在其规范神经应用中，观测是同时记录单元的变换分箱尖峰计数，每个试次在其潜路径上接收全区间后验分布 <span class="citation" data-cites="YuEtAl2009">(<a href="#ref-YuEtAl2009" role="doc-biblioref">Yu 等 2009年</a>)</span>。</p>
+<p>有界方法求解回顾性概率平滑与降维问题：</p>
+<blockquote class="blockquote">
+<p>在声明线性高斯观测模型与试次内时间的声明协方差函数下，完整观测序列支持潜轨迹上的什么后验分布？</p>
+</blockquote>
+<p>GPFA 不学习状态转移方程。其时序结构通过直接编码不同时间潜值之间相关的协方差核指定。因此光滑后验均值部分地是所选先验族、时间尺度与观测模型的推论，而非唯一存在路径的直接观测。</p>
+<p><strong>假定背景：</strong> 高斯过程与对称半正定协方差核。高斯过程协方差核 <span class="math inline">\(k(t,t')\)</span> 指定随机函数值之间的协方差，并必须在每个有限时间网格上生成半正定 Gram 矩阵 <span class="citation" data-cites="RasmussenWilliams2006">(<a href="#ref-RasmussenWilliams2006" role="doc-biblioref">Rasmussen 和 Williams 2006年</a>)</span>。现有 <a href="../../../zh/knowledge/concepts/kernel.html">Kernel Concept</a> 把 <strong>kernel</strong> 用于时序脉冲响应/滤波器加权函数。它不是此处使用的半正定协方差核的前置条件，也不得与其混淆。</p>
+</section>
+<section id="输入" class="level2">
+<h2 class="anchored" data-anchor-id="输入">输入</h2>
+<p>对试次 <span class="math inline">\(n=1,\ldots,N\)</span>，设</p>
+<p><span class="math display">\[
+Y^{(n)}=
+\begin{bmatrix}
+y^{(n)}_1&amp;\cdots&amp;y^{(n)}_{T_n}
+\end{bmatrix}
+\in\mathbb R^{p\times T_n},
+\]</span></p>
+<p>其中 <span class="math inline">\(p\)</span> 是观测通道数，<span class="math inline">\(t^{(n)}_1,\ldots,t^{(n)}_{T_n}\)</span> 是该试次的声明时间网格。在规范神经表述中，<span class="math inline">\(y^{(n)}_t\)</span> 包含平方根变换后的非重叠分箱尖峰计数；与两阶段平滑后静态降维不同，变换计数在 GPFA 前不被预平滑 <span class="citation" data-cites="YuEtAl2009">(<a href="#ref-YuEtAl2009" role="doc-biblioref">Yu 等 2009年</a>)</span>。</p>
+<p>可复现分析必须声明：</p>
+<ul>
+<li>实验单元、记录群体、同时对伪群体状态、包含规则与试次/序列边界；</li>
+<li>箱宽、时间网格、事件对齐、分析区间、计数变换与不等试次长度的处理；</li>
+<li>跨条件或试次特定均值是否被移除、表示在 <span class="math inline">\(d\)</span> 中或单独建模；</li>
+<li>候选潜维数 <span class="math inline">\(q\)</span> 及其选择规则；</li>
+<li>协方差核族、信号方差约定、时间尺度约束与任何潜 nugget/噪声项；</li>
+<li>观测协方差结构以及对角 <span class="math inline">\(R\)</span> 是否在科学上站得住脚；</li>
+<li>参数初始化、优化、重启、收敛检查与正则化；</li>
+<li>缺失观测与删失规则；以及</li>
+<li>训练、验证与测试划分单元。</li>
+</ul>
+<p>规范多试次模型在共享参数条件下把试次视为条件独立。它不要求相等 <span class="math inline">\(T_n\)</span>，但假设所有试次使用相同载荷矩阵、观测偏移、残差协方差与核超参数族。对齐重置试次内时间，不创建试次端点之间的连续性。</p>
+</section>
+<section id="输出" class="level2">
+<h2 class="anchored" data-anchor-id="输出">输出</h2>
+<p>对所选潜维数 <span class="math inline">\(q\)</span>，拟合 GPFA 返回：</p>
+<ul>
+<li>载荷矩阵 <span class="math inline">\(C\in\mathbb R^{p\times q}\)</span>；</li>
+<li>观测偏移 <span class="math inline">\(d\in\mathbb R^p\)</span>；</li>
+<li>对角观测残差协方差 <span class="math inline">\(R\in\mathbb R^{p\times p}\)</span>；</li>
+<li>每个潜坐标一个协方差核与拟合超参数；</li>
+<li>每个观测试次上的边际高斯分布；</li>
+<li>每个试次完整潜路径上的联合高斯后验；以及</li>
+<li>由该路径分布推导的后验均值、边际协方差、跨时间协方差、样本或后验预测。</li>
+</ul>
+<p>后验均值是单条轨迹摘要。它不是潜轨迹随机元素本身、测量状态路径，也不是积分掉参数不确定性的轨迹。如果参数由最大似然估计并保持固定，报告后验协方差以那些插件参数为条件。</p>
+</section>
+<section id="核心思想" class="level2">
+<h2 class="anchored" data-anchor-id="核心思想">核心思想</h2>
+<p>静态因子分析独立对每个观测向量应用相同低秩加对角高斯观测模型。GPFA 保留该观测层，但用 GP 先验跨时间耦合潜值。协方差函数时间尺度长时，邻近潜状态可以强相关，产生光滑后验路径；短时间尺度或大潜 nugget 允许更快或更不光滑变异。</p>
+<p>Yu 等人把 GPFA 描述为每个时间点一个共享观测参数的因子分析器，在潜空间由 GP 先验链接 <span class="citation" data-cites="YuEtAl2009">(<a href="#ref-YuEtAl2009" role="doc-biblioref">Yu 等 2009年</a>)</span>。完整有限网格模型是多元高斯，因此潜路径可以被积分掉获得精确边际似然，并以完整试次为条件获得精确高斯后验。精确性以高斯模型与有限矩阵计算为条件；它不是变换尖峰计数或神经活动真的遵循该模型的证据。</p>
+</section>
+<section id="生成-建模假设" class="level2">
+<h2 class="anchored" data-anchor-id="生成-建模假设">生成 / 建模假设</h2>
+<p>对一个试次中的时间 <span class="math inline">\(t\)</span>，观测模型是</p>
+<p><span class="math display">\[
+y_t=Cx_t+d+\epsilon_t,
+\qquad
+\epsilon_t\sim\mathcal N(0,R),
+\]</span></p>
+<p>其中 <span class="math inline">\(x_t\in\mathbb R^q\)</span> 且</p>
+<p><span class="math display">\[
+R=\operatorname{diag}(r_1,\ldots,r_p),
+\qquad r_i&gt;0.
+\]</span></p>
+<p>观测残差在 <span class="math inline">\(x_t\)</span> 条件下跨通道独立，因为 <span class="math inline">\(R\)</span> 对角，且通常被假设跨时间与试次独立。潜函数在坐标间先验独立：</p>
+<p><span class="math display">\[
+x_j^{(n)}(\cdot)\sim\mathcal{GP}(0,k_j),
+\qquad j=1,\ldots,q,
+\]</span></p>
+<p>并在共享超参数条件下跨试次独立。因此每个试次抽取新的潜路径；没有模型约束强制名义相似试次遵循相同实现 <span class="citation" data-cites="YuEtAl2009">(<a href="#ref-YuEtAl2009" role="doc-biblioref">Yu 等 2009年</a>)</span>。</p>
+<p>原始论文使用具有坐标特定时间尺度的平方指数协方差：</p>
+<p><span class="math display">\[
+k_j(t,t')
+=
+\alpha_j^2
+\exp\!\left[-\frac{(t-t')^2}{2\tau_j^2}\right]
++
+\nu_j^2\,\delta_{t,t'}.
+\]</span></p>
+<p>这里 <span class="math inline">\(\alpha_j^2\)</span> 是光滑潜信号方差，<span class="math inline">\(\tau_j&gt;0\)</span> 是特征时间尺度，<span class="math inline">\(\nu_j^2\ge0\)</span> 是可选<strong>潜 GP nugget/噪声方差</strong>。nugget 是采样时间处潜坐标的独立变异；它不是观测噪声 <span class="math inline">\(R\)</span>、转移方程中的过程噪声或测量误差。Yu 等人在其主分析中固定小的正潜 nugget，并归一化 <span class="math inline">\(k_j(t,t)=1\)</span>，这设置 <span class="math inline">\(\alpha_j^2=1-\nu_j^2\)</span> 并固定潜尺度 <span class="citation" data-cites="YuEtAl2009">(<a href="#ref-YuEtAl2009" role="doc-biblioref">Yu 等 2009年</a>)</span>。如果在该约定下 <span class="math inline">\(\nu_j^2=1\)</span>，跨时间协方差消失，时间耦合退化为随时间共享参数应用的静态 FA 式模型。</p>
+<p>这些假设是实质性的：</p>
+<ul>
+<li>潜到观测依赖线性；</li>
+<li>变换观测与残差为高斯；</li>
+<li><span class="math inline">\(R\)</span> 在声明观测坐标中对角；</li>
+<li>潜坐标在拟合参数化中是独立 GP；</li>
+<li>试次在参数条件下是独立重复；</li>
+<li>所选协方差族表示相关时间正则性；以及</li>
+<li>一个共享观测子空间与一组时间尺度适用于合并序列。</li>
+</ul>
+</section>
+<section id="数学表述" class="level2">
+<h2 class="anchored" data-anchor-id="数学表述">数学表述</h2>
+<section id="有限网格-gp-先验" class="level3">
+<h3 class="anchored" data-anchor-id="有限网格-gp-先验">有限网格 GP 先验</h3>
+<p>对具有时间网格 <span class="math inline">\(t_1,\ldots,t_T\)</span> 的单个试次，设</p>
+<p><span class="math display">\[
+X=
+\begin{bmatrix}
+x_1&amp;\cdots&amp;x_T
+\end{bmatrix}
+\in\mathbb R^{q\times T}.
+\]</span></p>
+<p>使用时间主序堆叠</p>
+<p><span class="math display">\[
+\mathbf x=
+\begin{bmatrix}
+x_1^\top&amp;\cdots&amp;x_T^\top
+\end{bmatrix}^\top
+\in\mathbb R^{qT}.
+\]</span></p>
+<p>GP 先验给出</p>
+<p><span class="math display">\[
+\mathbf x\sim\mathcal N(0,K),
+\]</span></p>
+<p>其中 <span class="math inline">\(K\in\mathbb R^{qT\times qT}\)</span> 的 <span class="math inline">\((a,b)\)</span> 块是</p>
+<p><span class="math display">\[
+K_{ab}
+=
+\operatorname{diag}\!\left(
+k_1(t_a,t_b),\ldots,k_q(t_a,t_b)
+\right).
+\]</span></p>
+<p>有效协方差核在每个有限网格上产生半正定 Gram 矩阵；严格正 nugget 常使矩阵正定并改善条件数 <span class="citation" data-cites="RasmussenWilliams2006">(<a href="#ref-RasmussenWilliams2006" role="doc-biblioref">Rasmussen 和 Williams 2006年</a>)</span>。任意对称相似函数不自动是有效 GP 协方差。</p>
+<p>定义</p>
+<p><span class="math display">\[
+\bar C=I_T\otimes C,
+\qquad
+\bar d=\mathbf 1_T\otimes d,
+\qquad
+\bar R=I_T\otimes R,
+\]</span></p>
+<p>并堆叠观测为</p>
+<p><span class="math display">\[
+\mathbf y=
+\begin{bmatrix}
+y_1^\top&amp;\cdots&amp;y_T^\top
+\end{bmatrix}^\top.
+\]</span></p>
+<p>则</p>
+<p><span class="math display">\[
+\mathbf y\mid\mathbf x
+\sim
+\mathcal N(\bar C\mathbf x+\bar d,\bar R).
+\]</span></p>
+</section>
+<section id="边际观测分布" class="level3">
+<h3 class="anchored" data-anchor-id="边际观测分布">边际观测分布</h3>
+<p>积分掉潜轨迹给出</p>
+<p><span class="math display">\[
+\mathbf y
+\sim
+\mathcal N(\bar d,\Sigma_y),
+\qquad
+\Sigma_y=\bar C K\bar C^\top+\bar R.
+\]</span></p>
+<p>因此试次对数边际似然是</p>
+<p><span class="math display">\[
+\log p(\mathbf y\mid\theta)
+=-\frac12
+\left[
+(\mathbf y-\bar d)^\top\Sigma_y^{-1}(\mathbf y-\bar d)
++\log|\Sigma_y|
++pT\log(2\pi)
+\right],
+\]</span></p>
+<p>其中 <span class="math inline">\(\theta\)</span> 表示 <span class="math inline">\(C,d,R\)</span> 与核超参数。独立试次贡献试次对数似然之和。二次数据拟合与对数行列式复杂度项是高斯过程边缘化的标准推论 <span class="citation" data-cites="RasmussenWilliams2006">(<a href="#ref-RasmussenWilliams2006" role="doc-biblioref">Rasmussen 和 Williams 2006年</a>)</span>。稳定实现使用 Cholesky 或其他结构化求解，而非显式逆或行列式。</p>
+</section>
+<section id="全区间潜后验" class="level3">
+<h3 class="anchored" data-anchor-id="全区间潜后验">全区间潜后验</h3>
+<p>高斯条件化给出</p>
+<p><span class="math display">\[
+\mathbf x\mid\mathbf y
+\sim
+\mathcal N(\mu_{x\mid y},\Sigma_{x\mid y}),
+\]</span></p>
+<p>其中</p>
+<p><span class="math display">\[
+\mu_{x\mid y}
+=K\bar C^\top\Sigma_y^{-1}(\mathbf y-\bar d),
+\]</span></p>
+<p><span class="math display">\[
+\Sigma_{x\mid y}
+=K-K\bar C^\top\Sigma_y^{-1}\bar C K.
+\]</span></p>
+<p>当 <span class="math inline">\(K\)</span> 与 <span class="math inline">\(\bar R\)</span> 非奇异时，等价精度形式是</p>
+<p><span class="math display">\[
+\Sigma_{x\mid y}
+=
+\left(K^{-1}+\bar C^\top\bar R^{-1}\bar C\right)^{-1},
+\]</span></p>
+<p><span class="math display">\[
+\mu_{x\mid y}
+=
+\Sigma_{x\mid y}\bar C^\top\bar R^{-1}(\mathbf y-\bar d).
+\]</span></p>
+<p>这些公式定义完整路径后验，包括条件化后不同潜坐标与时间之间的协方差。单独绘制 <span class="math inline">\(\mu_{x\mid y}\)</span> 会抑制该不确定性与跨时间依赖。相同有限网格高斯条件化原则支撑普通 GP 后验预测 <span class="citation" data-cites="RasmussenWilliams2006">(<a href="#ref-RasmussenWilliams2006" role="doc-biblioref">Rasmussen 和 Williams 2006年</a>)</span>；Yu 等人显式推导这些堆叠 GPFA 表达式 <span class="citation" data-cites="YuEtAl2009">(<a href="#ref-YuEtAl2009" role="doc-biblioref">Yu 等 2009年</a>)</span>。</p>
+</section>
+<section id="缺失观测" class="level3">
+<h3 class="anchored" data-anchor-id="缺失观测">缺失观测</h3>
+<p>设 <span class="math inline">\(H\)</span> 是只保留观测通道–时间条目的二元选择矩阵。则</p>
+<p><span class="math display">\[
+\mathbf y_O=H\mathbf y
+\]</span></p>
+<p>具有</p>
+<p><span class="math display">\[
+\mathbf y_O\mid\mathbf x
+\sim
+\mathcal N(H\bar C\mathbf x+H\bar d, H\bar R H^\top).
+\]</span></p>
+<p>把 <span class="math inline">\(\bar C,\bar d,\bar R\)</span> 替换为所选版本后，边际与后验公式适用。这在缺失可忽略时于模型下精确处理任意缺失通道或箱。状态依赖缺失、尖峰删失、饱和、事件触发采集或有信息试次终止需要显式缺失/观测模型，而非简单行删除。</p>
+</section>
+<section id="现有试次内新时间" class="level3">
+<h3 class="anchored" data-anchor-id="现有试次内新时间">现有试次内新时间</h3>
+<p>对新时间网格，新时间与观测时间之间的协方差交叉块提供联合高斯先验。条件化给出潜值的后验插值或外推。插值不确定性依赖采样间隙与核；外推回归先验且可以高度不确定。这是 GP 预测，不是学习转移律的传播。</p>
+</section>
+</section>
+<section id="学习得到了什么" class="level2">
+<h2 class="anchored" data-anchor-id="学习得到了什么">学习得到了什么？</h2>
+<p>最大似然拟合可以学习 <span class="math inline">\(C,d,R\)</span>、核时间尺度以及未被约定固定的任何核方差或 nugget 项。候选潜维数与协方差族可以通过嵌套验证选择。这些参数确定观测序列上的边际分布。</p>
+<p>参数固定后，后验推断为每个试次分别计算 <span class="math inline">\(p(\mathbf x\mid\mathbf y,\widehat\theta)\)</span>。后验均值、协方差与样本是推断输出，不是额外学习模型参数。参数学习与轨迹推断不得被描述为同一操作。</p>
+<p>GPFA 不学习转移矩阵、常微分方程、向量场、流、状态依赖速度、因果图或物理测量机制。拟合时间尺度描述所选核族下潜坐标的先验协方差衰减；没有进一步证据，它不是已发现的弛豫常数或因果交互时间。</p>
+</section>
+<section id="什么是固定的" class="level2">
+<h2 class="anchored" data-anchor-id="什么是固定的">什么是固定的？</h2>
+<p>分析者固定观测表示、分箱与变换、试次边界与对齐、潜维数搜索、高斯线性观测族、对角 <span class="math inline">\(R\)</span> 限制、核族、平稳性选择、潜方差或 nugget 是否固定、参数共享结构、优化方法、初始化/重启策略、缺失假设、划分单元与评估目标。</p>
+<p>在原始有界表述中，潜边际方差被固定、小潜 nugget 被固定，每个坐标的平方指数时间尺度被学习 <span class="citation" data-cites="YuEtAl2009">(<a href="#ref-YuEtAl2009" role="doc-biblioref">Yu 等 2009年</a>)</span>。学习任意幅度、跨潜协方差核、非平稳核、非线性观测或点过程似然的模型是相关扩展，必须陈述其扩大的可辨识性与推断要求。</p>
+</section>
+<section id="时序假设" class="level2">
+<h2 class="anchored" data-anchor-id="时序假设">时序假设</h2>
+<p>时间作为每个协方差核的索引进入。GPFA 可以在规则或不规则网格上评估核，但原始神经管线使用非重叠箱与试次相对时间。平稳平方指数核假设协方差在试次内只依赖 <span class="math inline">\(t-t'\)</span>，并蕴含非常光滑的潜样本路径。其他有效核编码不同正则性、周期性、粗糙度或非平稳性 <span class="citation" data-cites="RasmussenWilliams2006">(<a href="#ref-RasmussenWilliams2006" role="doc-biblioref">Rasmussen 和 Williams 2006年</a>)</span>。</p>
+<p>不同试次在共享参数下是独立抽样；规范模型不包含跨试次协方差，也不包含跨边界连续性。事件对齐改变提供给协方差函数的时间坐标。错误对齐可以模糊真实结构，或鼓励模型通过短时间尺度、潜 nugget 或观测噪声解释时序抖动。</p>
+<p>后验使用整个试次的观测。它像固定区间平滑一样是回顾性的，不是较早时间可用的在线估计。延长、缩短或重新对齐试次会改变后验。GPFA 不定义一步因果传播或预测状态转移，尽管其 GP 先验可以条件预测未观测时间。</p>
+</section>
+<section id="几何假设" class="level2">
+<h2 class="anchored" data-anchor-id="几何假设">几何假设</h2>
+<p>观测层在变换观测坐标中线性。<span class="math inline">\(C\)</span> 定义载荷子空间，而对角 <span class="math inline">\(R\)</span> 特权所选通道坐标。GP 核定义时间协方差与函数上的先验分布；它们不定义采样数据流形或生物状态空间上的黎曼度量。</p>
+<p>后验潜均值之间的欧氏距离依赖潜坐标约定与缩放。Yu 等人用 SVD 后处理 <span class="math inline">\(C\)</span>，获得张成相同载荷空间的标准正交化可视化坐标 <span class="citation" data-cites="YuEtAl2009">(<a href="#ref-YuEtAl2009" role="doc-biblioref">Yu 等 2009年</a>)</span>。该显示变换可以辅助解读，但不使显示轴唯一辨识、不在每个旋转下保留独立 GP 参数化，也不把后验均值变成直接观测的几何路径。</p>
+</section>
+<section id="监督" class="level2">
+<h2 class="anchored" data-anchor-id="监督">监督</h2>
+<p>似然不需要外部结果标签，因此规范拟合对行为或实验类别无监督。尽管如此，试次分段、事件对齐、所选区间、条件池化、神经元包含、预处理、核选择与潜维数搜索都是可以使用任务信息的设计选择。</p>
+<p>如果标签或行为选择模型、超参数、对齐、显示维数或时间区间，那些选择引入监督，必须发生在训练/验证折叠内。把固定、留出潜摘要与行为联系起来是下游分析；预测成功不证明潜坐标是因果或机制变量。</p>
+</section>
+<section id="优化-推断" class="level2">
+<h2 class="anchored" data-anchor-id="优化-推断">优化 / 推断</h2>
+<p>对固定参数，高斯路径后验与边际似然是精确有限维条件化计算。参数拟合是单独的一般非凸优化问题。</p>
+<p>Yu 等人使用期望最大化：E 步计算每个试次潜路径的后验一阶与二阶矩；M 步更新 <span class="math inline">\(C,d\)</span>、对角 <span class="math inline">\(R\)</span> 与核超参数，观测参数使用 FA 式闭式更新，时间尺度使用梯度优化 <span class="citation" data-cites="YuEtAl2009">(<a href="#ref-YuEtAl2009" role="doc-biblioref">Yu 等 2009年</a>)</span>。EM 的单调似然改善不确保唯一全局最优。原始研究发现即使似然与显示轨迹相似，时间尺度估计也依赖初始化，促使多次启动与显式收敛检查。</p>
+<p>直接边际似然优化也可行。长度尺度、信号、nugget 与残差噪声目标可以包含脊或局部最优，短记录可能对其提供弱信息 <span class="citation" data-cites="RasmussenWilliams2006">(<a href="#ref-RasmussenWilliams2006" role="doc-biblioref">Rasmussen 和 Williams 2006年</a>)</span>。稳定计算应使用 Cholesky 分解、三角求解、来自因子的对数行列式，并且只在承认它是协方差模型修改时使用声明抖动。</p>
+</section>
+<section id="优点" class="level2">
+<h2 class="anchored" data-anchor-id="优点">优点</h2>
+<ul>
+<li>它在单一归一化概率模型中组合时间平滑与因子分析。</li>
+<li>它返回全区间后验不确定性与跨时间协方差，而不仅是滤波曲线或确定性投影。</li>
+<li>坐标特定时间尺度允许潜因子以不同时间尺度变化。</li>
+<li>不规则时间网格与缺失观测条目可以通过协方差评估与高斯条件化处理。</li>
+<li>边际似然、预测密度、留神经元预测与后验检查提供可视化之外的评估准则。</li>
+<li>它为 LGSSM/RTS 平滑提供非马尔可夫协方差先验比较，为静态 FA 提供时间耦合比较。</li>
+</ul>
+</section>
+<section id="失效模式" class="level2">
+<h2 class="anchored" data-anchor-id="失效模式">失效模式</h2>
+<ul>
+<li><strong>错误观测律：</strong> 低分箱计数保持离散、有下界、偏斜且常过度离散；平方根计数上的高斯律只是近似。</li>
+<li><strong>对角残差失效：</strong> 同步伪迹、共享输入、串扰、分选错误与未建模群体结构可以留下被强迫进潜因子的相关残差。</li>
+<li><strong>核误设：</strong> 平方指数先验可以抑制突然转移、振荡粗糙度、变点或非平稳时间尺度。</li>
+<li><strong>先验施加光滑性：</strong> 即使数据稀疏或带噪，后验均值也可以看起来光滑，因为协方差先验奖励光滑函数。</li>
+<li><strong>错误试次边界：</strong> 把连续活动段当作独立重置或在真正重置上平滑会改变模型。</li>
+<li><strong>对齐与分箱敏感性：</strong> 事件抖动、箱宽与变换计数尺度改变估计协方差、表观维数与时间尺度。</li>
+<li><strong>短或稀疏试次：</strong> 当观测到很少试次内时滞时，时间尺度、nugget 与残差方差可能弱可分。</li>
+<li><strong>潜对观测噪声权衡：</strong> <span class="math inline">\(R\)</span>、潜 nugget、短时间尺度信号与额外因子可以相互补偿。</li>
+<li><strong>错误潜维数：</strong> 因子太少留下共享残差协方差；太多制造弱占用、不稳定或冗余轨迹。</li>
+<li><strong>局部优化：</strong> EM 或直接似然方法可以达到不同局部代表或超参数模态。</li>
+<li><strong>计算缩放：</strong> 朴素实现中精确稠密协方差计算随潜维数乘试次长度三次增长；长序列可能需要本有界对象之外的结构化或近似变体。</li>
+<li><strong>缺失误设：</strong> 忽略有信息缺失或删失会偏差后验。</li>
+<li><strong>分布移位：</strong> 共享 <span class="math inline">\(C,R\)</span> 与核可能跨会话、受试者、条件或记录漂移失败。</li>
+<li><strong>泄漏：</strong> 用测试试次选择箱、维数、核、时间尺度、对齐或显示轨迹会产生乐观结果。</li>
+<li><strong>可视化越界：</strong> 光滑低维后验均值被误认为流形、本征维数、动力学定律、向量场、机制或唯一路径。</li>
+</ul>
+</section>
+<section id="可辨识性问题" class="level2">
+<h2 class="anchored" data-anchor-id="可辨识性问题">可辨识性问题</h2>
+<p>必须区分若干精确或条件等价：</p>
+<ul>
+<li><strong>符号：</strong> 把潜坐标 <span class="math inline">\(x_j\)</span> 替换为 <span class="math inline">\(-x_j\)</span>、载荷列 <span class="math inline">\(C_{:j}\)</span> 替换为 <span class="math inline">\(-C_{:j}\)</span> 保留可观测律。</li>
+<li><strong>置换：</strong> 一起置换潜坐标、载荷列及其核超参数保留模型。</li>
+<li><strong>尺度：</strong> 如果核边际幅度自由，重标 <span class="math inline">\(x_j'=s_jx_j\)</span>、<span class="math inline">\(C'_{:j}=C_{:j}/s_j\)</span> 与 <span class="math inline">\(k'_j=s_j^2k_j\)</span> 保留可观测分布。固定 <span class="math inline">\(k_j(t,t)=1\)</span> 移除该连续尺度歧义，但不移除符号或置换。</li>
+<li><strong>旋转：</strong> 任意正交旋转只在具有相同协方差矩阵的潜坐标之间保留独立 GP 族。当核或时间尺度不同时，一般旋转引入跨潜协方差，落在对角独立 GP 参数化之外。因此相等或近相等核在相应子空间中制造精确或实用旋转歧义。</li>
+<li><strong>事后可视化：</strong> 任何可逆潜坐标变换都可以在 <span class="math inline">\(C\)</span> 与完整潜协方差被一致变换时表示相同拟合联合高斯，但变换模型可能不再具有独立逐坐标核。选择标准正交显示轴选择代表，而非辨识生物坐标。</li>
+</ul>
+<p>超参数辨识也可能弱。信号幅度与载荷尺度权衡，除非归一化；潜 nugget、短长度尺度、<span class="math inline">\(R\)</span> 与额外因子可以解释重叠高频变异；非常长长度尺度可以类似低阶趋势或试次均值。有限窗口约束观测到哪些时滞，因此最大似然时间尺度可能受边界限制或对初始化敏感。</p>
+<p>所选因子数是模型与准则相关的。它不是与模型无关的本征维数。即使拟合参数下后验集中，也不在观测等价或误设模型中确立唯一潜轨迹。</p>
+</section>
+<section id="与更简单方法的比较" class="level2">
+<h2 class="anchored" data-anchor-id="与更简单方法的比较">与更简单方法的比较</h2>
+<ul>
+<li><strong>训练均值加对角高斯：</strong> 不预测共享潜变异。在共享时序结构被归功之前，GPFA 应改善留出序列似然或留神经元预测。</li>
+<li><strong>静态因子分析：</strong> 使用相同线性高斯观测思想，但把时间点独立处理。它是 GP 时间耦合是否增加价值的所需基线。</li>
+<li><strong>两阶段平滑加 PCA 或 FA：</strong> 先选择时序平滑器，再应用静态降维。Yu 等人把 GPFA 与交叉验证两阶段变体比较；该比较检验联合拟合光滑性与共享协方差是否在所选观测尺度下改善预测 <span class="citation" data-cites="YuEtAl2009">(<a href="#ref-YuEtAl2009" role="doc-biblioref">Yu 等 2009年</a>)</span>。</li>
+<li><strong>逐通道 GP 或平滑器：</strong> 独立建模每个观测通道，检验是否需要共享低维载荷。</li>
+<li><strong>LGSSM：</strong> 指定一阶马尔可夫转移律、过程噪声与线性观测模型。GPFA 直接指定时间协方差，不必对应有界 LGSSM 参数化。更好拟合不蕴含任一模型机制上为真。</li>
+<li><strong>固定区间卡尔曼平滑：</strong> 是固定 LGSSM 的推断算法。GPFA 后验推断也是回顾性高斯平滑，但它条件化不同先验，不字面需要 RTS 遍历。某些 GP 协方差模型承认状态空间表示；该计算等价不使一般 GPFA 成为学习转移模型。</li>
+<li><strong>双侧移动平均：</strong> 透明非概率平滑器，缺乏共享潜因子与校准路径协方差，但可以揭示表观光滑性是否需要复杂模型。</li>
+<li><strong>独立箱后验均值：</strong> 在保持 <span class="math inline">\(C,d,R\)</span> 的同时移除跨时间协方差，隔离 GP 先验效应。</li>
+</ul>
+</section>
+<section id="评估准则" class="level2">
+<h2 class="anchored" data-anchor-id="评估准则">评估准则</h2>
+<p>评估必须保持参数选择、后验推断与最终评分分离：</p>
+<ol type="1">
+<li><strong>划分完整依赖单元：</strong> 在拟合前划分试次、会话、动物或条件。不要把来自一个试次的箱散落到训练与测试参数学习折叠。</li>
+<li><strong>仅训练设计选择：</strong> 在训练/验证数据内选择分箱、对齐、变换、包含通道、潜维数、协方差族、初始化策略与超参数。</li>
+<li><strong>留出试次似然：</strong> 在相同预处理拟合的静态 FA、对角与时间基线之下，报告未触碰试次上每时间/通道的边际对数似然或对数预测密度。</li>
+<li><strong>留神经元预测：</strong> 在训练试次上拟合参数，然后在留出试次中掩蔽一个记录通道、从其余通道推断潜路径，并对掩蔽通道的预测分布评分。不要用留出值重拟合。Yu 等人用类似预测误差准则比较 GPFA 与两阶段方法 <span class="citation" data-cites="YuEtAl2009">(<a href="#ref-YuEtAl2009" role="doc-biblioref">Yu 等 2009年</a>)</span>。</li>
+<li><strong>掩蔽时间预测：</strong> 从该测试试次的参数拟合与后验条件化都隐藏声明时间块，然后对其条件预测密度与区间覆盖评分。</li>
+<li><strong>残差诊断：</strong> 检查均值、边际方差、跨通道残差协方差、时序残差自相关、尾部、计数依赖与条件/会话漂移。</li>
+<li><strong>后验校准：</strong> 在保留真值的模拟中，评估逐点与同时覆盖、后验马氏统计量与路径不确定性——而不仅是后验均值 RMSE。</li>
+<li><strong>不变恢复目标：</strong> 只在允许符号/置换/尺度或相同核子空间对齐后比较载荷子空间、可观测协方差、预测与潜路径。</li>
+<li><strong>超参数稳定性：</strong> 报告多次启动、似然模态、时间尺度/nugget 边界、折叠变异以及对窗口长度与箱宽的敏感性。</li>
+<li><strong>先验敏感性：</strong> 比较合理协方差族与独立箱/静态极限。在合理先验变化下消失的光滑性不是鲁棒经验发现。</li>
+<li><strong>分布移位检验：</strong> 当声称时，留出会话、受试者、任务条件或采集时段，而不仅依赖随机试次折叠。</li>
+<li><strong>不同化目标评分：</strong> 用于形成后验的观测箱不能在没有条件预测或留出规程的情况下被复用为重构质量的独立证据。</li>
+</ol>
+<p>似然与留神经元度量仍以变换高斯观测模型为条件。更好预测表现支持该模型/任务组合，而非神经机制或唯一正确潜表示。</p>
+</section>
+<section id="最小玩具模型" class="level2">
+<h2 class="anchored" data-anchor-id="最小玩具模型">最小玩具模型</h2>
+<p>未来的非可执行解析/生成契约应使用 <span class="math inline">\(q=2\)</span> 个独立潜 GP，通过 <span class="math inline">\(p=8\)</span> 个通道在多个独立试次上观测。设</p>
+<p><span class="math display">\[
+k_1(t,t')=\exp\!\left[-\frac{(t-t')^2}{2(0.08)^2}\right],
+\qquad
+k_2(t,t')=0.95\exp\!\left[-\frac{(t-t')^2}{2(0.30)^2}\right]+0.05\delta_{t,t'}.
+\]</span></p>
+<p>选择满列秩载荷矩阵 <span class="math inline">\(C\)</span>、偏移 <span class="math inline">\(d\)</span> 与异质对角</p>
+<p><span class="math display">\[
+R=\operatorname{diag}(r_1,\ldots,r_8).
+\]</span></p>
+<p>对每个试次，在声明规则或不规则网格上抽取新 GP 潜值，生成高斯观测并保留潜真值。某些测试试次应包含掩蔽通道与时间块。</p>
+<p>比较：</p>
+<ul>
+<li>均值加对角高斯；</li>
+<li>静态双因子 FA；</li>
+<li>交叉验证两阶段平滑加 FA；</li>
+<li>正确指定的 GPFA；</li>
+<li>具有一个错误公共时间尺度的 GPFA 模型；以及</li>
+<li>拟合到相同序列的两状态 LGSSM。</li>
+</ul>
+<p>对留出边际似然、掩蔽通道/时间预测密度、可观测协方差、载荷子空间误差、对齐后验均值误差、后验覆盖与时间尺度恢复评分。必需压力情形是：</p>
+<ol type="1">
+<li>违反平方指数光滑性的突然变点；</li>
+<li>违反对角 <span class="math inline">\(R\)</span> 的相关观测残差；</li>
+<li>用高斯平方根近似分析的低率泊松计数；</li>
+<li>时间值近似独立的潜坐标；</li>
+<li>暴露旋转歧义的两个等时间尺度坐标；</li>
+<li>事件时间抖动与错误试次对齐；</li>
+<li>有信息缺失；以及</li>
+<li>从 <span class="math inline">\(d\)</span> 中省略的条件锁定均值，迫使潜因子吸收确定性试次结构。</li>
+</ol>
+<p>恢复主张必须尊重符号、置换、尺度与相同核旋转等价。该玩具契约会区分已知模型下的后验推断与参数学习和模型选择。本方法对象不产生代码、数据、图或结果。</p>
+</section>
+<section id="对-ldg-的意义" class="level2">
+<h2 class="anchored" data-anchor-id="对-ldg-的意义">对 LDG 的意义</h2>
+<p>GPFA 是 LDG 的规范协方差先验潜轨迹方法。它连接静态因子分析、全区间后验推断、时间正则化与依赖模型的不确定性，同时提供与基于转移的 LGSSM 平滑的对照。</p>
+<p>其主要方法学教训是光滑潜轨迹可以是合适的后验摘要，而不必是已发现动力学。协方差先验陈述条件化前哪些路径合理，观测模型陈述潜路径如何与测量相关，后验组合两者。这些步骤中没有一个单独识别向量场或机制。</p>
+<div class="callout callout-style-default callout-warning callout-titled" title="这并不蕴含">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">警告</span>这并不蕴含
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>光滑 GPFA 后验均值不确立学习转移律、向量场、流、动力学、流形、本征维数、生物机制、因果过程或唯一辨识潜轨迹。光滑性由协方差先验与拟合超参数施加。后验是回顾性的，并以线性高斯观测模型、对角残差假设、试次边界、核族、预处理与插件参数为条件。</p>
+</div>
+</div>
+<section id="小鼠轨迹" class="level3">
+<h3 class="anchored" data-anchor-id="小鼠轨迹">小鼠轨迹</h3>
+<p>不保留模态特定经验主张。GPFA 可以概括重复多通道运动测量，但外部任务驱动、试次对齐、间断与传感器相关需要显式处理。光滑潜曲线不确立自治行为动力学。</p>
+</section>
+<section id="眼动" class="level3">
+<h3 class="anchored" data-anchor-id="眼动">眼动</h3>
+<p>不保留模态特定经验主张。扫视间断、追踪输入、事件对齐、眨眼、删失与角度坐标可以违反平稳光滑 GP 与可忽略缺失假设。</p>
+</section>
+<section id="eeg" class="level3">
+<h3 class="anchored" data-anchor-id="eeg">EEG</h3>
+<p>不保留模态特定经验主张。重参考、容积传导、滤波、伪迹、非平稳性与相关传感器残差直接挑战对角 <span class="math inline">\(R\)</span> 与独立试次假设。GPFA 因子不自动是神经源。</p>
+</section>
+<section id="meg-神经群体数据" class="level3">
+<h3 class="anchored" data-anchor-id="meg-神经群体数据">MEG / 神经群体数据</h3>
+<p>Yu 等人把 GPFA 应用于 61 个同时记录猕猴前运动与运动皮层单元在伸手规划与执行期间的平方根变换分箱活动。在其交叉验证留神经元预测误差准则下，GPFA 优于所测试的两阶段方法，推断单试次轨迹被用于检查运动准备期间的收敛 <span class="citation" data-cites="YuEtAl2009">(<a href="#ref-YuEtAl2009" role="doc-biblioref">Yu 等 2009年</a>)</span>。这些是一个数据集与管线下的来源特定经验发现，不是光滑神经动力学或机制的普遍证据。</p>
+<p>Cunningham 与 Yu 综述 GPFA 为带显式噪声模型的单试次潜轨迹方法，并强调提取轨迹反映拟合模型鼓励的时间结构 <span class="citation" data-cites="CunninghamYu2014">(<a href="#ref-CunninghamYu2014" role="doc-biblioref">Cunningham 和 Yu 2014年</a>)</span>。因此新的神经主张需要独立预测评估、先验敏感性、残差检查与模态特定证据。</p>
+</section>
+</section>
+<section id="主要来源" class="level2">
+<h2 class="anchored" data-anchor-id="主要来源">主要来源</h2>
+<ul>
+<li>Yu 等人引入 GPFA，指定 FA 式观测层与独立潜 GP 先验，推导有限网格边际与后验，用 EM 拟合参数，定义标准正交化可视化，并报告原始单试次猕猴运动皮层应用 <span class="citation" data-cites="YuEtAl2009">(<a href="#ref-YuEtAl2009" role="doc-biblioref">Yu 等 2009年</a>)</span>。已核查发表勘误；它修正 Figure A2 中的颜色归属，不改变此处使用的模型方程。</li>
+</ul>
+</section>
+<section id="综述-次级来源" class="level2">
+<h2 class="anchored" data-anchor-id="综述-次级来源">综述 / 次级来源</h2>
+<ul>
+<li>Rasmussen 与 Williams 提供经核查的高斯过程、半正定协方差函数、有限网格联合高斯分布、后验条件化、平方指数长度尺度与边际似然学习权威处理 <span class="citation" data-cites="RasmussenWilliams2006">(<a href="#ref-RasmussenWilliams2006" role="doc-biblioref">Rasmussen 和 Williams 2006年</a>)</span>。</li>
+<li>Cunningham 与 Yu 综述神经降维方法，区分 GPFA 与两阶段和基于转移的替代，讨论单试次使用与交叉验证，并告诫潜轨迹反映模型施加的时间结构 <span class="citation" data-cites="CunninghamYu2014">(<a href="#ref-CunninghamYu2014" role="doc-biblioref">Cunningham 和 Yu 2014年</a>)</span>。</li>
+</ul>
+</section>
+<section id="开放方法学问题" class="level2">
+<h2 class="anchored" data-anchor-id="开放方法学问题">开放方法学问题</h2>
+<ul>
+<li>哪些协方差族在不抑制科学上有意义的间断或非平稳性的情况下捕获神经正则性？</li>
+<li>何时可以从可用试次长度与采样率区分潜 nugget、观测噪声、短时间尺度与额外因子？</li>
+<li>应如何在实用规模上把参数不确定性传播进后验路径不确定性？</li>
+<li>哪个留出目标——试次似然、神经元预测、掩蔽时间预测、行为或模拟器状态——最匹配科学用途？</li>
+<li>推断时间尺度与载荷子空间跨会话、受试者、条件、箱宽与观测变换有多鲁棒？</li>
+<li>何时基于转移的状态空间表示更适合预测、干预或机制问题？</li>
+<li>应如何界定与验证点过程、相关残差、非平稳或跨试次扩展，而不把灵活性当作证据？</li>
+</ul>
+</section>
+<section id="成熟度检查表" class="level2">
+<h2 class="anchored" data-anchor-id="成熟度检查表">成熟度检查表</h2>
+<ul class="task-list">
+<li><label><input type="checkbox" checked="">完整方法 schema，状态为 <code>L2/review</code>。</label></li>
+<li><label><input type="checkbox" checked="">定义对角 <span class="math inline">\(R\)</span> 的 FA 式线性高斯观测与跨坐标和试次独立的潜 GP 先验。</label></li>
+<li><label><input type="checkbox" checked="">声明高斯过程与半正定协方差核为假定背景，并排除时序核概念作为前置条件。</label></li>
+<li><label><input type="checkbox" checked="">定义平方指数时间尺度，并清楚区分可选潜 GP nugget 与观测噪声和转移过程噪声。</label></li>
+<li><label><input type="checkbox" checked="">给出有限网格堆叠联合高斯、边际似然、后验均值/协方差与缺失观测选择表述。</label></li>
+<li><label><input type="checkbox" checked="">区分参数学习、模型选择与后验轨迹推断。</label></li>
+<li><label><input type="checkbox" checked="">陈述学习/固定量、回顾性时间处理、几何、监督与尖峰计数高斯边界。</label></li>
+<li><label><input type="checkbox" checked="">覆盖符号、置换、尺度、相同核旋转、事后坐标与超参数可辨识性。</label></li>
+<li><label><input type="checkbox" checked="">覆盖先验施加光滑性、核/观测/试次/对齐/分箱/缺失失效与局部优化。</label></li>
+<li><label><input type="checkbox" checked="">包含静态 FA、两阶段、独立通道、LGSSM、卡尔曼平滑、移动平均与独立箱基线。</label></li>
+<li><label><input type="checkbox" checked="">给出防泄漏留出评估与非可执行正/负玩具契约。</label></li>
+<li><label><input type="checkbox" checked="">显式拒绝学习转移、向量场、动力学、流形、本征维数、机制、因果与唯一轨迹主张。</label></li>
+<li><label><input type="checkbox" checked="">三个保留来源与原始论文勘误经核查；元数据与 DOI 或稳定标识符已验证。</label></li>
+<li><label><input type="checkbox" checked="">独立混合审查返回 PASS，无需修正轮次。</label></li>
+<li><label><input type="checkbox" checked="">在对象特定 PASS 与验证后，根据记录的审查决定授权稳定晋升。</label></li>
+</ul>
+
+
+<!-- -->
+
+
+</section>
+</section>
+
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography" id="quarto-bibliography"><h2 class="anchored quarto-appendix-heading">参考文献</h2><div id="refs" class="references csl-bib-body hanging-indent" role="list">
+<div id="ref-CunninghamYu2014" class="csl-entry" role="listitem">
+Cunningham, John P., 和 Byron M. Yu. 2014年. <span>《Dimensionality Reduction for Large-Scale Neural Recordings》</span>. <em>Nature Neuroscience</em> 17 (11): 1500～1509. <a href="https://doi.org/10.1038/nn.3776">https://doi.org/10.1038/nn.3776</a>.
+</div>
+<div id="ref-RasmussenWilliams2006" class="csl-entry" role="listitem">
+Rasmussen, Carl Edward, 和 Christopher K. I. Williams. 2006年. <em>Gaussian Processes for Machine Learning</em>. Adaptive Computation and Machine Learning. MIT Press. <a href="https://gaussianprocess.org/gpml/">https://gaussianprocess.org/gpml/</a>.
+</div>
+<div id="ref-YuEtAl2009" class="csl-entry" role="listitem">
+Yu, Byron M., John P. Cunningham, Gopal Santhanam, Stephen I. Ryu, Krishna V. Shenoy, 和 Maneesh Sahani. 2009年. <span>《Gaussian-Process Factor Analysis for Low-Dimensional Single-Trial Analysis of Neural Population Activity》</span>. <em>Journal of Neurophysiology</em> 102 (1): 614～35. <a href="https://doi.org/10.1152/jn.90941.2008">https://doi.org/10.1152/jn.90941.2008</a>.
+</div>
+</div></section></div></main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "已复制");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "已复制");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+    const viewSource = window.document.getElementById('quarto-view-source') ||
+                       window.document.getElementById('quarto-code-tools-source');
+    if (viewSource) {
+      const sourceUrl = viewSource.getAttribute("data-quarto-source-url");
+      viewSource.addEventListener("click", function(e) {
+        if (sourceUrl) {
+          // rstudio viewer pane
+          if (/\bcapabilities=\b/.test(window.location)) {
+            window.open(sourceUrl);
+          } else {
+            window.location.href = sourceUrl;
+          }
+        } else {
+          const modal = new bootstrap.Modal(document.getElementById('quarto-embedded-source-code-modal'));
+          modal.show();
+        }
+        return false;
+      });
+    }
+    function toggleCodeHandler(show) {
+      return function(e) {
+        const cellDetails = window.document.querySelectorAll(".cell details.code-fold");
+        for (let i=0; i<cellDetails.length; i++) {
+          const details = cellDetails[i];
+          if (show) {
+            details.open = true;
+          } else {
+            details.removeAttribute("open");
+          }
+        }
+        const cellCodeDivs = window.document.querySelectorAll(".cell div.sourceCode.cell-code");
+        const fromCls = show ? "hidden" : "unhidden";
+        const toCls = show ? "unhidden" : "hidden";
+        for (let i=0; i<cellCodeDivs.length; i++) {
+          const codeDiv = cellCodeDivs[i];
+          if (codeDiv.classList.contains(fromCls)) {
+            codeDiv.classList.remove(fromCls);
+            codeDiv.classList.add(toCls);
+          } 
+        }
+        return false;
+      }
+    }
+    const hideAllCode = window.document.getElementById("quarto-hide-all-code");
+    if (hideAllCode) {
+      hideAllCode.addEventListener("click", toggleCodeHandler(false));
+    }
+    const showAllCode = window.document.getElementById("quarto-show-all-code");
+    if (showAllCode) {
+      showAllCode.addEventListener("click", toggleCodeHandler(true));
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/abelzheng\.github\.io\/latent-dynamics-geometry-public\/");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+            // target, if specified
+            link.setAttribute("target", "_blank");
+            if (link.getAttribute("rel") === null) {
+              link.setAttribute("rel", "noopener");
+            }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">源代码</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1" data-shortcodes="false"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="an">title:</span><span class="co"> "高斯过程因子分析"</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="an">lang:</span><span class="co"> zh-CN</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="an">comments:</span><span class="co"> false</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="an">object_type:</span><span class="co"> method</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="an">maturity:</span><span class="co"> L2</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="an">status:</span><span class="co"> stable</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="an">domain:</span><span class="co"> [latent-modeling, temporal-modeling, neuroscience, statistics]</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="an">tags:</span><span class="co"> [gpfa, gaussian-process, factor-analysis, latent-trajectory]</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="an">prerequisites:</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="co">- knowledge/methods/factor-analysis.qmd</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="co">- knowledge/concepts/latent-variable.qmd</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="co">- knowledge/concepts/latent-trajectory.qmd</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="co">- knowledge/concepts/observation-model.qmd</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="co">- knowledge/concepts/observation-noise.qmd</span></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="co">- knowledge/concepts/identifiability.qmd</span></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="an">related:</span></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a><span class="co">- knowledge/methods/linear-gaussian-state-space-model.qmd</span></span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a><span class="co">- knowledge/methods/kalman-smoothing.qmd</span></span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a><span class="an">created:</span><span class="co"> 2026-08-19</span></span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a><span class="an">updated:</span><span class="co"> 2026-08-19</span></span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a><span class="fu"># 高斯过程因子分析</span></span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a><span class="fu">## 问题</span></span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>高斯过程因子分析（GPFA）通过组合因子分析式线性高斯观测模型与潜坐标上的高斯过程先验，从高维时间序列推断光滑、低维潜轨迹。在其规范神经应用中，观测是同时记录单元的变换分箱尖峰计数，每个试次在其潜路径上接收全区间后验分布 <span class="co">[</span><span class="ot">@YuEtAl2009</span><span class="co">]</span>。</span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>有界方法求解回顾性概率平滑与降维问题：</span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a><span class="at">&gt; 在声明线性高斯观测模型与试次内时间的声明协方差函数下，完整观测序列支持潜轨迹上的什么后验分布？</span></span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a>GPFA 不学习状态转移方程。其时序结构通过直接编码不同时间潜值之间相关的协方差核指定。因此光滑后验均值部分地是所选先验族、时间尺度与观测模型的推论，而非唯一存在路径的直接观测。</span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a>**假定背景：** 高斯过程与对称半正定协方差核。高斯过程协方差核 $k(t,t')$ 指定随机函数值之间的协方差，并必须在每个有限时间网格上生成半正定 Gram 矩阵 [@RasmussenWilliams2006]。现有 [Kernel Concept](../concepts/kernel.qmd) 把 **kernel** 用于时序脉冲响应/滤波器加权函数。它不是此处使用的半正定协方差核的前置条件，也不得与其混淆。</span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a><span class="fu">## 输入</span></span>
+<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a>对试次 $n=1,\ldots,N$，设</span>
+<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a>Y^{(n)}=</span>
+<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a>\begin{bmatrix}</span>
+<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a>y^{(n)}_1&amp;\cdots&amp;y^{(n)}_{T_n}</span>
+<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a>\end{bmatrix}</span>
+<span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a>\in\mathbb R^{p\times T_n},</span>
+<span id="cb1-48"><a href="#cb1-48" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-50"><a href="#cb1-50" aria-hidden="true" tabindex="-1"></a>其中 $p$ 是观测通道数，$t^{(n)}_1,\ldots,t^{(n)}_{T_n}$ 是该试次的声明时间网格。在规范神经表述中，$y^{(n)}_t$ 包含平方根变换后的非重叠分箱尖峰计数；与两阶段平滑后静态降维不同，变换计数在 GPFA 前不被预平滑 <span class="co">[</span><span class="ot">@YuEtAl2009</span><span class="co">]</span>。</span>
+<span id="cb1-51"><a href="#cb1-51" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-52"><a href="#cb1-52" aria-hidden="true" tabindex="-1"></a>可复现分析必须声明：</span>
+<span id="cb1-53"><a href="#cb1-53" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-54"><a href="#cb1-54" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>实验单元、记录群体、同时对伪群体状态、包含规则与试次/序列边界；</span>
+<span id="cb1-55"><a href="#cb1-55" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>箱宽、时间网格、事件对齐、分析区间、计数变换与不等试次长度的处理；</span>
+<span id="cb1-56"><a href="#cb1-56" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>跨条件或试次特定均值是否被移除、表示在 $d$ 中或单独建模；</span>
+<span id="cb1-57"><a href="#cb1-57" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>候选潜维数 $q$ 及其选择规则；</span>
+<span id="cb1-58"><a href="#cb1-58" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>协方差核族、信号方差约定、时间尺度约束与任何潜 nugget/噪声项；</span>
+<span id="cb1-59"><a href="#cb1-59" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>观测协方差结构以及对角 $R$ 是否在科学上站得住脚；</span>
+<span id="cb1-60"><a href="#cb1-60" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>参数初始化、优化、重启、收敛检查与正则化；</span>
+<span id="cb1-61"><a href="#cb1-61" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>缺失观测与删失规则；以及</span>
+<span id="cb1-62"><a href="#cb1-62" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>训练、验证与测试划分单元。</span>
+<span id="cb1-63"><a href="#cb1-63" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-64"><a href="#cb1-64" aria-hidden="true" tabindex="-1"></a>规范多试次模型在共享参数条件下把试次视为条件独立。它不要求相等 $T_n$，但假设所有试次使用相同载荷矩阵、观测偏移、残差协方差与核超参数族。对齐重置试次内时间，不创建试次端点之间的连续性。</span>
+<span id="cb1-65"><a href="#cb1-65" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-66"><a href="#cb1-66" aria-hidden="true" tabindex="-1"></a><span class="fu">## 输出</span></span>
+<span id="cb1-67"><a href="#cb1-67" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-68"><a href="#cb1-68" aria-hidden="true" tabindex="-1"></a>对所选潜维数 $q$，拟合 GPFA 返回：</span>
+<span id="cb1-69"><a href="#cb1-69" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-70"><a href="#cb1-70" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>载荷矩阵 $C\in\mathbb R^{p\times q}$；</span>
+<span id="cb1-71"><a href="#cb1-71" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>观测偏移 $d\in\mathbb R^p$；</span>
+<span id="cb1-72"><a href="#cb1-72" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>对角观测残差协方差 $R\in\mathbb R^{p\times p}$；</span>
+<span id="cb1-73"><a href="#cb1-73" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>每个潜坐标一个协方差核与拟合超参数；</span>
+<span id="cb1-74"><a href="#cb1-74" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>每个观测试次上的边际高斯分布；</span>
+<span id="cb1-75"><a href="#cb1-75" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>每个试次完整潜路径上的联合高斯后验；以及</span>
+<span id="cb1-76"><a href="#cb1-76" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>由该路径分布推导的后验均值、边际协方差、跨时间协方差、样本或后验预测。</span>
+<span id="cb1-77"><a href="#cb1-77" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-78"><a href="#cb1-78" aria-hidden="true" tabindex="-1"></a>后验均值是单条轨迹摘要。它不是潜轨迹随机元素本身、测量状态路径，也不是积分掉参数不确定性的轨迹。如果参数由最大似然估计并保持固定，报告后验协方差以那些插件参数为条件。</span>
+<span id="cb1-79"><a href="#cb1-79" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-80"><a href="#cb1-80" aria-hidden="true" tabindex="-1"></a><span class="fu">## 核心思想</span></span>
+<span id="cb1-81"><a href="#cb1-81" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-82"><a href="#cb1-82" aria-hidden="true" tabindex="-1"></a>静态因子分析独立对每个观测向量应用相同低秩加对角高斯观测模型。GPFA 保留该观测层，但用 GP 先验跨时间耦合潜值。协方差函数时间尺度长时，邻近潜状态可以强相关，产生光滑后验路径；短时间尺度或大潜 nugget 允许更快或更不光滑变异。</span>
+<span id="cb1-83"><a href="#cb1-83" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-84"><a href="#cb1-84" aria-hidden="true" tabindex="-1"></a>Yu 等人把 GPFA 描述为每个时间点一个共享观测参数的因子分析器，在潜空间由 GP 先验链接 <span class="co">[</span><span class="ot">@YuEtAl2009</span><span class="co">]</span>。完整有限网格模型是多元高斯，因此潜路径可以被积分掉获得精确边际似然，并以完整试次为条件获得精确高斯后验。精确性以高斯模型与有限矩阵计算为条件；它不是变换尖峰计数或神经活动真的遵循该模型的证据。</span>
+<span id="cb1-85"><a href="#cb1-85" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-86"><a href="#cb1-86" aria-hidden="true" tabindex="-1"></a><span class="fu">## 生成 / 建模假设</span></span>
+<span id="cb1-87"><a href="#cb1-87" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-88"><a href="#cb1-88" aria-hidden="true" tabindex="-1"></a>对一个试次中的时间 $t$，观测模型是</span>
+<span id="cb1-89"><a href="#cb1-89" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-90"><a href="#cb1-90" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-91"><a href="#cb1-91" aria-hidden="true" tabindex="-1"></a>y_t=Cx_t+d+\epsilon_t,</span>
+<span id="cb1-92"><a href="#cb1-92" aria-hidden="true" tabindex="-1"></a>\qquad</span>
+<span id="cb1-93"><a href="#cb1-93" aria-hidden="true" tabindex="-1"></a>\epsilon_t\sim\mathcal N(0,R),</span>
+<span id="cb1-94"><a href="#cb1-94" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-95"><a href="#cb1-95" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-96"><a href="#cb1-96" aria-hidden="true" tabindex="-1"></a>其中 $x_t\in\mathbb R^q$ 且</span>
+<span id="cb1-97"><a href="#cb1-97" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-98"><a href="#cb1-98" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-99"><a href="#cb1-99" aria-hidden="true" tabindex="-1"></a>R=\operatorname{diag}(r_1,\ldots,r_p),</span>
+<span id="cb1-100"><a href="#cb1-100" aria-hidden="true" tabindex="-1"></a>\qquad r_i&gt;0.</span>
+<span id="cb1-101"><a href="#cb1-101" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-102"><a href="#cb1-102" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-103"><a href="#cb1-103" aria-hidden="true" tabindex="-1"></a>观测残差在 $x_t$ 条件下跨通道独立，因为 $R$ 对角，且通常被假设跨时间与试次独立。潜函数在坐标间先验独立：</span>
+<span id="cb1-104"><a href="#cb1-104" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-105"><a href="#cb1-105" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-106"><a href="#cb1-106" aria-hidden="true" tabindex="-1"></a>x_j^{(n)}(\cdot)\sim\mathcal{GP}(0,k_j),</span>
+<span id="cb1-107"><a href="#cb1-107" aria-hidden="true" tabindex="-1"></a>\qquad j=1,\ldots,q,</span>
+<span id="cb1-108"><a href="#cb1-108" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-109"><a href="#cb1-109" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-110"><a href="#cb1-110" aria-hidden="true" tabindex="-1"></a>并在共享超参数条件下跨试次独立。因此每个试次抽取新的潜路径；没有模型约束强制名义相似试次遵循相同实现 <span class="co">[</span><span class="ot">@YuEtAl2009</span><span class="co">]</span>。</span>
+<span id="cb1-111"><a href="#cb1-111" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-112"><a href="#cb1-112" aria-hidden="true" tabindex="-1"></a>原始论文使用具有坐标特定时间尺度的平方指数协方差：</span>
+<span id="cb1-113"><a href="#cb1-113" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-114"><a href="#cb1-114" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-115"><a href="#cb1-115" aria-hidden="true" tabindex="-1"></a>k_j(t,t')</span>
+<span id="cb1-116"><a href="#cb1-116" aria-hidden="true" tabindex="-1"></a>=</span>
+<span id="cb1-117"><a href="#cb1-117" aria-hidden="true" tabindex="-1"></a>\alpha_j^2</span>
+<span id="cb1-118"><a href="#cb1-118" aria-hidden="true" tabindex="-1"></a>\exp<span class="sc">\!</span>\left<span class="co">[</span><span class="ot">-\frac{(t-t')^2}{2\tau_j^2}\right</span><span class="co">]</span></span>
+<span id="cb1-119"><a href="#cb1-119" aria-hidden="true" tabindex="-1"></a>+</span>
+<span id="cb1-120"><a href="#cb1-120" aria-hidden="true" tabindex="-1"></a>\nu_j^2\,\delta_{t,t'}.</span>
+<span id="cb1-121"><a href="#cb1-121" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-122"><a href="#cb1-122" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-123"><a href="#cb1-123" aria-hidden="true" tabindex="-1"></a>这里 $\alpha_j^2$ 是光滑潜信号方差，$\tau_j&gt;0$ 是特征时间尺度，$\nu_j^2\ge0$ 是可选**潜 GP nugget/噪声方差**。nugget 是采样时间处潜坐标的独立变异；它不是观测噪声 $R$、转移方程中的过程噪声或测量误差。Yu 等人在其主分析中固定小的正潜 nugget，并归一化 $k_j(t,t)=1$，这设置 $\alpha_j^2=1-\nu_j^2$ 并固定潜尺度 <span class="co">[</span><span class="ot">@YuEtAl2009</span><span class="co">]</span>。如果在该约定下 $\nu_j^2=1$，跨时间协方差消失，时间耦合退化为随时间共享参数应用的静态 FA 式模型。</span>
+<span id="cb1-124"><a href="#cb1-124" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-125"><a href="#cb1-125" aria-hidden="true" tabindex="-1"></a>这些假设是实质性的：</span>
+<span id="cb1-126"><a href="#cb1-126" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-127"><a href="#cb1-127" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>潜到观测依赖线性；</span>
+<span id="cb1-128"><a href="#cb1-128" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>变换观测与残差为高斯；</span>
+<span id="cb1-129"><a href="#cb1-129" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>$R$ 在声明观测坐标中对角；</span>
+<span id="cb1-130"><a href="#cb1-130" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>潜坐标在拟合参数化中是独立 GP；</span>
+<span id="cb1-131"><a href="#cb1-131" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>试次在参数条件下是独立重复；</span>
+<span id="cb1-132"><a href="#cb1-132" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>所选协方差族表示相关时间正则性；以及</span>
+<span id="cb1-133"><a href="#cb1-133" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>一个共享观测子空间与一组时间尺度适用于合并序列。</span>
+<span id="cb1-134"><a href="#cb1-134" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-135"><a href="#cb1-135" aria-hidden="true" tabindex="-1"></a><span class="fu">## 数学表述</span></span>
+<span id="cb1-136"><a href="#cb1-136" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-137"><a href="#cb1-137" aria-hidden="true" tabindex="-1"></a><span class="fu">### 有限网格 GP 先验</span></span>
+<span id="cb1-138"><a href="#cb1-138" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-139"><a href="#cb1-139" aria-hidden="true" tabindex="-1"></a>对具有时间网格 $t_1,\ldots,t_T$ 的单个试次，设</span>
+<span id="cb1-140"><a href="#cb1-140" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-141"><a href="#cb1-141" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-142"><a href="#cb1-142" aria-hidden="true" tabindex="-1"></a>X=</span>
+<span id="cb1-143"><a href="#cb1-143" aria-hidden="true" tabindex="-1"></a>\begin{bmatrix}</span>
+<span id="cb1-144"><a href="#cb1-144" aria-hidden="true" tabindex="-1"></a>x_1&amp;\cdots&amp;x_T</span>
+<span id="cb1-145"><a href="#cb1-145" aria-hidden="true" tabindex="-1"></a>\end{bmatrix}</span>
+<span id="cb1-146"><a href="#cb1-146" aria-hidden="true" tabindex="-1"></a>\in\mathbb R^{q\times T}.</span>
+<span id="cb1-147"><a href="#cb1-147" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-148"><a href="#cb1-148" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-149"><a href="#cb1-149" aria-hidden="true" tabindex="-1"></a>使用时间主序堆叠</span>
+<span id="cb1-150"><a href="#cb1-150" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-151"><a href="#cb1-151" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-152"><a href="#cb1-152" aria-hidden="true" tabindex="-1"></a>\mathbf x=</span>
+<span id="cb1-153"><a href="#cb1-153" aria-hidden="true" tabindex="-1"></a>\begin{bmatrix}</span>
+<span id="cb1-154"><a href="#cb1-154" aria-hidden="true" tabindex="-1"></a>x_1^\top&amp;\cdots&amp;x_T^\top</span>
+<span id="cb1-155"><a href="#cb1-155" aria-hidden="true" tabindex="-1"></a>\end{bmatrix}^\top</span>
+<span id="cb1-156"><a href="#cb1-156" aria-hidden="true" tabindex="-1"></a>\in\mathbb R^{qT}.</span>
+<span id="cb1-157"><a href="#cb1-157" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-158"><a href="#cb1-158" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-159"><a href="#cb1-159" aria-hidden="true" tabindex="-1"></a>GP 先验给出</span>
+<span id="cb1-160"><a href="#cb1-160" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-161"><a href="#cb1-161" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-162"><a href="#cb1-162" aria-hidden="true" tabindex="-1"></a>\mathbf x\sim\mathcal N(0,K),</span>
+<span id="cb1-163"><a href="#cb1-163" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-164"><a href="#cb1-164" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-165"><a href="#cb1-165" aria-hidden="true" tabindex="-1"></a>其中 $K\in\mathbb R^{qT\times qT}$ 的 $(a,b)$ 块是</span>
+<span id="cb1-166"><a href="#cb1-166" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-167"><a href="#cb1-167" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-168"><a href="#cb1-168" aria-hidden="true" tabindex="-1"></a>K_{ab}</span>
+<span id="cb1-169"><a href="#cb1-169" aria-hidden="true" tabindex="-1"></a>=</span>
+<span id="cb1-170"><a href="#cb1-170" aria-hidden="true" tabindex="-1"></a>\operatorname{diag}<span class="sc">\!</span>\left(</span>
+<span id="cb1-171"><a href="#cb1-171" aria-hidden="true" tabindex="-1"></a> k_1(t_a,t_b),\ldots,k_q(t_a,t_b)</span>
+<span id="cb1-172"><a href="#cb1-172" aria-hidden="true" tabindex="-1"></a>\right).</span>
+<span id="cb1-173"><a href="#cb1-173" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-174"><a href="#cb1-174" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-175"><a href="#cb1-175" aria-hidden="true" tabindex="-1"></a>有效协方差核在每个有限网格上产生半正定 Gram 矩阵；严格正 nugget 常使矩阵正定并改善条件数 <span class="co">[</span><span class="ot">@RasmussenWilliams2006</span><span class="co">]</span>。任意对称相似函数不自动是有效 GP 协方差。</span>
+<span id="cb1-176"><a href="#cb1-176" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-177"><a href="#cb1-177" aria-hidden="true" tabindex="-1"></a>定义</span>
+<span id="cb1-178"><a href="#cb1-178" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-179"><a href="#cb1-179" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-180"><a href="#cb1-180" aria-hidden="true" tabindex="-1"></a>\bar C=I_T\otimes C,</span>
+<span id="cb1-181"><a href="#cb1-181" aria-hidden="true" tabindex="-1"></a>\qquad</span>
+<span id="cb1-182"><a href="#cb1-182" aria-hidden="true" tabindex="-1"></a>\bar d=\mathbf 1_T\otimes d,</span>
+<span id="cb1-183"><a href="#cb1-183" aria-hidden="true" tabindex="-1"></a>\qquad</span>
+<span id="cb1-184"><a href="#cb1-184" aria-hidden="true" tabindex="-1"></a>\bar R=I_T\otimes R,</span>
+<span id="cb1-185"><a href="#cb1-185" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-186"><a href="#cb1-186" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-187"><a href="#cb1-187" aria-hidden="true" tabindex="-1"></a>并堆叠观测为</span>
+<span id="cb1-188"><a href="#cb1-188" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-189"><a href="#cb1-189" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-190"><a href="#cb1-190" aria-hidden="true" tabindex="-1"></a>\mathbf y=</span>
+<span id="cb1-191"><a href="#cb1-191" aria-hidden="true" tabindex="-1"></a>\begin{bmatrix}</span>
+<span id="cb1-192"><a href="#cb1-192" aria-hidden="true" tabindex="-1"></a>y_1^\top&amp;\cdots&amp;y_T^\top</span>
+<span id="cb1-193"><a href="#cb1-193" aria-hidden="true" tabindex="-1"></a>\end{bmatrix}^\top.</span>
+<span id="cb1-194"><a href="#cb1-194" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-195"><a href="#cb1-195" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-196"><a href="#cb1-196" aria-hidden="true" tabindex="-1"></a>则</span>
+<span id="cb1-197"><a href="#cb1-197" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-198"><a href="#cb1-198" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-199"><a href="#cb1-199" aria-hidden="true" tabindex="-1"></a>\mathbf y\mid\mathbf x</span>
+<span id="cb1-200"><a href="#cb1-200" aria-hidden="true" tabindex="-1"></a>\sim</span>
+<span id="cb1-201"><a href="#cb1-201" aria-hidden="true" tabindex="-1"></a>\mathcal N(\bar C\mathbf x+\bar d,\bar R).</span>
+<span id="cb1-202"><a href="#cb1-202" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-203"><a href="#cb1-203" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-204"><a href="#cb1-204" aria-hidden="true" tabindex="-1"></a><span class="fu">### 边际观测分布</span></span>
+<span id="cb1-205"><a href="#cb1-205" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-206"><a href="#cb1-206" aria-hidden="true" tabindex="-1"></a>积分掉潜轨迹给出</span>
+<span id="cb1-207"><a href="#cb1-207" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-208"><a href="#cb1-208" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-209"><a href="#cb1-209" aria-hidden="true" tabindex="-1"></a>\mathbf y</span>
+<span id="cb1-210"><a href="#cb1-210" aria-hidden="true" tabindex="-1"></a>\sim</span>
+<span id="cb1-211"><a href="#cb1-211" aria-hidden="true" tabindex="-1"></a>\mathcal N(\bar d,\Sigma_y),</span>
+<span id="cb1-212"><a href="#cb1-212" aria-hidden="true" tabindex="-1"></a>\qquad</span>
+<span id="cb1-213"><a href="#cb1-213" aria-hidden="true" tabindex="-1"></a>\Sigma_y=\bar C K\bar C^\top+\bar R.</span>
+<span id="cb1-214"><a href="#cb1-214" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-215"><a href="#cb1-215" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-216"><a href="#cb1-216" aria-hidden="true" tabindex="-1"></a>因此试次对数边际似然是</span>
+<span id="cb1-217"><a href="#cb1-217" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-218"><a href="#cb1-218" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-219"><a href="#cb1-219" aria-hidden="true" tabindex="-1"></a>\log p(\mathbf y\mid\theta)</span>
+<span id="cb1-220"><a href="#cb1-220" aria-hidden="true" tabindex="-1"></a>=-\frac12</span>
+<span id="cb1-221"><a href="#cb1-221" aria-hidden="true" tabindex="-1"></a>\left[</span>
+<span id="cb1-222"><a href="#cb1-222" aria-hidden="true" tabindex="-1"></a>(\mathbf y-\bar d)^\top\Sigma_y^{-1}(\mathbf y-\bar d)</span>
+<span id="cb1-223"><a href="#cb1-223" aria-hidden="true" tabindex="-1"></a>+\log|\Sigma_y|</span>
+<span id="cb1-224"><a href="#cb1-224" aria-hidden="true" tabindex="-1"></a>+pT\log(2\pi)</span>
+<span id="cb1-225"><a href="#cb1-225" aria-hidden="true" tabindex="-1"></a>\right],</span>
+<span id="cb1-226"><a href="#cb1-226" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-227"><a href="#cb1-227" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-228"><a href="#cb1-228" aria-hidden="true" tabindex="-1"></a>其中 $\theta$ 表示 $C,d,R$ 与核超参数。独立试次贡献试次对数似然之和。二次数据拟合与对数行列式复杂度项是高斯过程边缘化的标准推论 <span class="co">[</span><span class="ot">@RasmussenWilliams2006</span><span class="co">]</span>。稳定实现使用 Cholesky 或其他结构化求解，而非显式逆或行列式。</span>
+<span id="cb1-229"><a href="#cb1-229" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-230"><a href="#cb1-230" aria-hidden="true" tabindex="-1"></a><span class="fu">### 全区间潜后验</span></span>
+<span id="cb1-231"><a href="#cb1-231" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-232"><a href="#cb1-232" aria-hidden="true" tabindex="-1"></a>高斯条件化给出</span>
+<span id="cb1-233"><a href="#cb1-233" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-234"><a href="#cb1-234" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-235"><a href="#cb1-235" aria-hidden="true" tabindex="-1"></a>\mathbf x\mid\mathbf y</span>
+<span id="cb1-236"><a href="#cb1-236" aria-hidden="true" tabindex="-1"></a>\sim</span>
+<span id="cb1-237"><a href="#cb1-237" aria-hidden="true" tabindex="-1"></a>\mathcal N(\mu_{x\mid y},\Sigma_{x\mid y}),</span>
+<span id="cb1-238"><a href="#cb1-238" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-239"><a href="#cb1-239" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-240"><a href="#cb1-240" aria-hidden="true" tabindex="-1"></a>其中</span>
+<span id="cb1-241"><a href="#cb1-241" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-242"><a href="#cb1-242" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-243"><a href="#cb1-243" aria-hidden="true" tabindex="-1"></a>\mu_{x\mid y}</span>
+<span id="cb1-244"><a href="#cb1-244" aria-hidden="true" tabindex="-1"></a>=K\bar C^\top\Sigma_y^{-1}(\mathbf y-\bar d),</span>
+<span id="cb1-245"><a href="#cb1-245" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-246"><a href="#cb1-246" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-247"><a href="#cb1-247" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-248"><a href="#cb1-248" aria-hidden="true" tabindex="-1"></a>\Sigma_{x\mid y}</span>
+<span id="cb1-249"><a href="#cb1-249" aria-hidden="true" tabindex="-1"></a>=K-K\bar C^\top\Sigma_y^{-1}\bar C K.</span>
+<span id="cb1-250"><a href="#cb1-250" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-251"><a href="#cb1-251" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-252"><a href="#cb1-252" aria-hidden="true" tabindex="-1"></a>当 $K$ 与 $\bar R$ 非奇异时，等价精度形式是</span>
+<span id="cb1-253"><a href="#cb1-253" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-254"><a href="#cb1-254" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-255"><a href="#cb1-255" aria-hidden="true" tabindex="-1"></a>\Sigma_{x\mid y}</span>
+<span id="cb1-256"><a href="#cb1-256" aria-hidden="true" tabindex="-1"></a>=</span>
+<span id="cb1-257"><a href="#cb1-257" aria-hidden="true" tabindex="-1"></a>\left(K^{-1}+\bar C^\top\bar R^{-1}\bar C\right)^{-1},</span>
+<span id="cb1-258"><a href="#cb1-258" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-259"><a href="#cb1-259" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-260"><a href="#cb1-260" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-261"><a href="#cb1-261" aria-hidden="true" tabindex="-1"></a>\mu_{x\mid y}</span>
+<span id="cb1-262"><a href="#cb1-262" aria-hidden="true" tabindex="-1"></a>=</span>
+<span id="cb1-263"><a href="#cb1-263" aria-hidden="true" tabindex="-1"></a>\Sigma_{x\mid y}\bar C^\top\bar R^{-1}(\mathbf y-\bar d).</span>
+<span id="cb1-264"><a href="#cb1-264" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-265"><a href="#cb1-265" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-266"><a href="#cb1-266" aria-hidden="true" tabindex="-1"></a>这些公式定义完整路径后验，包括条件化后不同潜坐标与时间之间的协方差。单独绘制 $\mu_{x\mid y}$ 会抑制该不确定性与跨时间依赖。相同有限网格高斯条件化原则支撑普通 GP 后验预测 <span class="co">[</span><span class="ot">@RasmussenWilliams2006</span><span class="co">]</span>；Yu 等人显式推导这些堆叠 GPFA 表达式 <span class="co">[</span><span class="ot">@YuEtAl2009</span><span class="co">]</span>。</span>
+<span id="cb1-267"><a href="#cb1-267" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-268"><a href="#cb1-268" aria-hidden="true" tabindex="-1"></a><span class="fu">### 缺失观测</span></span>
+<span id="cb1-269"><a href="#cb1-269" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-270"><a href="#cb1-270" aria-hidden="true" tabindex="-1"></a>设 $H$ 是只保留观测通道–时间条目的二元选择矩阵。则</span>
+<span id="cb1-271"><a href="#cb1-271" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-272"><a href="#cb1-272" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-273"><a href="#cb1-273" aria-hidden="true" tabindex="-1"></a>\mathbf y_O=H\mathbf y</span>
+<span id="cb1-274"><a href="#cb1-274" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-275"><a href="#cb1-275" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-276"><a href="#cb1-276" aria-hidden="true" tabindex="-1"></a>具有</span>
+<span id="cb1-277"><a href="#cb1-277" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-278"><a href="#cb1-278" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-279"><a href="#cb1-279" aria-hidden="true" tabindex="-1"></a>\mathbf y_O\mid\mathbf x</span>
+<span id="cb1-280"><a href="#cb1-280" aria-hidden="true" tabindex="-1"></a>\sim</span>
+<span id="cb1-281"><a href="#cb1-281" aria-hidden="true" tabindex="-1"></a>\mathcal N(H\bar C\mathbf x+H\bar d, H\bar R H^\top).</span>
+<span id="cb1-282"><a href="#cb1-282" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-283"><a href="#cb1-283" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-284"><a href="#cb1-284" aria-hidden="true" tabindex="-1"></a>把 $\bar C,\bar d,\bar R$ 替换为所选版本后，边际与后验公式适用。这在缺失可忽略时于模型下精确处理任意缺失通道或箱。状态依赖缺失、尖峰删失、饱和、事件触发采集或有信息试次终止需要显式缺失/观测模型，而非简单行删除。</span>
+<span id="cb1-285"><a href="#cb1-285" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-286"><a href="#cb1-286" aria-hidden="true" tabindex="-1"></a><span class="fu">### 现有试次内新时间</span></span>
+<span id="cb1-287"><a href="#cb1-287" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-288"><a href="#cb1-288" aria-hidden="true" tabindex="-1"></a>对新时间网格，新时间与观测时间之间的协方差交叉块提供联合高斯先验。条件化给出潜值的后验插值或外推。插值不确定性依赖采样间隙与核；外推回归先验且可以高度不确定。这是 GP 预测，不是学习转移律的传播。</span>
+<span id="cb1-289"><a href="#cb1-289" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-290"><a href="#cb1-290" aria-hidden="true" tabindex="-1"></a><span class="fu">## 学习得到了什么？</span></span>
+<span id="cb1-291"><a href="#cb1-291" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-292"><a href="#cb1-292" aria-hidden="true" tabindex="-1"></a>最大似然拟合可以学习 $C,d,R$、核时间尺度以及未被约定固定的任何核方差或 nugget 项。候选潜维数与协方差族可以通过嵌套验证选择。这些参数确定观测序列上的边际分布。</span>
+<span id="cb1-293"><a href="#cb1-293" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-294"><a href="#cb1-294" aria-hidden="true" tabindex="-1"></a>参数固定后，后验推断为每个试次分别计算 $p(\mathbf x\mid\mathbf y,\widehat\theta)$。后验均值、协方差与样本是推断输出，不是额外学习模型参数。参数学习与轨迹推断不得被描述为同一操作。</span>
+<span id="cb1-295"><a href="#cb1-295" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-296"><a href="#cb1-296" aria-hidden="true" tabindex="-1"></a>GPFA 不学习转移矩阵、常微分方程、向量场、流、状态依赖速度、因果图或物理测量机制。拟合时间尺度描述所选核族下潜坐标的先验协方差衰减；没有进一步证据，它不是已发现的弛豫常数或因果交互时间。</span>
+<span id="cb1-297"><a href="#cb1-297" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-298"><a href="#cb1-298" aria-hidden="true" tabindex="-1"></a><span class="fu">## 什么是固定的？</span></span>
+<span id="cb1-299"><a href="#cb1-299" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-300"><a href="#cb1-300" aria-hidden="true" tabindex="-1"></a>分析者固定观测表示、分箱与变换、试次边界与对齐、潜维数搜索、高斯线性观测族、对角 $R$ 限制、核族、平稳性选择、潜方差或 nugget 是否固定、参数共享结构、优化方法、初始化/重启策略、缺失假设、划分单元与评估目标。</span>
+<span id="cb1-301"><a href="#cb1-301" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-302"><a href="#cb1-302" aria-hidden="true" tabindex="-1"></a>在原始有界表述中，潜边际方差被固定、小潜 nugget 被固定，每个坐标的平方指数时间尺度被学习 <span class="co">[</span><span class="ot">@YuEtAl2009</span><span class="co">]</span>。学习任意幅度、跨潜协方差核、非平稳核、非线性观测或点过程似然的模型是相关扩展，必须陈述其扩大的可辨识性与推断要求。</span>
+<span id="cb1-303"><a href="#cb1-303" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-304"><a href="#cb1-304" aria-hidden="true" tabindex="-1"></a><span class="fu">## 时序假设</span></span>
+<span id="cb1-305"><a href="#cb1-305" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-306"><a href="#cb1-306" aria-hidden="true" tabindex="-1"></a>时间作为每个协方差核的索引进入。GPFA 可以在规则或不规则网格上评估核，但原始神经管线使用非重叠箱与试次相对时间。平稳平方指数核假设协方差在试次内只依赖 $t-t'$，并蕴含非常光滑的潜样本路径。其他有效核编码不同正则性、周期性、粗糙度或非平稳性 <span class="co">[</span><span class="ot">@RasmussenWilliams2006</span><span class="co">]</span>。</span>
+<span id="cb1-307"><a href="#cb1-307" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-308"><a href="#cb1-308" aria-hidden="true" tabindex="-1"></a>不同试次在共享参数下是独立抽样；规范模型不包含跨试次协方差，也不包含跨边界连续性。事件对齐改变提供给协方差函数的时间坐标。错误对齐可以模糊真实结构，或鼓励模型通过短时间尺度、潜 nugget 或观测噪声解释时序抖动。</span>
+<span id="cb1-309"><a href="#cb1-309" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-310"><a href="#cb1-310" aria-hidden="true" tabindex="-1"></a>后验使用整个试次的观测。它像固定区间平滑一样是回顾性的，不是较早时间可用的在线估计。延长、缩短或重新对齐试次会改变后验。GPFA 不定义一步因果传播或预测状态转移，尽管其 GP 先验可以条件预测未观测时间。</span>
+<span id="cb1-311"><a href="#cb1-311" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-312"><a href="#cb1-312" aria-hidden="true" tabindex="-1"></a><span class="fu">## 几何假设</span></span>
+<span id="cb1-313"><a href="#cb1-313" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-314"><a href="#cb1-314" aria-hidden="true" tabindex="-1"></a>观测层在变换观测坐标中线性。$C$ 定义载荷子空间，而对角 $R$ 特权所选通道坐标。GP 核定义时间协方差与函数上的先验分布；它们不定义采样数据流形或生物状态空间上的黎曼度量。</span>
+<span id="cb1-315"><a href="#cb1-315" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-316"><a href="#cb1-316" aria-hidden="true" tabindex="-1"></a>后验潜均值之间的欧氏距离依赖潜坐标约定与缩放。Yu 等人用 SVD 后处理 $C$，获得张成相同载荷空间的标准正交化可视化坐标 <span class="co">[</span><span class="ot">@YuEtAl2009</span><span class="co">]</span>。该显示变换可以辅助解读，但不使显示轴唯一辨识、不在每个旋转下保留独立 GP 参数化，也不把后验均值变成直接观测的几何路径。</span>
+<span id="cb1-317"><a href="#cb1-317" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-318"><a href="#cb1-318" aria-hidden="true" tabindex="-1"></a><span class="fu">## 监督</span></span>
+<span id="cb1-319"><a href="#cb1-319" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-320"><a href="#cb1-320" aria-hidden="true" tabindex="-1"></a>似然不需要外部结果标签，因此规范拟合对行为或实验类别无监督。尽管如此，试次分段、事件对齐、所选区间、条件池化、神经元包含、预处理、核选择与潜维数搜索都是可以使用任务信息的设计选择。</span>
+<span id="cb1-321"><a href="#cb1-321" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-322"><a href="#cb1-322" aria-hidden="true" tabindex="-1"></a>如果标签或行为选择模型、超参数、对齐、显示维数或时间区间，那些选择引入监督，必须发生在训练/验证折叠内。把固定、留出潜摘要与行为联系起来是下游分析；预测成功不证明潜坐标是因果或机制变量。</span>
+<span id="cb1-323"><a href="#cb1-323" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-324"><a href="#cb1-324" aria-hidden="true" tabindex="-1"></a><span class="fu">## 优化 / 推断</span></span>
+<span id="cb1-325"><a href="#cb1-325" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-326"><a href="#cb1-326" aria-hidden="true" tabindex="-1"></a>对固定参数，高斯路径后验与边际似然是精确有限维条件化计算。参数拟合是单独的一般非凸优化问题。</span>
+<span id="cb1-327"><a href="#cb1-327" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-328"><a href="#cb1-328" aria-hidden="true" tabindex="-1"></a>Yu 等人使用期望最大化：E 步计算每个试次潜路径的后验一阶与二阶矩；M 步更新 $C,d$、对角 $R$ 与核超参数，观测参数使用 FA 式闭式更新，时间尺度使用梯度优化 <span class="co">[</span><span class="ot">@YuEtAl2009</span><span class="co">]</span>。EM 的单调似然改善不确保唯一全局最优。原始研究发现即使似然与显示轨迹相似，时间尺度估计也依赖初始化，促使多次启动与显式收敛检查。</span>
+<span id="cb1-329"><a href="#cb1-329" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-330"><a href="#cb1-330" aria-hidden="true" tabindex="-1"></a>直接边际似然优化也可行。长度尺度、信号、nugget 与残差噪声目标可以包含脊或局部最优，短记录可能对其提供弱信息 <span class="co">[</span><span class="ot">@RasmussenWilliams2006</span><span class="co">]</span>。稳定计算应使用 Cholesky 分解、三角求解、来自因子的对数行列式，并且只在承认它是协方差模型修改时使用声明抖动。</span>
+<span id="cb1-331"><a href="#cb1-331" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-332"><a href="#cb1-332" aria-hidden="true" tabindex="-1"></a><span class="fu">## 优点</span></span>
+<span id="cb1-333"><a href="#cb1-333" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-334"><a href="#cb1-334" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>它在单一归一化概率模型中组合时间平滑与因子分析。</span>
+<span id="cb1-335"><a href="#cb1-335" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>它返回全区间后验不确定性与跨时间协方差，而不仅是滤波曲线或确定性投影。</span>
+<span id="cb1-336"><a href="#cb1-336" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>坐标特定时间尺度允许潜因子以不同时间尺度变化。</span>
+<span id="cb1-337"><a href="#cb1-337" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>不规则时间网格与缺失观测条目可以通过协方差评估与高斯条件化处理。</span>
+<span id="cb1-338"><a href="#cb1-338" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>边际似然、预测密度、留神经元预测与后验检查提供可视化之外的评估准则。</span>
+<span id="cb1-339"><a href="#cb1-339" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>它为 LGSSM/RTS 平滑提供非马尔可夫协方差先验比较，为静态 FA 提供时间耦合比较。</span>
+<span id="cb1-340"><a href="#cb1-340" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-341"><a href="#cb1-341" aria-hidden="true" tabindex="-1"></a><span class="fu">## 失效模式</span></span>
+<span id="cb1-342"><a href="#cb1-342" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-343"><a href="#cb1-343" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**错误观测律：** 低分箱计数保持离散、有下界、偏斜且常过度离散；平方根计数上的高斯律只是近似。</span>
+<span id="cb1-344"><a href="#cb1-344" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**对角残差失效：** 同步伪迹、共享输入、串扰、分选错误与未建模群体结构可以留下被强迫进潜因子的相关残差。</span>
+<span id="cb1-345"><a href="#cb1-345" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**核误设：** 平方指数先验可以抑制突然转移、振荡粗糙度、变点或非平稳时间尺度。</span>
+<span id="cb1-346"><a href="#cb1-346" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**先验施加光滑性：** 即使数据稀疏或带噪，后验均值也可以看起来光滑，因为协方差先验奖励光滑函数。</span>
+<span id="cb1-347"><a href="#cb1-347" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**错误试次边界：** 把连续活动段当作独立重置或在真正重置上平滑会改变模型。</span>
+<span id="cb1-348"><a href="#cb1-348" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**对齐与分箱敏感性：** 事件抖动、箱宽与变换计数尺度改变估计协方差、表观维数与时间尺度。</span>
+<span id="cb1-349"><a href="#cb1-349" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**短或稀疏试次：** 当观测到很少试次内时滞时，时间尺度、nugget 与残差方差可能弱可分。</span>
+<span id="cb1-350"><a href="#cb1-350" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**潜对观测噪声权衡：** $R$、潜 nugget、短时间尺度信号与额外因子可以相互补偿。</span>
+<span id="cb1-351"><a href="#cb1-351" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**错误潜维数：** 因子太少留下共享残差协方差；太多制造弱占用、不稳定或冗余轨迹。</span>
+<span id="cb1-352"><a href="#cb1-352" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**局部优化：** EM 或直接似然方法可以达到不同局部代表或超参数模态。</span>
+<span id="cb1-353"><a href="#cb1-353" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**计算缩放：** 朴素实现中精确稠密协方差计算随潜维数乘试次长度三次增长；长序列可能需要本有界对象之外的结构化或近似变体。</span>
+<span id="cb1-354"><a href="#cb1-354" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**缺失误设：** 忽略有信息缺失或删失会偏差后验。</span>
+<span id="cb1-355"><a href="#cb1-355" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**分布移位：** 共享 $C,R$ 与核可能跨会话、受试者、条件或记录漂移失败。</span>
+<span id="cb1-356"><a href="#cb1-356" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**泄漏：** 用测试试次选择箱、维数、核、时间尺度、对齐或显示轨迹会产生乐观结果。</span>
+<span id="cb1-357"><a href="#cb1-357" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**可视化越界：** 光滑低维后验均值被误认为流形、本征维数、动力学定律、向量场、机制或唯一路径。</span>
+<span id="cb1-358"><a href="#cb1-358" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-359"><a href="#cb1-359" aria-hidden="true" tabindex="-1"></a><span class="fu">## 可辨识性问题</span></span>
+<span id="cb1-360"><a href="#cb1-360" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-361"><a href="#cb1-361" aria-hidden="true" tabindex="-1"></a>必须区分若干精确或条件等价：</span>
+<span id="cb1-362"><a href="#cb1-362" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-363"><a href="#cb1-363" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**符号：** 把潜坐标 $x_j$ 替换为 $-x_j$、载荷列 $C_{:j}$ 替换为 $-C_{:j}$ 保留可观测律。</span>
+<span id="cb1-364"><a href="#cb1-364" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**置换：** 一起置换潜坐标、载荷列及其核超参数保留模型。</span>
+<span id="cb1-365"><a href="#cb1-365" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**尺度：** 如果核边际幅度自由，重标 $x_j'=s_jx_j$、$C'_{:j}=C_{:j}/s_j$ 与 $k'_j=s_j^2k_j$ 保留可观测分布。固定 $k_j(t,t)=1$ 移除该连续尺度歧义，但不移除符号或置换。</span>
+<span id="cb1-366"><a href="#cb1-366" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**旋转：** 任意正交旋转只在具有相同协方差矩阵的潜坐标之间保留独立 GP 族。当核或时间尺度不同时，一般旋转引入跨潜协方差，落在对角独立 GP 参数化之外。因此相等或近相等核在相应子空间中制造精确或实用旋转歧义。</span>
+<span id="cb1-367"><a href="#cb1-367" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**事后可视化：** 任何可逆潜坐标变换都可以在 $C$ 与完整潜协方差被一致变换时表示相同拟合联合高斯，但变换模型可能不再具有独立逐坐标核。选择标准正交显示轴选择代表，而非辨识生物坐标。</span>
+<span id="cb1-368"><a href="#cb1-368" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-369"><a href="#cb1-369" aria-hidden="true" tabindex="-1"></a>超参数辨识也可能弱。信号幅度与载荷尺度权衡，除非归一化；潜 nugget、短长度尺度、$R$ 与额外因子可以解释重叠高频变异；非常长长度尺度可以类似低阶趋势或试次均值。有限窗口约束观测到哪些时滞，因此最大似然时间尺度可能受边界限制或对初始化敏感。</span>
+<span id="cb1-370"><a href="#cb1-370" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-371"><a href="#cb1-371" aria-hidden="true" tabindex="-1"></a>所选因子数是模型与准则相关的。它不是与模型无关的本征维数。即使拟合参数下后验集中，也不在观测等价或误设模型中确立唯一潜轨迹。</span>
+<span id="cb1-372"><a href="#cb1-372" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-373"><a href="#cb1-373" aria-hidden="true" tabindex="-1"></a><span class="fu">## 与更简单方法的比较</span></span>
+<span id="cb1-374"><a href="#cb1-374" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-375"><a href="#cb1-375" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**训练均值加对角高斯：** 不预测共享潜变异。在共享时序结构被归功之前，GPFA 应改善留出序列似然或留神经元预测。</span>
+<span id="cb1-376"><a href="#cb1-376" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**静态因子分析：** 使用相同线性高斯观测思想，但把时间点独立处理。它是 GP 时间耦合是否增加价值的所需基线。</span>
+<span id="cb1-377"><a href="#cb1-377" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**两阶段平滑加 PCA 或 FA：** 先选择时序平滑器，再应用静态降维。Yu 等人把 GPFA 与交叉验证两阶段变体比较；该比较检验联合拟合光滑性与共享协方差是否在所选观测尺度下改善预测 <span class="co">[</span><span class="ot">@YuEtAl2009</span><span class="co">]</span>。</span>
+<span id="cb1-378"><a href="#cb1-378" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**逐通道 GP 或平滑器：** 独立建模每个观测通道，检验是否需要共享低维载荷。</span>
+<span id="cb1-379"><a href="#cb1-379" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**LGSSM：** 指定一阶马尔可夫转移律、过程噪声与线性观测模型。GPFA 直接指定时间协方差，不必对应有界 LGSSM 参数化。更好拟合不蕴含任一模型机制上为真。</span>
+<span id="cb1-380"><a href="#cb1-380" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**固定区间卡尔曼平滑：** 是固定 LGSSM 的推断算法。GPFA 后验推断也是回顾性高斯平滑，但它条件化不同先验，不字面需要 RTS 遍历。某些 GP 协方差模型承认状态空间表示；该计算等价不使一般 GPFA 成为学习转移模型。</span>
+<span id="cb1-381"><a href="#cb1-381" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**双侧移动平均：** 透明非概率平滑器，缺乏共享潜因子与校准路径协方差，但可以揭示表观光滑性是否需要复杂模型。</span>
+<span id="cb1-382"><a href="#cb1-382" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**独立箱后验均值：** 在保持 $C,d,R$ 的同时移除跨时间协方差，隔离 GP 先验效应。</span>
+<span id="cb1-383"><a href="#cb1-383" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-384"><a href="#cb1-384" aria-hidden="true" tabindex="-1"></a><span class="fu">## 评估准则</span></span>
+<span id="cb1-385"><a href="#cb1-385" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-386"><a href="#cb1-386" aria-hidden="true" tabindex="-1"></a>评估必须保持参数选择、后验推断与最终评分分离：</span>
+<span id="cb1-387"><a href="#cb1-387" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-388"><a href="#cb1-388" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>**划分完整依赖单元：** 在拟合前划分试次、会话、动物或条件。不要把来自一个试次的箱散落到训练与测试参数学习折叠。</span>
+<span id="cb1-389"><a href="#cb1-389" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>**仅训练设计选择：** 在训练/验证数据内选择分箱、对齐、变换、包含通道、潜维数、协方差族、初始化策略与超参数。</span>
+<span id="cb1-390"><a href="#cb1-390" aria-hidden="true" tabindex="-1"></a><span class="ss">3. </span>**留出试次似然：** 在相同预处理拟合的静态 FA、对角与时间基线之下，报告未触碰试次上每时间/通道的边际对数似然或对数预测密度。</span>
+<span id="cb1-391"><a href="#cb1-391" aria-hidden="true" tabindex="-1"></a><span class="ss">4. </span>**留神经元预测：** 在训练试次上拟合参数，然后在留出试次中掩蔽一个记录通道、从其余通道推断潜路径，并对掩蔽通道的预测分布评分。不要用留出值重拟合。Yu 等人用类似预测误差准则比较 GPFA 与两阶段方法 <span class="co">[</span><span class="ot">@YuEtAl2009</span><span class="co">]</span>。</span>
+<span id="cb1-392"><a href="#cb1-392" aria-hidden="true" tabindex="-1"></a><span class="ss">5. </span>**掩蔽时间预测：** 从该测试试次的参数拟合与后验条件化都隐藏声明时间块，然后对其条件预测密度与区间覆盖评分。</span>
+<span id="cb1-393"><a href="#cb1-393" aria-hidden="true" tabindex="-1"></a><span class="ss">6. </span>**残差诊断：** 检查均值、边际方差、跨通道残差协方差、时序残差自相关、尾部、计数依赖与条件/会话漂移。</span>
+<span id="cb1-394"><a href="#cb1-394" aria-hidden="true" tabindex="-1"></a><span class="ss">7. </span>**后验校准：** 在保留真值的模拟中，评估逐点与同时覆盖、后验马氏统计量与路径不确定性——而不仅是后验均值 RMSE。</span>
+<span id="cb1-395"><a href="#cb1-395" aria-hidden="true" tabindex="-1"></a><span class="ss">8. </span>**不变恢复目标：** 只在允许符号/置换/尺度或相同核子空间对齐后比较载荷子空间、可观测协方差、预测与潜路径。</span>
+<span id="cb1-396"><a href="#cb1-396" aria-hidden="true" tabindex="-1"></a><span class="ss">9. </span>**超参数稳定性：** 报告多次启动、似然模态、时间尺度/nugget 边界、折叠变异以及对窗口长度与箱宽的敏感性。</span>
+<span id="cb1-397"><a href="#cb1-397" aria-hidden="true" tabindex="-1"></a><span class="ss">10. </span>**先验敏感性：** 比较合理协方差族与独立箱/静态极限。在合理先验变化下消失的光滑性不是鲁棒经验发现。</span>
+<span id="cb1-398"><a href="#cb1-398" aria-hidden="true" tabindex="-1"></a><span class="ss">11. </span>**分布移位检验：** 当声称时，留出会话、受试者、任务条件或采集时段，而不仅依赖随机试次折叠。</span>
+<span id="cb1-399"><a href="#cb1-399" aria-hidden="true" tabindex="-1"></a><span class="ss">12. </span>**不同化目标评分：** 用于形成后验的观测箱不能在没有条件预测或留出规程的情况下被复用为重构质量的独立证据。</span>
+<span id="cb1-400"><a href="#cb1-400" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-401"><a href="#cb1-401" aria-hidden="true" tabindex="-1"></a>似然与留神经元度量仍以变换高斯观测模型为条件。更好预测表现支持该模型/任务组合，而非神经机制或唯一正确潜表示。</span>
+<span id="cb1-402"><a href="#cb1-402" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-403"><a href="#cb1-403" aria-hidden="true" tabindex="-1"></a><span class="fu">## 最小玩具模型</span></span>
+<span id="cb1-404"><a href="#cb1-404" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-405"><a href="#cb1-405" aria-hidden="true" tabindex="-1"></a>未来的非可执行解析/生成契约应使用 $q=2$ 个独立潜 GP，通过 $p=8$ 个通道在多个独立试次上观测。设</span>
+<span id="cb1-406"><a href="#cb1-406" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-407"><a href="#cb1-407" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-408"><a href="#cb1-408" aria-hidden="true" tabindex="-1"></a>k_1(t,t')=\exp<span class="sc">\!</span>\left<span class="co">[</span><span class="ot">-\frac{(t-t')^2}{2(0.08)^2}\right</span><span class="co">]</span>,</span>
+<span id="cb1-409"><a href="#cb1-409" aria-hidden="true" tabindex="-1"></a>\qquad</span>
+<span id="cb1-410"><a href="#cb1-410" aria-hidden="true" tabindex="-1"></a>k_2(t,t')=0.95\exp<span class="sc">\!</span>\left<span class="co">[</span><span class="ot">-\frac{(t-t')^2}{2(0.30)^2}\right</span><span class="co">]</span>+0.05\delta_{t,t'}.</span>
+<span id="cb1-411"><a href="#cb1-411" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-412"><a href="#cb1-412" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-413"><a href="#cb1-413" aria-hidden="true" tabindex="-1"></a>选择满列秩载荷矩阵 $C$、偏移 $d$ 与异质对角</span>
+<span id="cb1-414"><a href="#cb1-414" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-415"><a href="#cb1-415" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-416"><a href="#cb1-416" aria-hidden="true" tabindex="-1"></a>R=\operatorname{diag}(r_1,\ldots,r_8).</span>
+<span id="cb1-417"><a href="#cb1-417" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-418"><a href="#cb1-418" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-419"><a href="#cb1-419" aria-hidden="true" tabindex="-1"></a>对每个试次，在声明规则或不规则网格上抽取新 GP 潜值，生成高斯观测并保留潜真值。某些测试试次应包含掩蔽通道与时间块。</span>
+<span id="cb1-420"><a href="#cb1-420" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-421"><a href="#cb1-421" aria-hidden="true" tabindex="-1"></a>比较：</span>
+<span id="cb1-422"><a href="#cb1-422" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-423"><a href="#cb1-423" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>均值加对角高斯；</span>
+<span id="cb1-424"><a href="#cb1-424" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>静态双因子 FA；</span>
+<span id="cb1-425"><a href="#cb1-425" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>交叉验证两阶段平滑加 FA；</span>
+<span id="cb1-426"><a href="#cb1-426" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>正确指定的 GPFA；</span>
+<span id="cb1-427"><a href="#cb1-427" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>具有一个错误公共时间尺度的 GPFA 模型；以及</span>
+<span id="cb1-428"><a href="#cb1-428" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>拟合到相同序列的两状态 LGSSM。</span>
+<span id="cb1-429"><a href="#cb1-429" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-430"><a href="#cb1-430" aria-hidden="true" tabindex="-1"></a>对留出边际似然、掩蔽通道/时间预测密度、可观测协方差、载荷子空间误差、对齐后验均值误差、后验覆盖与时间尺度恢复评分。必需压力情形是：</span>
+<span id="cb1-431"><a href="#cb1-431" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-432"><a href="#cb1-432" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>违反平方指数光滑性的突然变点；</span>
+<span id="cb1-433"><a href="#cb1-433" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>违反对角 $R$ 的相关观测残差；</span>
+<span id="cb1-434"><a href="#cb1-434" aria-hidden="true" tabindex="-1"></a><span class="ss">3. </span>用高斯平方根近似分析的低率泊松计数；</span>
+<span id="cb1-435"><a href="#cb1-435" aria-hidden="true" tabindex="-1"></a><span class="ss">4. </span>时间值近似独立的潜坐标；</span>
+<span id="cb1-436"><a href="#cb1-436" aria-hidden="true" tabindex="-1"></a><span class="ss">5. </span>暴露旋转歧义的两个等时间尺度坐标；</span>
+<span id="cb1-437"><a href="#cb1-437" aria-hidden="true" tabindex="-1"></a><span class="ss">6. </span>事件时间抖动与错误试次对齐；</span>
+<span id="cb1-438"><a href="#cb1-438" aria-hidden="true" tabindex="-1"></a><span class="ss">7. </span>有信息缺失；以及</span>
+<span id="cb1-439"><a href="#cb1-439" aria-hidden="true" tabindex="-1"></a><span class="ss">8. </span>从 $d$ 中省略的条件锁定均值，迫使潜因子吸收确定性试次结构。</span>
+<span id="cb1-440"><a href="#cb1-440" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-441"><a href="#cb1-441" aria-hidden="true" tabindex="-1"></a>恢复主张必须尊重符号、置换、尺度与相同核旋转等价。该玩具契约会区分已知模型下的后验推断与参数学习和模型选择。本方法对象不产生代码、数据、图或结果。</span>
+<span id="cb1-442"><a href="#cb1-442" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-443"><a href="#cb1-443" aria-hidden="true" tabindex="-1"></a><span class="fu">## 对 LDG 的意义</span></span>
+<span id="cb1-444"><a href="#cb1-444" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-445"><a href="#cb1-445" aria-hidden="true" tabindex="-1"></a>GPFA 是 LDG 的规范协方差先验潜轨迹方法。它连接静态因子分析、全区间后验推断、时间正则化与依赖模型的不确定性，同时提供与基于转移的 LGSSM 平滑的对照。</span>
+<span id="cb1-446"><a href="#cb1-446" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-447"><a href="#cb1-447" aria-hidden="true" tabindex="-1"></a>其主要方法学教训是光滑潜轨迹可以是合适的后验摘要，而不必是已发现动力学。协方差先验陈述条件化前哪些路径合理，观测模型陈述潜路径如何与测量相关，后验组合两者。这些步骤中没有一个单独识别向量场或机制。</span>
+<span id="cb1-448"><a href="#cb1-448" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-449"><a href="#cb1-449" aria-hidden="true" tabindex="-1"></a>::: {.callout-warning title="这并不蕴含"}</span>
+<span id="cb1-450"><a href="#cb1-450" aria-hidden="true" tabindex="-1"></a>光滑 GPFA 后验均值不确立学习转移律、向量场、流、动力学、流形、本征维数、生物机制、因果过程或唯一辨识潜轨迹。光滑性由协方差先验与拟合超参数施加。后验是回顾性的，并以线性高斯观测模型、对角残差假设、试次边界、核族、预处理与插件参数为条件。</span>
+<span id="cb1-451"><a href="#cb1-451" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb1-452"><a href="#cb1-452" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-453"><a href="#cb1-453" aria-hidden="true" tabindex="-1"></a><span class="fu">### 小鼠轨迹</span></span>
+<span id="cb1-454"><a href="#cb1-454" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-455"><a href="#cb1-455" aria-hidden="true" tabindex="-1"></a>不保留模态特定经验主张。GPFA 可以概括重复多通道运动测量，但外部任务驱动、试次对齐、间断与传感器相关需要显式处理。光滑潜曲线不确立自治行为动力学。</span>
+<span id="cb1-456"><a href="#cb1-456" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-457"><a href="#cb1-457" aria-hidden="true" tabindex="-1"></a><span class="fu">### 眼动</span></span>
+<span id="cb1-458"><a href="#cb1-458" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-459"><a href="#cb1-459" aria-hidden="true" tabindex="-1"></a>不保留模态特定经验主张。扫视间断、追踪输入、事件对齐、眨眼、删失与角度坐标可以违反平稳光滑 GP 与可忽略缺失假设。</span>
+<span id="cb1-460"><a href="#cb1-460" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-461"><a href="#cb1-461" aria-hidden="true" tabindex="-1"></a><span class="fu">### EEG</span></span>
+<span id="cb1-462"><a href="#cb1-462" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-463"><a href="#cb1-463" aria-hidden="true" tabindex="-1"></a>不保留模态特定经验主张。重参考、容积传导、滤波、伪迹、非平稳性与相关传感器残差直接挑战对角 $R$ 与独立试次假设。GPFA 因子不自动是神经源。</span>
+<span id="cb1-464"><a href="#cb1-464" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-465"><a href="#cb1-465" aria-hidden="true" tabindex="-1"></a><span class="fu">### MEG / 神经群体数据</span></span>
+<span id="cb1-466"><a href="#cb1-466" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-467"><a href="#cb1-467" aria-hidden="true" tabindex="-1"></a>Yu 等人把 GPFA 应用于 61 个同时记录猕猴前运动与运动皮层单元在伸手规划与执行期间的平方根变换分箱活动。在其交叉验证留神经元预测误差准则下，GPFA 优于所测试的两阶段方法，推断单试次轨迹被用于检查运动准备期间的收敛 <span class="co">[</span><span class="ot">@YuEtAl2009</span><span class="co">]</span>。这些是一个数据集与管线下的来源特定经验发现，不是光滑神经动力学或机制的普遍证据。</span>
+<span id="cb1-468"><a href="#cb1-468" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-469"><a href="#cb1-469" aria-hidden="true" tabindex="-1"></a>Cunningham 与 Yu 综述 GPFA 为带显式噪声模型的单试次潜轨迹方法，并强调提取轨迹反映拟合模型鼓励的时间结构 <span class="co">[</span><span class="ot">@CunninghamYu2014</span><span class="co">]</span>。因此新的神经主张需要独立预测评估、先验敏感性、残差检查与模态特定证据。</span>
+<span id="cb1-470"><a href="#cb1-470" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-471"><a href="#cb1-471" aria-hidden="true" tabindex="-1"></a><span class="fu">## 主要来源</span></span>
+<span id="cb1-472"><a href="#cb1-472" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-473"><a href="#cb1-473" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Yu 等人引入 GPFA，指定 FA 式观测层与独立潜 GP 先验，推导有限网格边际与后验，用 EM 拟合参数，定义标准正交化可视化，并报告原始单试次猕猴运动皮层应用 <span class="co">[</span><span class="ot">@YuEtAl2009</span><span class="co">]</span>。已核查发表勘误；它修正 Figure A2 中的颜色归属，不改变此处使用的模型方程。</span>
+<span id="cb1-474"><a href="#cb1-474" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-475"><a href="#cb1-475" aria-hidden="true" tabindex="-1"></a><span class="fu">## 综述 / 次级来源</span></span>
+<span id="cb1-476"><a href="#cb1-476" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-477"><a href="#cb1-477" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Rasmussen 与 Williams 提供经核查的高斯过程、半正定协方差函数、有限网格联合高斯分布、后验条件化、平方指数长度尺度与边际似然学习权威处理 <span class="co">[</span><span class="ot">@RasmussenWilliams2006</span><span class="co">]</span>。</span>
+<span id="cb1-478"><a href="#cb1-478" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Cunningham 与 Yu 综述神经降维方法，区分 GPFA 与两阶段和基于转移的替代，讨论单试次使用与交叉验证，并告诫潜轨迹反映模型施加的时间结构 <span class="co">[</span><span class="ot">@CunninghamYu2014</span><span class="co">]</span>。</span>
+<span id="cb1-479"><a href="#cb1-479" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-480"><a href="#cb1-480" aria-hidden="true" tabindex="-1"></a><span class="fu">## 开放方法学问题</span></span>
+<span id="cb1-481"><a href="#cb1-481" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-482"><a href="#cb1-482" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>哪些协方差族在不抑制科学上有意义的间断或非平稳性的情况下捕获神经正则性？</span>
+<span id="cb1-483"><a href="#cb1-483" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>何时可以从可用试次长度与采样率区分潜 nugget、观测噪声、短时间尺度与额外因子？</span>
+<span id="cb1-484"><a href="#cb1-484" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>应如何在实用规模上把参数不确定性传播进后验路径不确定性？</span>
+<span id="cb1-485"><a href="#cb1-485" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>哪个留出目标——试次似然、神经元预测、掩蔽时间预测、行为或模拟器状态——最匹配科学用途？</span>
+<span id="cb1-486"><a href="#cb1-486" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>推断时间尺度与载荷子空间跨会话、受试者、条件、箱宽与观测变换有多鲁棒？</span>
+<span id="cb1-487"><a href="#cb1-487" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>何时基于转移的状态空间表示更适合预测、干预或机制问题？</span>
+<span id="cb1-488"><a href="#cb1-488" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>应如何界定与验证点过程、相关残差、非平稳或跨试次扩展，而不把灵活性当作证据？</span>
+<span id="cb1-489"><a href="#cb1-489" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-490"><a href="#cb1-490" aria-hidden="true" tabindex="-1"></a><span class="fu">## 成熟度检查表</span></span>
+<span id="cb1-491"><a href="#cb1-491" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-492"><a href="#cb1-492" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> 完整方法 schema，状态为 <span class="in">`L2/review`</span>。</span>
+<span id="cb1-493"><a href="#cb1-493" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> 定义对角 $R$ 的 FA 式线性高斯观测与跨坐标和试次独立的潜 GP 先验。</span>
+<span id="cb1-494"><a href="#cb1-494" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> 声明高斯过程与半正定协方差核为假定背景，并排除时序核概念作为前置条件。</span>
+<span id="cb1-495"><a href="#cb1-495" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> 定义平方指数时间尺度，并清楚区分可选潜 GP nugget 与观测噪声和转移过程噪声。</span>
+<span id="cb1-496"><a href="#cb1-496" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> 给出有限网格堆叠联合高斯、边际似然、后验均值/协方差与缺失观测选择表述。</span>
+<span id="cb1-497"><a href="#cb1-497" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> 区分参数学习、模型选择与后验轨迹推断。</span>
+<span id="cb1-498"><a href="#cb1-498" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> 陈述学习/固定量、回顾性时间处理、几何、监督与尖峰计数高斯边界。</span>
+<span id="cb1-499"><a href="#cb1-499" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> 覆盖符号、置换、尺度、相同核旋转、事后坐标与超参数可辨识性。</span>
+<span id="cb1-500"><a href="#cb1-500" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> 覆盖先验施加光滑性、核/观测/试次/对齐/分箱/缺失失效与局部优化。</span>
+<span id="cb1-501"><a href="#cb1-501" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> 包含静态 FA、两阶段、独立通道、LGSSM、卡尔曼平滑、移动平均与独立箱基线。</span>
+<span id="cb1-502"><a href="#cb1-502" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> 给出防泄漏留出评估与非可执行正/负玩具契约。</span>
+<span id="cb1-503"><a href="#cb1-503" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> 显式拒绝学习转移、向量场、动力学、流形、本征维数、机制、因果与唯一轨迹主张。</span>
+<span id="cb1-504"><a href="#cb1-504" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> 三个保留来源与原始论文勘误经核查；元数据与 DOI 或稳定标识符已验证。</span>
+<span id="cb1-505"><a href="#cb1-505" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> 独立混合审查返回 PASS，无需修正轮次。</span>
+<span id="cb1-506"><a href="#cb1-506" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> 在对象特定 PASS 与验证后，根据记录的审查决定授权稳定晋升。</span></code></pre></div><button title="复制到剪贴板" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></div>
+</div></div></div></div></div>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

@@ -1,0 +1,1639 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="zh-CN" xml:lang="zh-CN"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.10.18">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>解混主成分分析 – Latent Dynamics &amp; Geometry</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="../../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../../">
+<script src="../../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../../site_libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../../site_libs/bootstrap/bootstrap-e3adbaa939bcd423dddc8c8a834270b4.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "没有结果",
+    "search-matching-documents-text": "匹配的文档",
+    "search-copy-link-title": "复制搜索链接",
+    "search-hide-matches-text": "隐藏其它匹配结果",
+    "search-more-match-text": "更多匹配结果",
+    "search-more-matches-text": "更多匹配结果",
+    "search-clear-button-title": "清除",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "取消",
+    "search-submit-button-title": "提交",
+    "search-label": "搜索"
+  }
+}</script>
+<style>
+.ldg-lang{position:fixed;top:72px;right:16px;z-index:2000;display:flex;gap:4px;font-family:system-ui,-apple-system,"Segoe UI",sans-serif;}
+.ldg-lang a{display:inline-block;padding:4px 10px;border:1px solid #c8c8c8;border-radius:999px;background:#fff;color:#333;text-decoration:none;font-size:13px;box-shadow:0 1px 3px rgba(0,0,0,.15);}
+.ldg-lang a.active{background:#2c3e50;color:#fff;border-color:#2c3e50;}
+</style>
+</head><body class="nav-fixed quarto-light"><div class="ldg-lang" id="ldg-lang">
+  <a href="#" id="ldg-lang-en">EN</a>
+  <a href="#" id="ldg-lang-zh">中文</a>
+</div>
+<script>
+(function () {
+  var BASE = '';
+  if (window.location.pathname.indexOf('/latent-dynamics-geometry-public/') === 0) {
+    BASE = 'latent-dynamics-geometry-public';
+  }
+  var IS_FILE = window.location.protocol === 'file:';
+  function pathSegs() {
+    return window.location.pathname.split('/').filter(Boolean);
+  }
+  function zhIdx() {
+    return pathSegs().indexOf('zh');
+  }
+  function segs() {
+    var s = window.location.pathname.split('/').filter(Boolean);
+    if (BASE && s[0] === BASE) s = s.slice(1);
+    return s;
+  }
+  function isZh() { return zhIdx() !== -1; }
+  function fileTarget(lang) {
+    var s = pathSegs();
+    var siteIdx = s.lastIndexOf('_site');
+    var root = siteIdx === -1 ? s.slice(0, -1) : s.slice(0, siteIdx + 1);
+    var page = siteIdx === -1 ? [s[s.length - 1]] : s.slice(siteIdx + 1);
+    if (page[0] === 'zh') page = page.slice(1);
+    if (lang === 'zh') page = ['zh'].concat(page);
+    var rel = page.join('/');
+    if (rel === '' || rel === 'zh') rel = 'index.html';
+    return '/' + root.join('/') + '/' + rel;
+  }
+  function target(lang) {
+    if (IS_FILE) return fileTarget(lang);
+    var s = segs();
+    if (s[0] === 'zh') s = s.slice(1);
+    if (lang === 'zh') s = ['zh'].concat(s);
+    var rel = s.join('/');
+    if (rel === '' || rel === 'zh') rel = (lang === 'zh' ? 'zh/index.html' : 'index.html');
+    return '/' + (BASE ? BASE + '/' : '') + rel;
+  }
+  function go(lang) {
+    try { localStorage.setItem('ldg-lang', lang); } catch (e) {}
+    window.location.href = target(lang);
+  }
+  function mark() {
+    var zh = isZh();
+    var a = document.getElementById('ldg-lang-en');
+    var b = document.getElementById('ldg-lang-zh');
+    if (a) a.className = zh ? '' : 'active';
+    if (b) b.className = zh ? 'active' : '';
+  }
+  function localizeNav() {
+    if (!isZh()) return;
+    var cur = pathSegs();
+    var czi = zhIdx();
+    var dir = (czi === -1 ? cur.slice(0, -1) : cur.slice(czi, -1)).join('/');
+    document.querySelectorAll('nav a').forEach(function (a) {
+      var h = a.getAttribute('href') || '';
+      if (/^(https?:|#|mailto:)/.test(h)) return;
+      if (/\.html?$/.test(h) || /\/$/.test(h) || h === '') {
+        var abs = new URL(h, window.location.href).pathname;
+        var s = abs.split('/').filter(Boolean);
+        if (BASE && s[0] === BASE) s = s.slice(1);
+        var zi = s.indexOf('zh');
+        var rel = zi !== -1 ? s.slice(zi + 1).join('/') : s.slice(czi).join('/');
+        var tgt = 'zh/' + rel;
+        var f = dir.split('/').filter(Boolean);
+        var t = tgt.split('/').filter(Boolean);
+        var i = 0;
+        while (i < f.length && i < t.length && f[i] === t[i]) i++;
+        var rel = '';
+        for (var j = i; j < f.length; j++) rel += '../';
+        rel += t.slice(i).join('/');
+        a.setAttribute('href', rel);
+      }
+    });
+  }
+  document.getElementById('ldg-lang-en').addEventListener('click', function (e) { e.preventDefault(); go('en'); });
+  document.getElementById('ldg-lang-zh').addEventListener('click', function (e) { e.preventDefault(); go('zh'); });
+  mark();
+  localizeNav();
+})();
+</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-chtml.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+
+
+
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../../../index.html">
+    <span class="navbar-title">Latent Dynamics &amp; Geometry</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="搜索"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="展开或折叠导航栏" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../../index.html"> 
+<span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../../knowledge/concepts/index.html"> 
+<span class="menu-text">Concepts</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../../knowledge/methods/index.html"> 
+<span class="menu-text">Methods</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../../knowledge/math/index.html"> 
+<span class="menu-text">Math</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../../knowledge/papers/index.html"> 
+<span class="menu-text">Papers</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../../toy-models/index.html"> 
+<span class="menu-text">Toy Models</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../../research-questions/index.html"> 
+<span class="menu-text">Research Questions</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../../benchmarks/index.html"> 
+<span class="menu-text">Benchmarks</span></a>
+  </li>  
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/AbelZheng/latent-dynamics-geometry-public"> <i class="bi bi-github" role="img" aria-label="GitHub repository">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="https://github.com/AbelZheng/latent-dynamics-geometry-public/discussions"> 
+<span class="menu-text">Discussions</span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">该页面内容</h2>
+   
+  <ul>
+  <li><a href="#解混主成分分析" id="toc-解混主成分分析" class="nav-link active" data-scroll-target="#解混主成分分析">解混主成分分析</a>
+  <ul class="collapse">
+  <li><a href="#问题" id="toc-问题" class="nav-link" data-scroll-target="#问题">问题</a></li>
+  <li><a href="#输入" id="toc-输入" class="nav-link" data-scroll-target="#输入">输入</a></li>
+  <li><a href="#输出" id="toc-输出" class="nav-link" data-scroll-target="#输出">输出</a></li>
+  <li><a href="#核心思想" id="toc-核心思想" class="nav-link" data-scroll-target="#核心思想">核心思想</a></li>
+  <li><a href="#生成-建模假设" id="toc-生成-建模假设" class="nav-link" data-scroll-target="#生成-建模假设">生成 / 建模假设</a></li>
+  <li><a href="#数学表述" id="toc-数学表述" class="nav-link" data-scroll-target="#数学表述">数学表述</a>
+  <ul class="collapse">
+  <li><a href="#边际化" id="toc-边际化" class="nav-link" data-scroll-target="#边际化">边际化</a></li>
+  <li><a href="#正则化条件均值降秩目标" id="toc-正则化条件均值降秩目标" class="nav-link" data-scroll-target="#正则化条件均值降秩目标">正则化条件均值降秩目标</a></li>
+  <li><a href="#方差核算" id="toc-方差核算" class="nav-link" data-scroll-target="#方差核算">方差核算</a></li>
+  </ul></li>
+  <li><a href="#学习得到了什么" id="toc-学习得到了什么" class="nav-link" data-scroll-target="#学习得到了什么">学习得到了什么？</a></li>
+  <li><a href="#什么是固定的" id="toc-什么是固定的" class="nav-link" data-scroll-target="#什么是固定的">什么是固定的？</a></li>
+  <li><a href="#时序假设" id="toc-时序假设" class="nav-link" data-scroll-target="#时序假设">时序假设</a></li>
+  <li><a href="#几何假设" id="toc-几何假设" class="nav-link" data-scroll-target="#几何假设">几何假设</a></li>
+  <li><a href="#监督" id="toc-监督" class="nav-link" data-scroll-target="#监督">监督</a></li>
+  <li><a href="#优化-推断" id="toc-优化-推断" class="nav-link" data-scroll-target="#优化-推断">优化 / 推断</a></li>
+  <li><a href="#优点" id="toc-优点" class="nav-link" data-scroll-target="#优点">优点</a></li>
+  <li><a href="#失效模式" id="toc-失效模式" class="nav-link" data-scroll-target="#失效模式">失效模式</a></li>
+  <li><a href="#可辨识性问题" id="toc-可辨识性问题" class="nav-link" data-scroll-target="#可辨识性问题">可辨识性问题</a></li>
+  <li><a href="#与更简单方法的比较" id="toc-与更简单方法的比较" class="nav-link" data-scroll-target="#与更简单方法的比较">与更简单方法的比较</a></li>
+  <li><a href="#评估准则" id="toc-评估准则" class="nav-link" data-scroll-target="#评估准则">评估准则</a></li>
+  <li><a href="#最小玩具模型" id="toc-最小玩具模型" class="nav-link" data-scroll-target="#最小玩具模型">最小玩具模型</a></li>
+  <li><a href="#对-ldg-的意义" id="toc-对-ldg-的意义" class="nav-link" data-scroll-target="#对-ldg-的意义">对 LDG 的意义</a>
+  <ul class="collapse">
+  <li><a href="#小鼠轨迹" id="toc-小鼠轨迹" class="nav-link" data-scroll-target="#小鼠轨迹">小鼠轨迹</a></li>
+  <li><a href="#眼动" id="toc-眼动" class="nav-link" data-scroll-target="#眼动">眼动</a></li>
+  <li><a href="#eeg" id="toc-eeg" class="nav-link" data-scroll-target="#eeg">EEG</a></li>
+  <li><a href="#meg-神经群体数据" id="toc-meg-神经群体数据" class="nav-link" data-scroll-target="#meg-神经群体数据">MEG / 神经群体数据</a></li>
+  </ul></li>
+  <li><a href="#主要来源" id="toc-主要来源" class="nav-link" data-scroll-target="#主要来源">主要来源</a></li>
+  <li><a href="#综述-次级来源" id="toc-综述-次级来源" class="nav-link" data-scroll-target="#综述-次级来源">综述 / 次级来源</a></li>
+  <li><a href="#开放方法学问题" id="toc-开放方法学问题" class="nav-link" data-scroll-target="#开放方法学问题">开放方法学问题</a></li>
+  <li><a href="#成熟度检查表" id="toc-成熟度检查表" class="nav-link" data-scroll-target="#成熟度检查表">成熟度检查表</a></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<div class="quarto-title-block"><div><h1 class="title">解混主成分分析</h1><button type="button" class="btn code-tools-button" id="quarto-code-tools-source"><i class="bi"></i> 代码</button></div></div>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="解混主成分分析" class="level1">
+<h1>解混主成分分析</h1>
+<section id="问题" class="level2">
+<h2 class="anchored" data-anchor-id="问题">问题</h2>
+<p>解混主成分分析（dPCA）构造有监督线性坐标，近似重构多变量数据的声明任务变量边际化。它被开发用于试次结构化的神经群体记录，其中活动随时间和实验标记条件变化，而单个变量与普通主成分常混合若干任务依赖 <span class="citation" data-cites="BrendelRomoMachens2011 KobakEtAl2016">(<a href="#ref-BrendelRomoMachens2011" role="doc-biblioref">Brendel 等 2011年</a>; <a href="#ref-KobakEtAl2016" role="doc-biblioref">Kobak 等 2016年</a>)</span>。</p>
+<p><strong>demixed</strong>（解混）一词在特定标签分解与重构损失下命名成功。它不意味着所得分量统计独立、因果分离、唯一辨识、解剖定位，或由不同神经模块生成。该方法是依赖标签的线性摘要，不是盲源分离或机制模型。这里的有界表述遵循已发表的 2016 年<strong>试次平均条件均值</strong>分析；它不是试次级噪声协方差模型 <span class="citation" data-cites="KobakEtAl2016">(<a href="#ref-KobakEtAl2016" role="doc-biblioref">Kobak 等 2016年</a>)</span>。</p>
+</section>
+<section id="输入" class="level2">
+<h2 class="anchored" data-anchor-id="输入">输入</h2>
+<p>设 <span class="math inline">\(N\)</span> 是测得特征或神经元数目，<span class="math inline">\(T\)</span> 是对齐时间箱数目，<span class="math inline">\(a_1,\ldots,a_m\)</span> 表示声明的类别或离散化任务变量。对平衡全因子设计，试次解析张量可以写作</p>
+<p><span class="math display">\[
+\mathcal X\in
+\mathbb R^{N\times T\times A_1\times\cdots\times A_m\times K},
+\]</span></p>
+<p>其中 <span class="math inline">\(K\)</span> 是每个条件单元中相同试次数。此处有界表述中的拟合输入是试次平均条件张量</p>
+<p><span class="math display">\[
+\bar{\mathcal X}
+\in
+\mathbb R^{N\times T\times A_1\times\cdots\times A_m},
+\]</span></p>
+<p>展平为中心化矩阵 <span class="math inline">\(X\in\mathbb R^{N\times M}\)</span>，其中 <span class="math inline">\(M=T\prod_j A_j\)</span>。在下方有界表述中每个条件–时间列被赋予等权重。试次解析张量为估计这些均值与交叉验证提供独立重复；其单个试次列不替代下述目标中的 <span class="math inline">\(X\)</span>。</p>
+<p>可复现分析必须声明：</p>
+<ul>
+<li>实验单元、试次包含规则，以及特征是同时记录还是组装为伪群体；</li>
+<li>对齐、分箱、平滑、时间扭曲与基线扣除；</li>
+<li>特征缩放与中心化；</li>
+<li>任务变量、其编码、水平顺序以及保留或分组哪些交互；</li>
+<li>所有因子单元是否存在以及不平衡试次数如何处理；</li>
+<li>分配给每个边际化的秩 <span class="math inline">\(q_\phi\)</span>；</li>
+<li>正则化网格与交叉验证划分单元；以及</li>
+<li>投影将应用于条件均值、单个试次还是两者。</li>
+</ul>
+<p>条件均值等加权回答的问题不同于按试次数比例加权单元的问题。缺失单元、相关标签与不等噪声精度需要显式模型、加权或再平衡规程，而非静默应用平衡公式 <span class="citation" data-cites="KobakEtAl2016">(<a href="#ref-KobakEtAl2016" role="doc-biblioref">Kobak 等 2016年</a>)</span>。</p>
+</section>
+<section id="输出" class="level2">
+<h2 class="anchored" data-anchor-id="输出">输出</h2>
+<p>对每个声明边际化组 <span class="math inline">\(\phi\)</span>，dPCA 返回：</p>
+<ul>
+<li>与 <span class="math inline">\(X\)</span> 同形状的目标矩阵 <span class="math inline">\(X_\phi\)</span>；</li>
+<li>解码器矩阵 <span class="math inline">\(D_\phi\in\mathbb R^{q_\phi\times N}\)</span>，其行定义线性投影轴；</li>
+<li>用于重构相应边际化的编码器矩阵 <span class="math inline">\(F_\phi\in\mathbb R^{N\times q_\phi}\)</span>；</li>
+<li>分量得分 <span class="math inline">\(Z_\phi=D_\phi X\)</span>；以及</li>
+<li>近似边际重构 <span class="math inline">\(\widehat X_\phi=F_\phi D_\phi X\)</span>。</li>
+</ul>
+<p>组合近似是</p>
+<p><span class="math display">\[
+\widehat X=\sum_\phi F_\phi D_\phi X.
+\]</span></p>
+<p>属于不同边际化的分量一般不正交，其得分不必不相关。给定拟合数据与选择，输出是确定性的；它不是潜变量上的后验分布。</p>
+</section>
+<section id="核心思想" class="level2">
+<h2 class="anchored" data-anchor-id="核心思想">核心思想</h2>
+<p>普通 PCA 选择单个正交子空间来重构所有中心化方差而不使用标签。dPCA 先把平衡条件张量分解为与时间、任务变量主效应与交互关联的 ANOVA 式边际化。然后为每个边际化解单独的正则化降秩回归：完整数据经解码器投影，但重构目标只是数据中被选标签相关部分 <span class="citation" data-cites="KobakEtAl2016">(<a href="#ref-KobakEtAl2016" role="doc-biblioref">Kobak 等 2016年</a>)</span>。</p>
+<p>这把在普通 PCA 中重合的两个角色分开。解码器行定义低维读出 <span class="math inline">\(D_\phi X\)</span>；编码器列把这些读出映射回 <span class="math inline">\(X_\phi\)</span>。允许编码器与解码器轴不同避免强迫所有任务关联子空间相互正交。</p>
+</section>
+<section id="生成-建模假设" class="level2">
+<h2 class="anchored" data-anchor-id="生成-建模假设">生成 / 建模假设</h2>
+<p>有界 2016 dPCA 表述是确定性有监督近似方法，不是生成概率模型。其操作性假设是：</p>
+<ul>
+<li>声明任务标签及其交互提供科学相关的变异划分；</li>
+<li>条件均值可以在一个共同特征空间中比较；</li>
+<li>线性读出与线性重构是充分摘要；</li>
+<li>平方 Frobenius 重构损失与岭正则化是合适准则；</li>
+<li>因子边际化在声明平衡或加权约定下有意义；以及</li>
+<li>存在足够独立试次以估计条件均值、正则化与留出行为。</li>
+</ul>
+<p>早期 dPCA 工作使用正交约束概率表述，而规范降秩表述移除了该约束，因为任务相关子空间可以非正交 <span class="citation" data-cites="BrendelRomoMachens2011 KobakEtAl2016">(<a href="#ref-BrendelRomoMachens2011" role="doc-biblioref">Brendel 等 2011年</a>; <a href="#ref-KobakEtAl2016" role="doc-biblioref">Kobak 等 2016年</a>)</span>。两种表述都不蕴含标签效应是物理源或数据由独立模块生成。</p>
+</section>
+<section id="数学表述" class="level2">
+<h2 class="anchored" data-anchor-id="数学表述">数学表述</h2>
+<section id="边际化" class="level3">
+<h3 class="anchored" data-anchor-id="边际化">边际化</h3>
+<p>设</p>
+<p><span class="math display">\[
+\Omega=\{t,a_1,\ldots,a_m\}
+\]</span></p>
+<p>是指标变量集合。对每个子集 <span class="math inline">\(S\subseteq\Omega\)</span>，设 <span class="math inline">\(\mathcal M_S X\)</span> 表示对 <span class="math inline">\(\Omega\setminus S\)</span> 中每个变量平均并在被平均索引上复制所得值。通过递归定义完整因子分解</p>
+<p><span class="math display">\[
+X_S
+=
+\mathcal M_S X
+-
+\sum_{R\subsetneq S}X_R.
+\]</span></p>
+<p>空集项是总均值，在全局逐特征中心化后为零。在具有均匀单元加权的完整平衡因子设计下，</p>
+<p><span class="math display">\[
+X=\sum_{S\subseteq\Omega}X_S,
+\]</span></p>
+<p>且不同项在 Frobenius 内积中正交，因此其平方范数相加 <span class="citation" data-cites="BrendelRomoMachens2011 KobakEtAl2016">(<a href="#ref-BrendelRomoMachens2011" role="doc-biblioref">Brendel 等 2011年</a>; <a href="#ref-KobakEtAl2016" role="doc-biblioref">Kobak 等 2016年</a>)</span>。</p>
+<p>交互不是应被自动丢弃的残差干扰。有刺激 <span class="math inline">\(s\)</span>、决策 <span class="math inline">\(d\)</span> 与时间 <span class="math inline">\(t\)</span> 时，完整分解包含 <span class="math inline">\(t,s,d,ts,td,sd,tsd\)</span>。规范神经呈现把项分组为</p>
+<p><span class="math display">\[
+X_{\text{stimulus}}=X_s+X_{ts},
+\qquad
+X_{\text{decision}}=X_d+X_{td},
+\]</span></p>
+<p>与</p>
+<p><span class="math display">\[
+X_{\text{interaction}}=X_{sd}+X_{tsd},
+\]</span></p>
+<p>而 <span class="math inline">\(X_t\)</span> 是条件无关时间变异。该分组是分析者声明的解读选择。不同分组、标签编码或平均测度定义不同解混目标。</p>
+</section>
+<section id="正则化条件均值降秩目标" class="level3">
+<h3 class="anchored" data-anchor-id="正则化条件均值降秩目标">正则化条件均值降秩目标</h3>
+<p>对每个分组边际化 <span class="math inline">\(\phi\)</span>，选择秩 <span class="math inline">\(q_\phi\)</span> 并求解</p>
+<p><span class="math display">\[
+\min_{F_\phi,D_\phi}
+\left\lVert
+X_\phi-F_\phi D_\phi X
+\right\rVert_F^2
++
+\lambda
+\left\lVert F_\phi D_\phi\right\rVert_F^2,
+\]</span></p>
+<p>受</p>
+<p><span class="math display">\[
+\operatorname{rank}(F_\phi D_\phi)\le q_\phi.
+\]</span></p>
+<p>约束。该方程中的预测变量 <span class="math inline">\(X\)</span> 与目标 <span class="math inline">\(X_\phi\)</span> 都是训练条件均值，边际均值在被平均索引上复制。已发表分析通过留出伪试次并重建训练均值选择正则化；它还明确指出拟合 PSTH 表述忽略试次间变异性与未知噪声相关 <span class="citation" data-cites="KobakEtAl2016">(<a href="#ref-KobakEtAl2016" role="doc-biblioref">Kobak 等 2016年</a>)</span>。拟合所有单个试次或增加显式试次噪声协方差的方法求解不同目标，在本有界对象之外。</p>
+<p>诸如</p>
+<p><span class="math display">\[
+F_\phi^\top F_\phi=I
+\]</span></p>
+<p>的归一化约定移除任意编码器–解码器缩放，但不移除每个退化。总损失是分别最小化边际损失之和。</p>
+<p>把 <span class="math inline">\(A_\phi=F_\phi D_\phi\)</span> 写作无约束岭回归映射</p>
+<p><span class="math display">\[
+A_{\phi,\lambda}
+=
+X_\phi X^\top
+\left(XX^\top+\lambda I\right)^{-1},
+\]</span></p>
+<p>在奇异边界需要伪逆或等价稳定求解器。设 <span class="math inline">\(U_{\phi,q}\)</span> 包含 <span class="math inline">\(A_{\phi,\lambda}X\)</span> 的领先左奇异向量。一个规范分解是</p>
+<p><span class="math display">\[
+F_\phi=U_{\phi,q},
+\qquad
+D_\phi=U_{\phi,q}^\top A_{\phi,\lambda}.
+\]</span></p>
+<p>因此每个边际问题都是岭正则化降秩回归后接谱截断 <span class="citation" data-cites="KobakEtAl2016">(<a href="#ref-KobakEtAl2016" role="doc-biblioref">Kobak 等 2016年</a>)</span>。降秩回归约束多元回归系数矩阵的秩，具有独立于 dPCA 的更广统计理论 <span class="citation" data-cites="Izenman2008">(<a href="#ref-Izenman2008" role="doc-biblioref">Izenman 2008年</a>)</span>。</p>
+</section>
+<section id="方差核算" class="level3">
+<h3 class="anchored" data-anchor-id="方差核算">方差核算</h3>
+<p>对中心化平衡数据，用</p>
+<p><span class="math display">\[
+V_{\mathrm{tot}}=\lVert X\rVert_F^2,
+\qquad
+V_\phi=\lVert X_\phi\rVert_F^2.
+\]</span></p>
+<p>定义总方差与边际方差。平衡正交分解给出</p>
+<p><span class="math display">\[
+V_{\mathrm{tot}}=\sum_\phi V_\phi
+\]</span></p>
+<p>只在所有未分组项与任何声明残差/噪声项被一致包含时成立。对解码器行 <span class="math inline">\(d\)</span>，其归因于边际化 <span class="math inline">\(\phi\)</span> 的投影方差可以概括为</p>
+<p><span class="math display">\[
+v_\phi(d)=\lVert dX_\phi\rVert_2^2,
+\]</span></p>
+<p>描述性解混指数是</p>
+<p><span class="math display">\[
+\operatorname{DI}(d)
+=
+\frac{\max_\phi v_\phi(d)}{\sum_\psi v_\psi(d)}.
+\]</span></p>
+<p>该指数与所选标签、平均与度量绑定。因为跨边际化解码器轴可以非正交，逐分量重构或投影方差可以重叠；不得像 dPCA 是单个正交 PCA 基那样把它们相加。重构质量应改为从实际组合重构或从显式定义的边际误差计算。</p>
+</section>
+</section>
+<section id="学习得到了什么" class="level2">
+<h2 class="anchored" data-anchor-id="学习得到了什么">学习得到了什么？</h2>
+<p>对每个边际化，dPCA 学习正则化低秩线性映射 <span class="math inline">\(A_\phi=F_\phi D_\phi\)</span>、代表性编码器/解码器分解、有序分量得分与边际重构。它还在固定张量分解下产生描述性方差与解混摘要。</p>
+<p>它不学习任务标签、因果图、独立源、神经模块、转移律、潜状态后验或唯一生物坐标系。</p>
+</section>
+<section id="什么是固定的" class="level2">
+<h2 class="anchored" data-anchor-id="什么是固定的">什么是固定的？</h2>
+<p>分析者固定群体/特征、试次与条件单元、对齐与预处理、中心化与缩放、标签集与编码、因子平均测度、交互分组、单元加权或再平衡、秩、正则化选择规程、交叉验证单元、显示的分量数，以及用于评估的任何分类器。</p>
+<p>试次平均也被固定。在条件均值上拟合强调可重复的标签关联结构，但抑制试次间变异性。把解码器应用于单个试次是单独泛化问题。</p>
+</section>
+<section id="时序假设" class="level2">
+<h2 class="anchored" data-anchor-id="时序假设">时序假设</h2>
+<p>在有界 dPCA 表述中，时间是指标任务变量。时间边际化描述跨对齐时间箱的均值变异，而刺激–时间等项描述依赖标签的时间轮廓。方法不估计转移、导数、过程噪声、向量场或演化定律。</p>
+<p>改变箱宽、对齐事件、平滑核、时间扭曲或分析区间会改变边际化。光滑 dPCA 迹线可以来自平滑与试次平均；它们不是光滑潜动力学的证据。把来自一个试次的相邻箱当作独立留出样本会造成泄漏。</p>
+</section>
+<section id="几何假设" class="level2">
+<h2 class="anchored" data-anchor-id="几何假设">几何假设</h2>
+<p>dPCA 在声明特征坐标中使用线性投影与欧氏/Frobenius 平方误差。特征缩放因此改变目标与学习轴。不同边际化可以占据重叠、斜交子空间；方法不施加或恢复流形、非线性度量、拓扑或黎曼几何。</p>
+<p>一个分量的编码器与解码器不必沿同一特征空间轴，来自不同边际化的解码器不必正交。二维图组合所选线性读出；其视觉分离不是与坐标无关的几何事实。</p>
+</section>
+<section id="监督" class="level2">
+<h2 class="anchored" data-anchor-id="监督">监督</h2>
+<p>dPCA 是有监督的，因为实验提供的标签确定 <span class="math inline">\(X_\phi\)</span> 并因此进入训练损失。时间箱也作为索引设计水平。只有当后续行为结果未用于标签、预处理、超参数调优或分量选择时，方法对该结果才可能是无监督的。</p>
+<p>标签相关与标签间的确定性关系可以使边际效应不可分离或改变其解读。例如，如果决策几乎由刺激决定，把方差分别归于刺激与决策依赖采样的错误试次、编码、平衡与交互约定。监督不得隐藏在「降维」一词后面。</p>
+</section>
+<section id="优化-推断" class="level2">
+<h2 class="anchored" data-anchor-id="优化-推断">优化 / 推断</h2>
+<p>规范条件均值目标分解为每个边际化一个正则化降秩回归。每个可以用稳定岭回归系统与奇异值分解求解。这是确定性拟合而非后验推断，不估计试次级噪声协方差。</p>
+<p>岭参数 <span class="math inline">\(\lambda\)</span> 与（被调谐时）秩 <span class="math inline">\(q_\phi\)</span> 必须只用训练数据选择。Kobak 等人使用留出试次形成测试伪试次，并通过重复交叉验证选择正则化；这支持试次级分离原则，而非一个普遍有效划分或参数网格 <span class="citation" data-cites="KobakEtAl2016">(<a href="#ref-KobakEtAl2016" role="doc-biblioref">Kobak 等 2016年</a>)</span>。数值选择包括协方差正则化、伪逆容差与近零方差特征的处理。</p>
+</section>
+<section id="优点" class="level2">
+<h2 class="anchored" data-anchor-id="优点">优点</h2>
+<ul>
+<li>它使任务标签与交互显式，而不是要求未标记方差与实验问题对齐。</li>
+<li>分离编码器与解码器矩阵允许非正交任务关联子空间。</li>
+<li>降秩目标在边际重构与紧凑性之间平衡。</li>
+<li>边际化提供可审计的核算，说明分量表达哪些声明效应。</li>
+<li>当预处理与拟合防泄漏时，线性解码器可以应用于留出试次。</li>
+<li>PCA、边际均值与解码提供清晰相邻基线。</li>
+</ul>
+</section>
+<section id="失效模式" class="level2">
+<h2 class="anchored" data-anchor-id="失效模式">失效模式</h2>
+<ul>
+<li><strong>不平衡或缺失单元：</strong> 朴素平均可以破坏正交性并把主效应与交互混淆。</li>
+<li><strong>相关标签：</strong> 刺激、选择、奖赏与结果在实验设计下可能无法分别估计。</li>
+<li><strong>交互重分配：</strong> 把时间交互与任务主效应分组可以按构造产生偏好叙事。</li>
+<li><strong>试次平均：</strong> 弱、异质或试次特定结构可能消失，而平滑均值可能看起来比单试次读出更可靠。</li>
+<li><strong>伪群体：</strong> 组合顺序记录单元阻止估计同时噪声相关，并可能夸大群体级可用性。</li>
+<li><strong>重叠边际子空间：</strong> 可能没有线性轴干净分离所选效应；强制标记分量不修复重叠。</li>
+<li><strong>过拟合：</strong> 高特征数、少试次、多标签与灵活分量选择可以拟合采样噪声。</li>
+<li><strong>泄漏：</strong> 用留出试次计算条件均值、平滑参数、缩放、秩、正则化或首选分量会产生乐观结果。</li>
+<li><strong>尺度敏感性：</strong> 高方差神经元或特征主导 Frobenius 损失，除非缩放被科学论证。</li>
+<li><strong>非线性结构：</strong> 标签依赖可能无法通过低秩线性读出表示。</li>
+<li><strong>离群值与伪迹：</strong> 基于方差的拟合可以优先异常试次或单元。</li>
+<li><strong>不稳定：</strong> 接近奇异值、弱边际方差或小扰动可以旋转学习子空间。</li>
+<li><strong>解读具体化：</strong> 高解混指数或解码精度可能被误认为独立神经通道、解剖模块或原因。</li>
+</ul>
+</section>
+<section id="可辨识性问题" class="level2">
+<h2 class="anchored" data-anchor-id="可辨识性问题">可辨识性问题</h2>
+<p>只有低秩积 <span class="math inline">\(A_\phi=F_\phi D_\phi\)</span> 进入重构。没有归一化时，对任何可逆 <span class="math inline">\(R\)</span>，</p>
+<p><span class="math display">\[
+F_\phi D_\phi
+=
+(F_\phi R)(R^{-1}D_\phi),
+\]</span></p>
+<p>因此编码器与解码器因子不被分别辨识。选择标准正交编码器列并排序分量选择约定。单个分量符号仍任意，重复奇异值允许相应拟合子空间内的旋转。</p>
+<p>跨边际化，轴被分别拟合且可以非正交。相关得分不违背算法，明显视觉分离也不确立统计独立。改变任务编码、交互分组、单元权重、秩或正则化会改变估计目标，而非揭示唯一辨识分解的另一视图。</p>
+<p>因此「解混」指分量在拟合损失下集中来自一个声明边际化的方差。它<strong>不</strong>意味着独立分量、因果分离、唯一神经模块、解剖分割、机制变量或唯一辨识潜原因。</p>
+</section>
+<section id="与更简单方法的比较" class="level2">
+<h2 class="anchored" data-anchor-id="与更简单方法的比较">与更简单方法的比较</h2>
+<ul>
+<li><strong>PCA：</strong> 用相同中心化缩放训练矩阵拟合秩匹配 PCA。PCA 提供最强普通线性重构基线，但忽略标签。</li>
+<li><strong>边际均值与对照：</strong> 不学习投影直接绘制或量化 <span class="math inline">\(X_\phi\)</span>。这检验实质性结论是否已可见于条件均值。</li>
+<li><strong>每边际化单独 PCA：</strong> 对每个 <span class="math inline">\(X_\phi\)</span> 拟合 PCA。这压缩边际均值，但当应用于完整或单试次数据时，本身不提供隔离该边际化的解码器轴。</li>
+<li><strong>简单标签解码：</strong> 对原始特征或 PCA 得分拟合预先指定的线性分类器或回归器。解码检验标签可预测性；它不保留几何或重构群体活动，也不等价于解混。</li>
+<li><strong>仅均值重构：</strong> 用训练均值重构每个特征作为基本误差参考。</li>
+</ul>
+<p>dPCA 分析应报告它是否改善留出边际重构或单独声明的科学准则，而不仅仅是分量看起来是否比 PCA 更干净。</p>
+</section>
+<section id="评估准则" class="level2">
+<h2 class="anchored" data-anchor-id="评估准则">评估准则</h2>
+<p>防泄漏评估应包括：</p>
+<ol type="1">
+<li><strong>试次级划分：</strong> 按需要留出完整试次、会话、动物或其他独立单元。不要把同一试次的相邻时间箱跨折叠拆分。</li>
+<li><strong>仅训练预处理：</strong> 在无测试观测的情况下计算中心化、缩放、平滑选择、条件均值、边际化、交互分组、正则化、秩与分量排序。</li>
+<li><strong>留出边际重构：</strong> 从独立测试试次重建留出伪试次或留出条件均值，然后用训练定义评估 <span class="math display">\[
+\left\lVert X^{\mathrm{test}}_\phi-
+F^{\mathrm{train}}_\phi D^{\mathrm{train}}_\phi
+X^{\mathrm{test}}\right\rVert_F^2
+\]</span> 应用于那些留出条件估计。这检验基于均值映射的迁移；它不是试次噪声似然。</li>
+<li><strong>方差核算：</strong> 报告总与边际方差、组合重构误差以及被丢弃或残差项的贡献。不要把重叠非正交分量贡献当作独立相加。</li>
+<li><strong>解混诊断：</strong> 报告完整向量 <span class="math inline">\(v_\phi(d)\)</span> 或混淆矩阵，而不仅是最大边际标签。</li>
+<li><strong>稳定性：</strong> 跨试次重采样、会话、合理秩、正则化值与交互分组比较子空间与留出结论，并仅在合适处使用符号/子空间对齐。</li>
+<li><strong>基线：</strong> 比较秩匹配 PCA、原始边际均值、单独边际 PCA 与简单防泄漏标签解码。</li>
+<li><strong>零模型：</strong> 在独立试次或实验单元层面洗牌标签，同时保持声明的平衡结构。</li>
+</ol>
+<p>如果报告解码，解码器/分量选择与分类器必须在每个训练折叠内重拟合。成功解码在所述规程下确立标签信息，而非独立表示、因果角色或机制。</p>
+</section>
+<section id="最小玩具模型" class="level2">
+<h2 class="anchored" data-anchor-id="最小玩具模型">最小玩具模型</h2>
+<p>未来的非可执行玩具模型应为时间 <span class="math inline">\(t\)</span>、二元刺激 <span class="math inline">\(s\in\{-1,+1\}\)</span> 与二元决策 <span class="math inline">\(d\in\{-1,+1\}\)</span> 生成平衡试次：</p>
+<p><span class="math display">\[
+x(t,s,d,k)
+=
+a f_0(t)
++b\,s f_s(t)
++c\,d f_d(t)
++e\,sd f_{sd}(t)
++\varepsilon_k(t),
+\]</span></p>
+<p>其中 <span class="math inline">\(a,b,c,e\in\mathbb R^N\)</span> 是已知混合向量，<span class="math inline">\(\varepsilon\)</span> 是声明试次噪声。向量 <span class="math inline">\(b\)</span> 与 <span class="math inline">\(c\)</span> 应斜交而非人为正交。生成应保留真实时间、刺激、决策与交互项。</p>
+<p>未来比较应只用训练试次拟合 PCA、直接边际均值、单独边际 PCA、简单线性标签解码器与 dPCA。评估应测量留出边际重构、分量边际方差轮廓、直至符号/旋转的子空间恢复，并把标签解码作为单独准则。</p>
+<p>需要两个阴性对照：使 <span class="math inline">\(b\)</span> 与 <span class="math inline">\(c\)</span> 近似共线以演示不可分离边际子空间，并移除或严重失衡一个 <span class="math inline">\((s,d)\)</span> 单元以演示混淆与边际化失败。标签洗牌零模型应移除系统性任务依赖。本方法对象不创建代码、数据或结果。</p>
+</section>
+<section id="对-ldg-的意义" class="level2">
+<h2 class="anchored" data-anchor-id="对-ldg-的意义">对 LDG 的意义</h2>
+<p>dPCA 是 LDG 的规范有监督线性分解，用于把声明任务变量贡献与普通方差最大化分开。它提供受控示例，说明标签、平均、损失与实验设计如何定义表示——以及为什么有用的表示不得被提升为独立潜生成器或机制。</p>
+<div class="callout callout-style-default callout-warning callout-titled" title="这并不蕴含">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">警告</span>这并不蕴含
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>标记为「stimulus」「decision」「reward」或「time」的分量是标签与损失依赖的。dPCA 不确立统计独立、因果分离、解剖分割、唯一神经模块、潜状态、物理动力学或机制。高解释方差、解混指数或解码精度不自动加强这些主张。</p>
+</div>
+</div>
+<section id="小鼠轨迹" class="level3">
+<h3 class="anchored" data-anchor-id="小鼠轨迹">小鼠轨迹</h3>
+<p>不保留模态特定经验主张。行为因子、试次对齐与重复测量必须定义平衡有监督张量；分量仍将保持为依赖标签的线性摘要，而非行为原因或动力学。</p>
+</section>
+<section id="眼动" class="level3">
+<h3 class="anchored" data-anchor-id="眼动">眼动</h3>
+<p>不保留模态特定经验主张。事件标签、注视目标与时间对齐可以监督分解，但目标关联分量不识别动眼模块或转移律。</p>
+</section>
+<section id="eeg" class="level3">
+<h3 class="anchored" data-anchor-id="eeg">EEG</h3>
+<p>不保留模态特定经验主张。重参考、通道缩放、受试者/会话结构与试次平衡将决定拟合边际化；传感器分量不自动是神经源。</p>
+</section>
+<section id="meg-神经群体数据" class="level3">
+<h3 class="anchored" data-anchor-id="meg-神经群体数据">MEG / 神经群体数据</h3>
+<p>Kobak 等人引入规范降秩 dPCA 表述，并重新分析跨不同物种、记录区域与任务的四个神经群体数据集 <span class="citation" data-cites="KobakEtAl2016">(<a href="#ref-KobakEtAl2016" role="doc-biblioref">Kobak 等 2016年</a>)</span>。这是该方法可以概括那些特定试次结构化数据集的主要证据。它不确立神经群体中的普遍解混组织、解剖模块或因果机制，也不直接验证 MEG 应用。</p>
+</section>
+</section>
+<section id="主要来源" class="level2">
+<h2 class="anchored" data-anchor-id="主要来源">主要来源</h2>
+<ul>
+<li>Machens 发展用于分离声明任务参数方差的边际化协方差构造，并显式讨论重叠、不可分离性与独立分量假设的区别 <span class="citation" data-cites="Machens2010">(<a href="#ref-Machens2010" role="doc-biblioref">Machens 2010年</a>)</span>。</li>
+<li>Brendel、Romo 与 Machens 引入早期概率 dPCA 表述，包括因子边际化与交互项 <span class="citation" data-cites="BrendelRomoMachens2011">(<a href="#ref-BrendelRomoMachens2011" role="doc-biblioref">Brendel 等 2011年</a>)</span>。</li>
+<li>Kobak 等人引入本对象使用的规范编码器/解码器降秩重构目标、正则化、平衡处理、交叉验证与神经应用 <span class="citation" data-cites="KobakEtAl2016">(<a href="#ref-KobakEtAl2016" role="doc-biblioref">Kobak 等 2016年</a>)</span>。</li>
+</ul>
+</section>
+<section id="综述-次级来源" class="level2">
+<h2 class="anchored" data-anchor-id="综述-次级来源">综述 / 次级来源</h2>
+<ul>
+<li>Izenman 提供经核查的多元降秩回归、秩约束系数矩阵与加权最小二乘表述权威处理 <span class="citation" data-cites="Izenman2008">(<a href="#ref-Izenman2008" role="doc-biblioref">Izenman 2008年</a>, chap.&nbsp;6)</span>。</li>
+</ul>
+</section>
+<section id="开放方法学问题" class="level2">
+<h2 class="anchored" data-anchor-id="开放方法学问题">开放方法学问题</h2>
+<ul>
+<li>对连续、层级或强相关任务变量应如何定义边际化？</li>
+<li>当条件频率科学上有意义但高度不等时，哪种加权估计目标合适？</li>
+<li>条件均值与边际子空间中的不确定性应如何传播到分量图？</li>
+<li>何时交互应保持分离而非与时间依赖主效应分组？</li>
+<li>如何在不把伪群体当作同时记录的情况下纳入同时噪声协方差？</li>
+<li>哪些结论在替代标签编码、秩与正则化下保持稳定？</li>
+</ul>
+</section>
+<section id="成熟度检查表" class="level2">
+<h2 class="anchored" data-anchor-id="成熟度检查表">成熟度检查表</h2>
+<ul class="task-list">
+<li><label><input type="checkbox" checked="">使用完整方法 schema 并陈述有界有监督线性问题。</label></li>
+<li><label><input type="checkbox" checked="">定义试次解析与条件均值张量及平衡单元假设。</label></li>
+<li><label><input type="checkbox" checked="">定义主效应与交互边际化及其分组选择。</label></li>
+<li><label><input type="checkbox" checked="">定义编码器/解码器矩阵与正则化降秩目标。</label></li>
+<li><label><input type="checkbox" checked="">陈述方差核算与非正交分量限制。</label></li>
+<li><label><input type="checkbox" checked="">声明学习得到与固定的量、监督、几何与时间范围。</label></li>
+<li><label><input type="checkbox" checked="">覆盖交叉验证、正则化、失衡、缺失单元与泄漏。</label></li>
+<li><label><input type="checkbox" checked="">包含 PCA、边际均值、边际 PCA 与简单解码基线。</label></li>
+<li><label><input type="checkbox" checked="">包含带混淆与重叠对照的非可执行玩具契约。</label></li>
+<li><label><input type="checkbox" checked="">显式拒绝独立、因果、模块、动力学与机制过度宣称。</label></li>
+<li><label><input type="checkbox" checked="">规范、先前技术、降秩与主神经来源经核查与验证。</label></li>
+<li><label><input type="checkbox" checked="">在一轮有界修正轮次后完成独立混合审查；聚焦复审返回 PASS。</label></li>
+<li><label><input type="checkbox" checked="">在发布站点审查后，人类所有者根据记录的审查决定授权稳定晋升。</label></li>
+</ul>
+
+
+<!-- -->
+
+
+</section>
+</section>
+
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography" id="quarto-bibliography"><h2 class="anchored quarto-appendix-heading">参考文献</h2><div id="refs" class="references csl-bib-body hanging-indent" role="list">
+<div id="ref-BrendelRomoMachens2011" class="csl-entry" role="listitem">
+Brendel, Wieland, Ranulfo Romo, 和 Christian K. Machens. 2011年. <span>《Demixed Principal Component Analysis》</span>. 收入 <em>Advances in Neural Information Processing Systems</em>, 编辑 John Shawe-Taylor, Richard S. Zemel, Peter L. Bartlett, Fernando Pereira, 和 Kilian Q. Weinberger, 卷 24. Curran Associates, Inc. <a href="https://proceedings.neurips.cc/paper/2011/hash/f4a331b7a22d1b237565d8813a34d8ac-Abstract.html">https://proceedings.neurips.cc/paper/2011/hash/f4a331b7a22d1b237565d8813a34d8ac-Abstract.html</a>.
+</div>
+<div id="ref-Izenman2008" class="csl-entry" role="listitem">
+Izenman, Alan J. 2008年. <em>Modern Multivariate Statistical Techniques: Regression, Classification, and Manifold Learning</em>. Springer Texts in Statistics. Springer. <a href="https://doi.org/10.1007/978-0-387-78189-1">https://doi.org/10.1007/978-0-387-78189-1</a>.
+</div>
+<div id="ref-KobakEtAl2016" class="csl-entry" role="listitem">
+Kobak, Dmitry, Wieland Brendel, Christos Constantinidis, 等. 2016年. <span>《Demixed Principal Component Analysis of Neural Population Data》</span>. <em>eLife</em> 5: e10989. <a href="https://doi.org/10.7554/eLife.10989">https://doi.org/10.7554/eLife.10989</a>.
+</div>
+<div id="ref-Machens2010" class="csl-entry" role="listitem">
+Machens, Christian K. 2010年. <span>《Demixing Population Activity in Higher Cortical Areas》</span>. <em>Frontiers in Computational Neuroscience</em> 4: 126. <a href="https://doi.org/10.3389/fncom.2010.00126">https://doi.org/10.3389/fncom.2010.00126</a>.
+</div>
+</div></section></div></main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "已复制");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "已复制");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+    const viewSource = window.document.getElementById('quarto-view-source') ||
+                       window.document.getElementById('quarto-code-tools-source');
+    if (viewSource) {
+      const sourceUrl = viewSource.getAttribute("data-quarto-source-url");
+      viewSource.addEventListener("click", function(e) {
+        if (sourceUrl) {
+          // rstudio viewer pane
+          if (/\bcapabilities=\b/.test(window.location)) {
+            window.open(sourceUrl);
+          } else {
+            window.location.href = sourceUrl;
+          }
+        } else {
+          const modal = new bootstrap.Modal(document.getElementById('quarto-embedded-source-code-modal'));
+          modal.show();
+        }
+        return false;
+      });
+    }
+    function toggleCodeHandler(show) {
+      return function(e) {
+        const cellDetails = window.document.querySelectorAll(".cell details.code-fold");
+        for (let i=0; i<cellDetails.length; i++) {
+          const details = cellDetails[i];
+          if (show) {
+            details.open = true;
+          } else {
+            details.removeAttribute("open");
+          }
+        }
+        const cellCodeDivs = window.document.querySelectorAll(".cell div.sourceCode.cell-code");
+        const fromCls = show ? "hidden" : "unhidden";
+        const toCls = show ? "unhidden" : "hidden";
+        for (let i=0; i<cellCodeDivs.length; i++) {
+          const codeDiv = cellCodeDivs[i];
+          if (codeDiv.classList.contains(fromCls)) {
+            codeDiv.classList.remove(fromCls);
+            codeDiv.classList.add(toCls);
+          } 
+        }
+        return false;
+      }
+    }
+    const hideAllCode = window.document.getElementById("quarto-hide-all-code");
+    if (hideAllCode) {
+      hideAllCode.addEventListener("click", toggleCodeHandler(false));
+    }
+    const showAllCode = window.document.getElementById("quarto-show-all-code");
+    if (showAllCode) {
+      showAllCode.addEventListener("click", toggleCodeHandler(true));
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/abelzheng\.github\.io\/latent-dynamics-geometry-public\/");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+            // target, if specified
+            link.setAttribute("target", "_blank");
+            if (link.getAttribute("rel") === null) {
+              link.setAttribute("rel", "noopener");
+            }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">源代码</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1" data-shortcodes="false"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="an">title:</span><span class="co"> "解混主成分分析"</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="an">lang:</span><span class="co"> zh-CN</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="an">comments:</span><span class="co"> false</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="an">object_type:</span><span class="co"> method</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="an">maturity:</span><span class="co"> L2</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="an">status:</span><span class="co"> stable</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="an">domain:</span><span class="co"> [dimensionality-reduction, neuroscience, supervised-learning]</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="an">tags:</span><span class="co"> [dpca, marginalization, reduced-rank-regression, task-variables]</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="an">prerequisites:</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="co">- knowledge/methods/principal-component-analysis.qmd</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="co">- knowledge/concepts/linear-subspace.qmd</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="co">- knowledge/concepts/identifiability.qmd</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="an">related:</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="co">- knowledge/concepts/latent-variable.qmd</span></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="co">- knowledge/concepts/latent-trajectory.qmd</span></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="an">created:</span><span class="co"> 2026-08-19</span></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a><span class="an">updated:</span><span class="co"> 2026-08-19</span></span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a><span class="fu"># 解混主成分分析</span></span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a><span class="fu">## 问题</span></span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>解混主成分分析（dPCA）构造有监督线性坐标，近似重构多变量数据的声明任务变量边际化。它被开发用于试次结构化的神经群体记录，其中活动随时间和实验标记条件变化，而单个变量与普通主成分常混合若干任务依赖 <span class="co">[</span><span class="ot">@BrendelRomoMachens2011; @KobakEtAl2016</span><span class="co">]</span>。</span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>**demixed**（解混）一词在特定标签分解与重构损失下命名成功。它不意味着所得分量统计独立、因果分离、唯一辨识、解剖定位，或由不同神经模块生成。该方法是依赖标签的线性摘要，不是盲源分离或机制模型。这里的有界表述遵循已发表的 2016 年**试次平均条件均值**分析；它不是试次级噪声协方差模型 <span class="co">[</span><span class="ot">@KobakEtAl2016</span><span class="co">]</span>。</span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a><span class="fu">## 输入</span></span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>设 $N$ 是测得特征或神经元数目，$T$ 是对齐时间箱数目，$a_1,\ldots,a_m$ 表示声明的类别或离散化任务变量。对平衡全因子设计，试次解析张量可以写作</span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a>\mathcal X\in</span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a>\mathbb R^{N\times T\times A_1\times\cdots\times A_m\times K},</span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a>其中 $K$ 是每个条件单元中相同试次数。此处有界表述中的拟合输入是试次平均条件张量</span>
+<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a>\bar{\mathcal X}</span>
+<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a>\in</span>
+<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a>\mathbb R^{N\times T\times A_1\times\cdots\times A_m},</span>
+<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a>展平为中心化矩阵 $X\in\mathbb R^{N\times M}$，其中 $M=T\prod_j A_j$。在下方有界表述中每个条件–时间列被赋予等权重。试次解析张量为估计这些均值与交叉验证提供独立重复；其单个试次列不替代下述目标中的 $X$。</span>
+<span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-48"><a href="#cb1-48" aria-hidden="true" tabindex="-1"></a>可复现分析必须声明：</span>
+<span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-50"><a href="#cb1-50" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>实验单元、试次包含规则，以及特征是同时记录还是组装为伪群体；</span>
+<span id="cb1-51"><a href="#cb1-51" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>对齐、分箱、平滑、时间扭曲与基线扣除；</span>
+<span id="cb1-52"><a href="#cb1-52" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>特征缩放与中心化；</span>
+<span id="cb1-53"><a href="#cb1-53" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>任务变量、其编码、水平顺序以及保留或分组哪些交互；</span>
+<span id="cb1-54"><a href="#cb1-54" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>所有因子单元是否存在以及不平衡试次数如何处理；</span>
+<span id="cb1-55"><a href="#cb1-55" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>分配给每个边际化的秩 $q_\phi$；</span>
+<span id="cb1-56"><a href="#cb1-56" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>正则化网格与交叉验证划分单元；以及</span>
+<span id="cb1-57"><a href="#cb1-57" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>投影将应用于条件均值、单个试次还是两者。</span>
+<span id="cb1-58"><a href="#cb1-58" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-59"><a href="#cb1-59" aria-hidden="true" tabindex="-1"></a>条件均值等加权回答的问题不同于按试次数比例加权单元的问题。缺失单元、相关标签与不等噪声精度需要显式模型、加权或再平衡规程，而非静默应用平衡公式 <span class="co">[</span><span class="ot">@KobakEtAl2016</span><span class="co">]</span>。</span>
+<span id="cb1-60"><a href="#cb1-60" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-61"><a href="#cb1-61" aria-hidden="true" tabindex="-1"></a><span class="fu">## 输出</span></span>
+<span id="cb1-62"><a href="#cb1-62" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-63"><a href="#cb1-63" aria-hidden="true" tabindex="-1"></a>对每个声明边际化组 $\phi$，dPCA 返回：</span>
+<span id="cb1-64"><a href="#cb1-64" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-65"><a href="#cb1-65" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>与 $X$ 同形状的目标矩阵 $X_\phi$；</span>
+<span id="cb1-66"><a href="#cb1-66" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>解码器矩阵 $D_\phi\in\mathbb R^{q_\phi\times N}$，其行定义线性投影轴；</span>
+<span id="cb1-67"><a href="#cb1-67" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>用于重构相应边际化的编码器矩阵 $F_\phi\in\mathbb R^{N\times q_\phi}$；</span>
+<span id="cb1-68"><a href="#cb1-68" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>分量得分 $Z_\phi=D_\phi X$；以及</span>
+<span id="cb1-69"><a href="#cb1-69" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>近似边际重构 $\widehat X_\phi=F_\phi D_\phi X$。</span>
+<span id="cb1-70"><a href="#cb1-70" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-71"><a href="#cb1-71" aria-hidden="true" tabindex="-1"></a>组合近似是</span>
+<span id="cb1-72"><a href="#cb1-72" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-73"><a href="#cb1-73" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-74"><a href="#cb1-74" aria-hidden="true" tabindex="-1"></a>\widehat X=\sum_\phi F_\phi D_\phi X.</span>
+<span id="cb1-75"><a href="#cb1-75" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-76"><a href="#cb1-76" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-77"><a href="#cb1-77" aria-hidden="true" tabindex="-1"></a>属于不同边际化的分量一般不正交，其得分不必不相关。给定拟合数据与选择，输出是确定性的；它不是潜变量上的后验分布。</span>
+<span id="cb1-78"><a href="#cb1-78" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-79"><a href="#cb1-79" aria-hidden="true" tabindex="-1"></a><span class="fu">## 核心思想</span></span>
+<span id="cb1-80"><a href="#cb1-80" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-81"><a href="#cb1-81" aria-hidden="true" tabindex="-1"></a>普通 PCA 选择单个正交子空间来重构所有中心化方差而不使用标签。dPCA 先把平衡条件张量分解为与时间、任务变量主效应与交互关联的 ANOVA 式边际化。然后为每个边际化解单独的正则化降秩回归：完整数据经解码器投影，但重构目标只是数据中被选标签相关部分 <span class="co">[</span><span class="ot">@KobakEtAl2016</span><span class="co">]</span>。</span>
+<span id="cb1-82"><a href="#cb1-82" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-83"><a href="#cb1-83" aria-hidden="true" tabindex="-1"></a>这把在普通 PCA 中重合的两个角色分开。解码器行定义低维读出 $D_\phi X$；编码器列把这些读出映射回 $X_\phi$。允许编码器与解码器轴不同避免强迫所有任务关联子空间相互正交。</span>
+<span id="cb1-84"><a href="#cb1-84" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-85"><a href="#cb1-85" aria-hidden="true" tabindex="-1"></a><span class="fu">## 生成 / 建模假设</span></span>
+<span id="cb1-86"><a href="#cb1-86" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-87"><a href="#cb1-87" aria-hidden="true" tabindex="-1"></a>有界 2016 dPCA 表述是确定性有监督近似方法，不是生成概率模型。其操作性假设是：</span>
+<span id="cb1-88"><a href="#cb1-88" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-89"><a href="#cb1-89" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>声明任务标签及其交互提供科学相关的变异划分；</span>
+<span id="cb1-90"><a href="#cb1-90" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>条件均值可以在一个共同特征空间中比较；</span>
+<span id="cb1-91"><a href="#cb1-91" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>线性读出与线性重构是充分摘要；</span>
+<span id="cb1-92"><a href="#cb1-92" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>平方 Frobenius 重构损失与岭正则化是合适准则；</span>
+<span id="cb1-93"><a href="#cb1-93" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>因子边际化在声明平衡或加权约定下有意义；以及</span>
+<span id="cb1-94"><a href="#cb1-94" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>存在足够独立试次以估计条件均值、正则化与留出行为。</span>
+<span id="cb1-95"><a href="#cb1-95" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-96"><a href="#cb1-96" aria-hidden="true" tabindex="-1"></a>早期 dPCA 工作使用正交约束概率表述，而规范降秩表述移除了该约束，因为任务相关子空间可以非正交 <span class="co">[</span><span class="ot">@BrendelRomoMachens2011; @KobakEtAl2016</span><span class="co">]</span>。两种表述都不蕴含标签效应是物理源或数据由独立模块生成。</span>
+<span id="cb1-97"><a href="#cb1-97" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-98"><a href="#cb1-98" aria-hidden="true" tabindex="-1"></a><span class="fu">## 数学表述</span></span>
+<span id="cb1-99"><a href="#cb1-99" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-100"><a href="#cb1-100" aria-hidden="true" tabindex="-1"></a><span class="fu">### 边际化</span></span>
+<span id="cb1-101"><a href="#cb1-101" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-102"><a href="#cb1-102" aria-hidden="true" tabindex="-1"></a>设</span>
+<span id="cb1-103"><a href="#cb1-103" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-104"><a href="#cb1-104" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-105"><a href="#cb1-105" aria-hidden="true" tabindex="-1"></a>\Omega=<span class="sc">\{</span>t,a_1,\ldots,a_m<span class="sc">\}</span></span>
+<span id="cb1-106"><a href="#cb1-106" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-107"><a href="#cb1-107" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-108"><a href="#cb1-108" aria-hidden="true" tabindex="-1"></a>是指标变量集合。对每个子集 $S\subseteq\Omega$，设 $\mathcal M_S X$ 表示对 $\Omega\setminus S$ 中每个变量平均并在被平均索引上复制所得值。通过递归定义完整因子分解</span>
+<span id="cb1-109"><a href="#cb1-109" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-110"><a href="#cb1-110" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-111"><a href="#cb1-111" aria-hidden="true" tabindex="-1"></a>X_S</span>
+<span id="cb1-112"><a href="#cb1-112" aria-hidden="true" tabindex="-1"></a>=</span>
+<span id="cb1-113"><a href="#cb1-113" aria-hidden="true" tabindex="-1"></a>\mathcal M_S X</span>
+<span id="cb1-114"><a href="#cb1-114" aria-hidden="true" tabindex="-1"></a>-</span>
+<span id="cb1-115"><a href="#cb1-115" aria-hidden="true" tabindex="-1"></a>\sum_{R\subsetneq S}X_R.</span>
+<span id="cb1-116"><a href="#cb1-116" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-117"><a href="#cb1-117" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-118"><a href="#cb1-118" aria-hidden="true" tabindex="-1"></a>空集项是总均值，在全局逐特征中心化后为零。在具有均匀单元加权的完整平衡因子设计下，</span>
+<span id="cb1-119"><a href="#cb1-119" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-120"><a href="#cb1-120" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-121"><a href="#cb1-121" aria-hidden="true" tabindex="-1"></a>X=\sum_{S\subseteq\Omega}X_S,</span>
+<span id="cb1-122"><a href="#cb1-122" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-123"><a href="#cb1-123" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-124"><a href="#cb1-124" aria-hidden="true" tabindex="-1"></a>且不同项在 Frobenius 内积中正交，因此其平方范数相加 <span class="co">[</span><span class="ot">@BrendelRomoMachens2011; @KobakEtAl2016</span><span class="co">]</span>。</span>
+<span id="cb1-125"><a href="#cb1-125" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-126"><a href="#cb1-126" aria-hidden="true" tabindex="-1"></a>交互不是应被自动丢弃的残差干扰。有刺激 $s$、决策 $d$ 与时间 $t$ 时，完整分解包含 $t,s,d,ts,td,sd,tsd$。规范神经呈现把项分组为</span>
+<span id="cb1-127"><a href="#cb1-127" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-128"><a href="#cb1-128" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-129"><a href="#cb1-129" aria-hidden="true" tabindex="-1"></a>X_{\text{stimulus}}=X_s+X_{ts},</span>
+<span id="cb1-130"><a href="#cb1-130" aria-hidden="true" tabindex="-1"></a>\qquad</span>
+<span id="cb1-131"><a href="#cb1-131" aria-hidden="true" tabindex="-1"></a>X_{\text{decision}}=X_d+X_{td},</span>
+<span id="cb1-132"><a href="#cb1-132" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-133"><a href="#cb1-133" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-134"><a href="#cb1-134" aria-hidden="true" tabindex="-1"></a>与</span>
+<span id="cb1-135"><a href="#cb1-135" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-136"><a href="#cb1-136" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-137"><a href="#cb1-137" aria-hidden="true" tabindex="-1"></a>X_{\text{interaction}}=X_{sd}+X_{tsd},</span>
+<span id="cb1-138"><a href="#cb1-138" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-139"><a href="#cb1-139" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-140"><a href="#cb1-140" aria-hidden="true" tabindex="-1"></a>而 $X_t$ 是条件无关时间变异。该分组是分析者声明的解读选择。不同分组、标签编码或平均测度定义不同解混目标。</span>
+<span id="cb1-141"><a href="#cb1-141" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-142"><a href="#cb1-142" aria-hidden="true" tabindex="-1"></a><span class="fu">### 正则化条件均值降秩目标</span></span>
+<span id="cb1-143"><a href="#cb1-143" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-144"><a href="#cb1-144" aria-hidden="true" tabindex="-1"></a>对每个分组边际化 $\phi$，选择秩 $q_\phi$ 并求解</span>
+<span id="cb1-145"><a href="#cb1-145" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-146"><a href="#cb1-146" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-147"><a href="#cb1-147" aria-hidden="true" tabindex="-1"></a>\min_{F_\phi,D_\phi}</span>
+<span id="cb1-148"><a href="#cb1-148" aria-hidden="true" tabindex="-1"></a>\left\lVert</span>
+<span id="cb1-149"><a href="#cb1-149" aria-hidden="true" tabindex="-1"></a>X_\phi-F_\phi D_\phi X</span>
+<span id="cb1-150"><a href="#cb1-150" aria-hidden="true" tabindex="-1"></a>\right\rVert_F^2</span>
+<span id="cb1-151"><a href="#cb1-151" aria-hidden="true" tabindex="-1"></a>+</span>
+<span id="cb1-152"><a href="#cb1-152" aria-hidden="true" tabindex="-1"></a>\lambda</span>
+<span id="cb1-153"><a href="#cb1-153" aria-hidden="true" tabindex="-1"></a>\left\lVert F_\phi D_\phi\right\rVert_F^2,</span>
+<span id="cb1-154"><a href="#cb1-154" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-155"><a href="#cb1-155" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-156"><a href="#cb1-156" aria-hidden="true" tabindex="-1"></a>受</span>
+<span id="cb1-157"><a href="#cb1-157" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-158"><a href="#cb1-158" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-159"><a href="#cb1-159" aria-hidden="true" tabindex="-1"></a>\operatorname{rank}(F_\phi D_\phi)\le q_\phi.</span>
+<span id="cb1-160"><a href="#cb1-160" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-161"><a href="#cb1-161" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-162"><a href="#cb1-162" aria-hidden="true" tabindex="-1"></a>约束。该方程中的预测变量 $X$ 与目标 $X_\phi$ 都是训练条件均值，边际均值在被平均索引上复制。已发表分析通过留出伪试次并重建训练均值选择正则化；它还明确指出拟合 PSTH 表述忽略试次间变异性与未知噪声相关 <span class="co">[</span><span class="ot">@KobakEtAl2016</span><span class="co">]</span>。拟合所有单个试次或增加显式试次噪声协方差的方法求解不同目标，在本有界对象之外。</span>
+<span id="cb1-163"><a href="#cb1-163" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-164"><a href="#cb1-164" aria-hidden="true" tabindex="-1"></a>诸如</span>
+<span id="cb1-165"><a href="#cb1-165" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-166"><a href="#cb1-166" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-167"><a href="#cb1-167" aria-hidden="true" tabindex="-1"></a>F_\phi^\top F_\phi=I</span>
+<span id="cb1-168"><a href="#cb1-168" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-169"><a href="#cb1-169" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-170"><a href="#cb1-170" aria-hidden="true" tabindex="-1"></a>的归一化约定移除任意编码器–解码器缩放，但不移除每个退化。总损失是分别最小化边际损失之和。</span>
+<span id="cb1-171"><a href="#cb1-171" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-172"><a href="#cb1-172" aria-hidden="true" tabindex="-1"></a>把 $A_\phi=F_\phi D_\phi$ 写作无约束岭回归映射</span>
+<span id="cb1-173"><a href="#cb1-173" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-174"><a href="#cb1-174" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-175"><a href="#cb1-175" aria-hidden="true" tabindex="-1"></a>A_{\phi,\lambda}</span>
+<span id="cb1-176"><a href="#cb1-176" aria-hidden="true" tabindex="-1"></a>=</span>
+<span id="cb1-177"><a href="#cb1-177" aria-hidden="true" tabindex="-1"></a>X_\phi X^\top</span>
+<span id="cb1-178"><a href="#cb1-178" aria-hidden="true" tabindex="-1"></a>\left(XX^\top+\lambda I\right)^{-1},</span>
+<span id="cb1-179"><a href="#cb1-179" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-180"><a href="#cb1-180" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-181"><a href="#cb1-181" aria-hidden="true" tabindex="-1"></a>在奇异边界需要伪逆或等价稳定求解器。设 $U_{\phi,q}$ 包含 $A_{\phi,\lambda}X$ 的领先左奇异向量。一个规范分解是</span>
+<span id="cb1-182"><a href="#cb1-182" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-183"><a href="#cb1-183" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-184"><a href="#cb1-184" aria-hidden="true" tabindex="-1"></a>F_\phi=U_{\phi,q},</span>
+<span id="cb1-185"><a href="#cb1-185" aria-hidden="true" tabindex="-1"></a>\qquad</span>
+<span id="cb1-186"><a href="#cb1-186" aria-hidden="true" tabindex="-1"></a>D_\phi=U_{\phi,q}^\top A_{\phi,\lambda}.</span>
+<span id="cb1-187"><a href="#cb1-187" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-188"><a href="#cb1-188" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-189"><a href="#cb1-189" aria-hidden="true" tabindex="-1"></a>因此每个边际问题都是岭正则化降秩回归后接谱截断 <span class="co">[</span><span class="ot">@KobakEtAl2016</span><span class="co">]</span>。降秩回归约束多元回归系数矩阵的秩，具有独立于 dPCA 的更广统计理论 <span class="co">[</span><span class="ot">@Izenman2008</span><span class="co">]</span>。</span>
+<span id="cb1-190"><a href="#cb1-190" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-191"><a href="#cb1-191" aria-hidden="true" tabindex="-1"></a><span class="fu">### 方差核算</span></span>
+<span id="cb1-192"><a href="#cb1-192" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-193"><a href="#cb1-193" aria-hidden="true" tabindex="-1"></a>对中心化平衡数据，用</span>
+<span id="cb1-194"><a href="#cb1-194" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-195"><a href="#cb1-195" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-196"><a href="#cb1-196" aria-hidden="true" tabindex="-1"></a>V_{\mathrm{tot}}=\lVert X\rVert_F^2,</span>
+<span id="cb1-197"><a href="#cb1-197" aria-hidden="true" tabindex="-1"></a>\qquad</span>
+<span id="cb1-198"><a href="#cb1-198" aria-hidden="true" tabindex="-1"></a>V_\phi=\lVert X_\phi\rVert_F^2.</span>
+<span id="cb1-199"><a href="#cb1-199" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-200"><a href="#cb1-200" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-201"><a href="#cb1-201" aria-hidden="true" tabindex="-1"></a>定义总方差与边际方差。平衡正交分解给出</span>
+<span id="cb1-202"><a href="#cb1-202" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-203"><a href="#cb1-203" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-204"><a href="#cb1-204" aria-hidden="true" tabindex="-1"></a>V_{\mathrm{tot}}=\sum_\phi V_\phi</span>
+<span id="cb1-205"><a href="#cb1-205" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-206"><a href="#cb1-206" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-207"><a href="#cb1-207" aria-hidden="true" tabindex="-1"></a>只在所有未分组项与任何声明残差/噪声项被一致包含时成立。对解码器行 $d$，其归因于边际化 $\phi$ 的投影方差可以概括为</span>
+<span id="cb1-208"><a href="#cb1-208" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-209"><a href="#cb1-209" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-210"><a href="#cb1-210" aria-hidden="true" tabindex="-1"></a>v_\phi(d)=\lVert dX_\phi\rVert_2^2,</span>
+<span id="cb1-211"><a href="#cb1-211" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-212"><a href="#cb1-212" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-213"><a href="#cb1-213" aria-hidden="true" tabindex="-1"></a>描述性解混指数是</span>
+<span id="cb1-214"><a href="#cb1-214" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-215"><a href="#cb1-215" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-216"><a href="#cb1-216" aria-hidden="true" tabindex="-1"></a>\operatorname{DI}(d)</span>
+<span id="cb1-217"><a href="#cb1-217" aria-hidden="true" tabindex="-1"></a>=</span>
+<span id="cb1-218"><a href="#cb1-218" aria-hidden="true" tabindex="-1"></a>\frac{\max_\phi v_\phi(d)}{\sum_\psi v_\psi(d)}.</span>
+<span id="cb1-219"><a href="#cb1-219" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-220"><a href="#cb1-220" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-221"><a href="#cb1-221" aria-hidden="true" tabindex="-1"></a>该指数与所选标签、平均与度量绑定。因为跨边际化解码器轴可以非正交，逐分量重构或投影方差可以重叠；不得像 dPCA 是单个正交 PCA 基那样把它们相加。重构质量应改为从实际组合重构或从显式定义的边际误差计算。</span>
+<span id="cb1-222"><a href="#cb1-222" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-223"><a href="#cb1-223" aria-hidden="true" tabindex="-1"></a><span class="fu">## 学习得到了什么？</span></span>
+<span id="cb1-224"><a href="#cb1-224" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-225"><a href="#cb1-225" aria-hidden="true" tabindex="-1"></a>对每个边际化，dPCA 学习正则化低秩线性映射 $A_\phi=F_\phi D_\phi$、代表性编码器/解码器分解、有序分量得分与边际重构。它还在固定张量分解下产生描述性方差与解混摘要。</span>
+<span id="cb1-226"><a href="#cb1-226" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-227"><a href="#cb1-227" aria-hidden="true" tabindex="-1"></a>它不学习任务标签、因果图、独立源、神经模块、转移律、潜状态后验或唯一生物坐标系。</span>
+<span id="cb1-228"><a href="#cb1-228" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-229"><a href="#cb1-229" aria-hidden="true" tabindex="-1"></a><span class="fu">## 什么是固定的？</span></span>
+<span id="cb1-230"><a href="#cb1-230" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-231"><a href="#cb1-231" aria-hidden="true" tabindex="-1"></a>分析者固定群体/特征、试次与条件单元、对齐与预处理、中心化与缩放、标签集与编码、因子平均测度、交互分组、单元加权或再平衡、秩、正则化选择规程、交叉验证单元、显示的分量数，以及用于评估的任何分类器。</span>
+<span id="cb1-232"><a href="#cb1-232" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-233"><a href="#cb1-233" aria-hidden="true" tabindex="-1"></a>试次平均也被固定。在条件均值上拟合强调可重复的标签关联结构，但抑制试次间变异性。把解码器应用于单个试次是单独泛化问题。</span>
+<span id="cb1-234"><a href="#cb1-234" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-235"><a href="#cb1-235" aria-hidden="true" tabindex="-1"></a><span class="fu">## 时序假设</span></span>
+<span id="cb1-236"><a href="#cb1-236" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-237"><a href="#cb1-237" aria-hidden="true" tabindex="-1"></a>在有界 dPCA 表述中，时间是指标任务变量。时间边际化描述跨对齐时间箱的均值变异，而刺激–时间等项描述依赖标签的时间轮廓。方法不估计转移、导数、过程噪声、向量场或演化定律。</span>
+<span id="cb1-238"><a href="#cb1-238" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-239"><a href="#cb1-239" aria-hidden="true" tabindex="-1"></a>改变箱宽、对齐事件、平滑核、时间扭曲或分析区间会改变边际化。光滑 dPCA 迹线可以来自平滑与试次平均；它们不是光滑潜动力学的证据。把来自一个试次的相邻箱当作独立留出样本会造成泄漏。</span>
+<span id="cb1-240"><a href="#cb1-240" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-241"><a href="#cb1-241" aria-hidden="true" tabindex="-1"></a><span class="fu">## 几何假设</span></span>
+<span id="cb1-242"><a href="#cb1-242" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-243"><a href="#cb1-243" aria-hidden="true" tabindex="-1"></a>dPCA 在声明特征坐标中使用线性投影与欧氏/Frobenius 平方误差。特征缩放因此改变目标与学习轴。不同边际化可以占据重叠、斜交子空间；方法不施加或恢复流形、非线性度量、拓扑或黎曼几何。</span>
+<span id="cb1-244"><a href="#cb1-244" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-245"><a href="#cb1-245" aria-hidden="true" tabindex="-1"></a>一个分量的编码器与解码器不必沿同一特征空间轴，来自不同边际化的解码器不必正交。二维图组合所选线性读出；其视觉分离不是与坐标无关的几何事实。</span>
+<span id="cb1-246"><a href="#cb1-246" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-247"><a href="#cb1-247" aria-hidden="true" tabindex="-1"></a><span class="fu">## 监督</span></span>
+<span id="cb1-248"><a href="#cb1-248" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-249"><a href="#cb1-249" aria-hidden="true" tabindex="-1"></a>dPCA 是有监督的，因为实验提供的标签确定 $X_\phi$ 并因此进入训练损失。时间箱也作为索引设计水平。只有当后续行为结果未用于标签、预处理、超参数调优或分量选择时，方法对该结果才可能是无监督的。</span>
+<span id="cb1-250"><a href="#cb1-250" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-251"><a href="#cb1-251" aria-hidden="true" tabindex="-1"></a>标签相关与标签间的确定性关系可以使边际效应不可分离或改变其解读。例如，如果决策几乎由刺激决定，把方差分别归于刺激与决策依赖采样的错误试次、编码、平衡与交互约定。监督不得隐藏在「降维」一词后面。</span>
+<span id="cb1-252"><a href="#cb1-252" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-253"><a href="#cb1-253" aria-hidden="true" tabindex="-1"></a><span class="fu">## 优化 / 推断</span></span>
+<span id="cb1-254"><a href="#cb1-254" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-255"><a href="#cb1-255" aria-hidden="true" tabindex="-1"></a>规范条件均值目标分解为每个边际化一个正则化降秩回归。每个可以用稳定岭回归系统与奇异值分解求解。这是确定性拟合而非后验推断，不估计试次级噪声协方差。</span>
+<span id="cb1-256"><a href="#cb1-256" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-257"><a href="#cb1-257" aria-hidden="true" tabindex="-1"></a>岭参数 $\lambda$ 与（被调谐时）秩 $q_\phi$ 必须只用训练数据选择。Kobak 等人使用留出试次形成测试伪试次，并通过重复交叉验证选择正则化；这支持试次级分离原则，而非一个普遍有效划分或参数网格 <span class="co">[</span><span class="ot">@KobakEtAl2016</span><span class="co">]</span>。数值选择包括协方差正则化、伪逆容差与近零方差特征的处理。</span>
+<span id="cb1-258"><a href="#cb1-258" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-259"><a href="#cb1-259" aria-hidden="true" tabindex="-1"></a><span class="fu">## 优点</span></span>
+<span id="cb1-260"><a href="#cb1-260" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-261"><a href="#cb1-261" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>它使任务标签与交互显式，而不是要求未标记方差与实验问题对齐。</span>
+<span id="cb1-262"><a href="#cb1-262" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>分离编码器与解码器矩阵允许非正交任务关联子空间。</span>
+<span id="cb1-263"><a href="#cb1-263" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>降秩目标在边际重构与紧凑性之间平衡。</span>
+<span id="cb1-264"><a href="#cb1-264" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>边际化提供可审计的核算，说明分量表达哪些声明效应。</span>
+<span id="cb1-265"><a href="#cb1-265" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>当预处理与拟合防泄漏时，线性解码器可以应用于留出试次。</span>
+<span id="cb1-266"><a href="#cb1-266" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>PCA、边际均值与解码提供清晰相邻基线。</span>
+<span id="cb1-267"><a href="#cb1-267" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-268"><a href="#cb1-268" aria-hidden="true" tabindex="-1"></a><span class="fu">## 失效模式</span></span>
+<span id="cb1-269"><a href="#cb1-269" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-270"><a href="#cb1-270" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**不平衡或缺失单元：** 朴素平均可以破坏正交性并把主效应与交互混淆。</span>
+<span id="cb1-271"><a href="#cb1-271" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**相关标签：** 刺激、选择、奖赏与结果在实验设计下可能无法分别估计。</span>
+<span id="cb1-272"><a href="#cb1-272" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**交互重分配：** 把时间交互与任务主效应分组可以按构造产生偏好叙事。</span>
+<span id="cb1-273"><a href="#cb1-273" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**试次平均：** 弱、异质或试次特定结构可能消失，而平滑均值可能看起来比单试次读出更可靠。</span>
+<span id="cb1-274"><a href="#cb1-274" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**伪群体：** 组合顺序记录单元阻止估计同时噪声相关，并可能夸大群体级可用性。</span>
+<span id="cb1-275"><a href="#cb1-275" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**重叠边际子空间：** 可能没有线性轴干净分离所选效应；强制标记分量不修复重叠。</span>
+<span id="cb1-276"><a href="#cb1-276" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**过拟合：** 高特征数、少试次、多标签与灵活分量选择可以拟合采样噪声。</span>
+<span id="cb1-277"><a href="#cb1-277" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**泄漏：** 用留出试次计算条件均值、平滑参数、缩放、秩、正则化或首选分量会产生乐观结果。</span>
+<span id="cb1-278"><a href="#cb1-278" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**尺度敏感性：** 高方差神经元或特征主导 Frobenius 损失，除非缩放被科学论证。</span>
+<span id="cb1-279"><a href="#cb1-279" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**非线性结构：** 标签依赖可能无法通过低秩线性读出表示。</span>
+<span id="cb1-280"><a href="#cb1-280" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**离群值与伪迹：** 基于方差的拟合可以优先异常试次或单元。</span>
+<span id="cb1-281"><a href="#cb1-281" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**不稳定：** 接近奇异值、弱边际方差或小扰动可以旋转学习子空间。</span>
+<span id="cb1-282"><a href="#cb1-282" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**解读具体化：** 高解混指数或解码精度可能被误认为独立神经通道、解剖模块或原因。</span>
+<span id="cb1-283"><a href="#cb1-283" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-284"><a href="#cb1-284" aria-hidden="true" tabindex="-1"></a><span class="fu">## 可辨识性问题</span></span>
+<span id="cb1-285"><a href="#cb1-285" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-286"><a href="#cb1-286" aria-hidden="true" tabindex="-1"></a>只有低秩积 $A_\phi=F_\phi D_\phi$ 进入重构。没有归一化时，对任何可逆 $R$，</span>
+<span id="cb1-287"><a href="#cb1-287" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-288"><a href="#cb1-288" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-289"><a href="#cb1-289" aria-hidden="true" tabindex="-1"></a>F_\phi D_\phi</span>
+<span id="cb1-290"><a href="#cb1-290" aria-hidden="true" tabindex="-1"></a>=</span>
+<span id="cb1-291"><a href="#cb1-291" aria-hidden="true" tabindex="-1"></a>(F_\phi R)(R^{-1}D_\phi),</span>
+<span id="cb1-292"><a href="#cb1-292" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-293"><a href="#cb1-293" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-294"><a href="#cb1-294" aria-hidden="true" tabindex="-1"></a>因此编码器与解码器因子不被分别辨识。选择标准正交编码器列并排序分量选择约定。单个分量符号仍任意，重复奇异值允许相应拟合子空间内的旋转。</span>
+<span id="cb1-295"><a href="#cb1-295" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-296"><a href="#cb1-296" aria-hidden="true" tabindex="-1"></a>跨边际化，轴被分别拟合且可以非正交。相关得分不违背算法，明显视觉分离也不确立统计独立。改变任务编码、交互分组、单元权重、秩或正则化会改变估计目标，而非揭示唯一辨识分解的另一视图。</span>
+<span id="cb1-297"><a href="#cb1-297" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-298"><a href="#cb1-298" aria-hidden="true" tabindex="-1"></a>因此「解混」指分量在拟合损失下集中来自一个声明边际化的方差。它**不**意味着独立分量、因果分离、唯一神经模块、解剖分割、机制变量或唯一辨识潜原因。</span>
+<span id="cb1-299"><a href="#cb1-299" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-300"><a href="#cb1-300" aria-hidden="true" tabindex="-1"></a><span class="fu">## 与更简单方法的比较</span></span>
+<span id="cb1-301"><a href="#cb1-301" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-302"><a href="#cb1-302" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**PCA：** 用相同中心化缩放训练矩阵拟合秩匹配 PCA。PCA 提供最强普通线性重构基线，但忽略标签。</span>
+<span id="cb1-303"><a href="#cb1-303" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**边际均值与对照：** 不学习投影直接绘制或量化 $X_\phi$。这检验实质性结论是否已可见于条件均值。</span>
+<span id="cb1-304"><a href="#cb1-304" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**每边际化单独 PCA：** 对每个 $X_\phi$ 拟合 PCA。这压缩边际均值，但当应用于完整或单试次数据时，本身不提供隔离该边际化的解码器轴。</span>
+<span id="cb1-305"><a href="#cb1-305" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**简单标签解码：** 对原始特征或 PCA 得分拟合预先指定的线性分类器或回归器。解码检验标签可预测性；它不保留几何或重构群体活动，也不等价于解混。</span>
+<span id="cb1-306"><a href="#cb1-306" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**仅均值重构：** 用训练均值重构每个特征作为基本误差参考。</span>
+<span id="cb1-307"><a href="#cb1-307" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-308"><a href="#cb1-308" aria-hidden="true" tabindex="-1"></a>dPCA 分析应报告它是否改善留出边际重构或单独声明的科学准则，而不仅仅是分量看起来是否比 PCA 更干净。</span>
+<span id="cb1-309"><a href="#cb1-309" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-310"><a href="#cb1-310" aria-hidden="true" tabindex="-1"></a><span class="fu">## 评估准则</span></span>
+<span id="cb1-311"><a href="#cb1-311" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-312"><a href="#cb1-312" aria-hidden="true" tabindex="-1"></a>防泄漏评估应包括：</span>
+<span id="cb1-313"><a href="#cb1-313" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-314"><a href="#cb1-314" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>**试次级划分：** 按需要留出完整试次、会话、动物或其他独立单元。不要把同一试次的相邻时间箱跨折叠拆分。</span>
+<span id="cb1-315"><a href="#cb1-315" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>**仅训练预处理：** 在无测试观测的情况下计算中心化、缩放、平滑选择、条件均值、边际化、交互分组、正则化、秩与分量排序。</span>
+<span id="cb1-316"><a href="#cb1-316" aria-hidden="true" tabindex="-1"></a><span class="ss">3. </span>**留出边际重构：** 从独立测试试次重建留出伪试次或留出条件均值，然后用训练定义评估</span>
+<span id="cb1-317"><a href="#cb1-317" aria-hidden="true" tabindex="-1"></a>   $$</span>
+<span id="cb1-318"><a href="#cb1-318" aria-hidden="true" tabindex="-1"></a>   \left\lVert X^{\mathrm{test}}_\phi-</span>
+<span id="cb1-319"><a href="#cb1-319" aria-hidden="true" tabindex="-1"></a>   F^{\mathrm{train}}_\phi D^{\mathrm{train}}_\phi</span>
+<span id="cb1-320"><a href="#cb1-320" aria-hidden="true" tabindex="-1"></a>   X^{\mathrm{test}}\right\rVert_F^2</span>
+<span id="cb1-321"><a href="#cb1-321" aria-hidden="true" tabindex="-1"></a>   $$</span>
+<span id="cb1-322"><a href="#cb1-322" aria-hidden="true" tabindex="-1"></a>   应用于那些留出条件估计。这检验基于均值映射的迁移；它不是试次噪声似然。</span>
+<span id="cb1-323"><a href="#cb1-323" aria-hidden="true" tabindex="-1"></a><span class="ss">4. </span>**方差核算：** 报告总与边际方差、组合重构误差以及被丢弃或残差项的贡献。不要把重叠非正交分量贡献当作独立相加。</span>
+<span id="cb1-324"><a href="#cb1-324" aria-hidden="true" tabindex="-1"></a><span class="ss">5. </span>**解混诊断：** 报告完整向量 $v_\phi(d)$ 或混淆矩阵，而不仅是最大边际标签。</span>
+<span id="cb1-325"><a href="#cb1-325" aria-hidden="true" tabindex="-1"></a><span class="ss">6. </span>**稳定性：** 跨试次重采样、会话、合理秩、正则化值与交互分组比较子空间与留出结论，并仅在合适处使用符号/子空间对齐。</span>
+<span id="cb1-326"><a href="#cb1-326" aria-hidden="true" tabindex="-1"></a><span class="ss">7. </span>**基线：** 比较秩匹配 PCA、原始边际均值、单独边际 PCA 与简单防泄漏标签解码。</span>
+<span id="cb1-327"><a href="#cb1-327" aria-hidden="true" tabindex="-1"></a><span class="ss">8. </span>**零模型：** 在独立试次或实验单元层面洗牌标签，同时保持声明的平衡结构。</span>
+<span id="cb1-328"><a href="#cb1-328" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-329"><a href="#cb1-329" aria-hidden="true" tabindex="-1"></a>如果报告解码，解码器/分量选择与分类器必须在每个训练折叠内重拟合。成功解码在所述规程下确立标签信息，而非独立表示、因果角色或机制。</span>
+<span id="cb1-330"><a href="#cb1-330" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-331"><a href="#cb1-331" aria-hidden="true" tabindex="-1"></a><span class="fu">## 最小玩具模型</span></span>
+<span id="cb1-332"><a href="#cb1-332" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-333"><a href="#cb1-333" aria-hidden="true" tabindex="-1"></a>未来的非可执行玩具模型应为时间 $t$、二元刺激 $s\in<span class="sc">\{</span>-1,+1<span class="sc">\}</span>$ 与二元决策 $d\in<span class="sc">\{</span>-1,+1<span class="sc">\}</span>$ 生成平衡试次：</span>
+<span id="cb1-334"><a href="#cb1-334" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-335"><a href="#cb1-335" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-336"><a href="#cb1-336" aria-hidden="true" tabindex="-1"></a>x(t,s,d,k)</span>
+<span id="cb1-337"><a href="#cb1-337" aria-hidden="true" tabindex="-1"></a>=</span>
+<span id="cb1-338"><a href="#cb1-338" aria-hidden="true" tabindex="-1"></a>a f_0(t)</span>
+<span id="cb1-339"><a href="#cb1-339" aria-hidden="true" tabindex="-1"></a>+b\,s f_s(t)</span>
+<span id="cb1-340"><a href="#cb1-340" aria-hidden="true" tabindex="-1"></a>+c\,d f_d(t)</span>
+<span id="cb1-341"><a href="#cb1-341" aria-hidden="true" tabindex="-1"></a>+e\,sd f_{sd}(t)</span>
+<span id="cb1-342"><a href="#cb1-342" aria-hidden="true" tabindex="-1"></a>+\varepsilon_k(t),</span>
+<span id="cb1-343"><a href="#cb1-343" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-344"><a href="#cb1-344" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-345"><a href="#cb1-345" aria-hidden="true" tabindex="-1"></a>其中 $a,b,c,e\in\mathbb R^N$ 是已知混合向量，$\varepsilon$ 是声明试次噪声。向量 $b$ 与 $c$ 应斜交而非人为正交。生成应保留真实时间、刺激、决策与交互项。</span>
+<span id="cb1-346"><a href="#cb1-346" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-347"><a href="#cb1-347" aria-hidden="true" tabindex="-1"></a>未来比较应只用训练试次拟合 PCA、直接边际均值、单独边际 PCA、简单线性标签解码器与 dPCA。评估应测量留出边际重构、分量边际方差轮廓、直至符号/旋转的子空间恢复，并把标签解码作为单独准则。</span>
+<span id="cb1-348"><a href="#cb1-348" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-349"><a href="#cb1-349" aria-hidden="true" tabindex="-1"></a>需要两个阴性对照：使 $b$ 与 $c$ 近似共线以演示不可分离边际子空间，并移除或严重失衡一个 $(s,d)$ 单元以演示混淆与边际化失败。标签洗牌零模型应移除系统性任务依赖。本方法对象不创建代码、数据或结果。</span>
+<span id="cb1-350"><a href="#cb1-350" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-351"><a href="#cb1-351" aria-hidden="true" tabindex="-1"></a><span class="fu">## 对 LDG 的意义</span></span>
+<span id="cb1-352"><a href="#cb1-352" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-353"><a href="#cb1-353" aria-hidden="true" tabindex="-1"></a>dPCA 是 LDG 的规范有监督线性分解，用于把声明任务变量贡献与普通方差最大化分开。它提供受控示例，说明标签、平均、损失与实验设计如何定义表示——以及为什么有用的表示不得被提升为独立潜生成器或机制。</span>
+<span id="cb1-354"><a href="#cb1-354" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-355"><a href="#cb1-355" aria-hidden="true" tabindex="-1"></a>::: {.callout-warning title="这并不蕴含"}</span>
+<span id="cb1-356"><a href="#cb1-356" aria-hidden="true" tabindex="-1"></a>标记为「stimulus」「decision」「reward」或「time」的分量是标签与损失依赖的。dPCA 不确立统计独立、因果分离、解剖分割、唯一神经模块、潜状态、物理动力学或机制。高解释方差、解混指数或解码精度不自动加强这些主张。</span>
+<span id="cb1-357"><a href="#cb1-357" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb1-358"><a href="#cb1-358" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-359"><a href="#cb1-359" aria-hidden="true" tabindex="-1"></a><span class="fu">### 小鼠轨迹</span></span>
+<span id="cb1-360"><a href="#cb1-360" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-361"><a href="#cb1-361" aria-hidden="true" tabindex="-1"></a>不保留模态特定经验主张。行为因子、试次对齐与重复测量必须定义平衡有监督张量；分量仍将保持为依赖标签的线性摘要，而非行为原因或动力学。</span>
+<span id="cb1-362"><a href="#cb1-362" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-363"><a href="#cb1-363" aria-hidden="true" tabindex="-1"></a><span class="fu">### 眼动</span></span>
+<span id="cb1-364"><a href="#cb1-364" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-365"><a href="#cb1-365" aria-hidden="true" tabindex="-1"></a>不保留模态特定经验主张。事件标签、注视目标与时间对齐可以监督分解，但目标关联分量不识别动眼模块或转移律。</span>
+<span id="cb1-366"><a href="#cb1-366" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-367"><a href="#cb1-367" aria-hidden="true" tabindex="-1"></a><span class="fu">### EEG</span></span>
+<span id="cb1-368"><a href="#cb1-368" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-369"><a href="#cb1-369" aria-hidden="true" tabindex="-1"></a>不保留模态特定经验主张。重参考、通道缩放、受试者/会话结构与试次平衡将决定拟合边际化；传感器分量不自动是神经源。</span>
+<span id="cb1-370"><a href="#cb1-370" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-371"><a href="#cb1-371" aria-hidden="true" tabindex="-1"></a><span class="fu">### MEG / 神经群体数据</span></span>
+<span id="cb1-372"><a href="#cb1-372" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-373"><a href="#cb1-373" aria-hidden="true" tabindex="-1"></a>Kobak 等人引入规范降秩 dPCA 表述，并重新分析跨不同物种、记录区域与任务的四个神经群体数据集 <span class="co">[</span><span class="ot">@KobakEtAl2016</span><span class="co">]</span>。这是该方法可以概括那些特定试次结构化数据集的主要证据。它不确立神经群体中的普遍解混组织、解剖模块或因果机制，也不直接验证 MEG 应用。</span>
+<span id="cb1-374"><a href="#cb1-374" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-375"><a href="#cb1-375" aria-hidden="true" tabindex="-1"></a><span class="fu">## 主要来源</span></span>
+<span id="cb1-376"><a href="#cb1-376" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-377"><a href="#cb1-377" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Machens 发展用于分离声明任务参数方差的边际化协方差构造，并显式讨论重叠、不可分离性与独立分量假设的区别 <span class="co">[</span><span class="ot">@Machens2010</span><span class="co">]</span>。</span>
+<span id="cb1-378"><a href="#cb1-378" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Brendel、Romo 与 Machens 引入早期概率 dPCA 表述，包括因子边际化与交互项 <span class="co">[</span><span class="ot">@BrendelRomoMachens2011</span><span class="co">]</span>。</span>
+<span id="cb1-379"><a href="#cb1-379" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Kobak 等人引入本对象使用的规范编码器/解码器降秩重构目标、正则化、平衡处理、交叉验证与神经应用 <span class="co">[</span><span class="ot">@KobakEtAl2016</span><span class="co">]</span>。</span>
+<span id="cb1-380"><a href="#cb1-380" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-381"><a href="#cb1-381" aria-hidden="true" tabindex="-1"></a><span class="fu">## 综述 / 次级来源</span></span>
+<span id="cb1-382"><a href="#cb1-382" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-383"><a href="#cb1-383" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Izenman 提供经核查的多元降秩回归、秩约束系数矩阵与加权最小二乘表述权威处理 <span class="co">[</span><span class="ot">@Izenman2008, chap. 6</span><span class="co">]</span>。</span>
+<span id="cb1-384"><a href="#cb1-384" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-385"><a href="#cb1-385" aria-hidden="true" tabindex="-1"></a><span class="fu">## 开放方法学问题</span></span>
+<span id="cb1-386"><a href="#cb1-386" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-387"><a href="#cb1-387" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>对连续、层级或强相关任务变量应如何定义边际化？</span>
+<span id="cb1-388"><a href="#cb1-388" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>当条件频率科学上有意义但高度不等时，哪种加权估计目标合适？</span>
+<span id="cb1-389"><a href="#cb1-389" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>条件均值与边际子空间中的不确定性应如何传播到分量图？</span>
+<span id="cb1-390"><a href="#cb1-390" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>何时交互应保持分离而非与时间依赖主效应分组？</span>
+<span id="cb1-391"><a href="#cb1-391" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>如何在不把伪群体当作同时记录的情况下纳入同时噪声协方差？</span>
+<span id="cb1-392"><a href="#cb1-392" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>哪些结论在替代标签编码、秩与正则化下保持稳定？</span>
+<span id="cb1-393"><a href="#cb1-393" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-394"><a href="#cb1-394" aria-hidden="true" tabindex="-1"></a><span class="fu">## 成熟度检查表</span></span>
+<span id="cb1-395"><a href="#cb1-395" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-396"><a href="#cb1-396" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> 使用完整方法 schema 并陈述有界有监督线性问题。</span>
+<span id="cb1-397"><a href="#cb1-397" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> 定义试次解析与条件均值张量及平衡单元假设。</span>
+<span id="cb1-398"><a href="#cb1-398" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> 定义主效应与交互边际化及其分组选择。</span>
+<span id="cb1-399"><a href="#cb1-399" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> 定义编码器/解码器矩阵与正则化降秩目标。</span>
+<span id="cb1-400"><a href="#cb1-400" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> 陈述方差核算与非正交分量限制。</span>
+<span id="cb1-401"><a href="#cb1-401" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> 声明学习得到与固定的量、监督、几何与时间范围。</span>
+<span id="cb1-402"><a href="#cb1-402" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> 覆盖交叉验证、正则化、失衡、缺失单元与泄漏。</span>
+<span id="cb1-403"><a href="#cb1-403" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> 包含 PCA、边际均值、边际 PCA 与简单解码基线。</span>
+<span id="cb1-404"><a href="#cb1-404" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> 包含带混淆与重叠对照的非可执行玩具契约。</span>
+<span id="cb1-405"><a href="#cb1-405" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> 显式拒绝独立、因果、模块、动力学与机制过度宣称。</span>
+<span id="cb1-406"><a href="#cb1-406" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> 规范、先前技术、降秩与主神经来源经核查与验证。</span>
+<span id="cb1-407"><a href="#cb1-407" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> 在一轮有界修正轮次后完成独立混合审查；聚焦复审返回 PASS。</span>
+<span id="cb1-408"><a href="#cb1-408" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> 在发布站点审查后，人类所有者根据记录的审查决定授权稳定晋升。</span></code></pre></div><button title="复制到剪贴板" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></div>
+</div></div></div></div></div>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

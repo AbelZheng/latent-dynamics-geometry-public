@@ -1,0 +1,2325 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="zh-CN" xml:lang="zh-CN"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.10.18">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>一阶自治动力系统 – Latent Dynamics &amp; Geometry</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="../../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../../">
+<script src="../../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../../site_libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../../site_libs/bootstrap/bootstrap-e3adbaa939bcd423dddc8c8a834270b4.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "没有结果",
+    "search-matching-documents-text": "匹配的文档",
+    "search-copy-link-title": "复制搜索链接",
+    "search-hide-matches-text": "隐藏其它匹配结果",
+    "search-more-match-text": "更多匹配结果",
+    "search-more-matches-text": "更多匹配结果",
+    "search-clear-button-title": "清除",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "取消",
+    "search-submit-button-title": "提交",
+    "search-label": "搜索"
+  }
+}</script>
+<style>
+.ldg-lang{position:fixed;top:72px;right:16px;z-index:2000;display:flex;gap:4px;font-family:system-ui,-apple-system,"Segoe UI",sans-serif;}
+.ldg-lang a{display:inline-block;padding:4px 10px;border:1px solid #c8c8c8;border-radius:999px;background:#fff;color:#333;text-decoration:none;font-size:13px;box-shadow:0 1px 3px rgba(0,0,0,.15);}
+.ldg-lang a.active{background:#2c3e50;color:#fff;border-color:#2c3e50;}
+</style>
+</head><body class="nav-fixed quarto-light"><div class="ldg-lang" id="ldg-lang">
+  <a href="#" id="ldg-lang-en">EN</a>
+  <a href="#" id="ldg-lang-zh">中文</a>
+</div>
+<script>
+(function () {
+  var BASE = '';
+  if (window.location.pathname.indexOf('/latent-dynamics-geometry-public/') === 0) {
+    BASE = 'latent-dynamics-geometry-public';
+  }
+  var IS_FILE = window.location.protocol === 'file:';
+  function pathSegs() {
+    return window.location.pathname.split('/').filter(Boolean);
+  }
+  function zhIdx() {
+    return pathSegs().indexOf('zh');
+  }
+  function segs() {
+    var s = window.location.pathname.split('/').filter(Boolean);
+    if (BASE && s[0] === BASE) s = s.slice(1);
+    return s;
+  }
+  function isZh() { return zhIdx() !== -1; }
+  function fileTarget(lang) {
+    var s = pathSegs();
+    var siteIdx = s.lastIndexOf('_site');
+    var root = siteIdx === -1 ? s.slice(0, -1) : s.slice(0, siteIdx + 1);
+    var page = siteIdx === -1 ? [s[s.length - 1]] : s.slice(siteIdx + 1);
+    if (page[0] === 'zh') page = page.slice(1);
+    if (lang === 'zh') page = ['zh'].concat(page);
+    var rel = page.join('/');
+    if (rel === '' || rel === 'zh') rel = 'index.html';
+    return '/' + root.join('/') + '/' + rel;
+  }
+  function target(lang) {
+    if (IS_FILE) return fileTarget(lang);
+    var s = segs();
+    if (s[0] === 'zh') s = s.slice(1);
+    if (lang === 'zh') s = ['zh'].concat(s);
+    var rel = s.join('/');
+    if (rel === '' || rel === 'zh') rel = (lang === 'zh' ? 'zh/index.html' : 'index.html');
+    return '/' + (BASE ? BASE + '/' : '') + rel;
+  }
+  function go(lang) {
+    try { localStorage.setItem('ldg-lang', lang); } catch (e) {}
+    window.location.href = target(lang);
+  }
+  function mark() {
+    var zh = isZh();
+    var a = document.getElementById('ldg-lang-en');
+    var b = document.getElementById('ldg-lang-zh');
+    if (a) a.className = zh ? '' : 'active';
+    if (b) b.className = zh ? 'active' : '';
+  }
+  function localizeNav() {
+    if (!isZh()) return;
+    var cur = pathSegs();
+    var czi = zhIdx();
+    var dir = (czi === -1 ? cur.slice(0, -1) : cur.slice(czi, -1)).join('/');
+    document.querySelectorAll('nav a').forEach(function (a) {
+      var h = a.getAttribute('href') || '';
+      if (/^(https?:|#|mailto:)/.test(h)) return;
+      if (/\.html?$/.test(h) || /\/$/.test(h) || h === '') {
+        var abs = new URL(h, window.location.href).pathname;
+        var s = abs.split('/').filter(Boolean);
+        if (BASE && s[0] === BASE) s = s.slice(1);
+        var zi = s.indexOf('zh');
+        var rel = zi !== -1 ? s.slice(zi + 1).join('/') : s.slice(czi).join('/');
+        var tgt = 'zh/' + rel;
+        var f = dir.split('/').filter(Boolean);
+        var t = tgt.split('/').filter(Boolean);
+        var i = 0;
+        while (i < f.length && i < t.length && f[i] === t[i]) i++;
+        var rel = '';
+        for (var j = i; j < f.length; j++) rel += '../';
+        rel += t.slice(i).join('/');
+        a.setAttribute('href', rel);
+      }
+    });
+  }
+  document.getElementById('ldg-lang-en').addEventListener('click', function (e) { e.preventDefault(); go('en'); });
+  document.getElementById('ldg-lang-zh').addEventListener('click', function (e) { e.preventDefault(); go('zh'); });
+  mark();
+  localizeNav();
+})();
+</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-chtml.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+
+
+
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../../../index.html">
+    <span class="navbar-title">Latent Dynamics &amp; Geometry</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="搜索"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="展开或折叠导航栏" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../../index.html"> 
+<span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../../knowledge/concepts/index.html"> 
+<span class="menu-text">Concepts</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../../knowledge/methods/index.html"> 
+<span class="menu-text">Methods</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../../knowledge/math/index.html"> 
+<span class="menu-text">Math</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../../knowledge/papers/index.html"> 
+<span class="menu-text">Papers</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../../toy-models/index.html"> 
+<span class="menu-text">Toy Models</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../../research-questions/index.html"> 
+<span class="menu-text">Research Questions</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../../benchmarks/index.html"> 
+<span class="menu-text">Benchmarks</span></a>
+  </li>  
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/AbelZheng/latent-dynamics-geometry-public"> <i class="bi bi-github" role="img" aria-label="GitHub repository">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="https://github.com/AbelZheng/latent-dynamics-geometry-public/discussions"> 
+<span class="menu-text">Discussions</span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">该页面内容</h2>
+   
+  <ul>
+  <li><a href="#一阶自治动力系统" id="toc-一阶自治动力系统" class="nav-link active" data-scroll-target="#一阶自治动力系统">一阶自治动力系统</a>
+  <ul class="collapse">
+  <li><a href="#为什么需要它" id="toc-为什么需要它" class="nav-link" data-scroll-target="#为什么需要它">为什么需要它</a></li>
+  <li><a href="#前置知识" id="toc-前置知识" class="nav-link" data-scroll-target="#前置知识">前置知识</a></li>
+  <li><a href="#定义" id="toc-定义" class="nav-link" data-scroll-target="#定义">定义</a>
+  <ul class="collapse">
+  <li><a href="#系统与解" id="toc-系统与解" class="nav-link" data-scroll-target="#系统与解">系统与解</a></li>
+  <li><a href="#初值问题" id="toc-初值问题" class="nav-link" data-scroll-target="#初值问题">初值问题</a></li>
+  <li><a href="#局部极大与全局解" id="toc-局部极大与全局解" class="nav-link" data-scroll-target="#局部极大与全局解">局部、极大与全局解</a></li>
+  <li><a href="#有限时间演化与局部流" id="toc-有限时间演化与局部流" class="nav-link" data-scroll-target="#有限时间演化与局部流">有限时间演化与局部流</a></li>
+  </ul></li>
+  <li><a href="#记号" id="toc-记号" class="nav-link" data-scroll-target="#记号">记号</a></li>
+  <li><a href="#主要结果-表述" id="toc-主要结果-表述" class="nav-link" data-scroll-target="#主要结果-表述">主要结果 / 表述</a>
+  <ul class="collapse">
+  <li><a href="#正则性阶梯" id="toc-正则性阶梯" class="nav-link" data-scroll-target="#正则性阶梯">正则性阶梯</a></li>
+  <li><a href="#存在性与唯一性是不同主张" id="toc-存在性与唯一性是不同主张" class="nav-link" data-scroll-target="#存在性与唯一性是不同主张">存在性与唯一性是不同主张</a></li>
+  <li><a href="#连续场设定中的积分形式" id="toc-连续场设定中的积分形式" class="nav-link" data-scroll-target="#连续场设定中的积分形式">连续场设定中的积分形式</a></li>
+  <li><a href="#从局部存在性与唯一性到有限时间演化" id="toc-从局部存在性与唯一性到有限时间演化" class="nav-link" data-scroll-target="#从局部存在性与唯一性到有限时间演化">从局部存在性与唯一性到有限时间演化</a></li>
+  <li><a href="#时间微分联合流正则性与生成元" id="toc-时间微分联合流正则性与生成元" class="nav-link" data-scroll-target="#时间微分联合流正则性与生成元">时间微分、联合流正则性与生成元</a></li>
+  </ul></li>
+  <li><a href="#逐步推导" id="toc-逐步推导" class="nav-link" data-scroll-target="#逐步推导">逐步推导</a></li>
+  <li><a href="#几何直觉" id="toc-几何直觉" class="nav-link" data-scroll-target="#几何直觉">几何直觉</a></li>
+  <li><a href="#演练示例" id="toc-演练示例" class="nav-link" data-scroll-target="#演练示例">演练示例</a>
+  <ul class="collapse">
+  <li><a href="#推导轨迹" id="toc-推导轨迹" class="nav-link" data-scroll-target="#推导轨迹">推导轨迹</a></li>
+  <li><a href="#验证-ivp" id="toc-验证-ivp" class="nav-link" data-scroll-target="#验证-ivp">验证 IVP</a></li>
+  <li><a href="#识别数学角色" id="toc-识别数学角色" class="nav-link" data-scroll-target="#识别数学角色">识别数学角色</a></li>
+  <li><a href="#验证流律" id="toc-验证流律" class="nav-link" data-scroll-target="#验证流律">验证流律</a></li>
+  <li><a href="#二维旋转伸缩演练示例" id="toc-二维旋转伸缩演练示例" class="nav-link" data-scroll-target="#二维旋转伸缩演练示例">二维旋转–伸缩演练示例</a></li>
+  <li><a href="#为什么唯一性假设重要" id="toc-为什么唯一性假设重要" class="nav-link" data-scroll-target="#为什么唯一性假设重要">为什么唯一性假设重要</a></li>
+  </ul></li>
+  <li><a href="#常见错误" id="toc-常见错误" class="nav-link" data-scroll-target="#常见错误">常见错误</a></li>
+  <li><a href="#计算解释" id="toc-计算解释" class="nav-link" data-scroll-target="#计算解释">计算解释</a></li>
+  <li><a href="#与-ldg-的关系" id="toc-与-ldg-的关系" class="nav-link" data-scroll-target="#与-ldg-的关系">与 LDG 的关系</a></li>
+  <li><a href="#参考文献" id="toc-参考文献" class="nav-link" data-scroll-target="#参考文献">参考文献</a></li>
+  <li><a href="#成熟度检查表" id="toc-成熟度检查表" class="nav-link" data-scroll-target="#成熟度检查表">成熟度检查表</a></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<div class="quarto-title-block"><div><h1 class="title">一阶自治动力系统</h1><button type="button" class="btn code-tools-button" id="quarto-code-tools-source"><i class="bi"></i> 代码</button></div></div>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="一阶自治动力系统" class="level1">
+<h1>一阶自治动力系统</h1>
+<section id="为什么需要它" class="level2">
+<h2 class="anchored" data-anchor-id="为什么需要它">为什么需要它</h2>
+<p>六个 Cycle 1 概念区分 <a href="../../../zh/knowledge/concepts/state.html">state</a>、其 <a href="../../../zh/knowledge/concepts/state-space.html">state space</a>、<a href="../../../zh/knowledge/concepts/trajectory.html">trajectory</a>、<a href="../../../zh/knowledge/concepts/initial-condition.html">initial condition</a>、<a href="../../../zh/knowledge/concepts/vector-field.html">vector field</a> 与 <a href="../../../zh/knowledge/concepts/flow.html">flow</a>。本数学对象把这些角色连接在一个可复用连续时间表述中：</p>
+<p><span class="math display">\[
+\frac{dx}{dt}=f(x),
+\qquad
+x(t_0)=x_0.
+\]</span></p>
+<p>微分方程不只是绘制曲线的紧凑描述。它是对未知可微状态轨迹的约束。存在性、唯一性、延拓与有限时间流陈述需要单独假设。在后续 LDG 工作可以把自治 ODE 用作生成模型或恢复目标之前，使这些假设显式是必要的。</p>
+<p>范围刻意很窄：<span class="math inline">\(\mathcal{X}\)</span> 是 <span class="math inline">\(\mathbb{R}^n\)</span> 的开子集，时间是连续的，规则是确定性与自治的。离散时间、随机、输入驱动、显式时间相关与非欧氏系统在本对象之外。</p>
+</section>
+<section id="前置知识" class="level2">
+<h2 class="anchored" data-anchor-id="前置知识">前置知识</h2>
+<ul>
+<li><a href="../../../zh/knowledge/concepts/state.html">State</a>：模型在一个时间携带的状态值。</li>
+<li><a href="../../../zh/knowledge/concepts/state-space.html">State Space</a>：该状态的可取值。</li>
+<li><a href="../../../zh/knowledge/concepts/trajectory.html">Trajectory</a>：一条以时间为参数的演化。</li>
+<li><a href="../../../zh/knowledge/concepts/initial-condition.html">Initial Condition</a>：赋值 <span class="math inline">\(x(t_0)=x_0\)</span>。</li>
+<li><a href="../../../zh/knowledge/concepts/vector-field.html">Vector Field</a>：瞬时状态变化规则。</li>
+<li><a href="../../../zh/knowledge/concepts/flow.html">Flow</a>：跨受支持初始状态的有限时间演化。</li>
+</ul>
+<p><strong>假定背景：</strong> 初等集合、函数、欧氏向量、单变量微分与积分、链式法则与函数复合。</p>
+</section>
+<section id="定义" class="level2">
+<h2 class="anchored" data-anchor-id="定义">定义</h2>
+<section id="系统与解" class="level3">
+<h3 class="anchored" data-anchor-id="系统与解">系统与解</h3>
+<p>设</p>
+<p><span class="math display">\[
+\mathcal{X}\subseteq\mathbb{R}^n
+\]</span></p>
+<p>是开的，并设</p>
+<p><span class="math display">\[
+f:\mathcal{X}\rightarrow\mathbb{R}^n.
+\]</span></p>
+<p>方程</p>
+<p><span class="math display">\[
+\dot{x}=f(x)
+\]</span></p>
+<p>是<strong>一阶自治常微分方程</strong>。它是一阶的，因为最高阶导数是 <span class="math inline">\(\dot{x}\)</span>；它是自治的，因为右侧依赖当前状态 <span class="math inline">\(x\)</span> 而不显式依赖时钟时间 <span class="math inline">\(t\)</span>。</p>
+<p>区间 <span class="math inline">\(I\subseteq\mathbb{R}\)</span> 上的<strong>解</strong>是可微曲线</p>
+<p><span class="math display">\[
+x:I\rightarrow\mathcal{X}
+\]</span></p>
+<p>使得对每个 <span class="math inline">\(t\in I\)</span>，</p>
+<p><span class="math display">\[
+\dot{x}(t)=f\bigl(x(t)\bigr).
+\]</span></p>
+<p>因此 <span class="math inline">\(x(t)\)</span> 是 <span class="math inline">\(\mathcal{X}\)</span> 中的状态值，而 <span class="math inline">\(\dot{x}(t)\)</span> 与 <span class="math inline">\(f(x(t))\)</span> 都是 <span class="math inline">\(\mathbb{R}^n\)</span> 中的向量。方程要求轨迹在每个访问状态与 <span class="math inline">\(f\)</span> 赋予的向量相切。</p>
+</section>
+<section id="初值问题" class="level3">
+<h3 class="anchored" data-anchor-id="初值问题">初值问题</h3>
+<p>对参考时间 <span class="math inline">\(t_0\)</span> 与初始状态 <span class="math inline">\(x_0\in\mathcal{X}\)</span>，<strong>初值问题</strong>（IVP）是</p>
+<p><span class="math display">\[
+\dot{x}=f(x),
+\qquad
+x(t_0)=x_0.
+\]</span></p>
+<p>IVP 的解必须同时满足微分方程与初始条件。规则 <span class="math inline">\(f\)</span> 描述其定义域上可能的瞬时演化；初始条件选择在 <span class="math inline">\(t_0\)</span> 穿过 <span class="math inline">\(x_0\)</span> 的解或解集。</p>
+</section>
+<section id="局部极大与全局解" class="level3">
+<h3 class="anchored" data-anchor-id="局部极大与全局解">局部、极大与全局解</h3>
+<ul>
+<li><p><strong>局部解</strong>定义在包含 <span class="math inline">\(t_0\)</span> 的开区间 <span class="math inline">\(I\)</span> 上。</p></li>
+<li><p>如果解不能延拓到严格更大区间同时保持为 <span class="math inline">\(\mathcal{X}\)</span> 中的解，则它是<strong>极大</strong>的。如果 IVP 承认唯一局部解——即局部解存在且任何两个兼容局部解在其公共定义域上一致——那些局部片段组装成开极大区间</p>
+<p><span class="math display">\[
+I_{t_0,x_0}=(T_-(t_0,x_0),T_+(t_0,x_0)).
+\]</span></p>
+<p>上的唯一极大解。</p></li>
+<li><p>本对象全时设定中的<strong>全局解</strong>对每个 <span class="math inline">\(t\in\mathbb{R}\)</span> 有定义，因此其极大区间是 <span class="math inline">\(\mathbb{R}\)</span>。</p></li>
+</ul>
+<p>局部存在性与唯一性不蕴含全局存在性。在相同局部可解性假设下，如果极大解具有有限前向端点 <span class="math inline">\(T_+\)</span>，则当 <span class="math inline">\(t\uparrow T_+\)</span> 时它最终离开 <span class="math inline">\(\mathcal{X}\)</span> 的每个紧子集。当 <span class="math inline">\(\mathcal{X}=\mathbb{R}^n\)</span> 时，这意味着 <span class="math inline">\(\|x(t)\|\to\infty\)</span>。在真开域上，轨迹可以保持有界同时接近 <span class="math inline">\(\mathcal{X}\)</span> 的补集；它不必收敛到某个特定边界点。类似陈述在有限后向端点成立。Teschl 把局部可解性与极大延拓分开，并明确陈述该紧集准则 <span class="citation" data-cites="Teschl2012">(<a href="#ref-Teschl2012" role="doc-biblioref">Teschl 2012年</a>, secs. 2.2, 2.6)</span>。</p>
+</section>
+<section id="有限时间演化与局部流" class="level3">
+<h3 class="anchored" data-anchor-id="有限时间演化与局部流">有限时间演化与局部流</h3>
+<p>从初始条件度量时间是有用的。把</p>
+<p><span class="math display">\[
+\tau=t-t_0
+\]</span></p>
+<p>写为<strong>经过时间</strong>。对每个 <span class="math inline">\(x\in\mathcal{X}\)</span>，假设在经过时间 0 穿过 <span class="math inline">\(x\)</span> 的唯一极大解定义在包含 <span class="math inline">\(0\)</span> 的区间 <span class="math inline">\(I_x\)</span> 上。定义</p>
+<p><span class="math display">\[
+W=\{(\tau,x)\in\mathbb{R}\times\mathcal{X}:\tau\in I_x\}.
+\]</span></p>
+<p>集合 <span class="math inline">\(W\)</span> 记录哪些经过时间/状态对受支持。它不必等于 <span class="math inline">\(\mathbb{R}\times\mathcal{X}\)</span>：状态可以只支持有限的前向或后向演化区间。对固定经过时间 <span class="math inline">\(\tau\)</span>，有限时间映射具有类型化定义域</p>
+<p><span class="math display">\[
+\operatorname{dom}(\phi_\tau)
+=
+\{x\in\mathcal{X}:(\tau,x)\in W\}.
+\]</span></p>
+<section id="层级-1单值局部有限时间演化" class="level4">
+<h4 class="anchored" data-anchor-id="层级-1单值局部有限时间演化">层级 1：单值局部有限时间演化</h4>
+<p>在局部存在性与唯一性下，极大解定义单值映射</p>
+<p><span class="math display">\[
+\Phi:W\rightarrow\mathcal{X},
+\qquad
+(\tau,x)\mapsto\Phi(\tau,x)=\phi_\tau(x).
+\]</span></p>
+<p>该局部演化族满足</p>
+<p><span class="math display">\[
+\phi_0(x)=x
+\]</span></p>
+<p>且只要各项有定义，</p>
+<p><span class="math display">\[
+\phi_{\tau+s}(x)=\phi_\tau\bigl(\phi_s(x)\bigr).
+\]</span></p>
+<p>更显式地，如果 <span class="math inline">\(s\in I_x\)</span> 且 <span class="math inline">\(\tau\in I_{\phi_s(x)}\)</span>，则 <span class="math inline">\(s+\tau\in I_x\)</span>，且先演化 <span class="math inline">\(s\)</span> 再演化 <span class="math inline">\(\tau\)</span> 与演化组合经过时间 <span class="math inline">\(s+\tau\)</span> 一致。这些代数性质来自自治性与唯一性。它们本身不断言在 <span class="math inline">\((\tau,x)\)</span> 上的联合连续性或可微性。</p>
+<p>当 <span class="math inline">\(f\)</span> 局部利普希茨时它是连续的，因此每条单个曲线 <span class="math inline">\(\tau\mapsto\phi_\tau(x)\)</span> 对经过时间 <span class="math inline">\(C^1\)</span> 且满足</p>
+<p><span class="math display">\[
+\frac{d}{d\tau}\phi_\tau(x)
+=
+f\bigl(\phi_\tau(x)\bigr).
+\]</span></p>
+<p>特别地，</p>
+<p><span class="math display">\[
+\left.\frac{d}{d\tau}\phi_\tau(x)\right|_{\tau=0}
+=
+f(x).
+\]</span></p>
+<p>这是沿一条轨迹对 <span class="math inline">\(\tau\)</span> 的可微性；它尚不是对初始状态 <span class="math inline">\(x\)</span> 可微性的主张。</p>
+</section>
+<section id="层级-2联合-c1-局部流" class="level4">
+<h4 class="anchored" data-anchor-id="层级-2联合-c1-局部流">层级 2：联合 <span class="math inline">\(C^1\)</span> 局部流</h4>
+<p>如果 <span class="math inline">\(f\in C^1(\mathcal{X},\mathbb{R}^n)\)</span>，Teschl 的光滑依赖结果给出 <span class="math inline">\(W\)</span> 是开的，且联合映射</p>
+<p><span class="math display">\[
+\Phi:W\rightarrow\mathcal{X},
+\qquad
+(\tau,x)\mapsto\Phi(\tau,x)=\phi_\tau(x),
+\]</span></p>
+<p>对经过时间与初始状态联合 <span class="math inline">\(C^1\)</span>。在采用的 LDG 约定下，这个联合 <span class="math inline">\(C^1\)</span> 映射连同上述恒等与复合律是 <span class="math inline">\(f\)</span> 生成的<strong>局部流</strong>。更一般地，<span class="math inline">\(f\in C^k\)</span> 且 <span class="math inline">\(k\geq1\)</span> 给出联合 <span class="math inline">\(C^k\)</span> 局部流映射 <span class="citation" data-cites="Teschl2012">(<a href="#ref-Teschl2012" role="doc-biblioref">Teschl 2012年</a>, sec.&nbsp;6.2)</span>。</p>
+</section>
+</section>
+</section>
+<section id="记号" class="level2">
+<h2 class="anchored" data-anchor-id="记号">记号</h2>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>符号</th>
+<th>角色</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><span class="math inline">\(\mathcal{X}\subseteq\mathbb{R}^n\)</span></td>
+<td>开欧氏状态空间域。</td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(x\in\mathcal{X}\)</span></td>
+<td>一个可取状态值。</td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">\(x(t)\)</span></td>
+<td>一条轨迹上时钟时间 <span class="math inline">\(t\)</span> 的状态值。</td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(t_0\)</span></td>
+<td>IVP 的参考时钟时间。</td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">\(x_0\)</span></td>
+<td>满足 <span class="math inline">\(x(t_0)=x_0\)</span> 的初始状态。</td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(f:\mathcal{X}\to\mathbb{R}^n\)</span></td>
+<td>自治向量场。</td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">\(\dot{x}(t)\)</span></td>
+<td>轨迹的瞬时导数。</td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(I_{t_0,x_0}\)</span></td>
+<td>穿过 <span class="math inline">\((t_0,x_0)\)</span> 的解的极大时钟时间区间。</td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">\(\tau=t-t_0\)</span></td>
+<td>相对参考时间的经过时间。</td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(I_x\)</span></td>
+<td>在 <span class="math inline">\(\tau=0\)</span> 穿过 <span class="math inline">\(x\)</span> 的解的极大经过时间区间。</td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">\(W\)</span></td>
+<td>受支持的经过时间/状态对 <span class="math inline">\((\tau,x)\)</span>。</td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(\operatorname{dom}(\phi_\tau)\)</span></td>
+<td>满足 <span class="math inline">\((\tau,x)\in W\)</span> 的状态 <span class="math inline">\(x\)</span>。</td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">\(\Phi(\tau,x)=\phi_\tau(x)\)</span></td>
+<td>单值局部有限时间演化；当 <span class="math inline">\(f\in C^1\)</span> 时联合 <span class="math inline">\(C^1\)</span>。</td>
+</tr>
+</tbody>
+</table>
+<p>时钟时间 <span class="math inline">\(t\)</span> 把状态定位在特定轨迹上。经过时间 <span class="math inline">\(\tau\)</span> 索引自治规则推进初始状态多远。自治性使得相同单参数记号 <span class="math inline">\(\phi_\tau\)</span> 可以不依赖 <span class="math inline">\(t_0\)</span> 数值使用。</p>
+</section>
+<section id="主要结果-表述" class="level2">
+<h2 class="anchored" data-anchor-id="主要结果-表述">主要结果 / 表述</h2>
+<section id="正则性阶梯" class="level3">
+<h3 class="anchored" data-anchor-id="正则性阶梯">正则性阶梯</h3>
+<p>公式 <span class="math inline">\(\dot{x}=f(x)\)</span> 本身不解决解是否存在、唯一或全局持续。对上述开欧氏域，以下充分条件构成有用阶梯。</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>对 <span class="math inline">\(f\)</span> 的假设</th>
+<th>此处使用的推论</th>
+<th>不自动获得的内容</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><span class="math inline">\(f\)</span> 是任意映射</td>
+<td>表达式给每个状态赋予候选瞬时向量。</td>
+<td>甚至局部存在性也不保证。</td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(f\)</span> 连续</td>
+<td>对每个 <span class="math inline">\((t_0,x_0)\)</span>，由 Peano 定理的自治形式至少存在一个局部解。因为 <span class="math inline">\(\dot{x}=f(x)\)</span> 随后沿解连续，每个经典解是 <span class="math inline">\(C^1\)</span> <span class="citation" data-cites="Teschl2012">(<a href="#ref-Teschl2012" role="doc-biblioref">Teschl 2012年</a>, sec.&nbsp;2.7)</span>。</td>
+<td>解不必唯一。</td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">\(f\)</span> 局部利普希茨</td>
+<td>局部利普希茨连续性蕴含连续性。Picard–Lindelöf 因此给出局部存在性与唯一性，兼容局部片段组装成唯一极大解。极大解定义带恒等与（在定义处）复合的单值局部有限时间演化 <span class="citation" data-cites="Teschl2012">(<a href="#ref-Teschl2012" role="doc-biblioref">Teschl 2012年</a>, secs. 2.2, 2.6)</span>。</td>
+<td>不蕴含全局存在性与对初始状态的联合可微性。</td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(f\in C^k(\mathcal{X},\mathbb{R}^n)\)</span>，<span class="math inline">\(k\geq1\)</span></td>
+<td>唯一解曲线对时间 <span class="math inline">\(C^{k+1}\)</span>。受支持集 <span class="math inline">\(W\)</span> 是开的，联合局部流映射 <span class="math inline">\(\Phi:W\to\mathcal{X}\)</span> 在 <span class="math inline">\((\tau,x)\)</span> 上 <span class="math inline">\(C^k\)</span> <span class="citation" data-cites="Teschl2012">(<a href="#ref-Teschl2012" role="doc-biblioref">Teschl 2012年</a>, secs. 2.2, 6.2)</span>。</td>
+<td>即使光滑性也不阻止有限时间爆破或离开真开域。</td>
+</tr>
+</tbody>
+</table>
+<p>此处<strong>局部利普希茨</strong>指每个 <span class="math inline">\(x\in\mathcal{X}\)</span> 都有邻域 <span class="math inline">\(U\subseteq\mathcal{X}\)</span> 与有限常数 <span class="math inline">\(L_U\)</span>，使得</p>
+<p><span class="math display">\[
+\|f(y)-f(z)\|\leq L_U\|y-z\|
+\qquad
+\text{for all }y,z\in U.
+\]</span></p>
+<p>该阶梯给出充分而非逻辑必要条件。某些连续非利普希茨场仍有唯一解，某些更少正则的设定承认其他存在性或唯一性定理。范围化结论只是连续性与局部利普希茨连续性干净地分离基本存在性与基本唯一性。</p>
+</section>
+<section id="存在性与唯一性是不同主张" class="level3">
+<h3 class="anchored" data-anchor-id="存在性与唯一性是不同主张">存在性与唯一性是不同主张</h3>
+<p>存在性询问：</p>
+<blockquote class="blockquote">
+<p>是否至少有一条穿过 <span class="math inline">\((t_0,x_0)\)</span> 的可微曲线满足方程？</p>
+</blockquote>
+<p>唯一性询问：</p>
+<blockquote class="blockquote">
+<p>如果两条这样的曲线在同一参考时间穿过相同初始状态，它们是否必须在其公共定义域上重合？</p>
+</blockquote>
+<p>定理可以回答第一个问题而不回答第二个。该区分对流记号重要：只有当在有效假设下从 <span class="math inline">\(x_0\)</span> 的演化单值，或已声明额外选择规则时，<span class="math inline">\(\phi_\tau(x_0)\)</span> 才是单一状态。</p>
+</section>
+<section id="连续场设定中的积分形式" class="level3">
+<h3 class="anchored" data-anchor-id="连续场设定中的积分形式">连续场设定中的积分形式</h3>
+<p>现在假设 <span class="math inline">\(f\)</span> 连续且 <span class="math inline">\(x:I\to\mathcal{X}\)</span> 是 IVP 的经典解。则 <span class="math inline">\(f\circ x\)</span> 连续，因此 <span class="math inline">\(\dot{x}=f\circ x\)</span> 连续且 <span class="math inline">\(x\in C^1(I,\mathcal{X})\)</span>。微积分基本定理因此给出</p>
+<p><span class="math display">\[
+x(t)-x_0
+=
+\int_{t_0}^{t}\dot{x}(s)\,ds
+=
+\int_{t_0}^{t}f\bigl(x(s)\bigr)\,ds.
+\]</span></p>
+<p>因此每个解满足</p>
+<p><span class="math display">\[
+x(t)=x_0+\int_{t_0}^{t}f\bigl(x(s)\bigr)\,ds.
+\]</span></p>
+<p>反过来，设 <span class="math inline">\(f\)</span> 连续且连续曲线 <span class="math inline">\(x:I\to\mathcal{X}\)</span> 对每个 <span class="math inline">\(t\in I\)</span> 满足该积分方程。则 <span class="math inline">\(s\mapsto f(x(s))\)</span> 连续。右侧积分因此 <span class="math inline">\(C^1\)</span>，所以 <span class="math inline">\(x\)</span> 是 <span class="math inline">\(C^1\)</span>，微分给出 <span class="math inline">\(\dot{x}(t)=f(x(t))\)</span>；令 <span class="math inline">\(t=t_0\)</span> 给出 <span class="math inline">\(x(t_0)=x_0\)</span>。因此在该连续 <span class="math inline">\(f\)</span> 经典解设定中，微分与积分表述等价。Picard 迭代在更强局部利普希茨假设下把积分方程用作不动点问题 <span class="citation" data-cites="Teschl2012">(<a href="#ref-Teschl2012" role="doc-biblioref">Teschl 2012年</a>, sec.&nbsp;2.2)</span>。</p>
+</section>
+<section id="从局部存在性与唯一性到有限时间演化" class="level3">
+<h3 class="anchored" data-anchor-id="从局部存在性与唯一性到有限时间演化">从局部存在性与唯一性到有限时间演化</h3>
+<p>假设局部存在性与唯一性。对初始状态 <span class="math inline">\(x_0\)</span>，设 <span class="math inline">\(x(\cdot;t_0,x_0)\)</span> 表示其极大解。自治性允许有限时间映射</p>
+<p><span class="math display">\[
+\phi_\tau(x_0)
+=
+x(t_0+\tau;t_0,x_0),
+\]</span></p>
+<p>只要 <span class="math inline">\(t_0+\tau\)</span> 位于极大区间内。结果不依赖 <span class="math inline">\(t_0\)</span> 数值选择：移位时钟时间移位自治解，而不改变经过时间演化规则。</p>
+<p>对单个固定 <span class="math inline">\(x_0\)</span>，</p>
+<p><span class="math display">\[
+t\mapsto x(t)=\phi_{t-t_0}(x_0)
+\]</span></p>
+<p>是一条轨迹。相反，流同时变化经过时间与初始状态：</p>
+<p><span class="math display">\[
+(\tau,x_0)\mapsto\phi_\tau(x_0).
+\]</span></p>
+<p>恒等关系因为尚未经过时间而成立。复合关系来自自治性与唯一性：作为新经过时间变量的函数，两个延拓都从中间状态 <span class="math inline">\(\phi_s(x)\)</span> 开始并求解相同 IVP，因此它们在都有定义处一致。这些恒等式不要求对 <span class="math inline">\(x_0\)</span> 的可微性。</p>
+</section>
+<section id="时间微分联合流正则性与生成元" class="level3">
+<h3 class="anchored" data-anchor-id="时间微分联合流正则性与生成元">时间微分、联合流正则性与生成元</h3>
+<p>对局部利普希茨 <span class="math inline">\(f\)</span>，单个曲线 <span class="math inline">\(\tau\mapsto\phi_\tau(x)\)</span> 是 <span class="math inline">\(C^1\)</span> 的，其瞬时生成元是</p>
+<p><span class="math display">\[
+f(x)
+=
+\left.\frac{d}{d\tau}\phi_\tau(x)\right|_{\tau=0}.
+\]</span></p>
+<p>该导数只对经过时间取。如果 <span class="math inline">\(f\in C^1\)</span>，更强结论是 <span class="math inline">\(\Phi(\tau,x)\)</span> 对 <span class="math inline">\(\tau\)</span> 与 <span class="math inline">\(x\)</span> 联合 <span class="math inline">\(C^1\)</span>。反过来，满足恒等与复合的联合可微局部流通过零点导数关系生成自治向量场，其流曲线满足相应 ODE <span class="citation" data-cites="Teschl2012">(<a href="#ref-Teschl2012" role="doc-biblioref">Teschl 2012年</a>, sec.&nbsp;6.2, problem 6.5)</span>。因此瞬时与有限时间描述被连接，而不把一条轨迹的时间可微性与对初始状态的可微依赖混为一谈。</p>
+</section>
+</section>
+<section id="逐步推导" class="level2">
+<h2 class="anchored" data-anchor-id="逐步推导">逐步推导</h2>
+<p>中心逻辑链是：</p>
+<ol type="1">
+<li><p><strong>选择可取状态。</strong> 声明开域 <span class="math inline">\(\mathcal{X}\subseteq\mathbb{R}^n\)</span>。</p></li>
+<li><p><strong>赋予瞬时变化。</strong> 指定 <span class="math inline">\(f:\mathcal{X}\to\mathbb{R}^n\)</span>。</p></li>
+<li><p><strong>约束曲线。</strong> 要求可微 <span class="math inline">\(x:I\to\mathcal{X}\)</span> 满足 <span class="math inline">\(\dot{x}(t)=f(x(t))\)</span>。</p></li>
+<li><p><strong>锚定曲线。</strong> 添加 <span class="math inline">\(x(t_0)=x_0\)</span> 形成 IVP。</p></li>
+<li><p><strong>援引相关正则性结果。</strong> 连续性提供至少一个局部解；局部利普希茨连续性还提供局部唯一性。</p></li>
+<li><p><strong>尽可能延拓。</strong> 因为在局部利普希茨梯级局部存在性与唯一性都成立，兼容局部片段组合成 <span class="math inline">\(I_{t_0,x_0}\)</span> 上的唯一极大解。</p></li>
+<li><p><strong>用经过时间重新索引。</strong> 设 <span class="math inline">\(\tau=t-t_0\)</span> 并在受支持处定义 <span class="math inline">\(\phi_\tau(x_0)=x(t_0+\tau;t_0,x_0)\)</span>。</p></li>
+<li><p><strong>用唯一性复合。</strong> 从 <span class="math inline">\(x\)</span> 演化 <span class="math inline">\(s\)</span> 到达 <span class="math inline">\(\phi_s(x)\)</span>。从那里开始演化 <span class="math inline">\(\tau\)</span> 与从 <span class="math inline">\(x\)</span> 演化 <span class="math inline">\(s+\tau\)</span> 求解相同 IVP，因此</p>
+<p><span class="math display">\[
+\phi_{\tau+s}(x)=\phi_\tau(\phi_s(x)).
+\]</span></p></li>
+<li><p><strong>在零经过时间微分。</strong> 因为局部利普希茨 <span class="math inline">\(f\)</span> 连续，每条解曲线对 <span class="math inline">\(\tau\)</span> 是 <span class="math inline">\(C^1\)</span>，其局部斜率恢复瞬时规则：</p>
+<p><span class="math display">\[
+\left.\frac{d}{d\tau}\phi_\tau(x)\right|_{\tau=0}=f(x).
+\]</span></p>
+<p>这是沿经过时间坐标的导数。对 <span class="math inline">\((\tau,x)\)</span> 的联合 <span class="math inline">\(C^1\)</span> 依赖只在更强 <span class="math inline">\(f\in C^1\)</span> 梯级被断言。</p></li>
+</ol>
+<p>该链中没有一步把局部存在性变成全局存在性。例如，<span class="math inline">\(\mathbb{R}\)</span> 上光滑场 <span class="math inline">\(f(x)=x^2\)</span> 对 <span class="math inline">\(x_0&gt;0\)</span> 具有解</p>
+<p><span class="math display">\[
+x(t)=\frac{x_0}{1-x_0(t-t_0)}
+\]</span></p>
+<p>其极大区间是</p>
+<p><span class="math display">\[
+(-\infty,t_0+1/x_0),
+\]</span></p>
+<p>因为解在 <span class="math inline">\(t\uparrow t_0+1/x_0\)</span> 时发散。光滑性给出局部唯一性与光滑局部流，而非 <span class="math inline">\(\mathbb{R}\times\mathbb{R}\)</span> 上的全局流 <span class="citation" data-cites="Teschl2012">(<a href="#ref-Teschl2012" role="doc-biblioref">Teschl 2012年</a>, secs. 1.3, 6.2)</span>。</p>
+</section>
+<section id="几何直觉" class="level2">
+<h2 class="anchored" data-anchor-id="几何直觉">几何直觉</h2>
+<p>在每个 <span class="math inline">\(x\in\mathcal{X}\)</span>，向量 <span class="math inline">\(f(x)\)</span> 是带「状态每单位时间」单位的局部箭头。兼容轨迹在其访问的每个状态与该箭头相切：</p>
+<p><span class="math display">\[
+\text{trajectory tangent at }x(t)
+=
+\dot{x}(t)
+=
+f(x(t)).
+\]</span></p>
+<p>流询问不同问题。<span class="math inline">\(\phi_\tau\)</span> 不只在一点显示箭头，而是把每个受支持初始点运输过有限经过时间 <span class="math inline">\(\tau\)</span>。固定点给出一条轨迹；固定经过时间给出一个状态到状态映射。</p>
+<p>这幅图是直觉，不是测得数据拥有向量场或流的证据。拟合到样本的箭头与显示在投影中的曲线继承状态定义、采样过程与拟合模型的假设。</p>
+</section>
+<section id="演练示例" class="level2">
+<h2 class="anchored" data-anchor-id="演练示例">演练示例</h2>
+<p>考虑标量 IVP</p>
+<p><span class="math display">\[
+\frac{dx}{dt}=a x,
+\qquad
+x(t_0)=x_0,
+\]</span></p>
+<p>其中 <span class="math inline">\(a\in\mathbb{R}\)</span> 固定。</p>
+<section id="推导轨迹" class="level3">
+<h3 class="anchored" data-anchor-id="推导轨迹">推导轨迹</h3>
+<p>把状态乘以积分因子 <span class="math inline">\(e^{-a(t-t_0)}\)</span>。由乘积法则，</p>
+<p><span class="math display">\[
+\begin{aligned}
+\frac{d}{dt}\left(e^{-a(t-t_0)}x(t)\right)
+&amp;=
+-a e^{-a(t-t_0)}x(t)
++e^{-a(t-t_0)}\dot{x}(t)\\
+&amp;=
+e^{-a(t-t_0)}\bigl(\dot{x}(t)-a x(t)\bigr)\\
+&amp;=0.
+\end{aligned}
+\]</span></p>
+<p>因此 <span class="math inline">\(e^{-a(t-t_0)}x(t)\)</span> 在 <span class="math inline">\(t\)</span> 中恒定。在 <span class="math inline">\(t=t_0\)</span> 求该常值给出</p>
+<p><span class="math display">\[
+e^{-a(t_0-t_0)}x(t_0)=x_0.
+\]</span></p>
+<p>因此</p>
+<p><span class="math display">\[
+x(t)=x_0e^{a(t-t_0)}.
+\]</span></p>
+<p>该推导也覆盖 <span class="math inline">\(x_0=0\)</span>，无需除以状态。</p>
+</section>
+<section id="验证-ivp" class="level3">
+<h3 class="anchored" data-anchor-id="验证-ivp">验证 IVP</h3>
+<p>微分所提解：</p>
+<p><span class="math display">\[
+\dot{x}(t)
+=
+a x_0e^{a(t-t_0)}
+=
+a x(t).
+\]</span></p>
+<p>在参考时间，</p>
+<p><span class="math display">\[
+x(t_0)=x_0e^0=x_0.
+\]</span></p>
+<p>因此它同时满足 ODE 与初始条件。</p>
+</section>
+<section id="识别数学角色" class="level3">
+<h3 class="anchored" data-anchor-id="识别数学角色">识别数学角色</h3>
+<ul>
+<li><p><strong>状态空间：</strong> <span class="math inline">\(\mathcal{X}=\mathbb{R}\)</span>。</p></li>
+<li><p><strong>状态值：</strong> <span class="math inline">\(x(t)\in\mathbb{R}\)</span>。</p></li>
+<li><p><strong>向量场：</strong> <span class="math inline">\(f(x)=ax\)</span>。</p></li>
+<li><p><strong>初始状态：</strong> 参考时间 <span class="math inline">\(t_0\)</span> 处的 <span class="math inline">\(x_0\)</span>。</p></li>
+<li><p><strong>轨迹：</strong> 对所选 <span class="math inline">\(x_0\)</span>，<span class="math inline">\(t\mapsto x_0e^{a(t-t_0)}\)</span>。</p></li>
+<li><p><strong>经过时间流：</strong></p>
+<p><span class="math display">\[
+\phi_\tau(x)=xe^{a\tau}.
+\]</span></p></li>
+</ul>
+<p>该场全局利普希茨，因为</p>
+<p><span class="math display">\[
+|f(x)-f(y)|=|a|\,|x-y|.
+\]</span></p>
+<p>解对每个实数 <span class="math inline">\(t\)</span> 有限，因此该示例具有全局流。</p>
+</section>
+<section id="验证流律" class="level3">
+<h3 class="anchored" data-anchor-id="验证流律">验证流律</h3>
+<p>恒等：</p>
+<p><span class="math display">\[
+\phi_0(x)=xe^{a\cdot0}=x.
+\]</span></p>
+<p>复合：</p>
+<p><span class="math display">\[
+\begin{aligned}
+\phi_\tau\bigl(\phi_s(x)\bigr)
+&amp;=\phi_\tau(xe^{as})\\
+&amp;=(xe^{as})e^{a\tau}\\
+&amp;=xe^{a(\tau+s)}\\
+&amp;=\phi_{\tau+s}(x).
+\end{aligned}
+\]</span></p>
+<p>生成元：</p>
+<p><span class="math display">\[
+\left.\frac{d}{d\tau}\phi_\tau(x)\right|_{\tau=0}
+=
+\left.a xe^{a\tau}\right|_{\tau=0}
+=
+ax
+=
+f(x).
+\]</span></p>
+<p>该示例使三个层级显式：<span class="math inline">\(f(x)=ax\)</span> 给出瞬时变化，<span class="math inline">\(\phi_\tau(x)=xe^{a\tau}\)</span> 给出跨初始状态的有限时间演化，选择一个 <span class="math inline">\(x_0\)</span> 产生一条轨迹。</p>
+</section>
+<section id="二维旋转伸缩演练示例" class="level3">
+<h3 class="anchored" data-anchor-id="二维旋转伸缩演练示例">二维旋转–伸缩演练示例</h3>
+<p>对有界二维示例，设状态为</p>
+<p><span class="math display">\[
+z(t)=
+\begin{pmatrix}
+x(t)\\
+y(t)
+\end{pmatrix}
+\in\mathbb{R}^2
+\]</span></p>
+<p>并固定参数 <span class="math inline">\(a,\omega\in\mathbb{R}\)</span>。考虑自治 IVP</p>
+<p><span class="math display">\[
+\dot z=Az,
+\qquad
+A=
+\begin{pmatrix}
+a &amp; -\omega\\
+\omega &amp; a
+\end{pmatrix},
+\qquad
+z(t_0)=z_0.
+\]</span></p>
+<p>定义平面旋转矩阵</p>
+<p><span class="math display">\[
+R(\theta)
+=
+\begin{pmatrix}
+\cos\theta &amp; -\sin\theta\\
+\sin\theta &amp; \cos\theta
+\end{pmatrix}.
+\]</span></p>
+<p>用经过时间 <span class="math inline">\(\tau=t-t_0\)</span>，提出</p>
+<p><span class="math display">\[
+z(t_0+\tau)
+=
+e^{a\tau}R(\omega\tau)z_0.
+\]</span></p>
+<p>当 <span class="math inline">\(\omega\neq0\)</span> 时，旋转改变角位置而因子 <span class="math inline">\(e^{a\tau}\)</span> 改变半径：<span class="math inline">\(a&lt;0\)</span> 给出向内螺旋，<span class="math inline">\(a=0\)</span> 给出恒定半径旋转，<span class="math inline">\(a&gt;0\)</span> 给出向外螺旋。这些描述只关乎这个声明系统；它们不从绘制轨迹推断螺旋动力学。</p>
+<section id="验证初值与微分方程" class="level4">
+<h4 class="anchored" data-anchor-id="验证初值与微分方程">验证初值与微分方程</h4>
+<p>在零经过时间，<span class="math inline">\(e^{a\cdot0}=1\)</span> 且 <span class="math inline">\(R(0)=I\)</span>，因此</p>
+<p><span class="math display">\[
+z(t_0)=e^0R(0)z_0=z_0.
+\]</span></p>
+<p>设</p>
+<p><span class="math display">\[
+J=
+\begin{pmatrix}
+0 &amp; -1\\
+1 &amp; 0
+\end{pmatrix},
+\qquad
+A=aI+\omega J.
+\]</span></p>
+<p>对正弦与余弦条目直接微分给出</p>
+<p><span class="math display">\[
+\frac{d}{d\tau}R(\omega\tau)
+=
+\omega J R(\omega\tau).
+\]</span></p>
+<p>因为 <span class="math inline">\(d\tau/dt=1\)</span>，乘积法则给出</p>
+<p><span class="math display">\[
+\begin{aligned}
+\dot z(t_0+\tau)
+&amp;=
+e^{a\tau}
+\left[aI+\omega J\right]
+R(\omega\tau)z_0\\
+&amp;=
+A\left[e^{a\tau}R(\omega\tau)z_0\right]\\
+&amp;=Az(t_0+\tau).
+\end{aligned}
+\]</span></p>
+<p>因此所提曲线同时满足 ODE 与初始条件。</p>
+</section>
+<section id="识别数学角色-1" class="level4">
+<h4 class="anchored" data-anchor-id="识别数学角色-1">识别数学角色</h4>
+<ul>
+<li><p><strong>状态空间：</strong> <span class="math inline">\(\mathcal{X}=\mathbb{R}^2\)</span>。</p></li>
+<li><p><strong>状态值：</strong> <span class="math inline">\(z(t)=(x(t),y(t))^T\in\mathbb{R}^2\)</span>。</p></li>
+<li><p><strong>向量场：</strong> <span class="math inline">\(f(z)=Az\)</span>。</p></li>
+<li><p><strong>初始条件：</strong> <span class="math inline">\(z(t_0)=z_0\)</span>。</p></li>
+<li><p><strong>轨迹：</strong> 对所选 <span class="math inline">\(z_0\)</span>，<span class="math inline">\(t\mapsto e^{a(t-t_0)}R(\omega(t-t_0))z_0\)</span>。</p></li>
+<li><p><strong>经过时间流：</strong></p>
+<p><span class="math display">\[
+\phi_\tau(z)=e^{a\tau}R(\omega\tau)z.
+\]</span></p></li>
+</ul>
+</section>
+<section id="验证流律与全局域" class="level4">
+<h4 class="anchored" data-anchor-id="验证流律与全局域">验证流律与全局域</h4>
+<p>恒等律立即可得：</p>
+<p><span class="math display">\[
+\phi_0(z)=e^0R(0)z=z.
+\]</span></p>
+<p>使用 <span class="math inline">\(e^{a\tau}e^{as}=e^{a(\tau+s)}\)</span> 与平面旋转律 <span class="math inline">\(R(\alpha)R(\beta)=R(\alpha+\beta)\)</span> 给出</p>
+<p><span class="math display">\[
+\begin{aligned}
+\phi_\tau\bigl(\phi_s(z)\bigr)
+&amp;=
+e^{a\tau}R(\omega\tau)
+e^{as}R(\omega s)z\\
+&amp;=
+e^{a(\tau+s)}R\bigl(\omega(\tau+s)\bigr)z\\
+&amp;=
+\phi_{\tau+s}(z).
+\end{aligned}
+\]</span></p>
+<p>该场在 <span class="math inline">\(\mathbb{R}^2\)</span> 上全局利普希茨，因为对欧氏范数及其诱导矩阵范数，</p>
+<p><span class="math display">\[
+\|f(z)-f(w)\|
+=
+\|A(z-w)\|
+\leq
+\|A\|\,\|z-w\|.
+\]</span></p>
+<p>显式公式对每个 <span class="math inline">\(z\in\mathbb{R}^2\)</span> 与每个有限 <span class="math inline">\(\tau\in\mathbb{R}\)</span> 有限。因此受支持域是</p>
+<p><span class="math display">\[
+W=\mathbb{R}\times\mathbb{R}^2,
+\]</span></p>
+<p>所以该系统具有全局双侧流。每个 <span class="math inline">\(\phi_\tau\)</span> 是逆为 <span class="math inline">\(\phi_{-\tau}\)</span> 的全局定义双射。<span class="math inline">\(a&gt;0\)</span> 时向外增长在 <span class="math inline">\(\tau\to\infty\)</span> 时无界，但不造成有限时间爆破。</p>
+</section>
+</section>
+<section id="为什么唯一性假设重要" class="level3">
+<h3 class="anchored" data-anchor-id="为什么唯一性假设重要">为什么唯一性假设重要</h3>
+<p>现在考虑</p>
+<p><span class="math display">\[
+\dot{x}=\sqrt{|x|},
+\qquad
+x(0)=0,
+\qquad
+\mathcal{X}=\mathbb{R}.
+\]</span></p>
+<p>向量场 <span class="math inline">\(f(x)=\sqrt{|x|}\)</span> 连续，因此 Peano 定理保证穿过 <span class="math inline">\((0,0)\)</span> 至少一个局部解。它在 <span class="math inline">\(0\)</span> 处不局部利普希茨，因为对 <span class="math inline">\(x\neq0\)</span>，</p>
+<p><span class="math display">\[
+\frac{|f(x)-f(0)|}{|x-0|}
+=
+\frac{\sqrt{|x|}}{|x|}
+=
+\frac{1}{\sqrt{|x|}},
+\]</span></p>
+<p>在 <span class="math inline">\(x\to0\)</span> 时无界。</p>
+<p>一个解是</p>
+<p><span class="math display">\[
+x(t)=0.
+\]</span></p>
+<p>对每个等待时间 <span class="math inline">\(c\geq0\)</span>，另一个解是</p>
+<p><span class="math display">\[
+x_c(t)=
+\begin{cases}
+0, &amp; t\leq c,\\
+\dfrac{(t-c)^2}{4}, &amp; t\geq c.
+\end{cases}
+\]</span></p>
+<p>对 <span class="math inline">\(t&lt;c\)</span>，<span class="math inline">\(\dot{x}_c(t)\)</span> 与 <span class="math inline">\(\sqrt{|x_c(t)|}\)</span> 都为零。对 <span class="math inline">\(t&gt;c\)</span>，</p>
+<p><span class="math display">\[
+\dot{x}_c(t)=\frac{t-c}{2}
+=
+\sqrt{\frac{(t-c)^2}{4}}
+=
+\sqrt{|x_c(t)|}.
+\]</span></p>
+<p>在 <span class="math inline">\(t=c\)</span>，左右导数都为零，因此 <span class="math inline">\(x_c\)</span> 在那里可微。因为 <span class="math inline">\(c\geq0\)</span>，每条这样的曲线也满足 <span class="math inline">\(x_c(0)=0\)</span>。因此同一 IVP 有无限多个解。这是 Teschl 平方根示例展示的标准非唯一性机制 <span class="citation" data-cites="Teschl2012">(<a href="#ref-Teschl2012" role="doc-biblioref">Teschl 2012年</a>, sec.&nbsp;1.3)</span>。</p>
+<p>教训是精确的：连续性在此支持存在性，但失败的局部利普希茨条件移除基本唯一性保证。因此 ODE 与初始状态单独不在正经过时间后确定唯一值 <span class="math inline">\(\phi_\tau(0)\)</span>，从而不诱导唯一确定的单值流。</p>
+</section>
+</section>
+<section id="常见错误" class="level2">
+<h2 class="anchored" data-anchor-id="常见错误">常见错误</h2>
+<ol type="1">
+<li><strong>把方程当作曲线而非约束。</strong> 表达式 <span class="math inline">\(\dot{x}=f(x)\)</span> 指定哪些可微曲线有资格作为解；它本身不是一条轨迹。</li>
+<li><strong>把存在性与唯一性等同。</strong> 连续场可以承认解，而不从初始状态选择恰好一个解。</li>
+<li><strong>把局部与全局等同。</strong> 局部利普希茨连续性给出局部存在性与唯一性，从而唯一极大延拓，而非全时解。</li>
+<li><strong>忽略声明域。</strong> 解必须保持在 <span class="math inline">\(\mathcal{X}\)</span> 内。到达其边界可以在坐标值保持有界时结束极大解。</li>
+<li><strong>互换使用 <span class="math inline">\(t\)</span> 与 <span class="math inline">\(\tau\)</span>。</strong> 时钟时间相对 <span class="math inline">\(t_0\)</span> 标记轨迹；经过时间索引自治演化映射。</li>
+<li><strong>把一条轨迹称为流。</strong> 一个固定 <span class="math inline">\(x_0\)</span> 给出一条轨迹。流组织跨多个初始状态的演化，并必须在定义处满足恒等与复合。</li>
+<li><strong>假设每个向量场都有全局流。</strong> 即使光滑向量场也可以有限时间爆破。</li>
+<li><strong>从显示推断场。</strong> 绘制曲线或拟合箭头场本身不是唯一自治机制的证据。</li>
+</ol>
+<p>该形式体系也<strong>并不</strong>蕴含：</p>
+<ul>
+<li>每个观测时间序列都是动力系统轨迹；</li>
+<li>每个时变潜表示都承认有效自治向量场；</li>
+<li>一条观测轨迹唯一确定向量场，无论在未完全采样状态之外或沿其；</li>
+<li>多条相似轨迹证明一个共享流；</li>
+<li>预测成功确立机制正确性；</li>
+<li>推断潜状态是唯一真实物理状态；</li>
+<li>所有系统自治或连续时间；</li>
+<li>所有科学相关状态空间欧氏；或</li>
+<li>所有向量场生成全局流。</li>
+</ul>
+</section>
+<section id="计算解释" class="level2">
+<h2 class="anchored" data-anchor-id="计算解释">计算解释</h2>
+<p>给定声明 <span class="math inline">\(f\)</span>、<span class="math inline">\(x_0\)</span> 与 <span class="math inline">\(t_0\)</span>，数值 ODE 求解器在请求时间区间上近似一条解轨迹。步长、误差控制、刚度、域边界与有限时间发散影响计算是否可靠。数值输出不取代此处处理的解析问题：解是否存在、是否唯一，以及请求区间是否位于其极大域内。</p>
+<p>流视角在计算上对应为许多初始状态与经过时间求解相同 ODE。有限模拟网格采样所提出的流；它不是完整映射 <span class="math inline">\(\Phi:W\to\mathcal{X}\)</span>。同样，从数据估计 <span class="math inline">\(f\)</span> 是涉及采样、观测、噪声、可辨识性与基线的单独方法问题。它不是本数学定义的一部分。</p>
+</section>
+<section id="与-ldg-的关系" class="level2">
+<h2 class="anchored" data-anchor-id="与-ldg-的关系">与 LDG 的关系</h2>
+<p>本对象形式化而非取代六个 Cycle 1 概念：</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>概念</th>
+<th>在自治 IVP 中的形式角色</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><a href="../../../zh/knowledge/concepts/state.html">State</a></td>
+<td><span class="math inline">\(x(t)\)</span> 是时钟时间 <span class="math inline">\(t\)</span> 携带的状态值。</td>
+</tr>
+<tr class="even">
+<td><a href="../../../zh/knowledge/concepts/state-space.html">State Space</a></td>
+<td><span class="math inline">\(x(t)\in\mathcal{X}\subseteq\mathbb{R}^n\)</span>。</td>
+</tr>
+<tr class="odd">
+<td><a href="../../../zh/knowledge/concepts/initial-condition.html">Initial Condition</a></td>
+<td><span class="math inline">\(x(t_0)=x_0\)</span> 在参考时间锚定演化。</td>
+</tr>
+<tr class="even">
+<td><a href="../../../zh/knowledge/concepts/vector-field.html">Vector Field</a></td>
+<td><span class="math inline">\(f:\mathcal{X}\to\mathbb{R}^n\)</span> 赋予瞬时变化。</td>
+</tr>
+<tr class="odd">
+<td><a href="../../../zh/knowledge/concepts/trajectory.html">Trajectory</a></td>
+<td><span class="math inline">\(t\mapsto x(t)\)</span> 是唯一性成立时由初始条件选择的一个解。</td>
+</tr>
+<tr class="even">
+<td><a href="../../../zh/knowledge/concepts/flow.html">Flow</a></td>
+<td><span class="math inline">\((\tau,x_0)\mapsto\phi_\tau(x_0)\)</span> 组织跨受支持初始状态的有限时间演化。</td>
+</tr>
+</tbody>
+</table>
+<p>对 LDG，主要方法学边界是声明 ODE 模型内的数学自洽不是测得神经、行为或潜变量遵循该模型的经验证据。后续玩具模型可以使用本对象指定已知真值。真实数据主张将额外需要论证状态描述、观测模型、估计规程、更简单基线与区分自治共享规则与输入、非平稳性、被省略状态和测量伪迹的检验。</p>
+</section>
+<section id="参考文献" class="level2">
+<h2 class="anchored" data-anchor-id="参考文献">参考文献</h2>
+<ul>
+<li>IVP 解的存在性、唯一性、光滑性、积分形式与延拓：<span class="citation" data-cites="Teschl2012">(<a href="#ref-Teschl2012" role="doc-biblioref">Teschl 2012年</a>, ch.&nbsp;2)</span>。</li>
+<li>演示全局演化、有限时间爆破与非唯一性的标量自治示例：<span class="citation" data-cites="Teschl2012">(<a href="#ref-Teschl2012" role="doc-biblioref">Teschl 2012年</a>, sec.&nbsp;1.3)</span>。</li>
+<li>极大积分曲线、受支持域 <span class="math inline">\(W\)</span>、局部流复合与无穷小生成元：<span class="citation" data-cites="Teschl2012">(<a href="#ref-Teschl2012" role="doc-biblioref">Teschl 2012年</a>, sec.&nbsp;6.2)</span>。</li>
+</ul>
+</section>
+<section id="成熟度检查表" class="level2">
+<h2 class="anchored" data-anchor-id="成熟度检查表">成熟度检查表</h2>
+<ul class="task-list">
+<li><label><input type="checkbox" checked="">使用六个稳定 Cycle 1 概念作为规范前置知识。</label></li>
+<li><label><input type="checkbox" checked="">以良类型化定义域与值域陈述自治欧氏 IVP。</label></li>
+<li><label><input type="checkbox" checked="">分离连续性、局部利普希茨连续性与更强光滑性。</label></li>
+<li><label><input type="checkbox" checked="">区分存在性与唯一性，以及局部、极大与全局解。</label></li>
+<li><label><input type="checkbox" checked="">定义受支持局部流域，并只在定义处陈述恒等与复合。</label></li>
+<li><label><input type="checkbox" checked="">通过零点导数把可微局部流与其向量场联系起来。</label></li>
+<li><label><input type="checkbox" checked="">包含并验证完整 <span class="math inline">\(\dot{x}=ax\)</span> 轨迹与流推导。</label></li>
+<li><label><input type="checkbox" checked="">包含解析检查的二维旋转–伸缩轨迹与全局流。</label></li>
+<li><label><input type="checkbox" checked="">包含检查的非唯一性示例与有界有限时间爆破边界。</label></li>
+<li><label><input type="checkbox" checked="">陈述经验与建模非蕴含，而不进入被排除的下游主题。</label></li>
+<li><label><input type="checkbox" checked="">完成一次内部数学一致性 / 红队遍历。</label></li>
+<li><label><input type="checkbox" checked="">应用独立 L2 数学审查的有界修正。</label></li>
+<li><label><input type="checkbox" checked="">独立聚焦复审确认修订陈述；所有者于 2026-08-18 批准晋升为 <code>L2</code> / <code>stable</code>。</label></li>
+</ul>
+
+
+<!-- -->
+
+
+</section>
+</section>
+
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography" id="quarto-bibliography"><h2 class="anchored quarto-appendix-heading">参考文献</h2><div id="refs" class="references csl-bib-body hanging-indent" role="list">
+<div id="ref-Teschl2012" class="csl-entry" role="listitem">
+Teschl, Gerald. 2012年. <em>Ordinary Differential Equations and Dynamical Systems</em>. 卷 140. Graduate Studies in Mathematics. American Mathematical Society. <a href="https://doi.org/10.1090/gsm/140">https://doi.org/10.1090/gsm/140</a>.
+</div>
+</div></section></div></main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "已复制");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "已复制");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+    const viewSource = window.document.getElementById('quarto-view-source') ||
+                       window.document.getElementById('quarto-code-tools-source');
+    if (viewSource) {
+      const sourceUrl = viewSource.getAttribute("data-quarto-source-url");
+      viewSource.addEventListener("click", function(e) {
+        if (sourceUrl) {
+          // rstudio viewer pane
+          if (/\bcapabilities=\b/.test(window.location)) {
+            window.open(sourceUrl);
+          } else {
+            window.location.href = sourceUrl;
+          }
+        } else {
+          const modal = new bootstrap.Modal(document.getElementById('quarto-embedded-source-code-modal'));
+          modal.show();
+        }
+        return false;
+      });
+    }
+    function toggleCodeHandler(show) {
+      return function(e) {
+        const cellDetails = window.document.querySelectorAll(".cell details.code-fold");
+        for (let i=0; i<cellDetails.length; i++) {
+          const details = cellDetails[i];
+          if (show) {
+            details.open = true;
+          } else {
+            details.removeAttribute("open");
+          }
+        }
+        const cellCodeDivs = window.document.querySelectorAll(".cell div.sourceCode.cell-code");
+        const fromCls = show ? "hidden" : "unhidden";
+        const toCls = show ? "unhidden" : "hidden";
+        for (let i=0; i<cellCodeDivs.length; i++) {
+          const codeDiv = cellCodeDivs[i];
+          if (codeDiv.classList.contains(fromCls)) {
+            codeDiv.classList.remove(fromCls);
+            codeDiv.classList.add(toCls);
+          } 
+        }
+        return false;
+      }
+    }
+    const hideAllCode = window.document.getElementById("quarto-hide-all-code");
+    if (hideAllCode) {
+      hideAllCode.addEventListener("click", toggleCodeHandler(false));
+    }
+    const showAllCode = window.document.getElementById("quarto-show-all-code");
+    if (showAllCode) {
+      showAllCode.addEventListener("click", toggleCodeHandler(true));
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/abelzheng\.github\.io\/latent-dynamics-geometry-public\/");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+            // target, if specified
+            link.setAttribute("target", "_blank");
+            if (link.getAttribute("rel") === null) {
+              link.setAttribute("rel", "noopener");
+            }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">源代码</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1" data-shortcodes="false"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="an">title:</span><span class="co"> "一阶自治动力系统"</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="an">lang:</span><span class="co"> zh-CN</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="an">comments:</span><span class="co"> false</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="an">object_type:</span><span class="co"> math</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="an">maturity:</span><span class="co"> L2</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="an">status:</span><span class="co"> stable</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="an">domain:</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="co">- foundations</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="co">- dynamics</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="an">tags:</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="co">- autonomous-ode</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="co">- initial-value-problem</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="co">- existence-uniqueness</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="co">- local-flow</span></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="an">prerequisites:</span></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="co">- knowledge/concepts/state.qmd</span></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a><span class="co">- knowledge/concepts/state-space.qmd</span></span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a><span class="co">- knowledge/concepts/trajectory.qmd</span></span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a><span class="co">- knowledge/concepts/initial-condition.qmd</span></span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a><span class="co">- knowledge/concepts/vector-field.qmd</span></span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a><span class="co">- knowledge/concepts/flow.qmd</span></span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a><span class="an">related:</span><span class="co"> []</span></span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a><span class="an">created:</span><span class="co"> 2026-08-17</span></span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a><span class="an">updated:</span><span class="co"> 2026-08-19</span></span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a><span class="fu"># 一阶自治动力系统</span></span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a><span class="fu">## 为什么需要它</span></span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>六个 Cycle 1 概念区分 <span class="co">[</span><span class="ot">state</span><span class="co">](../concepts/state.qmd)</span>、其 <span class="co">[</span><span class="ot">state space</span><span class="co">](../concepts/state-space.qmd)</span>、<span class="co">[</span><span class="ot">trajectory</span><span class="co">](../concepts/trajectory.qmd)</span>、<span class="co">[</span><span class="ot">initial condition</span><span class="co">](../concepts/initial-condition.qmd)</span>、<span class="co">[</span><span class="ot">vector field</span><span class="co">](../concepts/vector-field.qmd)</span> 与 <span class="co">[</span><span class="ot">flow</span><span class="co">](../concepts/flow.qmd)</span>。本数学对象把这些角色连接在一个可复用连续时间表述中：</span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a>\frac{dx}{dt}=f(x),</span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a>\qquad</span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a>x(t_0)=x_0.</span>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a>微分方程不只是绘制曲线的紧凑描述。它是对未知可微状态轨迹的约束。存在性、唯一性、延拓与有限时间流陈述需要单独假设。在后续 LDG 工作可以把自治 ODE 用作生成模型或恢复目标之前，使这些假设显式是必要的。</span>
+<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a>范围刻意很窄：$\mathcal{X}$ 是 $\mathbb{R}^n$ 的开子集，时间是连续的，规则是确定性与自治的。离散时间、随机、输入驱动、显式时间相关与非欧氏系统在本对象之外。</span>
+<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a><span class="fu">## 前置知识</span></span>
+<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="co">[</span><span class="ot">State</span><span class="co">](../concepts/state.qmd)</span>：模型在一个时间携带的状态值。</span>
+<span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="co">[</span><span class="ot">State Space</span><span class="co">](../concepts/state-space.qmd)</span>：该状态的可取值。</span>
+<span id="cb1-48"><a href="#cb1-48" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="co">[</span><span class="ot">Trajectory</span><span class="co">](../concepts/trajectory.qmd)</span>：一条以时间为参数的演化。</span>
+<span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="co">[</span><span class="ot">Initial Condition</span><span class="co">](../concepts/initial-condition.qmd)</span>：赋值 $x(t_0)=x_0$。</span>
+<span id="cb1-50"><a href="#cb1-50" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="co">[</span><span class="ot">Vector Field</span><span class="co">](../concepts/vector-field.qmd)</span>：瞬时状态变化规则。</span>
+<span id="cb1-51"><a href="#cb1-51" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="co">[</span><span class="ot">Flow</span><span class="co">](../concepts/flow.qmd)</span>：跨受支持初始状态的有限时间演化。</span>
+<span id="cb1-52"><a href="#cb1-52" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-53"><a href="#cb1-53" aria-hidden="true" tabindex="-1"></a>**假定背景：** 初等集合、函数、欧氏向量、单变量微分与积分、链式法则与函数复合。</span>
+<span id="cb1-54"><a href="#cb1-54" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-55"><a href="#cb1-55" aria-hidden="true" tabindex="-1"></a><span class="fu">## 定义</span></span>
+<span id="cb1-56"><a href="#cb1-56" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-57"><a href="#cb1-57" aria-hidden="true" tabindex="-1"></a><span class="fu">### 系统与解</span></span>
+<span id="cb1-58"><a href="#cb1-58" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-59"><a href="#cb1-59" aria-hidden="true" tabindex="-1"></a>设</span>
+<span id="cb1-60"><a href="#cb1-60" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-61"><a href="#cb1-61" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-62"><a href="#cb1-62" aria-hidden="true" tabindex="-1"></a>\mathcal{X}\subseteq\mathbb{R}^n</span>
+<span id="cb1-63"><a href="#cb1-63" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-64"><a href="#cb1-64" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-65"><a href="#cb1-65" aria-hidden="true" tabindex="-1"></a>是开的，并设</span>
+<span id="cb1-66"><a href="#cb1-66" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-67"><a href="#cb1-67" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-68"><a href="#cb1-68" aria-hidden="true" tabindex="-1"></a>f:\mathcal{X}\rightarrow\mathbb{R}^n.</span>
+<span id="cb1-69"><a href="#cb1-69" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-70"><a href="#cb1-70" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-71"><a href="#cb1-71" aria-hidden="true" tabindex="-1"></a>方程</span>
+<span id="cb1-72"><a href="#cb1-72" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-73"><a href="#cb1-73" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-74"><a href="#cb1-74" aria-hidden="true" tabindex="-1"></a>\dot{x}=f(x)</span>
+<span id="cb1-75"><a href="#cb1-75" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-76"><a href="#cb1-76" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-77"><a href="#cb1-77" aria-hidden="true" tabindex="-1"></a>是**一阶自治常微分方程**。它是一阶的，因为最高阶导数是 $\dot{x}$；它是自治的，因为右侧依赖当前状态 $x$ 而不显式依赖时钟时间 $t$。</span>
+<span id="cb1-78"><a href="#cb1-78" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-79"><a href="#cb1-79" aria-hidden="true" tabindex="-1"></a>区间 $I\subseteq\mathbb{R}$ 上的**解**是可微曲线</span>
+<span id="cb1-80"><a href="#cb1-80" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-81"><a href="#cb1-81" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-82"><a href="#cb1-82" aria-hidden="true" tabindex="-1"></a>x:I\rightarrow\mathcal{X}</span>
+<span id="cb1-83"><a href="#cb1-83" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-84"><a href="#cb1-84" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-85"><a href="#cb1-85" aria-hidden="true" tabindex="-1"></a>使得对每个 $t\in I$，</span>
+<span id="cb1-86"><a href="#cb1-86" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-87"><a href="#cb1-87" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-88"><a href="#cb1-88" aria-hidden="true" tabindex="-1"></a>\dot{x}(t)=f\bigl(x(t)\bigr).</span>
+<span id="cb1-89"><a href="#cb1-89" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-90"><a href="#cb1-90" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-91"><a href="#cb1-91" aria-hidden="true" tabindex="-1"></a>因此 $x(t)$ 是 $\mathcal{X}$ 中的状态值，而 $\dot{x}(t)$ 与 $f(x(t))$ 都是 $\mathbb{R}^n$ 中的向量。方程要求轨迹在每个访问状态与 $f$ 赋予的向量相切。</span>
+<span id="cb1-92"><a href="#cb1-92" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-93"><a href="#cb1-93" aria-hidden="true" tabindex="-1"></a><span class="fu">### 初值问题</span></span>
+<span id="cb1-94"><a href="#cb1-94" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-95"><a href="#cb1-95" aria-hidden="true" tabindex="-1"></a>对参考时间 $t_0$ 与初始状态 $x_0\in\mathcal{X}$，**初值问题**（IVP）是</span>
+<span id="cb1-96"><a href="#cb1-96" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-97"><a href="#cb1-97" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-98"><a href="#cb1-98" aria-hidden="true" tabindex="-1"></a>\dot{x}=f(x),</span>
+<span id="cb1-99"><a href="#cb1-99" aria-hidden="true" tabindex="-1"></a>\qquad</span>
+<span id="cb1-100"><a href="#cb1-100" aria-hidden="true" tabindex="-1"></a>x(t_0)=x_0.</span>
+<span id="cb1-101"><a href="#cb1-101" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-102"><a href="#cb1-102" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-103"><a href="#cb1-103" aria-hidden="true" tabindex="-1"></a>IVP 的解必须同时满足微分方程与初始条件。规则 $f$ 描述其定义域上可能的瞬时演化；初始条件选择在 $t_0$ 穿过 $x_0$ 的解或解集。</span>
+<span id="cb1-104"><a href="#cb1-104" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-105"><a href="#cb1-105" aria-hidden="true" tabindex="-1"></a><span class="fu">### 局部、极大与全局解</span></span>
+<span id="cb1-106"><a href="#cb1-106" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-107"><a href="#cb1-107" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**局部解**定义在包含 $t_0$ 的开区间 $I$ 上。</span>
+<span id="cb1-108"><a href="#cb1-108" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>如果解不能延拓到严格更大区间同时保持为 $\mathcal{X}$ 中的解，则它是**极大**的。如果 IVP 承认唯一局部解——即局部解存在且任何两个兼容局部解在其公共定义域上一致——那些局部片段组装成开极大区间</span>
+<span id="cb1-109"><a href="#cb1-109" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-110"><a href="#cb1-110" aria-hidden="true" tabindex="-1"></a>  $$</span>
+<span id="cb1-111"><a href="#cb1-111" aria-hidden="true" tabindex="-1"></a>  I_{t_0,x_0}=(T_-(t_0,x_0),T_+(t_0,x_0)).</span>
+<span id="cb1-112"><a href="#cb1-112" aria-hidden="true" tabindex="-1"></a>  $$</span>
+<span id="cb1-113"><a href="#cb1-113" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-114"><a href="#cb1-114" aria-hidden="true" tabindex="-1"></a>  上的唯一极大解。</span>
+<span id="cb1-115"><a href="#cb1-115" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>本对象全时设定中的**全局解**对每个 $t\in\mathbb{R}$ 有定义，因此其极大区间是 $\mathbb{R}$。</span>
+<span id="cb1-116"><a href="#cb1-116" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-117"><a href="#cb1-117" aria-hidden="true" tabindex="-1"></a>局部存在性与唯一性不蕴含全局存在性。在相同局部可解性假设下，如果极大解具有有限前向端点 $T_+$，则当 $t\uparrow T_+$ 时它最终离开 $\mathcal{X}$ 的每个紧子集。当 $\mathcal{X}=\mathbb{R}^n$ 时，这意味着 $<span class="sc">\|</span>x(t)<span class="sc">\|</span>\to\infty$。在真开域上，轨迹可以保持有界同时接近 $\mathcal{X}$ 的补集；它不必收敛到某个特定边界点。类似陈述在有限后向端点成立。Teschl 把局部可解性与极大延拓分开，并明确陈述该紧集准则 <span class="co">[</span><span class="ot">@Teschl2012, secs. 2.2, 2.6</span><span class="co">]</span>。</span>
+<span id="cb1-118"><a href="#cb1-118" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-119"><a href="#cb1-119" aria-hidden="true" tabindex="-1"></a><span class="fu">### 有限时间演化与局部流</span></span>
+<span id="cb1-120"><a href="#cb1-120" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-121"><a href="#cb1-121" aria-hidden="true" tabindex="-1"></a>从初始条件度量时间是有用的。把</span>
+<span id="cb1-122"><a href="#cb1-122" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-123"><a href="#cb1-123" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-124"><a href="#cb1-124" aria-hidden="true" tabindex="-1"></a>\tau=t-t_0</span>
+<span id="cb1-125"><a href="#cb1-125" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-126"><a href="#cb1-126" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-127"><a href="#cb1-127" aria-hidden="true" tabindex="-1"></a>写为**经过时间**。对每个 $x\in\mathcal{X}$，假设在经过时间 0 穿过 $x$ 的唯一极大解定义在包含 $0$ 的区间 $I_x$ 上。定义</span>
+<span id="cb1-128"><a href="#cb1-128" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-129"><a href="#cb1-129" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-130"><a href="#cb1-130" aria-hidden="true" tabindex="-1"></a>W=<span class="sc">\{</span>(\tau,x)\in\mathbb{R}\times\mathcal{X}:\tau\in I_x<span class="sc">\}</span>.</span>
+<span id="cb1-131"><a href="#cb1-131" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-132"><a href="#cb1-132" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-133"><a href="#cb1-133" aria-hidden="true" tabindex="-1"></a>集合 $W$ 记录哪些经过时间/状态对受支持。它不必等于 $\mathbb{R}\times\mathcal{X}$：状态可以只支持有限的前向或后向演化区间。对固定经过时间 $\tau$，有限时间映射具有类型化定义域</span>
+<span id="cb1-134"><a href="#cb1-134" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-135"><a href="#cb1-135" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-136"><a href="#cb1-136" aria-hidden="true" tabindex="-1"></a>\operatorname{dom}(\phi_\tau)</span>
+<span id="cb1-137"><a href="#cb1-137" aria-hidden="true" tabindex="-1"></a>=</span>
+<span id="cb1-138"><a href="#cb1-138" aria-hidden="true" tabindex="-1"></a><span class="sc">\{</span>x\in\mathcal{X}:(\tau,x)\in W<span class="sc">\}</span>.</span>
+<span id="cb1-139"><a href="#cb1-139" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-140"><a href="#cb1-140" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-141"><a href="#cb1-141" aria-hidden="true" tabindex="-1"></a><span class="fu">#### 层级 1：单值局部有限时间演化</span></span>
+<span id="cb1-142"><a href="#cb1-142" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-143"><a href="#cb1-143" aria-hidden="true" tabindex="-1"></a>在局部存在性与唯一性下，极大解定义单值映射</span>
+<span id="cb1-144"><a href="#cb1-144" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-145"><a href="#cb1-145" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-146"><a href="#cb1-146" aria-hidden="true" tabindex="-1"></a>\Phi:W\rightarrow\mathcal{X},</span>
+<span id="cb1-147"><a href="#cb1-147" aria-hidden="true" tabindex="-1"></a>\qquad</span>
+<span id="cb1-148"><a href="#cb1-148" aria-hidden="true" tabindex="-1"></a>(\tau,x)\mapsto\Phi(\tau,x)=\phi_\tau(x).</span>
+<span id="cb1-149"><a href="#cb1-149" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-150"><a href="#cb1-150" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-151"><a href="#cb1-151" aria-hidden="true" tabindex="-1"></a>该局部演化族满足</span>
+<span id="cb1-152"><a href="#cb1-152" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-153"><a href="#cb1-153" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-154"><a href="#cb1-154" aria-hidden="true" tabindex="-1"></a>\phi_0(x)=x</span>
+<span id="cb1-155"><a href="#cb1-155" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-156"><a href="#cb1-156" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-157"><a href="#cb1-157" aria-hidden="true" tabindex="-1"></a>且只要各项有定义，</span>
+<span id="cb1-158"><a href="#cb1-158" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-159"><a href="#cb1-159" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-160"><a href="#cb1-160" aria-hidden="true" tabindex="-1"></a>\phi_{\tau+s}(x)=\phi_\tau\bigl(\phi_s(x)\bigr).</span>
+<span id="cb1-161"><a href="#cb1-161" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-162"><a href="#cb1-162" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-163"><a href="#cb1-163" aria-hidden="true" tabindex="-1"></a>更显式地，如果 $s\in I_x$ 且 $\tau\in I_{\phi_s(x)}$，则 $s+\tau\in I_x$，且先演化 $s$ 再演化 $\tau$ 与演化组合经过时间 $s+\tau$ 一致。这些代数性质来自自治性与唯一性。它们本身不断言在 $(\tau,x)$ 上的联合连续性或可微性。</span>
+<span id="cb1-164"><a href="#cb1-164" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-165"><a href="#cb1-165" aria-hidden="true" tabindex="-1"></a>当 $f$ 局部利普希茨时它是连续的，因此每条单个曲线 $\tau\mapsto\phi_\tau(x)$ 对经过时间 $C^1$ 且满足</span>
+<span id="cb1-166"><a href="#cb1-166" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-167"><a href="#cb1-167" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-168"><a href="#cb1-168" aria-hidden="true" tabindex="-1"></a>\frac{d}{d\tau}\phi_\tau(x)</span>
+<span id="cb1-169"><a href="#cb1-169" aria-hidden="true" tabindex="-1"></a>=</span>
+<span id="cb1-170"><a href="#cb1-170" aria-hidden="true" tabindex="-1"></a>f\bigl(\phi_\tau(x)\bigr).</span>
+<span id="cb1-171"><a href="#cb1-171" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-172"><a href="#cb1-172" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-173"><a href="#cb1-173" aria-hidden="true" tabindex="-1"></a>特别地，</span>
+<span id="cb1-174"><a href="#cb1-174" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-175"><a href="#cb1-175" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-176"><a href="#cb1-176" aria-hidden="true" tabindex="-1"></a>\left.\frac{d}{d\tau}\phi_\tau(x)\right|_{\tau=0}</span>
+<span id="cb1-177"><a href="#cb1-177" aria-hidden="true" tabindex="-1"></a>=</span>
+<span id="cb1-178"><a href="#cb1-178" aria-hidden="true" tabindex="-1"></a>f(x).</span>
+<span id="cb1-179"><a href="#cb1-179" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-180"><a href="#cb1-180" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-181"><a href="#cb1-181" aria-hidden="true" tabindex="-1"></a>这是沿一条轨迹对 $\tau$ 的可微性；它尚不是对初始状态 $x$ 可微性的主张。</span>
+<span id="cb1-182"><a href="#cb1-182" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-183"><a href="#cb1-183" aria-hidden="true" tabindex="-1"></a><span class="fu">#### 层级 2：联合 $C^1$ 局部流</span></span>
+<span id="cb1-184"><a href="#cb1-184" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-185"><a href="#cb1-185" aria-hidden="true" tabindex="-1"></a>如果 $f\in C^1(\mathcal{X},\mathbb{R}^n)$，Teschl 的光滑依赖结果给出 $W$ 是开的，且联合映射</span>
+<span id="cb1-186"><a href="#cb1-186" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-187"><a href="#cb1-187" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-188"><a href="#cb1-188" aria-hidden="true" tabindex="-1"></a>\Phi:W\rightarrow\mathcal{X},</span>
+<span id="cb1-189"><a href="#cb1-189" aria-hidden="true" tabindex="-1"></a>\qquad</span>
+<span id="cb1-190"><a href="#cb1-190" aria-hidden="true" tabindex="-1"></a>(\tau,x)\mapsto\Phi(\tau,x)=\phi_\tau(x),</span>
+<span id="cb1-191"><a href="#cb1-191" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-192"><a href="#cb1-192" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-193"><a href="#cb1-193" aria-hidden="true" tabindex="-1"></a>对经过时间与初始状态联合 $C^1$。在采用的 LDG 约定下，这个联合 $C^1$ 映射连同上述恒等与复合律是 $f$ 生成的**局部流**。更一般地，$f\in C^k$ 且 $k\geq1$ 给出联合 $C^k$ 局部流映射 <span class="co">[</span><span class="ot">@Teschl2012, sec. 6.2</span><span class="co">]</span>。</span>
+<span id="cb1-194"><a href="#cb1-194" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-195"><a href="#cb1-195" aria-hidden="true" tabindex="-1"></a><span class="fu">## 记号</span></span>
+<span id="cb1-196"><a href="#cb1-196" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-197"><a href="#cb1-197" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> 符号 <span class="pp">|</span> 角色 <span class="pp">|</span></span>
+<span id="cb1-198"><a href="#cb1-198" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|</span></span>
+<span id="cb1-199"><a href="#cb1-199" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> $\mathcal{X}\subseteq\mathbb{R}^n$ <span class="pp">|</span> 开欧氏状态空间域。 <span class="pp">|</span></span>
+<span id="cb1-200"><a href="#cb1-200" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> $x\in\mathcal{X}$ <span class="pp">|</span> 一个可取状态值。 <span class="pp">|</span></span>
+<span id="cb1-201"><a href="#cb1-201" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> $x(t)$ <span class="pp">|</span> 一条轨迹上时钟时间 $t$ 的状态值。 <span class="pp">|</span></span>
+<span id="cb1-202"><a href="#cb1-202" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> $t_0$ <span class="pp">|</span> IVP 的参考时钟时间。 <span class="pp">|</span></span>
+<span id="cb1-203"><a href="#cb1-203" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> $x_0$ <span class="pp">|</span> 满足 $x(t_0)=x_0$ 的初始状态。 <span class="pp">|</span></span>
+<span id="cb1-204"><a href="#cb1-204" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> $f:\mathcal{X}\to\mathbb{R}^n$ <span class="pp">|</span> 自治向量场。 <span class="pp">|</span></span>
+<span id="cb1-205"><a href="#cb1-205" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> $\dot{x}(t)$ <span class="pp">|</span> 轨迹的瞬时导数。 <span class="pp">|</span></span>
+<span id="cb1-206"><a href="#cb1-206" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> $I_{t_0,x_0}$ <span class="pp">|</span> 穿过 $(t_0,x_0)$ 的解的极大时钟时间区间。 <span class="pp">|</span></span>
+<span id="cb1-207"><a href="#cb1-207" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> $\tau=t-t_0$ <span class="pp">|</span> 相对参考时间的经过时间。 <span class="pp">|</span></span>
+<span id="cb1-208"><a href="#cb1-208" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> $I_x$ <span class="pp">|</span> 在 $\tau=0$ 穿过 $x$ 的解的极大经过时间区间。 <span class="pp">|</span></span>
+<span id="cb1-209"><a href="#cb1-209" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> $W$ <span class="pp">|</span> 受支持的经过时间/状态对 $(\tau,x)$。 <span class="pp">|</span></span>
+<span id="cb1-210"><a href="#cb1-210" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> $\operatorname{dom}(\phi_\tau)$ <span class="pp">|</span> 满足 $(\tau,x)\in W$ 的状态 $x$。 <span class="pp">|</span></span>
+<span id="cb1-211"><a href="#cb1-211" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> $\Phi(\tau,x)=\phi_\tau(x)$ <span class="pp">|</span> 单值局部有限时间演化；当 $f\in C^1$ 时联合 $C^1$。 <span class="pp">|</span></span>
+<span id="cb1-212"><a href="#cb1-212" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-213"><a href="#cb1-213" aria-hidden="true" tabindex="-1"></a>时钟时间 $t$ 把状态定位在特定轨迹上。经过时间 $\tau$ 索引自治规则推进初始状态多远。自治性使得相同单参数记号 $\phi_\tau$ 可以不依赖 $t_0$ 数值使用。</span>
+<span id="cb1-214"><a href="#cb1-214" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-215"><a href="#cb1-215" aria-hidden="true" tabindex="-1"></a><span class="fu">## 主要结果 / 表述</span></span>
+<span id="cb1-216"><a href="#cb1-216" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-217"><a href="#cb1-217" aria-hidden="true" tabindex="-1"></a><span class="fu">### 正则性阶梯</span></span>
+<span id="cb1-218"><a href="#cb1-218" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-219"><a href="#cb1-219" aria-hidden="true" tabindex="-1"></a>公式 $\dot{x}=f(x)$ 本身不解决解是否存在、唯一或全局持续。对上述开欧氏域，以下充分条件构成有用阶梯。</span>
+<span id="cb1-220"><a href="#cb1-220" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-221"><a href="#cb1-221" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> 对 $f$ 的假设 <span class="pp">|</span> 此处使用的推论 <span class="pp">|</span> 不自动获得的内容 <span class="pp">|</span></span>
+<span id="cb1-222"><a href="#cb1-222" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|---|</span></span>
+<span id="cb1-223"><a href="#cb1-223" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> $f$ 是任意映射 <span class="pp">|</span> 表达式给每个状态赋予候选瞬时向量。 <span class="pp">|</span> 甚至局部存在性也不保证。 <span class="pp">|</span></span>
+<span id="cb1-224"><a href="#cb1-224" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> $f$ 连续 <span class="pp">|</span> 对每个 $(t_0,x_0)$，由 Peano 定理的自治形式至少存在一个局部解。因为 $\dot{x}=f(x)$ 随后沿解连续，每个经典解是 $C^1$ <span class="co">[</span><span class="ot">@Teschl2012, sec. 2.7</span><span class="co">]</span>。 <span class="pp">|</span> 解不必唯一。 <span class="pp">|</span></span>
+<span id="cb1-225"><a href="#cb1-225" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> $f$ 局部利普希茨 <span class="pp">|</span> 局部利普希茨连续性蕴含连续性。Picard–Lindelöf 因此给出局部存在性与唯一性，兼容局部片段组装成唯一极大解。极大解定义带恒等与（在定义处）复合的单值局部有限时间演化 <span class="co">[</span><span class="ot">@Teschl2012, secs. 2.2, 2.6</span><span class="co">]</span>。 <span class="pp">|</span> 不蕴含全局存在性与对初始状态的联合可微性。 <span class="pp">|</span></span>
+<span id="cb1-226"><a href="#cb1-226" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> $f\in C^k(\mathcal{X},\mathbb{R}^n)$，$k\geq1$ <span class="pp">|</span> 唯一解曲线对时间 $C^{k+1}$。受支持集 $W$ 是开的，联合局部流映射 $\Phi:W\to\mathcal{X}$ 在 $(\tau,x)$ 上 $C^k$ <span class="co">[</span><span class="ot">@Teschl2012, secs. 2.2, 6.2</span><span class="co">]</span>。 <span class="pp">|</span> 即使光滑性也不阻止有限时间爆破或离开真开域。 <span class="pp">|</span></span>
+<span id="cb1-227"><a href="#cb1-227" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-228"><a href="#cb1-228" aria-hidden="true" tabindex="-1"></a>此处**局部利普希茨**指每个 $x\in\mathcal{X}$ 都有邻域 $U\subseteq\mathcal{X}$ 与有限常数 $L_U$，使得</span>
+<span id="cb1-229"><a href="#cb1-229" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-230"><a href="#cb1-230" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-231"><a href="#cb1-231" aria-hidden="true" tabindex="-1"></a><span class="sc">\|</span>f(y)-f(z)<span class="sc">\|</span>\leq L_U<span class="sc">\|</span>y-z<span class="sc">\|</span></span>
+<span id="cb1-232"><a href="#cb1-232" aria-hidden="true" tabindex="-1"></a>\qquad</span>
+<span id="cb1-233"><a href="#cb1-233" aria-hidden="true" tabindex="-1"></a>\text{for all }y,z\in U.</span>
+<span id="cb1-234"><a href="#cb1-234" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-235"><a href="#cb1-235" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-236"><a href="#cb1-236" aria-hidden="true" tabindex="-1"></a>该阶梯给出充分而非逻辑必要条件。某些连续非利普希茨场仍有唯一解，某些更少正则的设定承认其他存在性或唯一性定理。范围化结论只是连续性与局部利普希茨连续性干净地分离基本存在性与基本唯一性。</span>
+<span id="cb1-237"><a href="#cb1-237" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-238"><a href="#cb1-238" aria-hidden="true" tabindex="-1"></a><span class="fu">### 存在性与唯一性是不同主张</span></span>
+<span id="cb1-239"><a href="#cb1-239" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-240"><a href="#cb1-240" aria-hidden="true" tabindex="-1"></a>存在性询问：</span>
+<span id="cb1-241"><a href="#cb1-241" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-242"><a href="#cb1-242" aria-hidden="true" tabindex="-1"></a><span class="at">&gt; 是否至少有一条穿过 $(t_0,x_0)$ 的可微曲线满足方程？</span></span>
+<span id="cb1-243"><a href="#cb1-243" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-244"><a href="#cb1-244" aria-hidden="true" tabindex="-1"></a>唯一性询问：</span>
+<span id="cb1-245"><a href="#cb1-245" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-246"><a href="#cb1-246" aria-hidden="true" tabindex="-1"></a><span class="at">&gt; 如果两条这样的曲线在同一参考时间穿过相同初始状态，它们是否必须在其公共定义域上重合？</span></span>
+<span id="cb1-247"><a href="#cb1-247" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-248"><a href="#cb1-248" aria-hidden="true" tabindex="-1"></a>定理可以回答第一个问题而不回答第二个。该区分对流记号重要：只有当在有效假设下从 $x_0$ 的演化单值，或已声明额外选择规则时，$\phi_\tau(x_0)$ 才是单一状态。</span>
+<span id="cb1-249"><a href="#cb1-249" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-250"><a href="#cb1-250" aria-hidden="true" tabindex="-1"></a><span class="fu">### 连续场设定中的积分形式</span></span>
+<span id="cb1-251"><a href="#cb1-251" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-252"><a href="#cb1-252" aria-hidden="true" tabindex="-1"></a>现在假设 $f$ 连续且 $x:I\to\mathcal{X}$ 是 IVP 的经典解。则 $f\circ x$ 连续，因此 $\dot{x}=f\circ x$ 连续且 $x\in C^1(I,\mathcal{X})$。微积分基本定理因此给出</span>
+<span id="cb1-253"><a href="#cb1-253" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-254"><a href="#cb1-254" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-255"><a href="#cb1-255" aria-hidden="true" tabindex="-1"></a>x(t)-x_0</span>
+<span id="cb1-256"><a href="#cb1-256" aria-hidden="true" tabindex="-1"></a>=</span>
+<span id="cb1-257"><a href="#cb1-257" aria-hidden="true" tabindex="-1"></a>\int_{t_0}^{t}\dot{x}(s)\,ds</span>
+<span id="cb1-258"><a href="#cb1-258" aria-hidden="true" tabindex="-1"></a>=</span>
+<span id="cb1-259"><a href="#cb1-259" aria-hidden="true" tabindex="-1"></a>\int_{t_0}^{t}f\bigl(x(s)\bigr)\,ds.</span>
+<span id="cb1-260"><a href="#cb1-260" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-261"><a href="#cb1-261" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-262"><a href="#cb1-262" aria-hidden="true" tabindex="-1"></a>因此每个解满足</span>
+<span id="cb1-263"><a href="#cb1-263" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-264"><a href="#cb1-264" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-265"><a href="#cb1-265" aria-hidden="true" tabindex="-1"></a>x(t)=x_0+\int_{t_0}^{t}f\bigl(x(s)\bigr)\,ds.</span>
+<span id="cb1-266"><a href="#cb1-266" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-267"><a href="#cb1-267" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-268"><a href="#cb1-268" aria-hidden="true" tabindex="-1"></a>反过来，设 $f$ 连续且连续曲线 $x:I\to\mathcal{X}$ 对每个 $t\in I$ 满足该积分方程。则 $s\mapsto f(x(s))$ 连续。右侧积分因此 $C^1$，所以 $x$ 是 $C^1$，微分给出 $\dot{x}(t)=f(x(t))$；令 $t=t_0$ 给出 $x(t_0)=x_0$。因此在该连续 $f$ 经典解设定中，微分与积分表述等价。Picard 迭代在更强局部利普希茨假设下把积分方程用作不动点问题 <span class="co">[</span><span class="ot">@Teschl2012, sec. 2.2</span><span class="co">]</span>。</span>
+<span id="cb1-269"><a href="#cb1-269" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-270"><a href="#cb1-270" aria-hidden="true" tabindex="-1"></a><span class="fu">### 从局部存在性与唯一性到有限时间演化</span></span>
+<span id="cb1-271"><a href="#cb1-271" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-272"><a href="#cb1-272" aria-hidden="true" tabindex="-1"></a>假设局部存在性与唯一性。对初始状态 $x_0$，设 $x(\cdot;t_0,x_0)$ 表示其极大解。自治性允许有限时间映射</span>
+<span id="cb1-273"><a href="#cb1-273" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-274"><a href="#cb1-274" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-275"><a href="#cb1-275" aria-hidden="true" tabindex="-1"></a>\phi_\tau(x_0)</span>
+<span id="cb1-276"><a href="#cb1-276" aria-hidden="true" tabindex="-1"></a>=</span>
+<span id="cb1-277"><a href="#cb1-277" aria-hidden="true" tabindex="-1"></a>x(t_0+\tau;t_0,x_0),</span>
+<span id="cb1-278"><a href="#cb1-278" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-279"><a href="#cb1-279" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-280"><a href="#cb1-280" aria-hidden="true" tabindex="-1"></a>只要 $t_0+\tau$ 位于极大区间内。结果不依赖 $t_0$ 数值选择：移位时钟时间移位自治解，而不改变经过时间演化规则。</span>
+<span id="cb1-281"><a href="#cb1-281" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-282"><a href="#cb1-282" aria-hidden="true" tabindex="-1"></a>对单个固定 $x_0$，</span>
+<span id="cb1-283"><a href="#cb1-283" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-284"><a href="#cb1-284" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-285"><a href="#cb1-285" aria-hidden="true" tabindex="-1"></a>t\mapsto x(t)=\phi_{t-t_0}(x_0)</span>
+<span id="cb1-286"><a href="#cb1-286" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-287"><a href="#cb1-287" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-288"><a href="#cb1-288" aria-hidden="true" tabindex="-1"></a>是一条轨迹。相反，流同时变化经过时间与初始状态：</span>
+<span id="cb1-289"><a href="#cb1-289" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-290"><a href="#cb1-290" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-291"><a href="#cb1-291" aria-hidden="true" tabindex="-1"></a>(\tau,x_0)\mapsto\phi_\tau(x_0).</span>
+<span id="cb1-292"><a href="#cb1-292" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-293"><a href="#cb1-293" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-294"><a href="#cb1-294" aria-hidden="true" tabindex="-1"></a>恒等关系因为尚未经过时间而成立。复合关系来自自治性与唯一性：作为新经过时间变量的函数，两个延拓都从中间状态 $\phi_s(x)$ 开始并求解相同 IVP，因此它们在都有定义处一致。这些恒等式不要求对 $x_0$ 的可微性。</span>
+<span id="cb1-295"><a href="#cb1-295" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-296"><a href="#cb1-296" aria-hidden="true" tabindex="-1"></a><span class="fu">### 时间微分、联合流正则性与生成元</span></span>
+<span id="cb1-297"><a href="#cb1-297" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-298"><a href="#cb1-298" aria-hidden="true" tabindex="-1"></a>对局部利普希茨 $f$，单个曲线 $\tau\mapsto\phi_\tau(x)$ 是 $C^1$ 的，其瞬时生成元是</span>
+<span id="cb1-299"><a href="#cb1-299" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-300"><a href="#cb1-300" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-301"><a href="#cb1-301" aria-hidden="true" tabindex="-1"></a>f(x)</span>
+<span id="cb1-302"><a href="#cb1-302" aria-hidden="true" tabindex="-1"></a>=</span>
+<span id="cb1-303"><a href="#cb1-303" aria-hidden="true" tabindex="-1"></a>\left.\frac{d}{d\tau}\phi_\tau(x)\right|_{\tau=0}.</span>
+<span id="cb1-304"><a href="#cb1-304" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-305"><a href="#cb1-305" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-306"><a href="#cb1-306" aria-hidden="true" tabindex="-1"></a>该导数只对经过时间取。如果 $f\in C^1$，更强结论是 $\Phi(\tau,x)$ 对 $\tau$ 与 $x$ 联合 $C^1$。反过来，满足恒等与复合的联合可微局部流通过零点导数关系生成自治向量场，其流曲线满足相应 ODE <span class="co">[</span><span class="ot">@Teschl2012, sec. 6.2, problem 6.5</span><span class="co">]</span>。因此瞬时与有限时间描述被连接，而不把一条轨迹的时间可微性与对初始状态的可微依赖混为一谈。</span>
+<span id="cb1-307"><a href="#cb1-307" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-308"><a href="#cb1-308" aria-hidden="true" tabindex="-1"></a><span class="fu">## 逐步推导</span></span>
+<span id="cb1-309"><a href="#cb1-309" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-310"><a href="#cb1-310" aria-hidden="true" tabindex="-1"></a>中心逻辑链是：</span>
+<span id="cb1-311"><a href="#cb1-311" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-312"><a href="#cb1-312" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>**选择可取状态。** 声明开域 $\mathcal{X}\subseteq\mathbb{R}^n$。</span>
+<span id="cb1-313"><a href="#cb1-313" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>**赋予瞬时变化。** 指定 $f:\mathcal{X}\to\mathbb{R}^n$。</span>
+<span id="cb1-314"><a href="#cb1-314" aria-hidden="true" tabindex="-1"></a><span class="ss">3. </span>**约束曲线。** 要求可微 $x:I\to\mathcal{X}$ 满足 $\dot{x}(t)=f(x(t))$。</span>
+<span id="cb1-315"><a href="#cb1-315" aria-hidden="true" tabindex="-1"></a><span class="ss">4. </span>**锚定曲线。** 添加 $x(t_0)=x_0$ 形成 IVP。</span>
+<span id="cb1-316"><a href="#cb1-316" aria-hidden="true" tabindex="-1"></a><span class="ss">5. </span>**援引相关正则性结果。** 连续性提供至少一个局部解；局部利普希茨连续性还提供局部唯一性。</span>
+<span id="cb1-317"><a href="#cb1-317" aria-hidden="true" tabindex="-1"></a><span class="ss">6. </span>**尽可能延拓。** 因为在局部利普希茨梯级局部存在性与唯一性都成立，兼容局部片段组合成 $I_{t_0,x_0}$ 上的唯一极大解。</span>
+<span id="cb1-318"><a href="#cb1-318" aria-hidden="true" tabindex="-1"></a><span class="ss">7. </span>**用经过时间重新索引。** 设 $\tau=t-t_0$ 并在受支持处定义 $\phi_\tau(x_0)=x(t_0+\tau;t_0,x_0)$。</span>
+<span id="cb1-319"><a href="#cb1-319" aria-hidden="true" tabindex="-1"></a><span class="ss">8. </span>**用唯一性复合。** 从 $x$ 演化 $s$ 到达 $\phi_s(x)$。从那里开始演化 $\tau$ 与从 $x$ 演化 $s+\tau$ 求解相同 IVP，因此</span>
+<span id="cb1-320"><a href="#cb1-320" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-321"><a href="#cb1-321" aria-hidden="true" tabindex="-1"></a>   $$</span>
+<span id="cb1-322"><a href="#cb1-322" aria-hidden="true" tabindex="-1"></a>   \phi_{\tau+s}(x)=\phi_\tau(\phi_s(x)).</span>
+<span id="cb1-323"><a href="#cb1-323" aria-hidden="true" tabindex="-1"></a>   $$</span>
+<span id="cb1-324"><a href="#cb1-324" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-325"><a href="#cb1-325" aria-hidden="true" tabindex="-1"></a><span class="ss">9. </span>**在零经过时间微分。** 因为局部利普希茨 $f$ 连续，每条解曲线对 $\tau$ 是 $C^1$，其局部斜率恢复瞬时规则：</span>
+<span id="cb1-326"><a href="#cb1-326" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-327"><a href="#cb1-327" aria-hidden="true" tabindex="-1"></a>   $$</span>
+<span id="cb1-328"><a href="#cb1-328" aria-hidden="true" tabindex="-1"></a>   \left.\frac{d}{d\tau}\phi_\tau(x)\right|_{\tau=0}=f(x).</span>
+<span id="cb1-329"><a href="#cb1-329" aria-hidden="true" tabindex="-1"></a>   $$</span>
+<span id="cb1-330"><a href="#cb1-330" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-331"><a href="#cb1-331" aria-hidden="true" tabindex="-1"></a>   这是沿经过时间坐标的导数。对 $(\tau,x)$ 的联合 $C^1$ 依赖只在更强 $f\in C^1$ 梯级被断言。</span>
+<span id="cb1-332"><a href="#cb1-332" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-333"><a href="#cb1-333" aria-hidden="true" tabindex="-1"></a>该链中没有一步把局部存在性变成全局存在性。例如，$\mathbb{R}$ 上光滑场 $f(x)=x^2$ 对 $x_0&gt;0$ 具有解</span>
+<span id="cb1-334"><a href="#cb1-334" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-335"><a href="#cb1-335" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-336"><a href="#cb1-336" aria-hidden="true" tabindex="-1"></a>x(t)=\frac{x_0}{1-x_0(t-t_0)}</span>
+<span id="cb1-337"><a href="#cb1-337" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-338"><a href="#cb1-338" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-339"><a href="#cb1-339" aria-hidden="true" tabindex="-1"></a>其极大区间是</span>
+<span id="cb1-340"><a href="#cb1-340" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-341"><a href="#cb1-341" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-342"><a href="#cb1-342" aria-hidden="true" tabindex="-1"></a>(-\infty,t_0+1/x_0),</span>
+<span id="cb1-343"><a href="#cb1-343" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-344"><a href="#cb1-344" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-345"><a href="#cb1-345" aria-hidden="true" tabindex="-1"></a>因为解在 $t\uparrow t_0+1/x_0$ 时发散。光滑性给出局部唯一性与光滑局部流，而非 $\mathbb{R}\times\mathbb{R}$ 上的全局流 <span class="co">[</span><span class="ot">@Teschl2012, secs. 1.3, 6.2</span><span class="co">]</span>。</span>
+<span id="cb1-346"><a href="#cb1-346" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-347"><a href="#cb1-347" aria-hidden="true" tabindex="-1"></a><span class="fu">## 几何直觉</span></span>
+<span id="cb1-348"><a href="#cb1-348" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-349"><a href="#cb1-349" aria-hidden="true" tabindex="-1"></a>在每个 $x\in\mathcal{X}$，向量 $f(x)$ 是带「状态每单位时间」单位的局部箭头。兼容轨迹在其访问的每个状态与该箭头相切：</span>
+<span id="cb1-350"><a href="#cb1-350" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-351"><a href="#cb1-351" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-352"><a href="#cb1-352" aria-hidden="true" tabindex="-1"></a>\text{trajectory tangent at }x(t)</span>
+<span id="cb1-353"><a href="#cb1-353" aria-hidden="true" tabindex="-1"></a>=</span>
+<span id="cb1-354"><a href="#cb1-354" aria-hidden="true" tabindex="-1"></a>\dot{x}(t)</span>
+<span id="cb1-355"><a href="#cb1-355" aria-hidden="true" tabindex="-1"></a>=</span>
+<span id="cb1-356"><a href="#cb1-356" aria-hidden="true" tabindex="-1"></a>f(x(t)).</span>
+<span id="cb1-357"><a href="#cb1-357" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-358"><a href="#cb1-358" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-359"><a href="#cb1-359" aria-hidden="true" tabindex="-1"></a>流询问不同问题。$\phi_\tau$ 不只在一点显示箭头，而是把每个受支持初始点运输过有限经过时间 $\tau$。固定点给出一条轨迹；固定经过时间给出一个状态到状态映射。</span>
+<span id="cb1-360"><a href="#cb1-360" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-361"><a href="#cb1-361" aria-hidden="true" tabindex="-1"></a>这幅图是直觉，不是测得数据拥有向量场或流的证据。拟合到样本的箭头与显示在投影中的曲线继承状态定义、采样过程与拟合模型的假设。</span>
+<span id="cb1-362"><a href="#cb1-362" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-363"><a href="#cb1-363" aria-hidden="true" tabindex="-1"></a><span class="fu">## 演练示例</span></span>
+<span id="cb1-364"><a href="#cb1-364" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-365"><a href="#cb1-365" aria-hidden="true" tabindex="-1"></a>考虑标量 IVP</span>
+<span id="cb1-366"><a href="#cb1-366" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-367"><a href="#cb1-367" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-368"><a href="#cb1-368" aria-hidden="true" tabindex="-1"></a>\frac{dx}{dt}=a x,</span>
+<span id="cb1-369"><a href="#cb1-369" aria-hidden="true" tabindex="-1"></a>\qquad</span>
+<span id="cb1-370"><a href="#cb1-370" aria-hidden="true" tabindex="-1"></a>x(t_0)=x_0,</span>
+<span id="cb1-371"><a href="#cb1-371" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-372"><a href="#cb1-372" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-373"><a href="#cb1-373" aria-hidden="true" tabindex="-1"></a>其中 $a\in\mathbb{R}$ 固定。</span>
+<span id="cb1-374"><a href="#cb1-374" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-375"><a href="#cb1-375" aria-hidden="true" tabindex="-1"></a><span class="fu">### 推导轨迹</span></span>
+<span id="cb1-376"><a href="#cb1-376" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-377"><a href="#cb1-377" aria-hidden="true" tabindex="-1"></a>把状态乘以积分因子 $e^{-a(t-t_0)}$。由乘积法则，</span>
+<span id="cb1-378"><a href="#cb1-378" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-379"><a href="#cb1-379" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-380"><a href="#cb1-380" aria-hidden="true" tabindex="-1"></a>\begin{aligned}</span>
+<span id="cb1-381"><a href="#cb1-381" aria-hidden="true" tabindex="-1"></a>\frac{d}{dt}\left(e^{-a(t-t_0)}x(t)\right)</span>
+<span id="cb1-382"><a href="#cb1-382" aria-hidden="true" tabindex="-1"></a>&amp;=</span>
+<span id="cb1-383"><a href="#cb1-383" aria-hidden="true" tabindex="-1"></a>-a e^{-a(t-t_0)}x(t)</span>
+<span id="cb1-384"><a href="#cb1-384" aria-hidden="true" tabindex="-1"></a>+e^{-a(t-t_0)}\dot{x}(t)<span class="sc">\\</span></span>
+<span id="cb1-385"><a href="#cb1-385" aria-hidden="true" tabindex="-1"></a>&amp;=</span>
+<span id="cb1-386"><a href="#cb1-386" aria-hidden="true" tabindex="-1"></a>e^{-a(t-t_0)}\bigl(\dot{x}(t)-a x(t)\bigr)<span class="sc">\\</span></span>
+<span id="cb1-387"><a href="#cb1-387" aria-hidden="true" tabindex="-1"></a>&amp;=0.</span>
+<span id="cb1-388"><a href="#cb1-388" aria-hidden="true" tabindex="-1"></a>\end{aligned}</span>
+<span id="cb1-389"><a href="#cb1-389" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-390"><a href="#cb1-390" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-391"><a href="#cb1-391" aria-hidden="true" tabindex="-1"></a>因此 $e^{-a(t-t_0)}x(t)$ 在 $t$ 中恒定。在 $t=t_0$ 求该常值给出</span>
+<span id="cb1-392"><a href="#cb1-392" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-393"><a href="#cb1-393" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-394"><a href="#cb1-394" aria-hidden="true" tabindex="-1"></a>e^{-a(t_0-t_0)}x(t_0)=x_0.</span>
+<span id="cb1-395"><a href="#cb1-395" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-396"><a href="#cb1-396" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-397"><a href="#cb1-397" aria-hidden="true" tabindex="-1"></a>因此</span>
+<span id="cb1-398"><a href="#cb1-398" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-399"><a href="#cb1-399" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-400"><a href="#cb1-400" aria-hidden="true" tabindex="-1"></a>x(t)=x_0e^{a(t-t_0)}.</span>
+<span id="cb1-401"><a href="#cb1-401" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-402"><a href="#cb1-402" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-403"><a href="#cb1-403" aria-hidden="true" tabindex="-1"></a>该推导也覆盖 $x_0=0$，无需除以状态。</span>
+<span id="cb1-404"><a href="#cb1-404" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-405"><a href="#cb1-405" aria-hidden="true" tabindex="-1"></a><span class="fu">### 验证 IVP</span></span>
+<span id="cb1-406"><a href="#cb1-406" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-407"><a href="#cb1-407" aria-hidden="true" tabindex="-1"></a>微分所提解：</span>
+<span id="cb1-408"><a href="#cb1-408" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-409"><a href="#cb1-409" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-410"><a href="#cb1-410" aria-hidden="true" tabindex="-1"></a>\dot{x}(t)</span>
+<span id="cb1-411"><a href="#cb1-411" aria-hidden="true" tabindex="-1"></a>=</span>
+<span id="cb1-412"><a href="#cb1-412" aria-hidden="true" tabindex="-1"></a>a x_0e^{a(t-t_0)}</span>
+<span id="cb1-413"><a href="#cb1-413" aria-hidden="true" tabindex="-1"></a>=</span>
+<span id="cb1-414"><a href="#cb1-414" aria-hidden="true" tabindex="-1"></a>a x(t).</span>
+<span id="cb1-415"><a href="#cb1-415" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-416"><a href="#cb1-416" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-417"><a href="#cb1-417" aria-hidden="true" tabindex="-1"></a>在参考时间，</span>
+<span id="cb1-418"><a href="#cb1-418" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-419"><a href="#cb1-419" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-420"><a href="#cb1-420" aria-hidden="true" tabindex="-1"></a>x(t_0)=x_0e^0=x_0.</span>
+<span id="cb1-421"><a href="#cb1-421" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-422"><a href="#cb1-422" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-423"><a href="#cb1-423" aria-hidden="true" tabindex="-1"></a>因此它同时满足 ODE 与初始条件。</span>
+<span id="cb1-424"><a href="#cb1-424" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-425"><a href="#cb1-425" aria-hidden="true" tabindex="-1"></a><span class="fu">### 识别数学角色</span></span>
+<span id="cb1-426"><a href="#cb1-426" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-427"><a href="#cb1-427" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**状态空间：** $\mathcal{X}=\mathbb{R}$。</span>
+<span id="cb1-428"><a href="#cb1-428" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**状态值：** $x(t)\in\mathbb{R}$。</span>
+<span id="cb1-429"><a href="#cb1-429" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**向量场：** $f(x)=ax$。</span>
+<span id="cb1-430"><a href="#cb1-430" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**初始状态：** 参考时间 $t_0$ 处的 $x_0$。</span>
+<span id="cb1-431"><a href="#cb1-431" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**轨迹：** 对所选 $x_0$，$t\mapsto x_0e^{a(t-t_0)}$。</span>
+<span id="cb1-432"><a href="#cb1-432" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**经过时间流：**</span>
+<span id="cb1-433"><a href="#cb1-433" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-434"><a href="#cb1-434" aria-hidden="true" tabindex="-1"></a>  $$</span>
+<span id="cb1-435"><a href="#cb1-435" aria-hidden="true" tabindex="-1"></a>  \phi_\tau(x)=xe^{a\tau}.</span>
+<span id="cb1-436"><a href="#cb1-436" aria-hidden="true" tabindex="-1"></a>  $$</span>
+<span id="cb1-437"><a href="#cb1-437" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-438"><a href="#cb1-438" aria-hidden="true" tabindex="-1"></a>该场全局利普希茨，因为</span>
+<span id="cb1-439"><a href="#cb1-439" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-440"><a href="#cb1-440" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-441"><a href="#cb1-441" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span>f(x)-f(y)<span class="pp">|</span>=<span class="pp">|</span>a<span class="pp">|</span>\,<span class="pp">|</span>x-y<span class="pp">|</span>.</span>
+<span id="cb1-442"><a href="#cb1-442" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-443"><a href="#cb1-443" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-444"><a href="#cb1-444" aria-hidden="true" tabindex="-1"></a>解对每个实数 $t$ 有限，因此该示例具有全局流。</span>
+<span id="cb1-445"><a href="#cb1-445" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-446"><a href="#cb1-446" aria-hidden="true" tabindex="-1"></a><span class="fu">### 验证流律</span></span>
+<span id="cb1-447"><a href="#cb1-447" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-448"><a href="#cb1-448" aria-hidden="true" tabindex="-1"></a>恒等：</span>
+<span id="cb1-449"><a href="#cb1-449" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-450"><a href="#cb1-450" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-451"><a href="#cb1-451" aria-hidden="true" tabindex="-1"></a>\phi_0(x)=xe^{a\cdot0}=x.</span>
+<span id="cb1-452"><a href="#cb1-452" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-453"><a href="#cb1-453" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-454"><a href="#cb1-454" aria-hidden="true" tabindex="-1"></a>复合：</span>
+<span id="cb1-455"><a href="#cb1-455" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-456"><a href="#cb1-456" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-457"><a href="#cb1-457" aria-hidden="true" tabindex="-1"></a>\begin{aligned}</span>
+<span id="cb1-458"><a href="#cb1-458" aria-hidden="true" tabindex="-1"></a>\phi_\tau\bigl(\phi_s(x)\bigr)</span>
+<span id="cb1-459"><a href="#cb1-459" aria-hidden="true" tabindex="-1"></a>&amp;=\phi_\tau(xe^{as})<span class="sc">\\</span></span>
+<span id="cb1-460"><a href="#cb1-460" aria-hidden="true" tabindex="-1"></a>&amp;=(xe^{as})e^{a\tau}<span class="sc">\\</span></span>
+<span id="cb1-461"><a href="#cb1-461" aria-hidden="true" tabindex="-1"></a>&amp;=xe^{a(\tau+s)}<span class="sc">\\</span></span>
+<span id="cb1-462"><a href="#cb1-462" aria-hidden="true" tabindex="-1"></a>&amp;=\phi_{\tau+s}(x).</span>
+<span id="cb1-463"><a href="#cb1-463" aria-hidden="true" tabindex="-1"></a>\end{aligned}</span>
+<span id="cb1-464"><a href="#cb1-464" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-465"><a href="#cb1-465" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-466"><a href="#cb1-466" aria-hidden="true" tabindex="-1"></a>生成元：</span>
+<span id="cb1-467"><a href="#cb1-467" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-468"><a href="#cb1-468" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-469"><a href="#cb1-469" aria-hidden="true" tabindex="-1"></a>\left.\frac{d}{d\tau}\phi_\tau(x)\right|_{\tau=0}</span>
+<span id="cb1-470"><a href="#cb1-470" aria-hidden="true" tabindex="-1"></a>=</span>
+<span id="cb1-471"><a href="#cb1-471" aria-hidden="true" tabindex="-1"></a>\left.a xe^{a\tau}\right|_{\tau=0}</span>
+<span id="cb1-472"><a href="#cb1-472" aria-hidden="true" tabindex="-1"></a>=</span>
+<span id="cb1-473"><a href="#cb1-473" aria-hidden="true" tabindex="-1"></a>ax</span>
+<span id="cb1-474"><a href="#cb1-474" aria-hidden="true" tabindex="-1"></a>=</span>
+<span id="cb1-475"><a href="#cb1-475" aria-hidden="true" tabindex="-1"></a>f(x).</span>
+<span id="cb1-476"><a href="#cb1-476" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-477"><a href="#cb1-477" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-478"><a href="#cb1-478" aria-hidden="true" tabindex="-1"></a>该示例使三个层级显式：$f(x)=ax$ 给出瞬时变化，$\phi_\tau(x)=xe^{a\tau}$ 给出跨初始状态的有限时间演化，选择一个 $x_0$ 产生一条轨迹。</span>
+<span id="cb1-479"><a href="#cb1-479" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-480"><a href="#cb1-480" aria-hidden="true" tabindex="-1"></a><span class="fu">### 二维旋转–伸缩演练示例</span></span>
+<span id="cb1-481"><a href="#cb1-481" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-482"><a href="#cb1-482" aria-hidden="true" tabindex="-1"></a>对有界二维示例，设状态为</span>
+<span id="cb1-483"><a href="#cb1-483" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-484"><a href="#cb1-484" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-485"><a href="#cb1-485" aria-hidden="true" tabindex="-1"></a>z(t)=</span>
+<span id="cb1-486"><a href="#cb1-486" aria-hidden="true" tabindex="-1"></a>\begin{pmatrix}</span>
+<span id="cb1-487"><a href="#cb1-487" aria-hidden="true" tabindex="-1"></a>x(t)<span class="sc">\\</span></span>
+<span id="cb1-488"><a href="#cb1-488" aria-hidden="true" tabindex="-1"></a>y(t)</span>
+<span id="cb1-489"><a href="#cb1-489" aria-hidden="true" tabindex="-1"></a>\end{pmatrix}</span>
+<span id="cb1-490"><a href="#cb1-490" aria-hidden="true" tabindex="-1"></a>\in\mathbb{R}^2</span>
+<span id="cb1-491"><a href="#cb1-491" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-492"><a href="#cb1-492" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-493"><a href="#cb1-493" aria-hidden="true" tabindex="-1"></a>并固定参数 $a,\omega\in\mathbb{R}$。考虑自治 IVP</span>
+<span id="cb1-494"><a href="#cb1-494" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-495"><a href="#cb1-495" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-496"><a href="#cb1-496" aria-hidden="true" tabindex="-1"></a>\dot z=Az,</span>
+<span id="cb1-497"><a href="#cb1-497" aria-hidden="true" tabindex="-1"></a>\qquad</span>
+<span id="cb1-498"><a href="#cb1-498" aria-hidden="true" tabindex="-1"></a>A=</span>
+<span id="cb1-499"><a href="#cb1-499" aria-hidden="true" tabindex="-1"></a>\begin{pmatrix}</span>
+<span id="cb1-500"><a href="#cb1-500" aria-hidden="true" tabindex="-1"></a>a &amp; -\omega<span class="sc">\\</span></span>
+<span id="cb1-501"><a href="#cb1-501" aria-hidden="true" tabindex="-1"></a>\omega &amp; a</span>
+<span id="cb1-502"><a href="#cb1-502" aria-hidden="true" tabindex="-1"></a>\end{pmatrix},</span>
+<span id="cb1-503"><a href="#cb1-503" aria-hidden="true" tabindex="-1"></a>\qquad</span>
+<span id="cb1-504"><a href="#cb1-504" aria-hidden="true" tabindex="-1"></a>z(t_0)=z_0.</span>
+<span id="cb1-505"><a href="#cb1-505" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-506"><a href="#cb1-506" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-507"><a href="#cb1-507" aria-hidden="true" tabindex="-1"></a>定义平面旋转矩阵</span>
+<span id="cb1-508"><a href="#cb1-508" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-509"><a href="#cb1-509" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-510"><a href="#cb1-510" aria-hidden="true" tabindex="-1"></a>R(\theta)</span>
+<span id="cb1-511"><a href="#cb1-511" aria-hidden="true" tabindex="-1"></a>=</span>
+<span id="cb1-512"><a href="#cb1-512" aria-hidden="true" tabindex="-1"></a>\begin{pmatrix}</span>
+<span id="cb1-513"><a href="#cb1-513" aria-hidden="true" tabindex="-1"></a>\cos\theta &amp; -\sin\theta<span class="sc">\\</span></span>
+<span id="cb1-514"><a href="#cb1-514" aria-hidden="true" tabindex="-1"></a>\sin\theta &amp; \cos\theta</span>
+<span id="cb1-515"><a href="#cb1-515" aria-hidden="true" tabindex="-1"></a>\end{pmatrix}.</span>
+<span id="cb1-516"><a href="#cb1-516" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-517"><a href="#cb1-517" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-518"><a href="#cb1-518" aria-hidden="true" tabindex="-1"></a>用经过时间 $\tau=t-t_0$，提出</span>
+<span id="cb1-519"><a href="#cb1-519" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-520"><a href="#cb1-520" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-521"><a href="#cb1-521" aria-hidden="true" tabindex="-1"></a>z(t_0+\tau)</span>
+<span id="cb1-522"><a href="#cb1-522" aria-hidden="true" tabindex="-1"></a>=</span>
+<span id="cb1-523"><a href="#cb1-523" aria-hidden="true" tabindex="-1"></a>e^{a\tau}R(\omega\tau)z_0.</span>
+<span id="cb1-524"><a href="#cb1-524" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-525"><a href="#cb1-525" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-526"><a href="#cb1-526" aria-hidden="true" tabindex="-1"></a>当 $\omega\neq0$ 时，旋转改变角位置而因子 $e^{a\tau}$ 改变半径：$a&lt;0$ 给出向内螺旋，$a=0$ 给出恒定半径旋转，$a&gt;0$ 给出向外螺旋。这些描述只关乎这个声明系统；它们不从绘制轨迹推断螺旋动力学。</span>
+<span id="cb1-527"><a href="#cb1-527" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-528"><a href="#cb1-528" aria-hidden="true" tabindex="-1"></a><span class="fu">#### 验证初值与微分方程</span></span>
+<span id="cb1-529"><a href="#cb1-529" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-530"><a href="#cb1-530" aria-hidden="true" tabindex="-1"></a>在零经过时间，$e^{a\cdot0}=1$ 且 $R(0)=I$，因此</span>
+<span id="cb1-531"><a href="#cb1-531" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-532"><a href="#cb1-532" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-533"><a href="#cb1-533" aria-hidden="true" tabindex="-1"></a>z(t_0)=e^0R(0)z_0=z_0.</span>
+<span id="cb1-534"><a href="#cb1-534" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-535"><a href="#cb1-535" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-536"><a href="#cb1-536" aria-hidden="true" tabindex="-1"></a>设</span>
+<span id="cb1-537"><a href="#cb1-537" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-538"><a href="#cb1-538" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-539"><a href="#cb1-539" aria-hidden="true" tabindex="-1"></a>J=</span>
+<span id="cb1-540"><a href="#cb1-540" aria-hidden="true" tabindex="-1"></a>\begin{pmatrix}</span>
+<span id="cb1-541"><a href="#cb1-541" aria-hidden="true" tabindex="-1"></a>0 &amp; -1<span class="sc">\\</span></span>
+<span id="cb1-542"><a href="#cb1-542" aria-hidden="true" tabindex="-1"></a>1 &amp; 0</span>
+<span id="cb1-543"><a href="#cb1-543" aria-hidden="true" tabindex="-1"></a>\end{pmatrix},</span>
+<span id="cb1-544"><a href="#cb1-544" aria-hidden="true" tabindex="-1"></a>\qquad</span>
+<span id="cb1-545"><a href="#cb1-545" aria-hidden="true" tabindex="-1"></a>A=aI+\omega J.</span>
+<span id="cb1-546"><a href="#cb1-546" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-547"><a href="#cb1-547" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-548"><a href="#cb1-548" aria-hidden="true" tabindex="-1"></a>对正弦与余弦条目直接微分给出</span>
+<span id="cb1-549"><a href="#cb1-549" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-550"><a href="#cb1-550" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-551"><a href="#cb1-551" aria-hidden="true" tabindex="-1"></a>\frac{d}{d\tau}R(\omega\tau)</span>
+<span id="cb1-552"><a href="#cb1-552" aria-hidden="true" tabindex="-1"></a>=</span>
+<span id="cb1-553"><a href="#cb1-553" aria-hidden="true" tabindex="-1"></a>\omega J R(\omega\tau).</span>
+<span id="cb1-554"><a href="#cb1-554" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-555"><a href="#cb1-555" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-556"><a href="#cb1-556" aria-hidden="true" tabindex="-1"></a>因为 $d\tau/dt=1$，乘积法则给出</span>
+<span id="cb1-557"><a href="#cb1-557" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-558"><a href="#cb1-558" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-559"><a href="#cb1-559" aria-hidden="true" tabindex="-1"></a>\begin{aligned}</span>
+<span id="cb1-560"><a href="#cb1-560" aria-hidden="true" tabindex="-1"></a>\dot z(t_0+\tau)</span>
+<span id="cb1-561"><a href="#cb1-561" aria-hidden="true" tabindex="-1"></a>&amp;=</span>
+<span id="cb1-562"><a href="#cb1-562" aria-hidden="true" tabindex="-1"></a>e^{a\tau}</span>
+<span id="cb1-563"><a href="#cb1-563" aria-hidden="true" tabindex="-1"></a>\left<span class="co">[</span><span class="ot">aI+\omega J\right</span><span class="co">]</span></span>
+<span id="cb1-564"><a href="#cb1-564" aria-hidden="true" tabindex="-1"></a>R(\omega\tau)z_0<span class="sc">\\</span></span>
+<span id="cb1-565"><a href="#cb1-565" aria-hidden="true" tabindex="-1"></a>&amp;=</span>
+<span id="cb1-566"><a href="#cb1-566" aria-hidden="true" tabindex="-1"></a>A\left<span class="co">[</span><span class="ot">e^{a\tau}R(\omega\tau)z_0\right</span><span class="co">]</span><span class="sc">\\</span></span>
+<span id="cb1-567"><a href="#cb1-567" aria-hidden="true" tabindex="-1"></a>&amp;=Az(t_0+\tau).</span>
+<span id="cb1-568"><a href="#cb1-568" aria-hidden="true" tabindex="-1"></a>\end{aligned}</span>
+<span id="cb1-569"><a href="#cb1-569" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-570"><a href="#cb1-570" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-571"><a href="#cb1-571" aria-hidden="true" tabindex="-1"></a>因此所提曲线同时满足 ODE 与初始条件。</span>
+<span id="cb1-572"><a href="#cb1-572" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-573"><a href="#cb1-573" aria-hidden="true" tabindex="-1"></a><span class="fu">#### 识别数学角色</span></span>
+<span id="cb1-574"><a href="#cb1-574" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-575"><a href="#cb1-575" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**状态空间：** $\mathcal{X}=\mathbb{R}^2$。</span>
+<span id="cb1-576"><a href="#cb1-576" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**状态值：** $z(t)=(x(t),y(t))^T\in\mathbb{R}^2$。</span>
+<span id="cb1-577"><a href="#cb1-577" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**向量场：** $f(z)=Az$。</span>
+<span id="cb1-578"><a href="#cb1-578" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**初始条件：** $z(t_0)=z_0$。</span>
+<span id="cb1-579"><a href="#cb1-579" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**轨迹：** 对所选 $z_0$，$t\mapsto e^{a(t-t_0)}R(\omega(t-t_0))z_0$。</span>
+<span id="cb1-580"><a href="#cb1-580" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**经过时间流：**</span>
+<span id="cb1-581"><a href="#cb1-581" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-582"><a href="#cb1-582" aria-hidden="true" tabindex="-1"></a>  $$</span>
+<span id="cb1-583"><a href="#cb1-583" aria-hidden="true" tabindex="-1"></a>  \phi_\tau(z)=e^{a\tau}R(\omega\tau)z.</span>
+<span id="cb1-584"><a href="#cb1-584" aria-hidden="true" tabindex="-1"></a>  $$</span>
+<span id="cb1-585"><a href="#cb1-585" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-586"><a href="#cb1-586" aria-hidden="true" tabindex="-1"></a><span class="fu">#### 验证流律与全局域</span></span>
+<span id="cb1-587"><a href="#cb1-587" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-588"><a href="#cb1-588" aria-hidden="true" tabindex="-1"></a>恒等律立即可得：</span>
+<span id="cb1-589"><a href="#cb1-589" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-590"><a href="#cb1-590" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-591"><a href="#cb1-591" aria-hidden="true" tabindex="-1"></a>\phi_0(z)=e^0R(0)z=z.</span>
+<span id="cb1-592"><a href="#cb1-592" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-593"><a href="#cb1-593" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-594"><a href="#cb1-594" aria-hidden="true" tabindex="-1"></a>使用 $e^{a\tau}e^{as}=e^{a(\tau+s)}$ 与平面旋转律</span>
+<span id="cb1-595"><a href="#cb1-595" aria-hidden="true" tabindex="-1"></a>$R(\alpha)R(\beta)=R(\alpha+\beta)$ 给出</span>
+<span id="cb1-596"><a href="#cb1-596" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-597"><a href="#cb1-597" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-598"><a href="#cb1-598" aria-hidden="true" tabindex="-1"></a>\begin{aligned}</span>
+<span id="cb1-599"><a href="#cb1-599" aria-hidden="true" tabindex="-1"></a>\phi_\tau\bigl(\phi_s(z)\bigr)</span>
+<span id="cb1-600"><a href="#cb1-600" aria-hidden="true" tabindex="-1"></a>&amp;=</span>
+<span id="cb1-601"><a href="#cb1-601" aria-hidden="true" tabindex="-1"></a>e^{a\tau}R(\omega\tau)</span>
+<span id="cb1-602"><a href="#cb1-602" aria-hidden="true" tabindex="-1"></a>e^{as}R(\omega s)z<span class="sc">\\</span></span>
+<span id="cb1-603"><a href="#cb1-603" aria-hidden="true" tabindex="-1"></a>&amp;=</span>
+<span id="cb1-604"><a href="#cb1-604" aria-hidden="true" tabindex="-1"></a>e^{a(\tau+s)}R\bigl(\omega(\tau+s)\bigr)z<span class="sc">\\</span></span>
+<span id="cb1-605"><a href="#cb1-605" aria-hidden="true" tabindex="-1"></a>&amp;=</span>
+<span id="cb1-606"><a href="#cb1-606" aria-hidden="true" tabindex="-1"></a>\phi_{\tau+s}(z).</span>
+<span id="cb1-607"><a href="#cb1-607" aria-hidden="true" tabindex="-1"></a>\end{aligned}</span>
+<span id="cb1-608"><a href="#cb1-608" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-609"><a href="#cb1-609" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-610"><a href="#cb1-610" aria-hidden="true" tabindex="-1"></a>该场在 $\mathbb{R}^2$ 上全局利普希茨，因为对欧氏范数及其诱导矩阵范数，</span>
+<span id="cb1-611"><a href="#cb1-611" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-612"><a href="#cb1-612" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-613"><a href="#cb1-613" aria-hidden="true" tabindex="-1"></a><span class="sc">\|</span>f(z)-f(w)<span class="sc">\|</span></span>
+<span id="cb1-614"><a href="#cb1-614" aria-hidden="true" tabindex="-1"></a>=</span>
+<span id="cb1-615"><a href="#cb1-615" aria-hidden="true" tabindex="-1"></a><span class="sc">\|</span>A(z-w)<span class="sc">\|</span></span>
+<span id="cb1-616"><a href="#cb1-616" aria-hidden="true" tabindex="-1"></a>\leq</span>
+<span id="cb1-617"><a href="#cb1-617" aria-hidden="true" tabindex="-1"></a><span class="sc">\|</span>A<span class="sc">\|</span>\,<span class="sc">\|</span>z-w<span class="sc">\|</span>.</span>
+<span id="cb1-618"><a href="#cb1-618" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-619"><a href="#cb1-619" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-620"><a href="#cb1-620" aria-hidden="true" tabindex="-1"></a>显式公式对每个 $z\in\mathbb{R}^2$ 与每个有限 $\tau\in\mathbb{R}$ 有限。因此受支持域是</span>
+<span id="cb1-621"><a href="#cb1-621" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-622"><a href="#cb1-622" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-623"><a href="#cb1-623" aria-hidden="true" tabindex="-1"></a>W=\mathbb{R}\times\mathbb{R}^2,</span>
+<span id="cb1-624"><a href="#cb1-624" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-625"><a href="#cb1-625" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-626"><a href="#cb1-626" aria-hidden="true" tabindex="-1"></a>所以该系统具有全局双侧流。每个 $\phi_\tau$ 是逆为 $\phi_{-\tau}$ 的全局定义双射。$a&gt;0$ 时向外增长在 $\tau\to\infty$ 时无界，但不造成有限时间爆破。</span>
+<span id="cb1-627"><a href="#cb1-627" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-628"><a href="#cb1-628" aria-hidden="true" tabindex="-1"></a><span class="fu">### 为什么唯一性假设重要</span></span>
+<span id="cb1-629"><a href="#cb1-629" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-630"><a href="#cb1-630" aria-hidden="true" tabindex="-1"></a>现在考虑</span>
+<span id="cb1-631"><a href="#cb1-631" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-632"><a href="#cb1-632" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-633"><a href="#cb1-633" aria-hidden="true" tabindex="-1"></a>\dot{x}=\sqrt{|x|},</span>
+<span id="cb1-634"><a href="#cb1-634" aria-hidden="true" tabindex="-1"></a>\qquad</span>
+<span id="cb1-635"><a href="#cb1-635" aria-hidden="true" tabindex="-1"></a>x(0)=0,</span>
+<span id="cb1-636"><a href="#cb1-636" aria-hidden="true" tabindex="-1"></a>\qquad</span>
+<span id="cb1-637"><a href="#cb1-637" aria-hidden="true" tabindex="-1"></a>\mathcal{X}=\mathbb{R}.</span>
+<span id="cb1-638"><a href="#cb1-638" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-639"><a href="#cb1-639" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-640"><a href="#cb1-640" aria-hidden="true" tabindex="-1"></a>向量场 $f(x)=\sqrt{|x|}$ 连续，因此 Peano 定理保证穿过 $(0,0)$ 至少一个局部解。它在 $0$ 处不局部利普希茨，因为对 $x\neq0$，</span>
+<span id="cb1-641"><a href="#cb1-641" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-642"><a href="#cb1-642" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-643"><a href="#cb1-643" aria-hidden="true" tabindex="-1"></a>\frac{|f(x)-f(0)|}{|x-0|}</span>
+<span id="cb1-644"><a href="#cb1-644" aria-hidden="true" tabindex="-1"></a>=</span>
+<span id="cb1-645"><a href="#cb1-645" aria-hidden="true" tabindex="-1"></a>\frac{\sqrt{|x|}}{|x|}</span>
+<span id="cb1-646"><a href="#cb1-646" aria-hidden="true" tabindex="-1"></a>=</span>
+<span id="cb1-647"><a href="#cb1-647" aria-hidden="true" tabindex="-1"></a>\frac{1}{\sqrt{|x|}},</span>
+<span id="cb1-648"><a href="#cb1-648" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-649"><a href="#cb1-649" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-650"><a href="#cb1-650" aria-hidden="true" tabindex="-1"></a>在 $x\to0$ 时无界。</span>
+<span id="cb1-651"><a href="#cb1-651" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-652"><a href="#cb1-652" aria-hidden="true" tabindex="-1"></a>一个解是</span>
+<span id="cb1-653"><a href="#cb1-653" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-654"><a href="#cb1-654" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-655"><a href="#cb1-655" aria-hidden="true" tabindex="-1"></a>x(t)=0.</span>
+<span id="cb1-656"><a href="#cb1-656" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-657"><a href="#cb1-657" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-658"><a href="#cb1-658" aria-hidden="true" tabindex="-1"></a>对每个等待时间 $c\geq0$，另一个解是</span>
+<span id="cb1-659"><a href="#cb1-659" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-660"><a href="#cb1-660" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-661"><a href="#cb1-661" aria-hidden="true" tabindex="-1"></a>x_c(t)=</span>
+<span id="cb1-662"><a href="#cb1-662" aria-hidden="true" tabindex="-1"></a>\begin{cases}</span>
+<span id="cb1-663"><a href="#cb1-663" aria-hidden="true" tabindex="-1"></a>0, &amp; t\leq c,<span class="sc">\\</span></span>
+<span id="cb1-664"><a href="#cb1-664" aria-hidden="true" tabindex="-1"></a>\dfrac{(t-c)^2}{4}, &amp; t\geq c.</span>
+<span id="cb1-665"><a href="#cb1-665" aria-hidden="true" tabindex="-1"></a>\end{cases}</span>
+<span id="cb1-666"><a href="#cb1-666" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-667"><a href="#cb1-667" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-668"><a href="#cb1-668" aria-hidden="true" tabindex="-1"></a>对 $t&lt;c$，$\dot{x}_c(t)$ 与 $\sqrt{|x_c(t)|}$ 都为零。对 $t&gt;c$，</span>
+<span id="cb1-669"><a href="#cb1-669" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-670"><a href="#cb1-670" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-671"><a href="#cb1-671" aria-hidden="true" tabindex="-1"></a>\dot{x}_c(t)=\frac{t-c}{2}</span>
+<span id="cb1-672"><a href="#cb1-672" aria-hidden="true" tabindex="-1"></a>=</span>
+<span id="cb1-673"><a href="#cb1-673" aria-hidden="true" tabindex="-1"></a>\sqrt{\frac{(t-c)^2}{4}}</span>
+<span id="cb1-674"><a href="#cb1-674" aria-hidden="true" tabindex="-1"></a>=</span>
+<span id="cb1-675"><a href="#cb1-675" aria-hidden="true" tabindex="-1"></a>\sqrt{|x_c(t)|}.</span>
+<span id="cb1-676"><a href="#cb1-676" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-677"><a href="#cb1-677" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-678"><a href="#cb1-678" aria-hidden="true" tabindex="-1"></a>在 $t=c$，左右导数都为零，因此 $x_c$ 在那里可微。因为 $c\geq0$，每条这样的曲线也满足 $x_c(0)=0$。因此同一 IVP 有无限多个解。这是 Teschl 平方根示例展示的标准非唯一性机制 <span class="co">[</span><span class="ot">@Teschl2012, sec. 1.3</span><span class="co">]</span>。</span>
+<span id="cb1-679"><a href="#cb1-679" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-680"><a href="#cb1-680" aria-hidden="true" tabindex="-1"></a>教训是精确的：连续性在此支持存在性，但失败的局部利普希茨条件移除基本唯一性保证。因此 ODE 与初始状态单独不在正经过时间后确定唯一值 $\phi_\tau(0)$，从而不诱导唯一确定的单值流。</span>
+<span id="cb1-681"><a href="#cb1-681" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-682"><a href="#cb1-682" aria-hidden="true" tabindex="-1"></a><span class="fu">## 常见错误</span></span>
+<span id="cb1-683"><a href="#cb1-683" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-684"><a href="#cb1-684" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>**把方程当作曲线而非约束。** 表达式 $\dot{x}=f(x)$ 指定哪些可微曲线有资格作为解；它本身不是一条轨迹。</span>
+<span id="cb1-685"><a href="#cb1-685" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>**把存在性与唯一性等同。** 连续场可以承认解，而不从初始状态选择恰好一个解。</span>
+<span id="cb1-686"><a href="#cb1-686" aria-hidden="true" tabindex="-1"></a><span class="ss">3. </span>**把局部与全局等同。** 局部利普希茨连续性给出局部存在性与唯一性，从而唯一极大延拓，而非全时解。</span>
+<span id="cb1-687"><a href="#cb1-687" aria-hidden="true" tabindex="-1"></a><span class="ss">4. </span>**忽略声明域。** 解必须保持在 $\mathcal{X}$ 内。到达其边界可以在坐标值保持有界时结束极大解。</span>
+<span id="cb1-688"><a href="#cb1-688" aria-hidden="true" tabindex="-1"></a><span class="ss">5. </span>**互换使用 $t$ 与 $\tau$。** 时钟时间相对 $t_0$ 标记轨迹；经过时间索引自治演化映射。</span>
+<span id="cb1-689"><a href="#cb1-689" aria-hidden="true" tabindex="-1"></a><span class="ss">6. </span>**把一条轨迹称为流。** 一个固定 $x_0$ 给出一条轨迹。流组织跨多个初始状态的演化，并必须在定义处满足恒等与复合。</span>
+<span id="cb1-690"><a href="#cb1-690" aria-hidden="true" tabindex="-1"></a><span class="ss">7. </span>**假设每个向量场都有全局流。** 即使光滑向量场也可以有限时间爆破。</span>
+<span id="cb1-691"><a href="#cb1-691" aria-hidden="true" tabindex="-1"></a><span class="ss">8. </span>**从显示推断场。** 绘制曲线或拟合箭头场本身不是唯一自治机制的证据。</span>
+<span id="cb1-692"><a href="#cb1-692" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-693"><a href="#cb1-693" aria-hidden="true" tabindex="-1"></a>该形式体系也**并不**蕴含：</span>
+<span id="cb1-694"><a href="#cb1-694" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-695"><a href="#cb1-695" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>每个观测时间序列都是动力系统轨迹；</span>
+<span id="cb1-696"><a href="#cb1-696" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>每个时变潜表示都承认有效自治向量场；</span>
+<span id="cb1-697"><a href="#cb1-697" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>一条观测轨迹唯一确定向量场，无论在未完全采样状态之外或沿其；</span>
+<span id="cb1-698"><a href="#cb1-698" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>多条相似轨迹证明一个共享流；</span>
+<span id="cb1-699"><a href="#cb1-699" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>预测成功确立机制正确性；</span>
+<span id="cb1-700"><a href="#cb1-700" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>推断潜状态是唯一真实物理状态；</span>
+<span id="cb1-701"><a href="#cb1-701" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>所有系统自治或连续时间；</span>
+<span id="cb1-702"><a href="#cb1-702" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>所有科学相关状态空间欧氏；或</span>
+<span id="cb1-703"><a href="#cb1-703" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>所有向量场生成全局流。</span>
+<span id="cb1-704"><a href="#cb1-704" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-705"><a href="#cb1-705" aria-hidden="true" tabindex="-1"></a><span class="fu">## 计算解释</span></span>
+<span id="cb1-706"><a href="#cb1-706" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-707"><a href="#cb1-707" aria-hidden="true" tabindex="-1"></a>给定声明 $f$、$x_0$ 与 $t_0$，数值 ODE 求解器在请求时间区间上近似一条解轨迹。步长、误差控制、刚度、域边界与有限时间发散影响计算是否可靠。数值输出不取代此处处理的解析问题：解是否存在、是否唯一，以及请求区间是否位于其极大域内。</span>
+<span id="cb1-708"><a href="#cb1-708" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-709"><a href="#cb1-709" aria-hidden="true" tabindex="-1"></a>流视角在计算上对应为许多初始状态与经过时间求解相同 ODE。有限模拟网格采样所提出的流；它不是完整映射 $\Phi:W\to\mathcal{X}$。同样，从数据估计 $f$ 是涉及采样、观测、噪声、可辨识性与基线的单独方法问题。它不是本数学定义的一部分。</span>
+<span id="cb1-710"><a href="#cb1-710" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-711"><a href="#cb1-711" aria-hidden="true" tabindex="-1"></a><span class="fu">## 与 LDG 的关系</span></span>
+<span id="cb1-712"><a href="#cb1-712" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-713"><a href="#cb1-713" aria-hidden="true" tabindex="-1"></a>本对象形式化而非取代六个 Cycle 1 概念：</span>
+<span id="cb1-714"><a href="#cb1-714" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-715"><a href="#cb1-715" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> 概念 <span class="pp">|</span> 在自治 IVP 中的形式角色 <span class="pp">|</span></span>
+<span id="cb1-716"><a href="#cb1-716" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|</span></span>
+<span id="cb1-717"><a href="#cb1-717" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="co">[</span><span class="ot">State</span><span class="co">](../concepts/state.qmd)</span> <span class="pp">|</span> $x(t)$ 是时钟时间 $t$ 携带的状态值。 <span class="pp">|</span></span>
+<span id="cb1-718"><a href="#cb1-718" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="co">[</span><span class="ot">State Space</span><span class="co">](../concepts/state-space.qmd)</span> <span class="pp">|</span> $x(t)\in\mathcal{X}\subseteq\mathbb{R}^n$。 <span class="pp">|</span></span>
+<span id="cb1-719"><a href="#cb1-719" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="co">[</span><span class="ot">Initial Condition</span><span class="co">](../concepts/initial-condition.qmd)</span> <span class="pp">|</span> $x(t_0)=x_0$ 在参考时间锚定演化。 <span class="pp">|</span></span>
+<span id="cb1-720"><a href="#cb1-720" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="co">[</span><span class="ot">Vector Field</span><span class="co">](../concepts/vector-field.qmd)</span> <span class="pp">|</span> $f:\mathcal{X}\to\mathbb{R}^n$ 赋予瞬时变化。 <span class="pp">|</span></span>
+<span id="cb1-721"><a href="#cb1-721" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="co">[</span><span class="ot">Trajectory</span><span class="co">](../concepts/trajectory.qmd)</span> <span class="pp">|</span> $t\mapsto x(t)$ 是唯一性成立时由初始条件选择的一个解。 <span class="pp">|</span></span>
+<span id="cb1-722"><a href="#cb1-722" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="co">[</span><span class="ot">Flow</span><span class="co">](../concepts/flow.qmd)</span> <span class="pp">|</span> $(\tau,x_0)\mapsto\phi_\tau(x_0)$ 组织跨受支持初始状态的有限时间演化。 <span class="pp">|</span></span>
+<span id="cb1-723"><a href="#cb1-723" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-724"><a href="#cb1-724" aria-hidden="true" tabindex="-1"></a>对 LDG，主要方法学边界是声明 ODE 模型内的数学自洽不是测得神经、行为或潜变量遵循该模型的经验证据。后续玩具模型可以使用本对象指定已知真值。真实数据主张将额外需要论证状态描述、观测模型、估计规程、更简单基线与区分自治共享规则与输入、非平稳性、被省略状态和测量伪迹的检验。</span>
+<span id="cb1-725"><a href="#cb1-725" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-726"><a href="#cb1-726" aria-hidden="true" tabindex="-1"></a><span class="fu">## 参考文献</span></span>
+<span id="cb1-727"><a href="#cb1-727" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-728"><a href="#cb1-728" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>IVP 解的存在性、唯一性、光滑性、积分形式与延拓：<span class="co">[</span><span class="ot">@Teschl2012, ch. 2</span><span class="co">]</span>。</span>
+<span id="cb1-729"><a href="#cb1-729" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>演示全局演化、有限时间爆破与非唯一性的标量自治示例：<span class="co">[</span><span class="ot">@Teschl2012, sec. 1.3</span><span class="co">]</span>。</span>
+<span id="cb1-730"><a href="#cb1-730" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>极大积分曲线、受支持域 $W$、局部流复合与无穷小生成元：<span class="co">[</span><span class="ot">@Teschl2012, sec. 6.2</span><span class="co">]</span>。</span>
+<span id="cb1-731"><a href="#cb1-731" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-732"><a href="#cb1-732" aria-hidden="true" tabindex="-1"></a><span class="fu">## 成熟度检查表</span></span>
+<span id="cb1-733"><a href="#cb1-733" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-734"><a href="#cb1-734" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> 使用六个稳定 Cycle 1 概念作为规范前置知识。</span>
+<span id="cb1-735"><a href="#cb1-735" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> 以良类型化定义域与值域陈述自治欧氏 IVP。</span>
+<span id="cb1-736"><a href="#cb1-736" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> 分离连续性、局部利普希茨连续性与更强光滑性。</span>
+<span id="cb1-737"><a href="#cb1-737" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> 区分存在性与唯一性，以及局部、极大与全局解。</span>
+<span id="cb1-738"><a href="#cb1-738" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> 定义受支持局部流域，并只在定义处陈述恒等与复合。</span>
+<span id="cb1-739"><a href="#cb1-739" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> 通过零点导数把可微局部流与其向量场联系起来。</span>
+<span id="cb1-740"><a href="#cb1-740" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> 包含并验证完整 $\dot{x}=ax$ 轨迹与流推导。</span>
+<span id="cb1-741"><a href="#cb1-741" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> 包含解析检查的二维旋转–伸缩轨迹与全局流。</span>
+<span id="cb1-742"><a href="#cb1-742" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> 包含检查的非唯一性示例与有界有限时间爆破边界。</span>
+<span id="cb1-743"><a href="#cb1-743" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> 陈述经验与建模非蕴含，而不进入被排除的下游主题。</span>
+<span id="cb1-744"><a href="#cb1-744" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> 完成一次内部数学一致性 / 红队遍历。</span>
+<span id="cb1-745"><a href="#cb1-745" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> 应用独立 L2 数学审查的有界修正。</span>
+<span id="cb1-746"><a href="#cb1-746" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> 独立聚焦复审确认修订陈述；所有者于 2026-08-18 批准晋升为 <span class="in">`L2`</span> / <span class="in">`stable`</span>。</span></code></pre></div><button title="复制到剪贴板" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></div>
+</div></div></div></div></div>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

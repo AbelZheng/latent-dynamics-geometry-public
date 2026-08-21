@@ -1,0 +1,1592 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="zh-CN" xml:lang="zh-CN"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.10.18">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>跨套件鲁棒性综合 – Latent Dynamics &amp; Geometry</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-e3adbaa939bcd423dddc8c8a834270b4.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "没有结果",
+    "search-matching-documents-text": "匹配的文档",
+    "search-copy-link-title": "复制搜索链接",
+    "search-hide-matches-text": "隐藏其它匹配结果",
+    "search-more-match-text": "更多匹配结果",
+    "search-more-matches-text": "更多匹配结果",
+    "search-clear-button-title": "清除",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "取消",
+    "search-submit-button-title": "提交",
+    "search-label": "搜索"
+  }
+}</script>
+<style>
+.ldg-lang{position:fixed;top:72px;right:16px;z-index:2000;display:flex;gap:4px;font-family:system-ui,-apple-system,"Segoe UI",sans-serif;}
+.ldg-lang a{display:inline-block;padding:4px 10px;border:1px solid #c8c8c8;border-radius:999px;background:#fff;color:#333;text-decoration:none;font-size:13px;box-shadow:0 1px 3px rgba(0,0,0,.15);}
+.ldg-lang a.active{background:#2c3e50;color:#fff;border-color:#2c3e50;}
+</style>
+</head><body class="nav-fixed quarto-light"><div class="ldg-lang" id="ldg-lang">
+  <a href="#" id="ldg-lang-en">EN</a>
+  <a href="#" id="ldg-lang-zh">中文</a>
+</div>
+<script>
+(function () {
+  var BASE = '';
+  if (window.location.pathname.indexOf('/latent-dynamics-geometry-public/') === 0) {
+    BASE = 'latent-dynamics-geometry-public';
+  }
+  var IS_FILE = window.location.protocol === 'file:';
+  function pathSegs() {
+    return window.location.pathname.split('/').filter(Boolean);
+  }
+  function zhIdx() {
+    return pathSegs().indexOf('zh');
+  }
+  function segs() {
+    var s = window.location.pathname.split('/').filter(Boolean);
+    if (BASE && s[0] === BASE) s = s.slice(1);
+    return s;
+  }
+  function isZh() { return zhIdx() !== -1; }
+  function fileTarget(lang) {
+    var s = pathSegs();
+    var siteIdx = s.lastIndexOf('_site');
+    var root = siteIdx === -1 ? s.slice(0, -1) : s.slice(0, siteIdx + 1);
+    var page = siteIdx === -1 ? [s[s.length - 1]] : s.slice(siteIdx + 1);
+    if (page[0] === 'zh') page = page.slice(1);
+    if (lang === 'zh') page = ['zh'].concat(page);
+    var rel = page.join('/');
+    if (rel === '' || rel === 'zh') rel = 'index.html';
+    return '/' + root.join('/') + '/' + rel;
+  }
+  function target(lang) {
+    if (IS_FILE) return fileTarget(lang);
+    var s = segs();
+    if (s[0] === 'zh') s = s.slice(1);
+    if (lang === 'zh') s = ['zh'].concat(s);
+    var rel = s.join('/');
+    if (rel === '' || rel === 'zh') rel = (lang === 'zh' ? 'zh/index.html' : 'index.html');
+    return '/' + (BASE ? BASE + '/' : '') + rel;
+  }
+  function go(lang) {
+    try { localStorage.setItem('ldg-lang', lang); } catch (e) {}
+    window.location.href = target(lang);
+  }
+  function mark() {
+    var zh = isZh();
+    var a = document.getElementById('ldg-lang-en');
+    var b = document.getElementById('ldg-lang-zh');
+    if (a) a.className = zh ? '' : 'active';
+    if (b) b.className = zh ? 'active' : '';
+  }
+  function localizeNav() {
+    if (!isZh()) return;
+    var cur = pathSegs();
+    var czi = zhIdx();
+    var dir = (czi === -1 ? cur.slice(0, -1) : cur.slice(czi, -1)).join('/');
+    document.querySelectorAll('nav a').forEach(function (a) {
+      var h = a.getAttribute('href') || '';
+      if (/^(https?:|#|mailto:)/.test(h)) return;
+      if (/\.html?$/.test(h) || /\/$/.test(h) || h === '') {
+        var abs = new URL(h, window.location.href).pathname;
+        var s = abs.split('/').filter(Boolean);
+        if (BASE && s[0] === BASE) s = s.slice(1);
+        var zi = s.indexOf('zh');
+        var rel = zi !== -1 ? s.slice(zi + 1).join('/') : s.slice(czi).join('/');
+        var tgt = 'zh/' + rel;
+        var f = dir.split('/').filter(Boolean);
+        var t = tgt.split('/').filter(Boolean);
+        var i = 0;
+        while (i < f.length && i < t.length && f[i] === t[i]) i++;
+        var rel = '';
+        for (var j = i; j < f.length; j++) rel += '../';
+        rel += t.slice(i).join('/');
+        a.setAttribute('href', rel);
+      }
+    });
+  }
+  document.getElementById('ldg-lang-en').addEventListener('click', function (e) { e.preventDefault(); go('en'); });
+  document.getElementById('ldg-lang-zh').addEventListener('click', function (e) { e.preventDefault(); go('zh'); });
+  mark();
+  localizeNav();
+})();
+</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-chtml.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+
+
+
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">Latent Dynamics &amp; Geometry</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="搜索"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="展开或折叠导航栏" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../index.html"> 
+<span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../knowledge/concepts/index.html"> 
+<span class="menu-text">Concepts</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../knowledge/methods/index.html"> 
+<span class="menu-text">Methods</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../knowledge/math/index.html"> 
+<span class="menu-text">Math</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../knowledge/papers/index.html"> 
+<span class="menu-text">Papers</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../toy-models/index.html"> 
+<span class="menu-text">Toy Models</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../research-questions/index.html"> 
+<span class="menu-text">Research Questions</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../benchmarks/index.html"> 
+<span class="menu-text">Benchmarks</span></a>
+  </li>  
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/AbelZheng/latent-dynamics-geometry-public"> <i class="bi bi-github" role="img" aria-label="GitHub repository">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="https://github.com/AbelZheng/latent-dynamics-geometry-public/discussions"> 
+<span class="menu-text">Discussions</span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">该页面内容</h2>
+   
+  <ul>
+  <li><a href="#跨套件鲁棒性综合" id="toc-跨套件鲁棒性综合" class="nav-link active" data-scroll-target="#跨套件鲁棒性综合">跨套件鲁棒性综合</a>
+  <ul class="collapse">
+  <li><a href="#科学问题" id="toc-科学问题" class="nav-link" data-scroll-target="#科学问题">科学问题</a></li>
+  <li><a href="#真值" id="toc-真值" class="nav-link" data-scroll-target="#真值">真值</a></li>
+  <li><a href="#生成" id="toc-生成" class="nav-link" data-scroll-target="#生成">生成</a></li>
+  <li><a href="#场景网格" id="toc-场景网格" class="nav-link" data-scroll-target="#场景网格">场景网格</a></li>
+  <li><a href="#阴性对照与压力情形" id="toc-阴性对照与压力情形" class="nav-link" data-scroll-target="#阴性对照与压力情形">阴性对照与压力情形</a></li>
+  <li><a href="#重复与确定性种子" id="toc-重复与确定性种子" class="nav-link" data-scroll-target="#重复与确定性种子">重复与确定性种子</a></li>
+  <li><a href="#划分纪律" id="toc-划分纪律" class="nav-link" data-scroll-target="#划分纪律">划分纪律</a></li>
+  <li><a href="#方法与信息集" id="toc-方法与信息集" class="nav-link" data-scroll-target="#方法与信息集">方法与信息集</a>
+  <ul class="collapse">
+  <li><a href="#显式方法度量与目标词汇" id="toc-显式方法度量与目标词汇" class="nav-link" data-scroll-target="#显式方法度量与目标词汇">显式方法、度量与目标词汇</a></li>
+  </ul></li>
+  <li><a href="#参数选择" id="toc-参数选择" class="nav-link" data-scroll-target="#参数选择">参数选择</a></li>
+  <li><a href="#推断" id="toc-推断" class="nav-link" data-scroll-target="#推断">推断</a></li>
+  <li><a href="#评分" id="toc-评分" class="nav-link" data-scroll-target="#评分">评分</a></li>
+  <li><a href="#失效与适用性标签" id="toc-失效与适用性标签" class="nav-link" data-scroll-target="#失效与适用性标签">失效与适用性标签</a></li>
+  <li><a href="#产物契约" id="toc-产物契约" class="nav-link" data-scroll-target="#产物契约">产物契约</a></li>
+  <li><a href="#结果" id="toc-结果" class="nav-link" data-scroll-target="#结果">结果</a></li>
+  <li><a href="#解读界限" id="toc-解读界限" class="nav-link" data-scroll-target="#解读界限">解读界限</a></li>
+  <li><a href="#可复现性" id="toc-可复现性" class="nav-link" data-scroll-target="#可复现性">可复现性</a></li>
+  <li><a href="#审查记录" id="toc-审查记录" class="nav-link" data-scroll-target="#审查记录">审查记录</a></li>
+  <li><a href="#成熟度检查表" id="toc-成熟度检查表" class="nav-link" data-scroll-target="#成熟度检查表">成熟度检查表</a></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<div class="quarto-title-block"><div><h1 class="title">跨套件鲁棒性综合</h1><button type="button" class="btn code-tools-button" id="quarto-code-tools-source"><i class="bi"></i> 代码</button></div></div>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="跨套件鲁棒性综合" class="level1">
+<h1>跨套件鲁棒性综合</h1>
+<section id="科学问题" class="level2">
+<h2 class="anchored" data-anchor-id="科学问题">科学问题</h2>
+<p>P4-U06 询问一个刻意非比较的问题：<strong>五个稳定 Phase 4 合成基准对象中呈现哪些任务特定覆盖、适用性/失败模式与场景到适用目标映射？</strong></p>
+<p>本对象是清单与调和层。它不引入新生成器、拟合规程、参数选择、推断、恢复、评分度量、重复或科学结果。它不把源度量值复制进综合产物。不同度量永不被归一化、平均、合并或转换为排名。不产生方法胜者、普遍胜者、机制解释、因果结论或真实数据主张。</p>
+</section>
+<section id="真值" class="level2">
+<h2 class="anchored" data-anchor-id="真值">真值</h2>
+<p>P4-U06 没有新合成真值。真值保持定义在每个稳定源基准对象内部，且不跨任务合并：</p>
+<ul>
+<li>线性高斯推断的标量潜状态与观测；</li>
+<li>静态秩二公共信号、载荷与残差结构；</li>
+<li>时序潜轨迹、观测层与协方差先验；</li>
+<li>带标签解混效应与声明旋转生成器；</li>
+<li>弯曲重构真值与有限图/算子目标。</li>
+</ul>
+<p>这些真值对象具有不同数学类型。计数其声明目标族不使它们可通约，也不创造公共表现目标。</p>
+</section>
+<section id="生成" class="level2">
+<h2 class="anchored" data-anchor-id="生成">生成</h2>
+<p>P4-U06 <strong>不执行数据生成或源方法重跑</strong>。其解析科学输入只是五个稳定 Phase 4 源产物树各自的 <code>manifest.json</code>、<code>results.csv</code> 与 <code>diagnostics.json</code>。源 <code>summary.png</code> 是<strong>仅完整性附件</strong>：检查并记录其存在、字节数与声明哈希，但其像素、标签与绘制值不被解析或用作科学输入。综合前可执行要求 <code>maturity: L1</code>、<code>status: stable</code>、验证科学输入哈希、检查源状态词汇并把诊断状态计数与原始源行调和。</p>
+<p>验证稳定输入是：</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 23%">
+<col style="width: 30%">
+<col style="width: 23%">
+<col style="width: 23%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>源基准</th>
+<th style="text-align: right;">源行</th>
+<th>解析科学输入</th>
+<th>仅完整性附件</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>P4-U01 线性高斯鲁棒性</td>
+<td style="text-align: right;">5,445</td>
+<td>manifest/results/diagnostics</td>
+<td>summary PNG</td>
+</tr>
+<tr class="even">
+<td>P4-U02 静态线性潜恢复</td>
+<td style="text-align: right;">4,356</td>
+<td>manifest/results/diagnostics</td>
+<td>summary PNG</td>
+</tr>
+<tr class="odd">
+<td>P4-U03 时序协方差与推断</td>
+<td style="text-align: right;">3,960</td>
+<td>manifest/results/diagnostics</td>
+<td>summary PNG</td>
+</tr>
+<tr class="even">
+<td>P4-U04 解混与旋转投影</td>
+<td style="text-align: right;">2,712</td>
+<td>manifest/results/diagnostics</td>
+<td>summary PNG</td>
+</tr>
+<tr class="odd">
+<td>P4-U05 非线性重构与图几何</td>
+<td style="text-align: right;">4,167</td>
+<td>manifest/results/diagnostics</td>
+<td>summary PNG</td>
+</tr>
+</tbody>
+</table>
+<p>这些源合计包含 20,640 个原始源行。该总数是清单计数，不是池化样本量或跨任务方法比较的分母。源文件摘要与字节数冻结在 P4-U06 清单中，使后续源漂移机器可检测。</p>
+</section>
+<section id="场景网格" class="level2">
+<h2 class="anchored" data-anchor-id="场景网格">场景网格</h2>
+<p>综合清单包含七个任务记录与 73 个声明场景记录。它保留源任务边界，而非构造新跨套件网格。</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>任务</th>
+<th style="text-align: right;">场景</th>
+<th style="text-align: right;">重复</th>
+<th style="text-align: right;">方法</th>
+<th style="text-align: right;">度量</th>
+<th style="text-align: right;">目标</th>
+<th style="text-align: right;">源行</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>线性高斯推断</td>
+<td style="text-align: right;">11</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">11</td>
+<td style="text-align: right;">9</td>
+<td style="text-align: right;">7</td>
+<td style="text-align: right;">5,445</td>
+</tr>
+<tr class="even">
+<td>静态线性潜恢复</td>
+<td style="text-align: right;">11</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">9</td>
+<td style="text-align: right;">11</td>
+<td style="text-align: right;">13</td>
+<td style="text-align: right;">4,356</td>
+</tr>
+<tr class="odd">
+<td>时序协方差与推断</td>
+<td style="text-align: right;">12</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">11</td>
+<td style="text-align: right;">10</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">3,960</td>
+</tr>
+<tr class="even">
+<td>解混</td>
+<td style="text-align: right;">9</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">8</td>
+<td style="text-align: right;">7</td>
+<td style="text-align: right;">7</td>
+<td style="text-align: right;">1,512</td>
+</tr>
+<tr class="odd">
+<td>旋转</td>
+<td style="text-align: right;">10</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">8</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">1,200</td>
+</tr>
+<tr class="even">
+<td>非线性重构</td>
+<td style="text-align: right;">7</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">7</td>
+<td style="text-align: right;">7</td>
+<td style="text-align: right;">735</td>
+</tr>
+<tr class="odd">
+<td>图几何/算子恢复</td>
+<td style="text-align: right;">13</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">8</td>
+<td style="text-align: right;">11</td>
+<td style="text-align: right;">11</td>
+<td style="text-align: right;">3,432</td>
+</tr>
+</tbody>
+</table>
+<p>某些计数表面相等是巧合。一个任务中的度量数对另一个任务中的度量数没有数值或科学等价。</p>
+</section>
+<section id="阴性对照与压力情形" class="level2">
+<h2 class="anchored" data-anchor-id="阴性对照与压力情形">阴性对照与压力情形</h2>
+<p>综合为 73 个源场景每个发出一个 <code>scenario_target_coverage</code> 行。每行清点源声明压力类与该场景中至少一个非 <code>inapplicable</code> 源行的<strong>适用目标族</strong>。这只是覆盖元数据。它不估计敏感性、效应大小、效应方向、鲁棒性、显著性或因果响应。</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>任务</th>
+<th>保留声明压力类</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>线性高斯推断</td>
+<td>转移稳定性、噪声比、序列长度、缺失块、错误参数、重置边界失败、近单位根压力</td>
+</tr>
+<tr class="even">
+<td>静态线性潜恢复</td>
+<td>样本量、信号/特征值分离、异质或近零唯一性、相关残差、高干扰、离群值、预处理泄漏、参考</td>
+</tr>
+<tr class="odd">
+<td>时序协方差与推断</td>
+<td>时间尺度分离、试次数、通道/时间掩码、变点、相关残差、泊松误设、相等核、对齐抖动、有信息缺失</td>
+</tr>
+<tr class="even">
+<td>解混</td>
+<td>平衡参考、近共线子空间、缺失/不等单元、标签洗牌、伪群体、平均失配、样本量</td>
+</tr>
+<tr class="odd">
+<td>旋转</td>
+<td>干净旋转、对称衰减、时滞、公共输入、短弧、时间抖动、平滑/减法、非正交度量、协方差对照</td>
+</tr>
+<tr class="even">
+<td>非线性重构</td>
+<td>曲率、支撑族、样本/容量、干扰、支撑移位</td>
+</tr>
+<tr class="odd">
+<td>图几何</td>
+<td>参考、间隙、捷径、密度、连通性、邻域大小、带宽、度量缩放</td>
+</tr>
+</tbody>
+</table>
+<p>阴性对照保持为命名源场景或方法。P4-U06 不重调它们、不把它们重新解读为普通竞争者，也不移除观测失败与不适用标签。</p>
+</section>
+<section id="重复与确定性种子" class="level2">
+<h2 class="anchored" data-anchor-id="重复与确定性种子">重复与确定性种子</h2>
+<p>不引入新重复或随机种子。任务清单中的重复数继承自稳定源产物：P4-U01 五个、P4-U02 四个、P4-U03–P4-U05 每任务三个。P4-U06 确定性来自规范解析、稳定字典行排序与字节可验证输出，而非新随机实验。</p>
+<p>综合不得把不同任务的源重复当作一个可交换样本。源 q10/中位数/q90 摘要不被导入。</p>
+</section>
+<section id="划分纪律" class="level2">
+<h2 class="anchored" data-anchor-id="划分纪律">划分纪律</h2>
+<p>训练、验证、测试、诊断、在线、回顾性与神谕边界保持源本地。P4-U06 在其自身划分纪律被验证后读取已完成源行；它不接收原始生成数组，也没有重拟合源方法的能力。</p>
+<p>源出处词汇被保留而非塌缩。它们包括测试、验证、拟合/场景/泄漏/架构诊断、训练设计、留出测试、测试扩展、训练诊断、神谕诊断与训练所选对照出处。跨套件的相似词语不蕴含相同数据访问。</p>
+</section>
+<section id="方法与信息集" class="level2">
+<h2 class="anchored" data-anchor-id="方法与信息集">方法与信息集</h2>
+<p>P4-U06 不添加方法。它逐任务清点源方法并保留源本地信息集标签：</p>
+<ul>
+<li><strong>线性高斯推断：</strong> 固定参考；若干在线历史；回顾性完整区间；神谕回顾性完整区间；以及显式无效跨序列历史。</li>
+<li><strong>静态线性恢复：</strong> 固定参考、仅训练、训练/验证、神谕参数与无效测试预处理集。</li>
+<li><strong>时序协方差：</strong> 静态观测、在线、回顾性与神谕回顾性集。</li>
+<li><strong>解混：</strong> 设计诊断、有监督训练、有监督训练/验证与置换标签对照。</li>
+<li><strong>旋转：</strong> 固定参考、训练拟合投影、已知输入拟合与所选置换条件对照。</li>
+<li><strong>重构：</strong> 训练/验证拟合后冻结测试恢复。</li>
+<li><strong>图几何：</strong> 训练图/算子诊断与带留出扩展的冻结训练图。</li>
+</ul>
+<p>这些标签作为清单调和，而非映射到单一有序信息访问尺度。特别地，在线、回顾性、神谕、诊断与故意无效对照不能像求解一个部署任务那样排名。</p>
+<section id="显式方法度量与目标词汇" class="level3">
+<h3 class="anchored" data-anchor-id="显式方法度量与目标词汇">显式方法、度量与目标词汇</h3>
+<p>产物为每个不同任务本地词汇成员包含一个命名空间化 <code>method_member</code>、<code>metric_member</code> 与 <code>target_member</code> 清单行：<strong>60 个方法成员行、60 个度量成员行与 56 个目标成员行</strong>。名称不跨任务去重，因为相同表面词语可以具有不同角色或契约。</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>任务</th>
+<th>方法</th>
+<th>度量</th>
+<th>目标</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>线性高斯推断</td>
+<td><code>stationary_mean</code>、<code>persistence</code>、<code>open_loop</code>、<code>known_kalman_filter</code>、<code>known_rts_smoother</code>、<code>batch_conditioning_oracle</code>、<code>selected_kalman_filter</code>、<code>selected_rts_smoother</code>、<code>misspecified_kalman_filter</code>、<code>misspecified_rts_smoother</code>、<code>false_continuation_filter</code></td>
+<td><code>latent_rmse</code>、<code>interval_95_coverage</code>、<code>mean_posterior_variance</code>、<code>predictive_nll</code>、<code>inside_missing_block_rmse</code>、<code>outside_missing_block_rmse</code>、<code>selection_parameter_l1</code>、<code>oracle_mean_discrepancy</code>、<code>reset_first_state_abs_difference</code></td>
+<td><code>point_state</code>、<code>online_state</code>、<code>retrospective_state</code>、<code>one_step_observation_prediction</code>、<code>selected_parameter_tuple</code>、<code>numerical_correctness_reference</code>、<code>boundary_reset_diagnostic</code></td>
+</tr>
+<tr class="even">
+<td>静态线性潜恢复</td>
+<td><code>mean</code>、<code>fixed_projection</code>、<code>random_projection</code>、<code>pca</code>、<code>ppca</code>、<code>fa_selected</code>、<code>proper_scaled_pca</code>、<code>leaked_scaled_pca_control</code>、<code>true_gaussian_reference</code></td>
+<td><code>heldout_reconstruction_mse</code>、<code>latent_signal_reconstruction_mse</code>、<code>heldout_gaussian_nll</code>、<code>covariance_relative_frobenius</code>、<code>principal_subspace_angle_max_degrees</code>、<code>loading_subspace_angle_max_degrees</code>、<code>uniqueness_rmse</code>、<code>selected_validation_nll</code>、<code>optimizer_iterations</code>、<code>identification_applicable</code>、<code>preprocessing_test_poison_parameter_change</code></td>
+<td><code>observed_coordinate_reconstruction</code>、<code>true_common_signal</code>、<code>observable_distribution</code>、<code>observable_covariance</code>、<code>population_principal_subspace</code>、<code>identified_true_common_loading_subspace</code>、<code>identified_diagonal_uniqueness</code>、<code>bounded_fa_selection</code>、<code>diagonal_fa_identification_applicability</code>、<code>contaminated_observed_coordinate_reconstruction</code>、<code>contaminated_observation_gaussian_score</code>、<code>nominal_clean_gaussian_covariance</code>、<code>preprocessing_leakage_diagnostic</code></td>
+</tr>
+<tr class="odd">
+<td>时序协方差与推断</td>
+<td><code>mean_diagonal</code>、<code>static_factor</code>、<code>two_stage_pca_smooth</code>、<code>independent_channel_gp</code>、<code>known_gpfa</code>、<code>selected_gpfa</code>、<code>wrong_timescale_gpfa</code>、<code>wrong_ar_gpfa</code>、<code>ar_kalman_filter</code>、<code>ar_rts_smoother</code>、<code>exact_gaussian_oracle</code></td>
+<td><code>marginal_nll_per_entry</code>、<code>masked_prediction_nll_per_entry</code>、<code>masked_prediction_rmse</code>、<code>latent_rmse</code>、<code>latent_90_coverage</code>、<code>loading_subspace_angle_degrees</code>、<code>timescale_l1</code>、<code>selected_combined_nll_per_entry</code>、<code>covariance_relative_frobenius</code>、<code>posterior_mean_oracle_max_abs</code></td>
+<td><code>observation_distribution</code>、<code>masked_observation_prediction</code>、<code>latent_trajectory</code>、<code>loading_subspace</code>、<code>timescale_selection</code>、<code>numerical_posterior_oracle</code></td>
+</tr>
+<tr class="even">
+<td>解混</td>
+<td><code>condition_mean</code>、<code>pca</code>、<code>marginal_pca</code>、<code>selected_dpca</code>、<code>ridge_decoder</code>、<code>shuffled_dpca_control</code>、<code>shuffled_decoder_control</code>、<code>factorial_design_diagnostic</code></td>
+<td><code>stimulus_marginal_nmse</code>、<code>decision_marginal_nmse</code>、<code>stimulus_subspace_angle_degrees</code>、<code>decision_subspace_angle_degrees</code>、<code>stimulus_decoding_accuracy</code>、<code>decision_decoding_accuracy</code>、<code>factorial_design_rank</code></td>
+<td><code>stimulus_marginal_reconstruction</code>、<code>decision_marginal_reconstruction</code>、<code>stimulus_marginal_subspace</code>、<code>decision_marginal_subspace</code>、<code>stimulus_label_decoding</code>、<code>decision_label_decoding</code>、<code>factorial_design_identification</code></td>
+</tr>
+<tr class="odd">
+<td>旋转</td>
+<td>覆盖 PCA/固定/随机平面、无限制/斜/对称/输入感知拟合与协方差对照的 8 个成员</td>
+<td><code>plane_angle_degrees</code>、<code>angular_rate_abs_error</code>、<code>derivative_rmse</code>、<code>tangential_velocity_ratio</code>、<code>covariance_similarity</code></td>
+<td><code>rotational_plane</code>、<code>angular_rate</code>、<code>heldout_derivative_prediction</code>、<code>plane_tangential_motion</code>、<code>condition_covariance_control</code></td>
+</tr>
+<tr class="even">
+<td>非线性重构</td>
+<td><code>mean</code>、<code>pca</code>、<code>linear_autoencoder</code>、<code>nonlinear_autoencoder</code>、<code>frozen_encoder</code></td>
+<td><code>observed_reconstruction_mse</code>、<code>noiseless_signal_mse</code>、<code>code_variance</code>、<code>code_abs_spearman_truth</code>、<code>code_collision_rate</code>、<code>selected_validation_mse</code>、<code>parameter_count</code></td>
+<td><code>observed_test_reconstruction</code>、<code>known_noiseless_test_signal</code>、<code>deterministic_test_code_activity</code>、<code>scoring_only_generator_parameter</code>、<code>scoring_only_generator_collision_diagnostic</code>、<code>validation_selection_diagnostic</code>、<code>architecture_diagnostic</code></td>
+</tr>
+<tr class="odd">
+<td>图几何/算子恢复</td>
+<td><code>mean</code>、<code>pca</code>、<code>ambient_mds</code>、<code>isomap</code>、<code>graph_diagnostics</code>、<code>diffusion_maps</code>、<code>direct_operator</code>、<code>nystrom_extension</code></td>
+<td><code>component_count</code>、<code>infinite_pair_rate</code>、<code>material_shortcut_rate</code>、<code>graph_distance_relative_rmse</code>、<code>mds_negative_eigenmass</code>、<code>heldout_coordinate_rmse</code>、<code>diffusion_eigenspace_angle_max_degrees</code>、<code>diffusion_truncation_relative_rmse</code>、<code>operator_row_sum_max_abs</code>、<code>direct_spectral_distance_max_abs</code>、<code>heldout_extension_rmse</code></td>
+<td><code>finite_training_graph_connectivity_diagnostic</code>、<code>finite_training_graph_disconnection_diagnostic</code>、<code>known_hairpin_pairwise_arc_separation</code>、<code>known_hairpin_path_underestimation_diagnostic</code>、<code>classical_mds_euclideanity_diagnostic</code>、<code>scoring_aligned_known_hairpin_arc_length</code>、<code>l2_pi_cosine_sine_eigenspace_diagnostic</code>、<code>full_finite_operator_diffusion_distance</code>、<code>markov_operator_numerical_oracle</code>、<code>finite_operator_numerical_oracle</code>、<code>heldout_cosine_sine_extension_after_train_alignment</code></td>
+</tr>
+</tbody>
+</table>
+<p>精确完整字符串在 <code>results.csv</code> 的 <code>inventory</code> 行中权威；上方紧凑表记录其任务本地角色，不创建跨任务词汇层级。</p>
+</section>
+</section>
+<section id="参数选择" class="level2">
+<h2 class="anchored" data-anchor-id="参数选择">参数选择</h2>
+<p>没有 P4-U06 参数选择。源所选超参数与选择诊断保留在其稳定源产物中。综合只记录方法、任务、场景、状态与声明词汇；它既不选择源方法，也不搜索跨套件工作点。</p>
+</section>
+<section id="推断" class="level2">
+<h2 class="anchored" data-anchor-id="推断">推断</h2>
+<p>没有 P4-U06 推断或恢复。源后验状态、重构、子空间、导数、嵌入与扩展不被重算，其度量值不被复制。可执行只构造清单、适用性/失败模式与场景目标覆盖行。</p>
+</section>
+<section id="评分" class="level2">
+<h2 class="anchored" data-anchor-id="评分">评分</h2>
+<p>P4-U06 没有公共科学得分。其四种记录类型是：</p>
+<ol type="1">
+<li><code>inventory</code> —— 任务特定计数加显式方法、度量、目标、信息集与出处词汇成员；</li>
+<li><code>applicability_pattern</code> —— 原始笛卡尔方法 × 度量 × 重复行上的任务/场景/方法适用性；</li>
+<li><code>failure_pattern</code> —— 两个单独命名的失败标签比例，带精确分母；以及</li>
+<li><code>scenario_target_coverage</code> —— 场景级适用目标族清单，无源度量值或效应。</li>
+</ol>
+<p>对固定任务/场景/方法组，定义</p>
+<ul>
+<li><span class="math inline">\(N_{all}\)</span>：所有原始笛卡尔度量 × 重复行；</li>
+<li><span class="math inline">\(N_{app}=N_{ok}+N_{invalid}+N_{nonconvergence}\)</span>：状态非 <code>inapplicable</code> 的行；以及</li>
+<li><span class="math inline">\(N_{fail}=N_{invalid}+N_{nonconvergence}\)</span>。</li>
+</ul>
+<p>产物报告：</p>
+<ul>
+<li>适用性率 <span class="math inline">\(N_{app}/N_{all}\)</span>；</li>
+<li><strong>原始笛卡尔失败标签比例</strong> <span class="math inline">\(N_{fail}/N_{all}\)</span>；以及</li>
+<li><strong>条件失败率</strong> <span class="math inline">\(N_{fail}/N_{app}\)</span>。</li>
+</ul>
+<p>当 <span class="math inline">\(N_{app}=0\)</span> 时条件率数学上未定义。该行以 <code>status: inapplicable</code>、空白序列化分母/率字段与无捏造零保留。有 <strong>104</strong> 个此类零适用分母行；其他 <strong>539</strong> 个条件率行具有显式正分母。全部 643 个原始笛卡尔失败标签比例行保留其非零 <span class="math inline">\(N_{all}\)</span> 分母。</p>
+<p>这些比例描述源标签与笛卡尔设计，而非归一化方法表现。它们不得作为排行榜比较。高 <code>inapplicable</code> 比例可以是窄类型度量的正确结果。</p>
+</section>
+<section id="失效与适用性标签" class="level2">
+<h2 class="anchored" data-anchor-id="失效与适用性标签">失效与适用性标签</h2>
+<p>共享词汇如下调和：</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>标签</th>
+<th>跨套件解读</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>ok</code></td>
+<td>源行声明计算完成且适用；它不意味一般科学正确。</td>
+</tr>
+<tr class="even">
+<td><code>inapplicable</code></td>
+<td>方法/度量/场景目标在源契约下未定义；它被保留，而非当作缺失或零。</td>
+</tr>
+<tr class="odd">
+<td><code>invalid</code></td>
+<td>声明的设计、信息集、辨识或有限值条件失败。</td>
+</tr>
+<tr class="even">
+<td><code>nonconvergence</code></td>
+<td>有界数值/优化规程未满足其源完成规则。</td>
+</tr>
+</tbody>
+</table>
+<p>任务特定状态组成是：</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>任务</th>
+<th style="text-align: right;"><code>ok</code></th>
+<th style="text-align: right;"><code>inapplicable</code></th>
+<th style="text-align: right;"><code>invalid</code></th>
+<th style="text-align: right;"><code>nonconvergence</code></th>
+<th style="text-align: right;">分母</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>线性高斯推断</td>
+<td style="text-align: right;">1,515</td>
+<td style="text-align: right;">3,930</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">5,445</td>
+</tr>
+<tr class="even">
+<td>静态线性潜恢复</td>
+<td style="text-align: right;">1,260</td>
+<td style="text-align: right;">3,044</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">52</td>
+<td style="text-align: right;">4,356</td>
+</tr>
+<tr class="odd">
+<td>时序协方差与推断</td>
+<td style="text-align: right;">2,049</td>
+<td style="text-align: right;">1,911</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">3,960</td>
+</tr>
+<tr class="even">
+<td>解混</td>
+<td style="text-align: right;">567</td>
+<td style="text-align: right;">891</td>
+<td style="text-align: right;">54</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1,512</td>
+</tr>
+<tr class="odd">
+<td>旋转</td>
+<td style="text-align: right;">474</td>
+<td style="text-align: right;">726</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1,200</td>
+</tr>
+<tr class="even">
+<td>非线性重构</td>
+<td style="text-align: right;">690</td>
+<td style="text-align: right;">45</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">735</td>
+</tr>
+<tr class="odd">
+<td>图几何/算子恢复</td>
+<td style="text-align: right;">299</td>
+<td style="text-align: right;">3,133</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">3,432</td>
+</tr>
+</tbody>
+</table>
+<p>稳定输入中唯一自然失败标签是静态线性恢复中的 52 个有界 FA <code>nonconvergence</code> 行与解混中的 54 个缺失单元设计秩 <code>invalid</code> 行。其含义保持源特定。另一任务中自然失败缺失不是方法族普遍鲁棒的证据；源验证器通过故障注入单独演练失败路由。</p>
+</section>
+<section id="产物契约" class="level2">
+<h2 class="anchored" data-anchor-id="产物契约">产物契约</h2>
+<p>综合产物目录限于：</p>
+<pre class="text"><code>manifest.json
+results.csv
+diagnostics.json
+summary.png</code></pre>
+<p>权威产物包含 <strong>2,308</strong> 个完整规范综合行：</p>
+<ul>
+<li>306 个 <code>inventory</code> 行，包括 60 个方法、60 个度量与 56 个目标成员；</li>
+<li>643 个 <code>applicability_pattern</code> 行；</li>
+<li>1,286 个 <code>failure_pattern</code> 行：643 个原始笛卡尔比例与 643 个条件率；以及</li>
+<li>73 个 <code>scenario_target_coverage</code> 行。</li>
+</ul>
+<p>清单记录五个稳定源树、所有源内容哈希与字节数、17 字段原始 schema、字典序 <code>row_key</code> 排序、运行时、命令与对源方法重跑、导入度量值、跨任务归一化/平均、得分、排名与胜者的显式禁止。</p>
+</section>
+<section id="结果" class="level2">
+<h2 class="anchored" data-anchor-id="结果">结果</h2>
+<p>综合确认跨五个稳定基准对象与七个独立任务的覆盖。任务清单跨越 73 个命名场景与 20,640 个源行，而综合本身包含 2,308 个清单/模式/覆盖行。这些只是覆盖计数。</p>
+<p>场景目标覆盖清单显示 Phase 4 刻意演练不同种类边界，而非一个重复基准模板：时间稳定性与重置；静态辨识与残差规格；协方差、缺失与观测族误设；标签/设计与旋转对照；非线性支撑/容量；以及有限图连通性、捷径、带宽与度量依赖。覆盖行陈述每个场景中哪些目标族适用；它们不陈述效应大小、方向、敏感性或鲁棒性结果。</p>
+<p>任务特定状态表还演示为什么池化率会误导。图几何具有许多刻意类型化方法–度量对，因此许多 <code>inapplicable</code> 行，而重构具有更稠密适用性设计。解混的 <code>invalid</code> 行编码缺失单元设计失败；静态恢复的 <code>nonconvergence</code> 行编码有界 FA 优化。那些标签不是可互换损失。</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="../../benchmarks/artifacts/cross-suite-robustness-synthesis/summary.png" class="img-fluid figure-img"></p>
+<figcaption>P4-U06 跨套件覆盖清单</figcaption>
+</figure>
+</div>
+<p>图使用每个任务自身源行分母显示场景/方法/度量清单计数与任务特定状态组成。它不包含源度量值、池化得分、归一化排名或胜者。</p>
+</section>
+<section id="解读界限" class="level2">
+<h2 class="anchored" data-anchor-id="解读界限">解读界限</h2>
+<ul>
+<li>清单量不是科学质量、成熟度或方法优越性的证据。</li>
+<li>场景数不是难度或证据权重的可比度量。</li>
+<li>适用性与两个失败标签比例以每个任务的方法-度量-重复笛卡尔设计及其显式命名分母为条件。</li>
+<li>场景目标覆盖条目记录适用目标族覆盖，而非敏感性、效应大小、方向、显著性或因果归因。</li>
+<li><code>ok</code> 是计算/状态标签，不是模型正确性、可辨识性、机制、因果性或真实数据迁移的证明。</li>
+<li><code>inapplicable</code>、<code>invalid</code> 与 <code>nonconvergence</code> 具有不同含义，永不被组合为普遍惩罚。</li>
+<li>没有结果支持普遍胜者、跨任务方法排名、公共潜生成器、流形/拓扑恢复、生物有效性或 Phase 5 就绪。</li>
+<li>本综合不取代阅读源基准对象、其原始行、产物、审查记录与解读界限。</li>
+</ul>
+</section>
+<section id="可复现性" class="level2">
+<h2 class="anchored" data-anchor-id="可复现性">可复现性</h2>
+<p>从仓库根目录用清单记录运行时运行：</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">/Users/bytedance/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3</span> benchmarks/cross-suite-robustness-synthesis.py <span class="at">--generate</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="ex">/Users/bytedance/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3</span> benchmarks/cross-suite-robustness-synthesis.py <span class="at">--generate</span> <span class="at">--resume</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="ex">/Users/bytedance/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3</span> benchmarks/cross-suite-robustness-synthesis.py <span class="at">--verify</span></span></code></pre></div><button title="复制到剪贴板" class="code-copy-button"><i class="bi"></i></button></div>
+<p>验证器检查稳定源状态；源清单/内容哈希；源诊断/原始行状态调和；精确四产物清单；2,308 个唯一规范行；无源度量值与排名/得分/胜者字段；显式分母；逐字节相同干净与反转顺序生成；有效部分恢复；拒绝损坏、重复、未知与不完整恢复行；源内容漂移拒绝；以及非稳定源清单拒绝。</p>
+</section>
+<section id="审查记录" class="level2">
+<h2 class="anchored" data-anchor-id="审查记录">审查记录</h2>
+<p>独立科学与实现审查员是只读且独立于执行者。其初始审查在诚实场景目标覆盖术语、原始对条件失败分母、命名空间化方法/度量/目标清单与科学输入对完整性附件边界上返回 <code>REVISE</code>。有界修正轮次只处理那些发现；聚焦科学与实现复审都返回 <code>PASS</code>，无未解决发现。</p>
+<p>已接受验证记录包括 63 对象结构验证、33 仓库测试、综合验证器与对抗源检查、目标/索引渲染、工作流验证与 <code>git diff --check</code>。记录的审查决定随后授权机械晋升到 <code>L1/stable</code>。稳定状态记录该声明合成基准对象的有界验收；它不扩大其证据、信息集、目标或解读边界。</p>
+</section>
+<section id="成熟度检查表" class="level2">
+<h2 class="anchored" data-anchor-id="成熟度检查表">成熟度检查表</h2>
+<ul class="task-list">
+<li><label><input type="checkbox" checked="">只读取五个验证 <code>L1/stable</code> Phase 4 产物树。</label></li>
+<li><label><input type="checkbox" checked="">不引入新生成器、重复、选择、推断、恢复或科学得分。</label></li>
+<li><label><input type="checkbox" checked="">保留七个任务边界与源本地信息集/出处。</label></li>
+<li><label><input type="checkbox" checked="">调和四个状态标签而不把它们当作一个损失。</label></li>
+<li><label><input type="checkbox" checked="">记录带精确源行分母的任务/场景/方法/度量清单。</label></li>
+<li><label><input type="checkbox" checked="">记录 73 个场景目标覆盖行，不蕴含敏感性或导入效应大小。</label></li>
+<li><label><input type="checkbox" checked="">不产生度量归一化、跨任务聚合、得分、排名、胜者或机制推断。</label></li>
+<li><label><input type="checkbox" checked="">输出限于四个确定性字节可验证产物。</label></li>
+<li><label><input type="checkbox" checked="">聚焦科学复审通过。</label></li>
+<li><label><input type="checkbox" checked="">聚焦实现复审通过。</label></li>
+<li><label><input type="checkbox" checked="">只有两个复审与验证都通过后，才发生机械 <code>L1/stable</code> 晋升。</label></li>
+</ul>
+
+
+<!-- -->
+
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "已复制");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "已复制");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+    const viewSource = window.document.getElementById('quarto-view-source') ||
+                       window.document.getElementById('quarto-code-tools-source');
+    if (viewSource) {
+      const sourceUrl = viewSource.getAttribute("data-quarto-source-url");
+      viewSource.addEventListener("click", function(e) {
+        if (sourceUrl) {
+          // rstudio viewer pane
+          if (/\bcapabilities=\b/.test(window.location)) {
+            window.open(sourceUrl);
+          } else {
+            window.location.href = sourceUrl;
+          }
+        } else {
+          const modal = new bootstrap.Modal(document.getElementById('quarto-embedded-source-code-modal'));
+          modal.show();
+        }
+        return false;
+      });
+    }
+    function toggleCodeHandler(show) {
+      return function(e) {
+        const cellDetails = window.document.querySelectorAll(".cell details.code-fold");
+        for (let i=0; i<cellDetails.length; i++) {
+          const details = cellDetails[i];
+          if (show) {
+            details.open = true;
+          } else {
+            details.removeAttribute("open");
+          }
+        }
+        const cellCodeDivs = window.document.querySelectorAll(".cell div.sourceCode.cell-code");
+        const fromCls = show ? "hidden" : "unhidden";
+        const toCls = show ? "unhidden" : "hidden";
+        for (let i=0; i<cellCodeDivs.length; i++) {
+          const codeDiv = cellCodeDivs[i];
+          if (codeDiv.classList.contains(fromCls)) {
+            codeDiv.classList.remove(fromCls);
+            codeDiv.classList.add(toCls);
+          } 
+        }
+        return false;
+      }
+    }
+    const hideAllCode = window.document.getElementById("quarto-hide-all-code");
+    if (hideAllCode) {
+      hideAllCode.addEventListener("click", toggleCodeHandler(false));
+    }
+    const showAllCode = window.document.getElementById("quarto-show-all-code");
+    if (showAllCode) {
+      showAllCode.addEventListener("click", toggleCodeHandler(true));
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/abelzheng\.github\.io\/latent-dynamics-geometry-public\/");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+            // target, if specified
+            link.setAttribute("target", "_blank");
+            if (link.getAttribute("rel") === null) {
+              link.setAttribute("rel", "noopener");
+            }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">源代码</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3" data-shortcodes="false"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="an">title:</span><span class="co"> "跨套件鲁棒性综合"</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="an">lang:</span><span class="co"> zh-CN</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="an">comments:</span><span class="co"> false</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="an">object_type:</span><span class="co"> benchmark</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="an">maturity:</span><span class="co"> L1</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="an">status:</span><span class="co"> stable</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="an">domain:</span><span class="co"> [latent-dynamics, dimensionality-reduction, graph-methods, robustness]</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="an">tags:</span><span class="co"> [benchmark, synthesis, applicability, failure-boundaries, scenario-target-coverage]</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="an">prerequisites:</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a><span class="co">- benchmarks/linear-gaussian-robustness.qmd</span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a><span class="co">- benchmarks/static-linear-latent-robustness.qmd</span></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a><span class="co">- benchmarks/temporal-covariance-inference.qmd</span></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a><span class="co">- benchmarks/demixing-rotational-robustness.qmd</span></span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a><span class="co">- benchmarks/nonlinear-graph-robustness.qmd</span></span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a><span class="an">related:</span><span class="co"> []</span></span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a><span class="an">created:</span><span class="co"> 2026-08-20</span></span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a><span class="an">updated:</span><span class="co"> 2026-08-20</span></span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a><span class="fu"># 跨套件鲁棒性综合</span></span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a><span class="fu">## 科学问题</span></span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a>P4-U06 询问一个刻意非比较的问题：**五个稳定 Phase 4 合成基准对象中呈现哪些任务特定覆盖、适用性/失败模式与场景到适用目标映射？**</span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a>本对象是清单与调和层。它不引入新生成器、拟合规程、参数选择、推断、恢复、评分度量、重复或科学结果。它不把源度量值复制进综合产物。不同度量永不被归一化、平均、合并或转换为排名。不产生方法胜者、普遍胜者、机制解释、因果结论或真实数据主张。</span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a><span class="fu">## 真值</span></span>
+<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a>P4-U06 没有新合成真值。真值保持定义在每个稳定源基准对象内部，且不跨任务合并：</span>
+<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>线性高斯推断的标量潜状态与观测；</span>
+<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>静态秩二公共信号、载荷与残差结构；</span>
+<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>时序潜轨迹、观测层与协方差先验；</span>
+<span id="cb3-36"><a href="#cb3-36" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>带标签解混效应与声明旋转生成器；</span>
+<span id="cb3-37"><a href="#cb3-37" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>弯曲重构真值与有限图/算子目标。</span>
+<span id="cb3-38"><a href="#cb3-38" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-39"><a href="#cb3-39" aria-hidden="true" tabindex="-1"></a>这些真值对象具有不同数学类型。计数其声明目标族不使它们可通约，也不创造公共表现目标。</span>
+<span id="cb3-40"><a href="#cb3-40" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-41"><a href="#cb3-41" aria-hidden="true" tabindex="-1"></a><span class="fu">## 生成</span></span>
+<span id="cb3-42"><a href="#cb3-42" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-43"><a href="#cb3-43" aria-hidden="true" tabindex="-1"></a>P4-U06 **不执行数据生成或源方法重跑**。其解析科学输入只是五个稳定 Phase 4 源产物树各自的 `manifest.json`、`results.csv` 与 `diagnostics.json`。源 `summary.png` 是**仅完整性附件**：检查并记录其存在、字节数与声明哈希，但其像素、标签与绘制值不被解析或用作科学输入。综合前可执行要求 <span class="in">`maturity: L1`</span>、<span class="in">`status: stable`</span>、验证科学输入哈希、检查源状态词汇并把诊断状态计数与原始源行调和。</span>
+<span id="cb3-44"><a href="#cb3-44" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-45"><a href="#cb3-45" aria-hidden="true" tabindex="-1"></a>验证稳定输入是：</span>
+<span id="cb3-46"><a href="#cb3-46" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-47"><a href="#cb3-47" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> 源基准 <span class="pp">|</span> 源行 <span class="pp">|</span> 解析科学输入 <span class="pp">|</span> 仅完整性附件 <span class="pp">|</span></span>
+<span id="cb3-48"><a href="#cb3-48" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---:|---|---|</span></span>
+<span id="cb3-49"><a href="#cb3-49" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> P4-U01 线性高斯鲁棒性 <span class="pp">|</span> 5,445 <span class="pp">|</span> manifest/results/diagnostics <span class="pp">|</span> summary PNG <span class="pp">|</span></span>
+<span id="cb3-50"><a href="#cb3-50" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> P4-U02 静态线性潜恢复 <span class="pp">|</span> 4,356 <span class="pp">|</span> manifest/results/diagnostics <span class="pp">|</span> summary PNG <span class="pp">|</span></span>
+<span id="cb3-51"><a href="#cb3-51" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> P4-U03 时序协方差与推断 <span class="pp">|</span> 3,960 <span class="pp">|</span> manifest/results/diagnostics <span class="pp">|</span> summary PNG <span class="pp">|</span></span>
+<span id="cb3-52"><a href="#cb3-52" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> P4-U04 解混与旋转投影 <span class="pp">|</span> 2,712 <span class="pp">|</span> manifest/results/diagnostics <span class="pp">|</span> summary PNG <span class="pp">|</span></span>
+<span id="cb3-53"><a href="#cb3-53" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> P4-U05 非线性重构与图几何 <span class="pp">|</span> 4,167 <span class="pp">|</span> manifest/results/diagnostics <span class="pp">|</span> summary PNG <span class="pp">|</span></span>
+<span id="cb3-54"><a href="#cb3-54" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-55"><a href="#cb3-55" aria-hidden="true" tabindex="-1"></a>这些源合计包含 20,640 个原始源行。该总数是清单计数，不是池化样本量或跨任务方法比较的分母。源文件摘要与字节数冻结在 P4-U06 清单中，使后续源漂移机器可检测。</span>
+<span id="cb3-56"><a href="#cb3-56" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-57"><a href="#cb3-57" aria-hidden="true" tabindex="-1"></a><span class="fu">## 场景网格</span></span>
+<span id="cb3-58"><a href="#cb3-58" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-59"><a href="#cb3-59" aria-hidden="true" tabindex="-1"></a>综合清单包含七个任务记录与 73 个声明场景记录。它保留源任务边界，而非构造新跨套件网格。</span>
+<span id="cb3-60"><a href="#cb3-60" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-61"><a href="#cb3-61" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> 任务 <span class="pp">|</span> 场景 <span class="pp">|</span> 重复 <span class="pp">|</span> 方法 <span class="pp">|</span> 度量 <span class="pp">|</span> 目标 <span class="pp">|</span> 源行 <span class="pp">|</span></span>
+<span id="cb3-62"><a href="#cb3-62" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---:|---:|---:|---:|---:|---:|</span></span>
+<span id="cb3-63"><a href="#cb3-63" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> 线性高斯推断 <span class="pp">|</span> 11 <span class="pp">|</span> 5 <span class="pp">|</span> 11 <span class="pp">|</span> 9 <span class="pp">|</span> 7 <span class="pp">|</span> 5,445 <span class="pp">|</span></span>
+<span id="cb3-64"><a href="#cb3-64" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> 静态线性潜恢复 <span class="pp">|</span> 11 <span class="pp">|</span> 4 <span class="pp">|</span> 9 <span class="pp">|</span> 11 <span class="pp">|</span> 13 <span class="pp">|</span> 4,356 <span class="pp">|</span></span>
+<span id="cb3-65"><a href="#cb3-65" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> 时序协方差与推断 <span class="pp">|</span> 12 <span class="pp">|</span> 3 <span class="pp">|</span> 11 <span class="pp">|</span> 10 <span class="pp">|</span> 6 <span class="pp">|</span> 3,960 <span class="pp">|</span></span>
+<span id="cb3-66"><a href="#cb3-66" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> 解混 <span class="pp">|</span> 9 <span class="pp">|</span> 3 <span class="pp">|</span> 8 <span class="pp">|</span> 7 <span class="pp">|</span> 7 <span class="pp">|</span> 1,512 <span class="pp">|</span></span>
+<span id="cb3-67"><a href="#cb3-67" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> 旋转 <span class="pp">|</span> 10 <span class="pp">|</span> 3 <span class="pp">|</span> 8 <span class="pp">|</span> 5 <span class="pp">|</span> 5 <span class="pp">|</span> 1,200 <span class="pp">|</span></span>
+<span id="cb3-68"><a href="#cb3-68" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> 非线性重构 <span class="pp">|</span> 7 <span class="pp">|</span> 3 <span class="pp">|</span> 5 <span class="pp">|</span> 7 <span class="pp">|</span> 7 <span class="pp">|</span> 735 <span class="pp">|</span></span>
+<span id="cb3-69"><a href="#cb3-69" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> 图几何/算子恢复 <span class="pp">|</span> 13 <span class="pp">|</span> 3 <span class="pp">|</span> 8 <span class="pp">|</span> 11 <span class="pp">|</span> 11 <span class="pp">|</span> 3,432 <span class="pp">|</span></span>
+<span id="cb3-70"><a href="#cb3-70" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-71"><a href="#cb3-71" aria-hidden="true" tabindex="-1"></a>某些计数表面相等是巧合。一个任务中的度量数对另一个任务中的度量数没有数值或科学等价。</span>
+<span id="cb3-72"><a href="#cb3-72" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-73"><a href="#cb3-73" aria-hidden="true" tabindex="-1"></a><span class="fu">## 阴性对照与压力情形</span></span>
+<span id="cb3-74"><a href="#cb3-74" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-75"><a href="#cb3-75" aria-hidden="true" tabindex="-1"></a>综合为 73 个源场景每个发出一个 <span class="in">`scenario_target_coverage`</span> 行。每行清点源声明压力类与该场景中至少一个非 <span class="in">`inapplicable`</span> 源行的**适用目标族**。这只是覆盖元数据。它不估计敏感性、效应大小、效应方向、鲁棒性、显著性或因果响应。</span>
+<span id="cb3-76"><a href="#cb3-76" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-77"><a href="#cb3-77" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> 任务 <span class="pp">|</span> 保留声明压力类 <span class="pp">|</span></span>
+<span id="cb3-78"><a href="#cb3-78" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|</span></span>
+<span id="cb3-79"><a href="#cb3-79" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> 线性高斯推断 <span class="pp">|</span> 转移稳定性、噪声比、序列长度、缺失块、错误参数、重置边界失败、近单位根压力 <span class="pp">|</span></span>
+<span id="cb3-80"><a href="#cb3-80" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> 静态线性潜恢复 <span class="pp">|</span> 样本量、信号/特征值分离、异质或近零唯一性、相关残差、高干扰、离群值、预处理泄漏、参考 <span class="pp">|</span></span>
+<span id="cb3-81"><a href="#cb3-81" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> 时序协方差与推断 <span class="pp">|</span> 时间尺度分离、试次数、通道/时间掩码、变点、相关残差、泊松误设、相等核、对齐抖动、有信息缺失 <span class="pp">|</span></span>
+<span id="cb3-82"><a href="#cb3-82" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> 解混 <span class="pp">|</span> 平衡参考、近共线子空间、缺失/不等单元、标签洗牌、伪群体、平均失配、样本量 <span class="pp">|</span></span>
+<span id="cb3-83"><a href="#cb3-83" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> 旋转 <span class="pp">|</span> 干净旋转、对称衰减、时滞、公共输入、短弧、时间抖动、平滑/减法、非正交度量、协方差对照 <span class="pp">|</span></span>
+<span id="cb3-84"><a href="#cb3-84" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> 非线性重构 <span class="pp">|</span> 曲率、支撑族、样本/容量、干扰、支撑移位 <span class="pp">|</span></span>
+<span id="cb3-85"><a href="#cb3-85" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> 图几何 <span class="pp">|</span> 参考、间隙、捷径、密度、连通性、邻域大小、带宽、度量缩放 <span class="pp">|</span></span>
+<span id="cb3-86"><a href="#cb3-86" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-87"><a href="#cb3-87" aria-hidden="true" tabindex="-1"></a>阴性对照保持为命名源场景或方法。P4-U06 不重调它们、不把它们重新解读为普通竞争者，也不移除观测失败与不适用标签。</span>
+<span id="cb3-88"><a href="#cb3-88" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-89"><a href="#cb3-89" aria-hidden="true" tabindex="-1"></a><span class="fu">## 重复与确定性种子</span></span>
+<span id="cb3-90"><a href="#cb3-90" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-91"><a href="#cb3-91" aria-hidden="true" tabindex="-1"></a>不引入新重复或随机种子。任务清单中的重复数继承自稳定源产物：P4-U01 五个、P4-U02 四个、P4-U03–P4-U05 每任务三个。P4-U06 确定性来自规范解析、稳定字典行排序与字节可验证输出，而非新随机实验。</span>
+<span id="cb3-92"><a href="#cb3-92" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-93"><a href="#cb3-93" aria-hidden="true" tabindex="-1"></a>综合不得把不同任务的源重复当作一个可交换样本。源 q10/中位数/q90 摘要不被导入。</span>
+<span id="cb3-94"><a href="#cb3-94" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-95"><a href="#cb3-95" aria-hidden="true" tabindex="-1"></a><span class="fu">## 划分纪律</span></span>
+<span id="cb3-96"><a href="#cb3-96" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-97"><a href="#cb3-97" aria-hidden="true" tabindex="-1"></a>训练、验证、测试、诊断、在线、回顾性与神谕边界保持源本地。P4-U06 在其自身划分纪律被验证后读取已完成源行；它不接收原始生成数组，也没有重拟合源方法的能力。</span>
+<span id="cb3-98"><a href="#cb3-98" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-99"><a href="#cb3-99" aria-hidden="true" tabindex="-1"></a>源出处词汇被保留而非塌缩。它们包括测试、验证、拟合/场景/泄漏/架构诊断、训练设计、留出测试、测试扩展、训练诊断、神谕诊断与训练所选对照出处。跨套件的相似词语不蕴含相同数据访问。</span>
+<span id="cb3-100"><a href="#cb3-100" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-101"><a href="#cb3-101" aria-hidden="true" tabindex="-1"></a><span class="fu">## 方法与信息集</span></span>
+<span id="cb3-102"><a href="#cb3-102" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-103"><a href="#cb3-103" aria-hidden="true" tabindex="-1"></a>P4-U06 不添加方法。它逐任务清点源方法并保留源本地信息集标签：</span>
+<span id="cb3-104"><a href="#cb3-104" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-105"><a href="#cb3-105" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**线性高斯推断：** 固定参考；若干在线历史；回顾性完整区间；神谕回顾性完整区间；以及显式无效跨序列历史。</span>
+<span id="cb3-106"><a href="#cb3-106" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**静态线性恢复：** 固定参考、仅训练、训练/验证、神谕参数与无效测试预处理集。</span>
+<span id="cb3-107"><a href="#cb3-107" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**时序协方差：** 静态观测、在线、回顾性与神谕回顾性集。</span>
+<span id="cb3-108"><a href="#cb3-108" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**解混：** 设计诊断、有监督训练、有监督训练/验证与置换标签对照。</span>
+<span id="cb3-109"><a href="#cb3-109" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**旋转：** 固定参考、训练拟合投影、已知输入拟合与所选置换条件对照。</span>
+<span id="cb3-110"><a href="#cb3-110" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**重构：** 训练/验证拟合后冻结测试恢复。</span>
+<span id="cb3-111"><a href="#cb3-111" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**图几何：** 训练图/算子诊断与带留出扩展的冻结训练图。</span>
+<span id="cb3-112"><a href="#cb3-112" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-113"><a href="#cb3-113" aria-hidden="true" tabindex="-1"></a>这些标签作为清单调和，而非映射到单一有序信息访问尺度。特别地，在线、回顾性、神谕、诊断与故意无效对照不能像求解一个部署任务那样排名。</span>
+<span id="cb3-114"><a href="#cb3-114" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-115"><a href="#cb3-115" aria-hidden="true" tabindex="-1"></a><span class="fu">### 显式方法、度量与目标词汇</span></span>
+<span id="cb3-116"><a href="#cb3-116" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-117"><a href="#cb3-117" aria-hidden="true" tabindex="-1"></a>产物为每个不同任务本地词汇成员包含一个命名空间化 <span class="in">`method_member`</span>、<span class="in">`metric_member`</span> 与 <span class="in">`target_member`</span> 清单行：**60 个方法成员行、60 个度量成员行与 56 个目标成员行**。名称不跨任务去重，因为相同表面词语可以具有不同角色或契约。</span>
+<span id="cb3-118"><a href="#cb3-118" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-119"><a href="#cb3-119" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> 任务 <span class="pp">|</span> 方法 <span class="pp">|</span> 度量 <span class="pp">|</span> 目标 <span class="pp">|</span></span>
+<span id="cb3-120"><a href="#cb3-120" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|---|---|</span></span>
+<span id="cb3-121"><a href="#cb3-121" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> 线性高斯推断 <span class="pp">|</span> <span class="in">`stationary_mean`</span>、<span class="in">`persistence`</span>、<span class="in">`open_loop`</span>、<span class="in">`known_kalman_filter`</span>、<span class="in">`known_rts_smoother`</span>、<span class="in">`batch_conditioning_oracle`</span>、<span class="in">`selected_kalman_filter`</span>、<span class="in">`selected_rts_smoother`</span>、<span class="in">`misspecified_kalman_filter`</span>、<span class="in">`misspecified_rts_smoother`</span>、<span class="in">`false_continuation_filter`</span> <span class="pp">|</span> <span class="in">`latent_rmse`</span>、<span class="in">`interval_95_coverage`</span>、<span class="in">`mean_posterior_variance`</span>、<span class="in">`predictive_nll`</span>、<span class="in">`inside_missing_block_rmse`</span>、<span class="in">`outside_missing_block_rmse`</span>、<span class="in">`selection_parameter_l1`</span>、<span class="in">`oracle_mean_discrepancy`</span>、<span class="in">`reset_first_state_abs_difference`</span> <span class="pp">|</span> <span class="in">`point_state`</span>、<span class="in">`online_state`</span>、<span class="in">`retrospective_state`</span>、<span class="in">`one_step_observation_prediction`</span>、<span class="in">`selected_parameter_tuple`</span>、<span class="in">`numerical_correctness_reference`</span>、<span class="in">`boundary_reset_diagnostic`</span> <span class="pp">|</span></span>
+<span id="cb3-122"><a href="#cb3-122" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> 静态线性潜恢复 <span class="pp">|</span> <span class="in">`mean`</span>、<span class="in">`fixed_projection`</span>、<span class="in">`random_projection`</span>、<span class="in">`pca`</span>、<span class="in">`ppca`</span>、<span class="in">`fa_selected`</span>、<span class="in">`proper_scaled_pca`</span>、<span class="in">`leaked_scaled_pca_control`</span>、<span class="in">`true_gaussian_reference`</span> <span class="pp">|</span> <span class="in">`heldout_reconstruction_mse`</span>、<span class="in">`latent_signal_reconstruction_mse`</span>、<span class="in">`heldout_gaussian_nll`</span>、<span class="in">`covariance_relative_frobenius`</span>、<span class="in">`principal_subspace_angle_max_degrees`</span>、<span class="in">`loading_subspace_angle_max_degrees`</span>、<span class="in">`uniqueness_rmse`</span>、<span class="in">`selected_validation_nll`</span>、<span class="in">`optimizer_iterations`</span>、<span class="in">`identification_applicable`</span>、<span class="in">`preprocessing_test_poison_parameter_change`</span> <span class="pp">|</span> <span class="in">`observed_coordinate_reconstruction`</span>、<span class="in">`true_common_signal`</span>、<span class="in">`observable_distribution`</span>、<span class="in">`observable_covariance`</span>、<span class="in">`population_principal_subspace`</span>、<span class="in">`identified_true_common_loading_subspace`</span>、<span class="in">`identified_diagonal_uniqueness`</span>、<span class="in">`bounded_fa_selection`</span>、<span class="in">`diagonal_fa_identification_applicability`</span>、<span class="in">`contaminated_observed_coordinate_reconstruction`</span>、<span class="in">`contaminated_observation_gaussian_score`</span>、<span class="in">`nominal_clean_gaussian_covariance`</span>、<span class="in">`preprocessing_leakage_diagnostic`</span> <span class="pp">|</span></span>
+<span id="cb3-123"><a href="#cb3-123" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> 时序协方差与推断 <span class="pp">|</span> <span class="in">`mean_diagonal`</span>、<span class="in">`static_factor`</span>、<span class="in">`two_stage_pca_smooth`</span>、<span class="in">`independent_channel_gp`</span>、<span class="in">`known_gpfa`</span>、<span class="in">`selected_gpfa`</span>、<span class="in">`wrong_timescale_gpfa`</span>、<span class="in">`wrong_ar_gpfa`</span>、<span class="in">`ar_kalman_filter`</span>、<span class="in">`ar_rts_smoother`</span>、<span class="in">`exact_gaussian_oracle`</span> <span class="pp">|</span> <span class="in">`marginal_nll_per_entry`</span>、<span class="in">`masked_prediction_nll_per_entry`</span>、<span class="in">`masked_prediction_rmse`</span>、<span class="in">`latent_rmse`</span>、<span class="in">`latent_90_coverage`</span>、<span class="in">`loading_subspace_angle_degrees`</span>、<span class="in">`timescale_l1`</span>、<span class="in">`selected_combined_nll_per_entry`</span>、<span class="in">`covariance_relative_frobenius`</span>、<span class="in">`posterior_mean_oracle_max_abs`</span> <span class="pp">|</span> <span class="in">`observation_distribution`</span>、<span class="in">`masked_observation_prediction`</span>、<span class="in">`latent_trajectory`</span>、<span class="in">`loading_subspace`</span>、<span class="in">`timescale_selection`</span>、<span class="in">`numerical_posterior_oracle`</span> <span class="pp">|</span></span>
+<span id="cb3-124"><a href="#cb3-124" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> 解混 <span class="pp">|</span> <span class="in">`condition_mean`</span>、<span class="in">`pca`</span>、<span class="in">`marginal_pca`</span>、<span class="in">`selected_dpca`</span>、<span class="in">`ridge_decoder`</span>、<span class="in">`shuffled_dpca_control`</span>、<span class="in">`shuffled_decoder_control`</span>、<span class="in">`factorial_design_diagnostic`</span> <span class="pp">|</span> <span class="in">`stimulus_marginal_nmse`</span>、<span class="in">`decision_marginal_nmse`</span>、<span class="in">`stimulus_subspace_angle_degrees`</span>、<span class="in">`decision_subspace_angle_degrees`</span>、<span class="in">`stimulus_decoding_accuracy`</span>、<span class="in">`decision_decoding_accuracy`</span>、<span class="in">`factorial_design_rank`</span> <span class="pp">|</span> <span class="in">`stimulus_marginal_reconstruction`</span>、<span class="in">`decision_marginal_reconstruction`</span>、<span class="in">`stimulus_marginal_subspace`</span>、<span class="in">`decision_marginal_subspace`</span>、<span class="in">`stimulus_label_decoding`</span>、<span class="in">`decision_label_decoding`</span>、<span class="in">`factorial_design_identification`</span> <span class="pp">|</span></span>
+<span id="cb3-125"><a href="#cb3-125" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> 旋转 <span class="pp">|</span> 覆盖 PCA/固定/随机平面、无限制/斜/对称/输入感知拟合与协方差对照的 8 个成员 <span class="pp">|</span> <span class="in">`plane_angle_degrees`</span>、<span class="in">`angular_rate_abs_error`</span>、<span class="in">`derivative_rmse`</span>、<span class="in">`tangential_velocity_ratio`</span>、<span class="in">`covariance_similarity`</span> <span class="pp">|</span> <span class="in">`rotational_plane`</span>、<span class="in">`angular_rate`</span>、<span class="in">`heldout_derivative_prediction`</span>、<span class="in">`plane_tangential_motion`</span>、<span class="in">`condition_covariance_control`</span> <span class="pp">|</span></span>
+<span id="cb3-126"><a href="#cb3-126" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> 非线性重构 <span class="pp">|</span> <span class="in">`mean`</span>、<span class="in">`pca`</span>、<span class="in">`linear_autoencoder`</span>、<span class="in">`nonlinear_autoencoder`</span>、<span class="in">`frozen_encoder`</span> <span class="pp">|</span> <span class="in">`observed_reconstruction_mse`</span>、<span class="in">`noiseless_signal_mse`</span>、<span class="in">`code_variance`</span>、<span class="in">`code_abs_spearman_truth`</span>、<span class="in">`code_collision_rate`</span>、<span class="in">`selected_validation_mse`</span>、<span class="in">`parameter_count`</span> <span class="pp">|</span> <span class="in">`observed_test_reconstruction`</span>、<span class="in">`known_noiseless_test_signal`</span>、<span class="in">`deterministic_test_code_activity`</span>、<span class="in">`scoring_only_generator_parameter`</span>、<span class="in">`scoring_only_generator_collision_diagnostic`</span>、<span class="in">`validation_selection_diagnostic`</span>、<span class="in">`architecture_diagnostic`</span> <span class="pp">|</span></span>
+<span id="cb3-127"><a href="#cb3-127" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> 图几何/算子恢复 <span class="pp">|</span> <span class="in">`mean`</span>、<span class="in">`pca`</span>、<span class="in">`ambient_mds`</span>、<span class="in">`isomap`</span>、<span class="in">`graph_diagnostics`</span>、<span class="in">`diffusion_maps`</span>、<span class="in">`direct_operator`</span>、<span class="in">`nystrom_extension`</span> <span class="pp">|</span> <span class="in">`component_count`</span>、<span class="in">`infinite_pair_rate`</span>、<span class="in">`material_shortcut_rate`</span>、<span class="in">`graph_distance_relative_rmse`</span>、<span class="in">`mds_negative_eigenmass`</span>、<span class="in">`heldout_coordinate_rmse`</span>、<span class="in">`diffusion_eigenspace_angle_max_degrees`</span>、<span class="in">`diffusion_truncation_relative_rmse`</span>、<span class="in">`operator_row_sum_max_abs`</span>、<span class="in">`direct_spectral_distance_max_abs`</span>、<span class="in">`heldout_extension_rmse`</span> <span class="pp">|</span> <span class="in">`finite_training_graph_connectivity_diagnostic`</span>、<span class="in">`finite_training_graph_disconnection_diagnostic`</span>、<span class="in">`known_hairpin_pairwise_arc_separation`</span>、<span class="in">`known_hairpin_path_underestimation_diagnostic`</span>、<span class="in">`classical_mds_euclideanity_diagnostic`</span>、<span class="in">`scoring_aligned_known_hairpin_arc_length`</span>、<span class="in">`l2_pi_cosine_sine_eigenspace_diagnostic`</span>、<span class="in">`full_finite_operator_diffusion_distance`</span>、<span class="in">`markov_operator_numerical_oracle`</span>、<span class="in">`finite_operator_numerical_oracle`</span>、<span class="in">`heldout_cosine_sine_extension_after_train_alignment`</span> <span class="pp">|</span></span>
+<span id="cb3-128"><a href="#cb3-128" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-129"><a href="#cb3-129" aria-hidden="true" tabindex="-1"></a>精确完整字符串在 <span class="in">`results.csv`</span> 的 <span class="in">`inventory`</span> 行中权威；上方紧凑表记录其任务本地角色，不创建跨任务词汇层级。</span>
+<span id="cb3-130"><a href="#cb3-130" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-131"><a href="#cb3-131" aria-hidden="true" tabindex="-1"></a><span class="fu">## 参数选择</span></span>
+<span id="cb3-132"><a href="#cb3-132" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-133"><a href="#cb3-133" aria-hidden="true" tabindex="-1"></a>没有 P4-U06 参数选择。源所选超参数与选择诊断保留在其稳定源产物中。综合只记录方法、任务、场景、状态与声明词汇；它既不选择源方法，也不搜索跨套件工作点。</span>
+<span id="cb3-134"><a href="#cb3-134" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-135"><a href="#cb3-135" aria-hidden="true" tabindex="-1"></a><span class="fu">## 推断</span></span>
+<span id="cb3-136"><a href="#cb3-136" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-137"><a href="#cb3-137" aria-hidden="true" tabindex="-1"></a>没有 P4-U06 推断或恢复。源后验状态、重构、子空间、导数、嵌入与扩展不被重算，其度量值不被复制。可执行只构造清单、适用性/失败模式与场景目标覆盖行。</span>
+<span id="cb3-138"><a href="#cb3-138" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-139"><a href="#cb3-139" aria-hidden="true" tabindex="-1"></a><span class="fu">## 评分</span></span>
+<span id="cb3-140"><a href="#cb3-140" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-141"><a href="#cb3-141" aria-hidden="true" tabindex="-1"></a>P4-U06 没有公共科学得分。其四种记录类型是：</span>
+<span id="cb3-142"><a href="#cb3-142" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-143"><a href="#cb3-143" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span><span class="in">`inventory`</span> —— 任务特定计数加显式方法、度量、目标、信息集与出处词汇成员；</span>
+<span id="cb3-144"><a href="#cb3-144" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span><span class="in">`applicability_pattern`</span> —— 原始笛卡尔方法 × 度量 × 重复行上的任务/场景/方法适用性；</span>
+<span id="cb3-145"><a href="#cb3-145" aria-hidden="true" tabindex="-1"></a><span class="ss">3. </span><span class="in">`failure_pattern`</span> —— 两个单独命名的失败标签比例，带精确分母；以及</span>
+<span id="cb3-146"><a href="#cb3-146" aria-hidden="true" tabindex="-1"></a><span class="ss">4. </span><span class="in">`scenario_target_coverage`</span> —— 场景级适用目标族清单，无源度量值或效应。</span>
+<span id="cb3-147"><a href="#cb3-147" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-148"><a href="#cb3-148" aria-hidden="true" tabindex="-1"></a>对固定任务/场景/方法组，定义</span>
+<span id="cb3-149"><a href="#cb3-149" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-150"><a href="#cb3-150" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>$N_{all}$：所有原始笛卡尔度量 × 重复行；</span>
+<span id="cb3-151"><a href="#cb3-151" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>$N_{app}=N_{ok}+N_{invalid}+N_{nonconvergence}$：状态非 <span class="in">`inapplicable`</span> 的行；以及</span>
+<span id="cb3-152"><a href="#cb3-152" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>$N_{fail}=N_{invalid}+N_{nonconvergence}$。</span>
+<span id="cb3-153"><a href="#cb3-153" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-154"><a href="#cb3-154" aria-hidden="true" tabindex="-1"></a>产物报告：</span>
+<span id="cb3-155"><a href="#cb3-155" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-156"><a href="#cb3-156" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>适用性率 $N_{app}/N_{all}$；</span>
+<span id="cb3-157"><a href="#cb3-157" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**原始笛卡尔失败标签比例** $N_{fail}/N_{all}$；以及</span>
+<span id="cb3-158"><a href="#cb3-158" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**条件失败率** $N_{fail}/N_{app}$。</span>
+<span id="cb3-159"><a href="#cb3-159" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-160"><a href="#cb3-160" aria-hidden="true" tabindex="-1"></a>当 $N_{app}=0$ 时条件率数学上未定义。该行以 <span class="in">`status: inapplicable`</span>、空白序列化分母/率字段与无捏造零保留。有 **104** 个此类零适用分母行；其他 **539** 个条件率行具有显式正分母。全部 643 个原始笛卡尔失败标签比例行保留其非零 $N_{all}$ 分母。</span>
+<span id="cb3-161"><a href="#cb3-161" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-162"><a href="#cb3-162" aria-hidden="true" tabindex="-1"></a>这些比例描述源标签与笛卡尔设计，而非归一化方法表现。它们不得作为排行榜比较。高 <span class="in">`inapplicable`</span> 比例可以是窄类型度量的正确结果。</span>
+<span id="cb3-163"><a href="#cb3-163" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-164"><a href="#cb3-164" aria-hidden="true" tabindex="-1"></a><span class="fu">## 失效与适用性标签</span></span>
+<span id="cb3-165"><a href="#cb3-165" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-166"><a href="#cb3-166" aria-hidden="true" tabindex="-1"></a>共享词汇如下调和：</span>
+<span id="cb3-167"><a href="#cb3-167" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-168"><a href="#cb3-168" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> 标签 <span class="pp">|</span> 跨套件解读 <span class="pp">|</span></span>
+<span id="cb3-169"><a href="#cb3-169" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|</span></span>
+<span id="cb3-170"><a href="#cb3-170" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`ok`</span> <span class="pp">|</span> 源行声明计算完成且适用；它不意味一般科学正确。 <span class="pp">|</span></span>
+<span id="cb3-171"><a href="#cb3-171" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`inapplicable`</span> <span class="pp">|</span> 方法/度量/场景目标在源契约下未定义；它被保留，而非当作缺失或零。 <span class="pp">|</span></span>
+<span id="cb3-172"><a href="#cb3-172" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`invalid`</span> <span class="pp">|</span> 声明的设计、信息集、辨识或有限值条件失败。 <span class="pp">|</span></span>
+<span id="cb3-173"><a href="#cb3-173" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`nonconvergence`</span> <span class="pp">|</span> 有界数值/优化规程未满足其源完成规则。 <span class="pp">|</span></span>
+<span id="cb3-174"><a href="#cb3-174" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-175"><a href="#cb3-175" aria-hidden="true" tabindex="-1"></a>任务特定状态组成是：</span>
+<span id="cb3-176"><a href="#cb3-176" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-177"><a href="#cb3-177" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> 任务 <span class="pp">|</span> <span class="in">`ok`</span> <span class="pp">|</span> <span class="in">`inapplicable`</span> <span class="pp">|</span> <span class="in">`invalid`</span> <span class="pp">|</span> <span class="in">`nonconvergence`</span> <span class="pp">|</span> 分母 <span class="pp">|</span></span>
+<span id="cb3-178"><a href="#cb3-178" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---:|---:|---:|---:|---:|</span></span>
+<span id="cb3-179"><a href="#cb3-179" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> 线性高斯推断 <span class="pp">|</span> 1,515 <span class="pp">|</span> 3,930 <span class="pp">|</span> 0 <span class="pp">|</span> 0 <span class="pp">|</span> 5,445 <span class="pp">|</span></span>
+<span id="cb3-180"><a href="#cb3-180" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> 静态线性潜恢复 <span class="pp">|</span> 1,260 <span class="pp">|</span> 3,044 <span class="pp">|</span> 0 <span class="pp">|</span> 52 <span class="pp">|</span> 4,356 <span class="pp">|</span></span>
+<span id="cb3-181"><a href="#cb3-181" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> 时序协方差与推断 <span class="pp">|</span> 2,049 <span class="pp">|</span> 1,911 <span class="pp">|</span> 0 <span class="pp">|</span> 0 <span class="pp">|</span> 3,960 <span class="pp">|</span></span>
+<span id="cb3-182"><a href="#cb3-182" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> 解混 <span class="pp">|</span> 567 <span class="pp">|</span> 891 <span class="pp">|</span> 54 <span class="pp">|</span> 0 <span class="pp">|</span> 1,512 <span class="pp">|</span></span>
+<span id="cb3-183"><a href="#cb3-183" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> 旋转 <span class="pp">|</span> 474 <span class="pp">|</span> 726 <span class="pp">|</span> 0 <span class="pp">|</span> 0 <span class="pp">|</span> 1,200 <span class="pp">|</span></span>
+<span id="cb3-184"><a href="#cb3-184" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> 非线性重构 <span class="pp">|</span> 690 <span class="pp">|</span> 45 <span class="pp">|</span> 0 <span class="pp">|</span> 0 <span class="pp">|</span> 735 <span class="pp">|</span></span>
+<span id="cb3-185"><a href="#cb3-185" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> 图几何/算子恢复 <span class="pp">|</span> 299 <span class="pp">|</span> 3,133 <span class="pp">|</span> 0 <span class="pp">|</span> 0 <span class="pp">|</span> 3,432 <span class="pp">|</span></span>
+<span id="cb3-186"><a href="#cb3-186" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-187"><a href="#cb3-187" aria-hidden="true" tabindex="-1"></a>稳定输入中唯一自然失败标签是静态线性恢复中的 52 个有界 FA <span class="in">`nonconvergence`</span> 行与解混中的 54 个缺失单元设计秩 <span class="in">`invalid`</span> 行。其含义保持源特定。另一任务中自然失败缺失不是方法族普遍鲁棒的证据；源验证器通过故障注入单独演练失败路由。</span>
+<span id="cb3-188"><a href="#cb3-188" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-189"><a href="#cb3-189" aria-hidden="true" tabindex="-1"></a><span class="fu">## 产物契约</span></span>
+<span id="cb3-190"><a href="#cb3-190" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-191"><a href="#cb3-191" aria-hidden="true" tabindex="-1"></a>综合产物目录限于：</span>
+<span id="cb3-192"><a href="#cb3-192" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-193"><a href="#cb3-193" aria-hidden="true" tabindex="-1"></a><span class="in">```text</span></span>
+<span id="cb3-194"><a href="#cb3-194" aria-hidden="true" tabindex="-1"></a><span class="in">manifest.json</span></span>
+<span id="cb3-195"><a href="#cb3-195" aria-hidden="true" tabindex="-1"></a><span class="in">results.csv</span></span>
+<span id="cb3-196"><a href="#cb3-196" aria-hidden="true" tabindex="-1"></a><span class="in">diagnostics.json</span></span>
+<span id="cb3-197"><a href="#cb3-197" aria-hidden="true" tabindex="-1"></a><span class="in">summary.png</span></span>
+<span id="cb3-198"><a href="#cb3-198" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb3-199"><a href="#cb3-199" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-200"><a href="#cb3-200" aria-hidden="true" tabindex="-1"></a>权威产物包含 **2,308** 个完整规范综合行：</span>
+<span id="cb3-201"><a href="#cb3-201" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-202"><a href="#cb3-202" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>306 个 <span class="in">`inventory`</span> 行，包括 60 个方法、60 个度量与 56 个目标成员；</span>
+<span id="cb3-203"><a href="#cb3-203" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>643 个 <span class="in">`applicability_pattern`</span> 行；</span>
+<span id="cb3-204"><a href="#cb3-204" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>1,286 个 <span class="in">`failure_pattern`</span> 行：643 个原始笛卡尔比例与 643 个条件率；以及</span>
+<span id="cb3-205"><a href="#cb3-205" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>73 个 <span class="in">`scenario_target_coverage`</span> 行。</span>
+<span id="cb3-206"><a href="#cb3-206" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-207"><a href="#cb3-207" aria-hidden="true" tabindex="-1"></a>清单记录五个稳定源树、所有源内容哈希与字节数、17 字段原始 schema、字典序 <span class="in">`row_key`</span> 排序、运行时、命令与对源方法重跑、导入度量值、跨任务归一化/平均、得分、排名与胜者的显式禁止。</span>
+<span id="cb3-208"><a href="#cb3-208" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-209"><a href="#cb3-209" aria-hidden="true" tabindex="-1"></a><span class="fu">## 结果</span></span>
+<span id="cb3-210"><a href="#cb3-210" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-211"><a href="#cb3-211" aria-hidden="true" tabindex="-1"></a>综合确认跨五个稳定基准对象与七个独立任务的覆盖。任务清单跨越 73 个命名场景与 20,640 个源行，而综合本身包含 2,308 个清单/模式/覆盖行。这些只是覆盖计数。</span>
+<span id="cb3-212"><a href="#cb3-212" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-213"><a href="#cb3-213" aria-hidden="true" tabindex="-1"></a>场景目标覆盖清单显示 Phase 4 刻意演练不同种类边界，而非一个重复基准模板：时间稳定性与重置；静态辨识与残差规格；协方差、缺失与观测族误设；标签/设计与旋转对照；非线性支撑/容量；以及有限图连通性、捷径、带宽与度量依赖。覆盖行陈述每个场景中哪些目标族适用；它们不陈述效应大小、方向、敏感性或鲁棒性结果。</span>
+<span id="cb3-214"><a href="#cb3-214" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-215"><a href="#cb3-215" aria-hidden="true" tabindex="-1"></a>任务特定状态表还演示为什么池化率会误导。图几何具有许多刻意类型化方法–度量对，因此许多 <span class="in">`inapplicable`</span> 行，而重构具有更稠密适用性设计。解混的 <span class="in">`invalid`</span> 行编码缺失单元设计失败；静态恢复的 <span class="in">`nonconvergence`</span> 行编码有界 FA 优化。那些标签不是可互换损失。</span>
+<span id="cb3-216"><a href="#cb3-216" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-217"><a href="#cb3-217" aria-hidden="true" tabindex="-1"></a><span class="al">![P4-U06 跨套件覆盖清单](../../benchmarks/artifacts/cross-suite-robustness-synthesis/summary.png)</span></span>
+<span id="cb3-218"><a href="#cb3-218" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-219"><a href="#cb3-219" aria-hidden="true" tabindex="-1"></a>图使用每个任务自身源行分母显示场景/方法/度量清单计数与任务特定状态组成。它不包含源度量值、池化得分、归一化排名或胜者。</span>
+<span id="cb3-220"><a href="#cb3-220" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-221"><a href="#cb3-221" aria-hidden="true" tabindex="-1"></a><span class="fu">## 解读界限</span></span>
+<span id="cb3-222"><a href="#cb3-222" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-223"><a href="#cb3-223" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>清单量不是科学质量、成熟度或方法优越性的证据。</span>
+<span id="cb3-224"><a href="#cb3-224" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>场景数不是难度或证据权重的可比度量。</span>
+<span id="cb3-225"><a href="#cb3-225" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>适用性与两个失败标签比例以每个任务的方法-度量-重复笛卡尔设计及其显式命名分母为条件。</span>
+<span id="cb3-226"><a href="#cb3-226" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>场景目标覆盖条目记录适用目标族覆盖，而非敏感性、效应大小、方向、显著性或因果归因。</span>
+<span id="cb3-227"><a href="#cb3-227" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`ok`</span> 是计算/状态标签，不是模型正确性、可辨识性、机制、因果性或真实数据迁移的证明。</span>
+<span id="cb3-228"><a href="#cb3-228" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`inapplicable`</span>、<span class="in">`invalid`</span> 与 <span class="in">`nonconvergence`</span> 具有不同含义，永不被组合为普遍惩罚。</span>
+<span id="cb3-229"><a href="#cb3-229" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>没有结果支持普遍胜者、跨任务方法排名、公共潜生成器、流形/拓扑恢复、生物有效性或 Phase 5 就绪。</span>
+<span id="cb3-230"><a href="#cb3-230" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>本综合不取代阅读源基准对象、其原始行、产物、审查记录与解读界限。</span>
+<span id="cb3-231"><a href="#cb3-231" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-232"><a href="#cb3-232" aria-hidden="true" tabindex="-1"></a><span class="fu">## 可复现性</span></span>
+<span id="cb3-233"><a href="#cb3-233" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-234"><a href="#cb3-234" aria-hidden="true" tabindex="-1"></a>从仓库根目录用清单记录运行时运行：</span>
+<span id="cb3-235"><a href="#cb3-235" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-236"><a href="#cb3-236" aria-hidden="true" tabindex="-1"></a><span class="in">```bash</span></span>
+<span id="cb3-237"><a href="#cb3-237" aria-hidden="true" tabindex="-1"></a><span class="ex">/Users/bytedance/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3</span> benchmarks/cross-suite-robustness-synthesis.py <span class="at">--generate</span></span>
+<span id="cb3-238"><a href="#cb3-238" aria-hidden="true" tabindex="-1"></a><span class="ex">/Users/bytedance/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3</span> benchmarks/cross-suite-robustness-synthesis.py <span class="at">--generate</span> <span class="at">--resume</span></span>
+<span id="cb3-239"><a href="#cb3-239" aria-hidden="true" tabindex="-1"></a><span class="ex">/Users/bytedance/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3</span> benchmarks/cross-suite-robustness-synthesis.py <span class="at">--verify</span></span>
+<span id="cb3-240"><a href="#cb3-240" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb3-241"><a href="#cb3-241" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-242"><a href="#cb3-242" aria-hidden="true" tabindex="-1"></a>验证器检查稳定源状态；源清单/内容哈希；源诊断/原始行状态调和；精确四产物清单；2,308 个唯一规范行；无源度量值与排名/得分/胜者字段；显式分母；逐字节相同干净与反转顺序生成；有效部分恢复；拒绝损坏、重复、未知与不完整恢复行；源内容漂移拒绝；以及非稳定源清单拒绝。</span>
+<span id="cb3-243"><a href="#cb3-243" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-244"><a href="#cb3-244" aria-hidden="true" tabindex="-1"></a><span class="fu">## 审查记录</span></span>
+<span id="cb3-245"><a href="#cb3-245" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-246"><a href="#cb3-246" aria-hidden="true" tabindex="-1"></a>独立科学与实现审查员是只读且独立于执行者。其初始审查在诚实场景目标覆盖术语、原始对条件失败分母、命名空间化方法/度量/目标清单与科学输入对完整性附件边界上返回 <span class="in">`REVISE`</span>。有界修正轮次只处理那些发现；聚焦科学与实现复审都返回 <span class="in">`PASS`</span>，无未解决发现。</span>
+<span id="cb3-247"><a href="#cb3-247" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-248"><a href="#cb3-248" aria-hidden="true" tabindex="-1"></a>已接受验证记录包括 63 对象结构验证、33 仓库测试、综合验证器与对抗源检查、目标/索引渲染、工作流验证与 <span class="in">`git diff --check`</span>。记录的审查决定随后授权机械晋升到 <span class="in">`L1/stable`</span>。稳定状态记录该声明合成基准对象的有界验收；它不扩大其证据、信息集、目标或解读边界。</span>
+<span id="cb3-249"><a href="#cb3-249" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-250"><a href="#cb3-250" aria-hidden="true" tabindex="-1"></a><span class="fu">## 成熟度检查表</span></span>
+<span id="cb3-251"><a href="#cb3-251" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-252"><a href="#cb3-252" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> 只读取五个验证 <span class="in">`L1/stable`</span> Phase 4 产物树。</span>
+<span id="cb3-253"><a href="#cb3-253" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> 不引入新生成器、重复、选择、推断、恢复或科学得分。</span>
+<span id="cb3-254"><a href="#cb3-254" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> 保留七个任务边界与源本地信息集/出处。</span>
+<span id="cb3-255"><a href="#cb3-255" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> 调和四个状态标签而不把它们当作一个损失。</span>
+<span id="cb3-256"><a href="#cb3-256" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> 记录带精确源行分母的任务/场景/方法/度量清单。</span>
+<span id="cb3-257"><a href="#cb3-257" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> 记录 73 个场景目标覆盖行，不蕴含敏感性或导入效应大小。</span>
+<span id="cb3-258"><a href="#cb3-258" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> 不产生度量归一化、跨任务聚合、得分、排名、胜者或机制推断。</span>
+<span id="cb3-259"><a href="#cb3-259" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> 输出限于四个确定性字节可验证产物。</span>
+<span id="cb3-260"><a href="#cb3-260" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> 聚焦科学复审通过。</span>
+<span id="cb3-261"><a href="#cb3-261" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> 聚焦实现复审通过。</span>
+<span id="cb3-262"><a href="#cb3-262" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> 只有两个复审与验证都通过后，才发生机械 <span class="in">`L1/stable`</span> 晋升。</span></code></pre></div><button title="复制到剪贴板" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></div>
+</div></div></div></div></div>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

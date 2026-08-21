@@ -1,0 +1,2473 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="zh-CN" xml:lang="zh-CN"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.10.18">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>旋转投影与替代方案对照 – Latent Dynamics &amp; Geometry</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-e3adbaa939bcd423dddc8c8a834270b4.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "没有结果",
+    "search-matching-documents-text": "匹配的文档",
+    "search-copy-link-title": "复制搜索链接",
+    "search-hide-matches-text": "隐藏其它匹配结果",
+    "search-more-match-text": "更多匹配结果",
+    "search-more-matches-text": "更多匹配结果",
+    "search-clear-button-title": "清除",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "取消",
+    "search-submit-button-title": "提交",
+    "search-label": "搜索"
+  }
+}</script>
+<style>
+.ldg-lang{position:fixed;top:72px;right:16px;z-index:2000;display:flex;gap:4px;font-family:system-ui,-apple-system,"Segoe UI",sans-serif;}
+.ldg-lang a{display:inline-block;padding:4px 10px;border:1px solid #c8c8c8;border-radius:999px;background:#fff;color:#333;text-decoration:none;font-size:13px;box-shadow:0 1px 3px rgba(0,0,0,.15);}
+.ldg-lang a.active{background:#2c3e50;color:#fff;border-color:#2c3e50;}
+</style>
+</head><body class="nav-fixed quarto-light"><div class="ldg-lang" id="ldg-lang">
+  <a href="#" id="ldg-lang-en">EN</a>
+  <a href="#" id="ldg-lang-zh">中文</a>
+</div>
+<script>
+(function () {
+  var BASE = '';
+  if (window.location.pathname.indexOf('/latent-dynamics-geometry-public/') === 0) {
+    BASE = 'latent-dynamics-geometry-public';
+  }
+  var IS_FILE = window.location.protocol === 'file:';
+  function pathSegs() {
+    return window.location.pathname.split('/').filter(Boolean);
+  }
+  function zhIdx() {
+    return pathSegs().indexOf('zh');
+  }
+  function segs() {
+    var s = window.location.pathname.split('/').filter(Boolean);
+    if (BASE && s[0] === BASE) s = s.slice(1);
+    return s;
+  }
+  function isZh() { return zhIdx() !== -1; }
+  function fileTarget(lang) {
+    var s = pathSegs();
+    var siteIdx = s.lastIndexOf('_site');
+    var root = siteIdx === -1 ? s.slice(0, -1) : s.slice(0, siteIdx + 1);
+    var page = siteIdx === -1 ? [s[s.length - 1]] : s.slice(siteIdx + 1);
+    if (page[0] === 'zh') page = page.slice(1);
+    if (lang === 'zh') page = ['zh'].concat(page);
+    var rel = page.join('/');
+    if (rel === '' || rel === 'zh') rel = 'index.html';
+    return '/' + root.join('/') + '/' + rel;
+  }
+  function target(lang) {
+    if (IS_FILE) return fileTarget(lang);
+    var s = segs();
+    if (s[0] === 'zh') s = s.slice(1);
+    if (lang === 'zh') s = ['zh'].concat(s);
+    var rel = s.join('/');
+    if (rel === '' || rel === 'zh') rel = (lang === 'zh' ? 'zh/index.html' : 'index.html');
+    return '/' + (BASE ? BASE + '/' : '') + rel;
+  }
+  function go(lang) {
+    try { localStorage.setItem('ldg-lang', lang); } catch (e) {}
+    window.location.href = target(lang);
+  }
+  function mark() {
+    var zh = isZh();
+    var a = document.getElementById('ldg-lang-en');
+    var b = document.getElementById('ldg-lang-zh');
+    if (a) a.className = zh ? '' : 'active';
+    if (b) b.className = zh ? 'active' : '';
+  }
+  function localizeNav() {
+    if (!isZh()) return;
+    var cur = pathSegs();
+    var czi = zhIdx();
+    var dir = (czi === -1 ? cur.slice(0, -1) : cur.slice(czi, -1)).join('/');
+    document.querySelectorAll('nav a').forEach(function (a) {
+      var h = a.getAttribute('href') || '';
+      if (/^(https?:|#|mailto:)/.test(h)) return;
+      if (/\.html?$/.test(h) || /\/$/.test(h) || h === '') {
+        var abs = new URL(h, window.location.href).pathname;
+        var s = abs.split('/').filter(Boolean);
+        if (BASE && s[0] === BASE) s = s.slice(1);
+        var zi = s.indexOf('zh');
+        var rel = zi !== -1 ? s.slice(zi + 1).join('/') : s.slice(czi).join('/');
+        var tgt = 'zh/' + rel;
+        var f = dir.split('/').filter(Boolean);
+        var t = tgt.split('/').filter(Boolean);
+        var i = 0;
+        while (i < f.length && i < t.length && f[i] === t[i]) i++;
+        var rel = '';
+        for (var j = i; j < f.length; j++) rel += '../';
+        rel += t.slice(i).join('/');
+        a.setAttribute('href', rel);
+      }
+    });
+  }
+  document.getElementById('ldg-lang-en').addEventListener('click', function (e) { e.preventDefault(); go('en'); });
+  document.getElementById('ldg-lang-zh').addEventListener('click', function (e) { e.preventDefault(); go('zh'); });
+  mark();
+  localizeNav();
+})();
+</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-chtml.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+
+
+
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">Latent Dynamics &amp; Geometry</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="搜索"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="展开或折叠导航栏" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../index.html"> 
+<span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../knowledge/concepts/index.html"> 
+<span class="menu-text">Concepts</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../knowledge/methods/index.html"> 
+<span class="menu-text">Methods</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../knowledge/math/index.html"> 
+<span class="menu-text">Math</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../knowledge/papers/index.html"> 
+<span class="menu-text">Papers</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../toy-models/index.html"> 
+<span class="menu-text">Toy Models</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../research-questions/index.html"> 
+<span class="menu-text">Research Questions</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../benchmarks/index.html"> 
+<span class="menu-text">Benchmarks</span></a>
+  </li>  
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/AbelZheng/latent-dynamics-geometry-public"> <i class="bi bi-github" role="img" aria-label="GitHub repository">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="https://github.com/AbelZheng/latent-dynamics-geometry-public/discussions"> 
+<span class="menu-text">Discussions</span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">该页面内容</h2>
+   
+  <ul>
+  <li><a href="#旋转投影与替代方案对照" id="toc-旋转投影与替代方案对照" class="nav-link active" data-scroll-target="#旋转投影与替代方案对照">旋转投影与替代方案对照</a>
+  <ul class="collapse">
+  <li><a href="#问题" id="toc-问题" class="nav-link" data-scroll-target="#问题">问题</a></li>
+  <li><a href="#真值" id="toc-真值" class="nav-link" data-scroll-target="#真值">真值</a>
+  <ul class="collapse">
+  <li><a href="#正六维状态方程" id="toc-正六维状态方程" class="nav-link" data-scroll-target="#正六维状态方程">正六维状态方程</a></li>
+  <li><a href="#条件与初始状态" id="toc-条件与初始状态" class="nav-link" data-scroll-target="#条件与初始状态">条件与初始状态</a></li>
+  <li><a href="#等距观测嵌入" id="toc-等距观测嵌入" class="nav-link" data-scroll-target="#等距观测嵌入">等距观测嵌入</a></li>
+  <li><a href="#试次观测" id="toc-试次观测" class="nav-link" data-scroll-target="#试次观测">试次观测</a></li>
+  </ul></li>
+  <li><a href="#生成模型" id="toc-生成模型" class="nav-link" data-scroll-target="#生成模型">生成模型</a></li>
+  <li><a href="#参数" id="toc-参数" class="nav-link" data-scroll-target="#参数">参数</a></li>
+  <li><a href="#模拟" id="toc-模拟" class="nav-link" data-scroll-target="#模拟">模拟</a>
+  <ul class="collapse">
+  <li><a href="#条件均值与预处理" id="toc-条件均值与预处理" class="nav-link" data-scroll-target="#条件均值与预处理">条件均值与预处理</a></li>
+  <li><a href="#pca-表示" id="toc-pca-表示" class="nav-link" data-scroll-target="#pca-表示">PCA 表示</a></li>
+  <li><a href="#保边界导数" id="toc-保边界导数" class="nav-link" data-scroll-target="#保边界导数">保边界导数</a></li>
+  <li><a href="#经验结果" id="toc-经验结果" class="nav-link" data-scroll-target="#经验结果">经验结果</a></li>
+  </ul></li>
+  <li><a href="#可视化" id="toc-可视化" class="nav-link" data-scroll-target="#可视化">可视化</a></li>
+  <li><a href="#预期行为" id="toc-预期行为" class="nav-link" data-scroll-target="#预期行为">预期行为</a></li>
+  <li><a href="#参数操控" id="toc-参数操控" class="nav-link" data-scroll-target="#参数操控">参数操控</a>
+  <ul class="collapse">
+  <li><a href="#a.-正全窗口等距条件" id="toc-a.-正全窗口等距条件" class="nav-link" data-scroll-target="#a.-正全窗口等距条件">A. 正全窗口等距条件</a></li>
+  <li><a href="#b.-短弧压力" id="toc-b.-短弧压力" class="nav-link" data-scroll-target="#b.-短弧压力">B. 短弧压力</a></li>
+  <li><a href="#c.-事件时间抖动" id="toc-c.-事件时间抖动" class="nav-link" data-scroll-target="#c.-事件时间抖动">C. 事件时间抖动</a></li>
+  <li><a href="#d.-无对轻平滑" id="toc-d.-无对轻平滑" class="nav-link" data-scroll-target="#d.-无对轻平滑">D. 无对轻平滑</a></li>
+  <li><a href="#e.-跨条件时间均值减法" id="toc-e.-跨条件时间均值减法" class="nav-link" data-scroll-target="#e.-跨条件时间均值减法">E. 跨条件时间均值减法</a></li>
+  <li><a href="#f.-对称衰减对照" id="toc-f.-对称衰减对照" class="nav-link" data-scroll-target="#f.-对称衰减对照">F. 对称衰减对照</a></li>
+  <li><a href="#g.-时滞序列瞬态对照" id="toc-g.-时滞序列瞬态对照" class="nav-link" data-scroll-target="#g.-时滞序列瞬态对照">G. 时滞序列瞬态对照</a></li>
+  <li><a href="#h.-输入驱动脉冲公共输入对照" id="toc-h.-输入驱动脉冲公共输入对照" class="nav-link" data-scroll-target="#h.-输入驱动脉冲公共输入对照">H. 输入驱动脉冲/公共输入对照</a></li>
+  <li><a href="#i.-非正交混合与度量依赖" id="toc-i.-非正交混合与度量依赖" class="nav-link" data-scroll-target="#i.-非正交混合与度量依赖">I. 非正交混合与度量依赖</a></li>
+  <li><a href="#j.-协方差与条件结构匹配洗牌" id="toc-j.-协方差与条件结构匹配洗牌" class="nav-link" data-scroll-target="#j.-协方差与条件结构匹配洗牌">J. 协方差与条件结构匹配洗牌</a></li>
+  </ul></li>
+  <li><a href="#健全性检查" id="toc-健全性检查" class="nav-link" data-scroll-target="#健全性检查">健全性检查</a></li>
+  <li><a href="#失效情形" id="toc-失效情形" class="nav-link" data-scroll-target="#失效情形">失效情形</a></li>
+  <li><a href="#恢复任务" id="toc-恢复任务" class="nav-link" data-scroll-target="#恢复任务">恢复任务</a>
+  <ul class="collapse">
+  <li><a href="#秩六-pca" id="toc-秩六-pca" class="nav-link" data-scroll-target="#秩六-pca">秩六 PCA</a></li>
+  <li><a href="#无限制导数回归" id="toc-无限制导数回归" class="nav-link" data-scroll-target="#无限制导数回归">无限制导数回归</a></li>
+  <li><a href="#斜约束最小二乘" id="toc-斜约束最小二乘" class="nav-link" data-scroll-target="#斜约束最小二乘">斜约束最小二乘</a></li>
+  <li><a href="#对称结构" id="toc-对称结构" class="nav-link" data-scroll-target="#对称结构">对称结构</a></li>
+  <li><a href="#旋转平面提取" id="toc-旋转平面提取" class="nav-link" data-scroll-target="#旋转平面提取">旋转平面提取</a></li>
+  <li><a href="#输入感知回归" id="toc-输入感知回归" class="nav-link" data-scroll-target="#输入感知回归">输入感知回归</a></li>
+  <li><a href="#固定与随机平面" id="toc-固定与随机平面" class="nav-link" data-scroll-target="#固定与随机平面">固定与随机平面</a></li>
+  </ul></li>
+  <li><a href="#候选分析方法" id="toc-候选分析方法" class="nav-link" data-scroll-target="#候选分析方法">候选分析方法</a></li>
+  <li><a href="#评估" id="toc-评估" class="nav-link" data-scroll-target="#评估">评估</a>
+  <ul class="collapse">
+  <li><a href="#留出导数预测" id="toc-留出导数预测" class="nav-link" data-scroll-target="#留出导数预测">留出导数预测</a></li>
+  <li><a href="#真实平面主角度" id="toc-真实平面主角度" class="nav-link" data-scroll-target="#真实平面主角度">真实平面主角度</a></li>
+  <li><a href="#角速率误差" id="toc-角速率误差" class="nav-link" data-scroll-target="#角速率误差">角速率误差</a></li>
+  <li><a href="#切向与径向能量" id="toc-切向与径向能量" class="nav-link" data-scroll-target="#切向与径向能量">切向与径向能量</a></li>
+  <li><a href="#平面占用与角跨度" id="toc-平面占用与角跨度" class="nav-link" data-scroll-target="#平面占用与角跨度">平面占用与角跨度</a></li>
+  <li><a href="#条件与试次稳定性" id="toc-条件与试次稳定性" class="nav-link" data-scroll-target="#条件与试次稳定性">条件与试次稳定性</a></li>
+  <li><a href="#矩阵与预处理诊断" id="toc-矩阵与预处理诊断" class="nav-link" data-scroll-target="#矩阵与预处理诊断">矩阵与预处理诊断</a></li>
+  <li><a href="#整洁度量-schema" id="toc-整洁度量-schema" class="nav-link" data-scroll-target="#整洁度量-schema">整洁度量 schema</a></li>
+  </ul></li>
+  <li><a href="#解读" id="toc-解读" class="nav-link" data-scroll-target="#解读">解读</a></li>
+  <li><a href="#这个玩具模型并不确立" id="toc-这个玩具模型并不确立" class="nav-link" data-scroll-target="#这个玩具模型并不确立">这个玩具模型并不确立</a></li>
+  <li><a href="#向真实数据的扩展" id="toc-向真实数据的扩展" class="nav-link" data-scroll-target="#向真实数据的扩展">向真实数据的扩展</a></li>
+  <li><a href="#可复现性" id="toc-可复现性" class="nav-link" data-scroll-target="#可复现性">可复现性</a>
+  <ul class="collapse">
+  <li><a href="#有界产物契约" id="toc-有界产物契约" class="nav-link" data-scroll-target="#有界产物契约">有界产物契约</a></li>
+  <li><a href="#经核查证据" id="toc-经核查证据" class="nav-link" data-scroll-target="#经核查证据">经核查证据</a></li>
+  <li><a href="#集成状态" id="toc-集成状态" class="nav-link" data-scroll-target="#集成状态">集成状态</a></li>
+  <li><a href="#历史目标检查职责" id="toc-历史目标检查职责" class="nav-link" data-scroll-target="#历史目标检查职责">历史目标检查职责</a></li>
+  </ul></li>
+  <li><a href="#成熟度检查表" id="toc-成熟度检查表" class="nav-link" data-scroll-target="#成熟度检查表">成熟度检查表</a></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<div class="quarto-title-block"><div><h1 class="title">旋转投影与替代方案对照</h1><button type="button" class="btn code-tools-button" id="quarto-code-tools-source"><i class="bi"></i> 代码</button></div></div>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="旋转投影与替代方案对照" class="level1">
+<h1>旋转投影与替代方案对照</h1>
+<p>这个 L1/stable Candidate E 玩具模型检验 jPCA 式斜约束导数拟合何时恢复已知旋转平面，以及视觉旋转投影何时来自衰减、时滞序列、公共输入、预处理、短弧或坐标选择。数值是主种子 <code>20260819</code> 下的确定性输出；它们以该模拟器、欧氏度量、预处理与损失为条件。</p>
+<p><strong>假定背景：</strong> 中心化 PCA、连续时间线性系统、有限差分导数、最小二乘、实斜对称矩阵、主角度与训练/验证/测试分离。</p>
+<section id="问题" class="level2">
+<h2 class="anchored" data-anchor-id="问题">问题</h2>
+<p>在声明欧氏特征度量与训练拟合秩六 PCA 表示内：</p>
+<ol type="1">
+<li>真实斜约束最小二乘是否在等距嵌入下恢复已知旋转状态平面的观测空间像；</li>
+<li>相对于无限制线性回归，斜限制损失多少留出导数预测；</li>
+<li>对称衰减、延迟瞬态或公共输入能否在没有正自治生成器的情况下产生旋转外观投影；</li>
+<li>拟合平面对弧长、事件时间抖动、平滑与跨条件均值减法有多敏感；以及</li>
+<li>非正交观测映射改变欧氏度量时什么会变化？</li>
+</ol>
+<p>旋转投影是对一个拟合平面中已处理轨迹的描述。其本身不是振荡器、自治动力学、回归、全局向量场、因果性或神经/物理机制的证明 <span class="citation" data-cites="ChurchlandEtAl2012 CunninghamYu2014">(<a href="#ref-ChurchlandEtAl2012" role="doc-biblioref">Churchland 等 2012年</a>; <a href="#ref-CunninghamYu2014" role="doc-biblioref">Cunningham 和 Yu 2014年</a>)</span>。</p>
+</section>
+<section id="真值" class="level2">
+<h2 class="anchored" data-anchor-id="真值">真值</h2>
+<section id="正六维状态方程" class="level3">
+<h3 class="anchored" data-anchor-id="正六维状态方程">正六维状态方程</h3>
+<p>正生成器是连续时间系统</p>
+<p><span class="math display">\[
+\dot z(t)=Az(t),
+\qquad z(t)\in\mathbb R^6,
+\]</span></p>
+<p>其中</p>
+<p><span class="math display">\[
+A=operatorname{blockdiag}
+\left(
+J(2.0),
+J(0.7),
+\operatorname{diag}(-0.4,-0.9)
+\right),
+\]</span></p>
+<p>与<strong>精确符号约定</strong></p>
+<p><span class="math display">\[
+J(\omega)=
+\begin{pmatrix}
+0&amp;-\omega\\
+\omega&amp;0
+\end{pmatrix}.
+\]</span></p>
+<p>因此对列状态，</p>
+<p><span class="math display">\[
+\dot z_1=-2z_2,
+\qquad
+\dot z_2=2z_1,
+\]</span></p>
+<p>所以正 <span class="math inline">\(\omega\)</span> 在 <span class="math inline">\((z_1,z_2)\)</span> 平面中生成逆时针旋转。即使来源的 OCR 或邻近散文丢失负号，该显式块定义也是权威的。</p>
+<p>真实旋转平面是</p>
+<p><span class="math display">\[
+\mathcal P_1=\operatorname{span}(e_1,e_2),
+\qquad
+\mathcal P_2=\operatorname{span}(e_3,e_4),
+\]</span></p>
+<p>角速率分别为每单位时间 <span class="math inline">\(2.0\)</span> 与 <span class="math inline">\(0.7\)</span> 弧度。坐标五与六单调衰减，不是旋转模态。</p>
+</section>
+<section id="条件与初始状态" class="level3">
+<h3 class="anchored" data-anchor-id="条件与初始状态">条件与初始状态</h3>
+<p>有 <span class="math inline">\(C=8\)</span> 个实验条件。用种子词语 <code>initial_states</code> 从独立标准正态抽取一个确定性初始状态矩阵</p>
+<p><span class="math display">\[
+Z_0\in\mathbb R^{8\times6}
+\]</span></p>
+<p>然后将其列乘以</p>
+<p><span class="math display">\[
+(1.2,1.2,0.8,0.8,0.55,0.55).
+\]</span></p>
+<p>相同八个群体初始状态定义训练、验证与测试条件均值；独立试次只通过观测噪声与声明事件抖动不同。清单存储已实现 <span class="math inline">\(Z_0\)</span>、其秩、逐对距离与两个旋转平面中的初始占用。没有初始状态在观察恢复后被选择。</p>
+</section>
+<section id="等距观测嵌入" class="level3">
+<h3 class="anchored" data-anchor-id="等距观测嵌入">等距观测嵌入</h3>
+<p>观测维数是 <span class="math inline">\(p=10\)</span>。用种子词语 <code>isometric_embedding</code> 抽取固定 <span class="math inline">\(10\times6\)</span> 标准正态矩阵，计算其简化 QR 分解，并定向列使 <span class="math inline">\(R\)</span> 的对角为正。把结果称为 <span class="math inline">\(H\)</span>。要求在 <span class="math inline">\(10^{-12}\)</span> 内</p>
+<p><span class="math display">\[
+H^\top H=I_6
+\]</span></p>
+<p>无噪观测轨迹是</p>
+<p><span class="math display">\[
+y_c(t)=Hz_c(t).
+\]</span></p>
+<p>因为 <span class="math inline">\(H\)</span> 在六维状态像上是等距，观测空间真实平面是</p>
+<p><span class="math display">\[
+\mathcal Q_1=\operatorname{span}(He_1,He_2),
+\qquad
+\mathcal Q_2=\operatorname{span}(He_3,He_4).
+\]</span></p>
+<p>正恢复目标是观测坐标中的 <span class="math inline">\(\mathcal Q_j\)</span>，或其在<strong>训练拟合</strong> PCA 基 <span class="math inline">\(W\)</span> 下的像：</p>
+<p><span class="math display">\[
+\mathcal Q_j^{\mathrm{PCA}}=operatorname{col}
+\left(W^\top H[e_{2j-1},e_{2j}]
+ight).
+\]</span></p>
+<p>后者基在主角度评分前被正交归一化。测试数据永不重拟合 <span class="math inline">\(W\)</span>。</p>
+</section>
+<section id="试次观测" class="level3">
+<h3 class="anchored" data-anchor-id="试次观测">试次观测</h3>
+<p>在每个条件、划分、试次与时间箱，</p>
+<p><span class="math display">\[
+y_{c,r}^{\mathrm{obs}}(t)=y_c(t)+\epsilon_{c,r}(t),
+\qquad
+\epsilon_{c,r}(t)\sim\mathcal N(0,0.12^2I_{10}),
+\]</span></p>
+<p>跨试次、时间箱、条件与划分独立，除非显式抖动压力改变采样对齐。</p>
+</section>
+</section>
+<section id="生成模型" class="level2">
+<h2 class="anchored" data-anchor-id="生成模型">生成模型</h2>
+<p>时间网格是</p>
+<p><span class="math display">\[
+t_m=0.04m,qquad m=0,\ldots,60,
+\]</span></p>
+<p>因此 <span class="math inline">\(T=61\)</span>，完整区间是 <span class="math inline">\([0,2.4]\)</span>。精确正轨迹使用矩阵指数块公式而非数值积分：</p>
+<p><span class="math display">\[
+\begin{pmatrix}z_1(t)\\z_2(t)\end{pmatrix}
+=
+\begin{pmatrix}
+\cos(2t)&amp;-\sin(2t)\\
+\sin(2t)&amp;\cos(2t)
+\end{pmatrix}
+\begin{pmatrix}z_1(0)\\z_2(0)\end{pmatrix},
+\]</span></p>
+<p>坐标五与六具有类似 <span class="math inline">\(0.7\)</span> 块与指数衰减。</p>
+<p>每条件独立试次是：</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>划分</th>
+<th style="text-align: right;">每条件试次</th>
+<th style="text-align: right;">总试次</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>训练</td>
+<td style="text-align: right;">10</td>
+<td style="text-align: right;">80</td>
+</tr>
+<tr class="even">
+<td>验证</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">40</td>
+</tr>
+<tr class="odd">
+<td>测试</td>
+<td style="text-align: right;">7</td>
+<td style="text-align: right;">56</td>
+</tr>
+</tbody>
+</table>
+<p>生成、条件平均、预处理、PCA、导数构造、拟合、平面提取、评分、对照、绘图与验证是独立函数。精确状态、真实矩阵与真实平面只进入生成、最终评分与实现神谕。</p>
+<p>主种子是 <code>20260819</code>。每个条件、划分、试次、抖动、随机平面、嵌入与洗牌提案接收记录在清单中的显式整数种子词语。</p>
+</section>
+<section id="参数" class="level2">
+<h2 class="anchored" data-anchor-id="参数">参数</h2>
+<p>固定分析契约是：</p>
+<ul>
+<li>主表示：在训练条件均值上拟合的秩六协方差 PCA；</li>
+<li>除声明中心化外无特征标准化，保留正等距度量；</li>
+<li>主导数估计器：条件内中点割线；</li>
+<li>主平滑：无；</li>
+<li>轻平滑压力：端点不变的中心化三箱移动平均；</li>
+<li>主跨条件预处理：在每个时间箱减去每个特征的训练跨条件均值，然后减去一个训练全局特征均值；</li>
+<li>替代预处理：省略时变跨条件减法，保留训练全局均值；</li>
+<li>五个确定性随机秩二平面加一个固定前两 PC 平面；</li>
+<li>矩阵与平面代数容差 <span class="math inline">\(10^{-10}\)</span>；</li>
+<li>等距与真值变换容差 <span class="math inline">\(10^{-12}\)</span>；</li>
+<li>有限差分解析检查容差 <span class="math inline">\(3\times10^{-3}\)</span>；以及</li>
+<li>逐字节相同产物再生。</li>
+</ul>
+<p>没有秩、窗口、平滑、减法、对照族或平面使用测试结果选择。</p>
+</section>
+<section id="模拟" class="level2">
+<h2 class="anchored" data-anchor-id="模拟">模拟</h2>
+<section id="条件均值与预处理" class="level3">
+<h3 class="anchored" data-anchor-id="条件均值与预处理">条件均值与预处理</h3>
+<p>只在相同条件与划分内平均试次。在训练均值上拟合所有预处理。启用跨条件减法时，定义</p>
+<p><span class="math display">\[
+\bar y_{\mathrm{cond}}(t)=\frac1C\sum_c\bar y_c^{\mathrm{train}}(t),
+\]</span></p>
+<p>并在对应名义时间从训练、验证与测试条件均值减去该冻结函数。然后减去冻结训练全局均值并拟合 PCA。对正齐次系统，跨条件均值在观测噪声前也遵循相同 <span class="math inline">\(A\)</span>，因此减法改变条件偏移但不引入不同状态矩阵。该性质在输入驱动或时滞对照中不必成立。</p>
+</section>
+<section id="pca-表示" class="level3">
+<h3 class="anchored" data-anchor-id="pca-表示">PCA 表示</h3>
+<p>设 <span class="math inline">\(W\in\mathbb R^{10\times6}\)</span> 包含训练秩六 PCA 基。对每个已处理条件轨迹，</p>
+<p><span class="math display">\[
+x_c(t)=W^\top y_c^{\mathrm{proc}}(t).
+\]</span></p>
+<p>PCA 子空间是训练拟合观测投影，不是推断潜状态后验。Churchland 等人的 jPC 旋转保留 PCA 基，而 Cunningham 与 Yu 区分此类投影与在数据与概率动力学模型之间权衡的后验轨迹 <span class="citation" data-cites="ChurchlandEtAl2012 CunninghamYu2014">(<a href="#ref-ChurchlandEtAl2012" role="doc-biblioref">Churchland 等 2012年</a>; <a href="#ref-CunninghamYu2014" role="doc-biblioref">Cunningham 和 Yu 2014年</a>)</span>。</p>
+</section>
+<section id="保边界导数" class="level3">
+<h3 class="anchored" data-anchor-id="保边界导数">保边界导数</h3>
+<p>对每个条件分别定义</p>
+<p><span class="math display">\[
+x_{c,m+1/2}=\frac{x_c(t_{m+1})+x_c(t_m)}2,
+\]</span></p>
+<p><span class="math display">\[
+\dot x_{c,m+1/2}
+=\frac{x_c(t_{m+1})-x_c(t_m)}{0.04}.
+\]</span></p>
+<p>只在微分后堆叠这些对。永不以一个条件或试次的最终样本到另一个的首样本创建导数。抖动观测一致地使用其声明物理或名义样本时间；禁止包裹 <code>roll</code> 转移。</p>
+</section>
+<section id="经验结果" class="level3">
+<h3 class="anchored" data-anchor-id="经验结果">经验结果</h3>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>验收项</th>
+<th>结果</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>正恢复平面 1 / 平面 2 最大角度</td>
+<td><span class="math inline">\(1.35^\circ / 4.78^\circ\)</span></td>
+</tr>
+<tr class="even">
+<td>正带符号速率</td>
+<td>1.9944 / 0.6999</td>
+</tr>
+<tr class="odd">
+<td>正绝对速率误差</td>
+<td>0.00557 / 0.000105</td>
+</tr>
+<tr class="even">
+<td>训练–验证观测空间平面稳定性</td>
+<td><span class="math inline">\(1.02^\circ / 1.36^\circ\)</span></td>
+</tr>
+<tr class="odd">
+<td>训练–测试观测空间平面稳定性</td>
+<td><span class="math inline">\(0.73^\circ / 1.71^\circ\)</span></td>
+</tr>
+<tr class="even">
+<td>正测试无限制 / 斜 / 对称导数 <span class="math inline">\(R^2\)</span></td>
+<td>0.3381 / 0.3364 / 0.0126</td>
+</tr>
+<tr class="odd">
+<td>正合并平面占用</td>
+<td>0.4001 / 0.4919</td>
+</tr>
+<tr class="even">
+<td>正切向/径向导数能量比</td>
+<td>3.44 / 1.64</td>
+</tr>
+<tr class="odd">
+<td>短窗口平面 1 角度</td>
+<td><span class="math inline">\(4.98^\circ\)</span></td>
+</tr>
+<tr class="even">
+<td>抖动无限制 / 斜 <span class="math inline">\(R^2\)</span></td>
+<td>0.3329 / 0.3311</td>
+</tr>
+<tr class="odd">
+<td>平滑无限制 / 斜 <span class="math inline">\(R^2\)</span></td>
+<td>0.8187 / 0.8144</td>
+</tr>
+<tr class="even">
+<td>无减法无限制 / 斜 <span class="math inline">\(R^2\)</span></td>
+<td>0.4310 / 0.4294</td>
+</tr>
+<tr class="odd">
+<td>对称衰减无限制 / 斜 / 对称 <span class="math inline">\(R^2\)</span></td>
+<td>0.0353 / 0.00175 / 0.0355</td>
+</tr>
+<tr class="even">
+<td>时滞序列无限制 / 斜 <span class="math inline">\(R^2\)</span></td>
+<td>0.3036 / 0.3005；无自治平面真值目标</td>
+</tr>
+<tr class="odd">
+<td>同数据输入驱动仅状态仿射 <span class="math inline">\(R^2\)</span></td>
+<td>0.0465</td>
+</tr>
+<tr class="even">
+<td>同数据输入感知仿射 <span class="math inline">\(R^2\)</span></td>
+<td>0.0808</td>
+</tr>
+<tr class="odd">
+<td>干净 Euler 恒等 / 拟合 <span class="math inline">\(M,G,b\)</span> 误差</td>
+<td><span class="math inline">\(2.33\times10^{-14}\)</span> / 2.614 / 0.207 / 0.033</td>
+</tr>
+<tr class="even">
+<td>非正交平面 1 角度与无限制/斜 <span class="math inline">\(R^2\)</span></td>
+<td><span class="math inline">\(7.29^\circ\)</span>，0.4609 / 0.3399</td>
+</tr>
+<tr class="odd">
+<td>整轨迹洗牌训练/验证/测试协方差相似性</td>
+<td>0.746 / 0.750 / 0.730；全部未达 0.95 目标</td>
+</tr>
+<tr class="even">
+<td>确定性再生</td>
+<td>逐字节相同清单、度量、诊断与 PNG</td>
+</tr>
+</tbody>
+</table>
+<p>两个正平面被联合匹配到两个真实 PCA 空间平面。较慢平面具有更大有限样本角度但准确速率。平滑大幅增加导数预测与切向/径向比，因为差分放大观测噪声；该敏感性不是动力学的独立证据。128 洗牌中的最佳保留每个特征的完整轨迹多重集，但未达预先声明协方差相似阈值，因此被保留为不完全匹配对照而非成功零模型。</p>
+</section>
+</section>
+<section id="可视化" class="level2">
+<h2 class="anchored" data-anchor-id="可视化">可视化</h2>
+<p>单一 <code>summary.png</code> 至多包含四个面板：</p>
+<ol type="1">
+<li>恢复平面 1 中的一条正留出条件轨迹，作为有界投影显示；</li>
+<li>跨所有场景的无限制/仅状态仿射与斜约束留出导数 <span class="math inline">\(R^2\)</span>；</li>
+<li>两个正平面匹配/速率、正平面 1 占用/切向/垂直摘要、预处理敏感性，以及带显式阈值未达的已实现整轨迹洗牌相似性；以及</li>
+<li>等距、有限差分、约束/LS、平面重提取、投毒、适用性与解读检查。</li>
+</ol>
+<p>图中文本陈述轨迹是投影而非后验状态估计，时滞与输入驱动对照省略自治平面真值度量，旋转不是振荡器、自治性或机制的证据。对称约束与输入感知导数行、完整固定/随机/阴性对照平面度量与稳定性记录保留在 <code>metrics.csv</code> 中；单一 PNG 不是其替代。</p>
+</section>
+<section id="预期行为" class="level2">
+<h2 class="anchored" data-anchor-id="预期行为">预期行为</h2>
+<ol type="1">
+<li>在正等距生成器下，秩六 PCA 应恢复六维观测像，约束斜最小二乘应近似恢复两个真实旋转平面，受噪声、有限差分、占用与减法影响。</li>
+<li>无限制导数拟合的训练 SSE 不可能大于约束斜拟合。相似留出表现支持该度量下斜主导局部线性关系；它不证明未知数据中的纯旋转生成器。</li>
+<li>对称衰减对照应偏好对称导数映射，并缺少有效旋转平面真值目标。</li>
+<li>错开瞬态时滞可以产生弯曲或旋转外观投影，尽管没有共享自治六维状态律 <span class="citation" data-cites="MichaelsEtAl2016 LebedevEtAl2019">(<a href="#ref-MichaelsEtAl2016" role="doc-biblioref">Michaels 等 2016年</a>; <a href="#ref-LebedevEtAl2019" role="doc-biblioref">Lebedev 等 2019年</a>)</span>。</li>
+<li>输入驱动轨迹可以使仅状态矩阵吸收与 <span class="math inline">\(u(t)\)</span> 的相关。输入感知拟合应由留出导数预测与声明状态/输入系数的恢复评判，而非其投影曲线是否看起来不那么圆。</li>
+<li>短弧可以在未完成周期的情况下显示强切向关系。事件抖动可以降低条件一致性；轻平滑可以降低导数噪声，同时改变带宽与相位。</li>
+<li>跨条件减法可以揭示或抑制不同方差模式，并是估计目标的一部分，而非中性清理 <span class="citation" data-cites="LebedevEtAl2019">(<a href="#ref-LebedevEtAl2019" role="doc-biblioref">Lebedev 等 2019年</a>)</span>。</li>
+<li>协方差匹配条件洗牌只在它实际保留的干扰结构上比无约束洗牌更有信息量 <span class="citation" data-cites="MichaelsEtAl2016">(<a href="#ref-MichaelsEtAl2016" role="doc-biblioref">Michaels 等 2016年</a>)</span>。</li>
+<li>在非正交混合下，潜物理轨迹不变，但欧氏斜对称性一般不保留。这是度量依赖压力，不是失败等距正情形。</li>
+</ol>
+</section>
+<section id="参数操控" class="level2">
+<h2 class="anchored" data-anchor-id="参数操控">参数操控</h2>
+<section id="a.-正全窗口等距条件" class="level3">
+<h3 class="anchored" data-anchor-id="a.-正全窗口等距条件">A. 正全窗口等距条件</h3>
+<p>使用声明 <span class="math inline">\(A\)</span>、八个初始状态、等距 <span class="math inline">\(H\)</span>、完整 <span class="math inline">\([0,2.4]\)</span> 区间、无平滑、正确对齐与主跨条件减法。两个真实旋转平面与速率均适用。</p>
+<p>名称 <code>full_window</code> 指完整预先声明观测区间，不是每个轨迹完成一个周期的证明。最快理想模态覆盖 <span class="math inline">\(4.8\)</span> 弧度，较慢模态覆盖 <span class="math inline">\(1.68\)</span> 弧度；那些事实被显式报告。</p>
+</section>
+<section id="b.-短弧压力" class="level3">
+<h3 class="anchored" data-anchor-id="b.-短弧压力">B. 短弧压力</h3>
+<p>在拟合 PCA 与导数前只保留前 18 个样本，<span class="math inline">\(t\in[0,0.68]\)</span>。最快理想模态覆盖 <span class="math inline">\(1.36\)</span> 弧度，较慢模态 <span class="math inline">\(0.476\)</span> 弧度。报告角跨度、占用、平面角度、速率误差与拟合稳定性。该窗口上的低导数误差不能确立周期性、回归或闭合轨道。</p>
+</section>
+<section id="c.-事件时间抖动" class="level3">
+<h3 class="anchored" data-anchor-id="c.-事件时间抖动">C. 事件时间抖动</h3>
+<p>对每个试次独立，用冻结种子从 <span class="math inline">\(\{-3,-2,\ldots,3\}\)</span> 箱抽取整数偏移。在加噪声前于移位物理时间生成或重采样解析轨迹，然后对照名义对齐网格分析。<span class="math inline">\([0,2.4]\)</span> 之外的样本使用解析生成器而非循环包裹。存储每个偏移。这建模不完美事件对齐而不在窗口边界发明转移。</p>
+</section>
+<section id="d.-无对轻平滑" class="level3">
+<h3 class="anchored" data-anchor-id="d.-无对轻平滑">D. 无对轻平滑</h3>
+<p>比较无平滑与在每条条件/试次轨迹内独立应用的冻结三箱移动平均。对两个分支分别只用训练数据拟合预处理、PCA、导数与矩阵。不在一个分支微分后、另一分支微分前平滑而不命名改变的目标。</p>
+</section>
+<section id="e.-跨条件时间均值减法" class="level3">
+<h3 class="anchored" data-anchor-id="e.-跨条件时间均值减法">E. 跨条件时间均值减法</h3>
+<p>带与不带时变训练跨条件均值减法运行正生成器。保留相同秩、导数估计器与划分。报告平面占用、真实平面角度、导数拟合、角速率与条件一致性如何改变。两个分支都不被声明普遍正确。</p>
+</section>
+<section id="f.-对称衰减对照" class="level3">
+<h3 class="anchored" data-anchor-id="f.-对称衰减对照">F. 对称衰减对照</h3>
+<p>把正状态矩阵替换为</p>
+<p><span class="math display">\[
+A_{\mathrm{sym}}=operatorname{diag}(-1.2,-0.8,-0.5,-0.35,-0.2,-0.1)
+\]</span></p>
+<p>在相同等距 <span class="math inline">\(H\)</span>、初始状态、噪声与划分下。真实导数映射对称且无非零虚特征值。对无限制、斜约束与对称约束拟合的导数预测评分。不赋予真实旋转平面角度或角速率目标。</p>
+</section>
+<section id="g.-时滞序列瞬态对照" class="level3">
+<h3 class="anchored" data-anchor-id="g.-时滞序列瞬态对照">G. 时滞序列瞬态对照</h3>
+<p>该对照直接在观测坐标中定义，没有自治潜状态方程。对观测特征 <span class="math inline">\(j=1,\ldots,10\)</span>、条件 <span class="math inline">\(c=0,\ldots,7\)</span> 与时间 <span class="math inline">\(t\)</span>，</p>
+<p><span class="math display">\[
+y_{c,j}(t)
+=
+(-1)^j(1+0.08c)
+\exp\left[-\left(\frac{t-\tau_{j,c}}{w_j}\right)^2\right],
+\]</span></p>
+<p>其中</p>
+<p><span class="math display">\[
+\tau_{j,c}=\operatorname{linspace}(0.35,1.70)_{j}+0.025c,
+\qquad
+w_j=\operatorname{linspace}(0.13,0.25)_j.
+\]</span></p>
+<p>添加相同观测噪声与划分结构。这产生有序特征峰序列。可以计算 jPCA 度量，但真实平面与自治矩阵恢复不适用。该对照检验延迟瞬态是否能产生旋转外观投影，正如 Michaels 等人与 Lebedev 等人所激励 <span class="citation" data-cites="MichaelsEtAl2016 LebedevEtAl2019">(<a href="#ref-MichaelsEtAl2016" role="doc-biblioref">Michaels 等 2016年</a>; <a href="#ref-LebedevEtAl2019" role="doc-biblioref">Lebedev 等 2019年</a>)</span>。</p>
+</section>
+<section id="h.-输入驱动脉冲公共输入对照" class="level3">
+<h3 class="anchored" data-anchor-id="h.-输入驱动脉冲公共输入对照">H. 输入驱动脉冲/公共输入对照</h3>
+<p>生成</p>
+<p><span class="math display">\[
+\dot z(t)=A_u z(t)+Bu_c(t),
+\]</span></p>
+<p>其中</p>
+<p><span class="math display">\[
+A_u=\operatorname{diag}(-0.25,-0.30,-0.35,-0.40,-0.45,-0.50),
+\]</span></p>
+<p><span class="math display">\[
+B=
+\begin{pmatrix}
+0.8&amp;0\\
+0&amp;0.7\\
+0.5&amp;0.3\\
+-0.3&amp;0.5\\
+0.2&amp;-0.4\\
+0.4&amp;0.25
+\end{pmatrix},
+\]</span></p>
+<p>且</p>
+<p><span class="math display">\[
+u_{c,1}(t)=\sin(1.3t+0.35c),
+\qquad
+u_{c,2}(t)=
+\exp\left[-\left(\frac{t-(0.8+0.04c)}{0.28}\right)^2\right].
+\]</span></p>
+<p>使用一个冻结数值积分规则与等于观测网格的步长；记录其局部一致性检查。比较：</p>
+<ul>
+<li><strong>仅状态仿射：</strong> <span class="math inline">\(\Delta x/\Delta t\approx Mx_i+b\)</span>；</li>
+<li><strong>输入感知仿射：</strong> <span class="math inline">\(\Delta x/\Delta t\approx Mx_i+Gu_i+b\)</span>。</li>
+</ul>
+<p>两个拟合使用相同冻结带噪试次、训练中心化、PCA 坐标与左端点预测器，匹配前向 Euler 生成器。该对照不使用时变跨条件减法。已知输入列只提供给输入感知拟合。仅状态拟合的斜分量可以反映被省略驱动。包含 <span class="math inline">\(u\)</span> 是已知模拟器输入下的模型比较，不是观测数据中因果输入辨识的证明 <span class="citation" data-cites="CunninghamYu2014">(<a href="#ref-CunninghamYu2014" role="doc-biblioref">Cunningham 和 Yu 2014年</a>)</span>。</p>
+</section>
+<section id="i.-非正交混合与度量依赖" class="level3">
+<h3 class="anchored" data-anchor-id="i.-非正交混合与度量依赖">I. 非正交混合与度量依赖</h3>
+<p>使用</p>
+<p><span class="math display">\[
+G=HS,
+\]</span></p>
+<p>其中</p>
+<p><span class="math display">\[
+S=egin{pmatrix}
+1&amp;0.35&amp;0&amp;0&amp;0&amp;0\\
+0&amp;1.6&amp;0.2&amp;0&amp;0&amp;0\\
+0&amp;0&amp;0.7&amp;0.25&amp;0&amp;0\\
+0&amp;0&amp;0&amp;1.3&amp;0.2&amp;0\\
+0&amp;0&amp;0&amp;0&amp;0.8&amp;0.3\\
+0&amp;0&amp;0&amp;0&amp;0&amp;1.8
+\end{pmatrix}.
+\]</span></p>
+<p>从相同正潜轨迹生成 <span class="math inline">\(y=Gz\)</span>。映射真实平面 <span class="math inline">\(G\mathcal P_j\)</span> 对角度评分仍为有效几何像，但 <span class="math inline">\(GAG^+\)</span> 在普通观测欧氏度量下一般不斜对称。报告 Gram 矩阵 <span class="math inline">\(G^\top G\)</span>、其条件数与平面/速率诊断。不要将该压力与等距正验收准则合并。</p>
+</section>
+<section id="j.-协方差与条件结构匹配洗牌" class="level3">
+<h3 class="anchored" data-anchor-id="j.-协方差与条件结构匹配洗牌">J. 协方差与条件结构匹配洗牌</h3>
+<p>对每个特征独立，在八个条件间置换<strong>整条条件轨迹</strong>，保留每个特征的完整时间进程与边际条件分布，同时破坏跨特征条件身份。为每个划分生成 128 个冻结置换提案。用仅协方差相似性——而非任何旋转度量——选择原始与洗牌展平特征协方差之间相似性最大的提案，并报告</p>
+<p><span class="math display">\[
+\operatorname{sim}(C,C_\pi)
+=1-rac{\lVert C-C_\pi\rVert_F^2}{\lVert C\rVert_F^2}.
+\]</span></p>
+<p>目标阈值是 <span class="math inline">\(0.95\)</span>；如果没有提案达到，使用最高相似性提案、记录未达并缩小解读。在所选洗牌训练/验证数据上重拟合完整管线。该有界构造受 Michaels 等人迭代 CMPT 激励，但与其不同 <span class="citation" data-cites="MichaelsEtAl2016">(<a href="#ref-MichaelsEtAl2016" role="doc-biblioref">Michaels 等 2016年</a>)</span>。破坏每条轨迹的时间方向置换不是可接受匹配对照。</p>
+</section>
+</section>
+<section id="健全性检查" class="level2">
+<h2 class="anchored" data-anchor-id="健全性检查">健全性检查</h2>
+<p>验证器必须断言以下全部。</p>
+<ol type="1">
+<li><strong>正生成器代数：</strong> 解析导数在浮点容差内等于 <span class="math inline">\(Az(t)\)</span>。</li>
+<li><strong>正确斜符号：</strong> 存储 <span class="math inline">\(J(\omega)\)</span> 块右上为 <span class="math inline">\(-\omega\)</span>、左下为 <span class="math inline">\(+\omega\)</span>，且 <span class="math inline">\(J^\top=-J\)</span>。</li>
+<li><strong>嵌入等距：</strong> <span class="math inline">\(\lVert H^\top H-I\rVert_{\max}\le10^{-12}\)</span>。</li>
+<li><strong>划分完整性：</strong> 试次标识符不相交，没有条件均值、预处理、PCA 基、矩阵、平面或超参数使用测试试次。</li>
+<li><strong>边界完整性：</strong> 每个导数对属于一个条件与一条试次/条件均值轨迹；精确检查预期对数。</li>
+<li><strong>导数神谕：</strong> 无噪正轨迹上的中点有限差分在 <span class="math inline">\(3\times10^{-3}\)</span> 内与解析中点导数一致。</li>
+<li><strong>PCA 神谕：</strong> 训练 PCA 投影器在 <span class="math inline">\(10^{-10}\)</span> 内等于独立秩六 SVD 投影器。</li>
+<li><strong>无限制 LS：</strong> 正规方程残差正交性或独立最小二乘重算通过容差。</li>
+<li><strong>真实约束斜 LS：</strong> <span class="math inline">\(M_{\mathrm{skew}}+M_{\mathrm{skew}}^\top=0\)</span>，且从显式斜基重构在 <span class="math inline">\(10^{-10}\)</span> 内一致。</li>
+<li><strong>无反对称化替换：</strong> 验证器独立求解斜基最小二乘问题，除非两者数值恰好一致，否则不接受 <span class="math inline">\((M_{\mathrm{un}}-M_{\mathrm{un}}^\top)/2\)</span> 作为神谕。</li>
+<li><strong>对称约束 LS：</strong> <span class="math inline">\(M_{\mathrm{sym}}-M_{\mathrm{sym}}^\top=0\)</span>，且对称基解被独立重算。</li>
+<li><strong>嵌套训练损失：</strong> 无限制训练 SSE 在数值容差内不大于斜或对称约束 SSE。</li>
+<li><strong>平面提取：</strong> 每个恢复平面标准正交且在拟合斜矩阵下不变；存储速率等于 <span class="math inline">\(|q_1^\top M_{\mathrm{skew}}q_2|\)</span>。</li>
+<li><strong>平面等价：</strong> 平面角度度量对平面内旋转、轴交换与符号变化不变。</li>
+<li><strong>真值适用性：</strong> 真实平面/速率行只存在于正条件与单独标记非正交映射平面条件；时滞与对称对照中不存在。</li>
+<li><strong>输入设计：</strong> 输入感知预测器包含声明两个输入列、在需要处满秩，且仅状态拟合无法访问它们。</li>
+<li><strong>抖动完整性：</strong> 偏移被存储、无循环包裹，物理导数时间被一致处理。</li>
+<li><strong>平滑/减法隔离：</strong> 每个分支重拟合训练预处理，只改变其命名操作。</li>
+<li><strong>洗牌匹配：</strong> 整条轨迹被置换、协方差相似性在旋转分析前计算，选择永不用 jPCA 度量。</li>
+<li><strong>真值与测试投毒：</strong> 替换潜真值与测试观测不能改变训练/验证拟合参数或所选对照。</li>
+<li><strong>确定性：</strong> 干净临时重跑产生逐字节相同 <code>manifest.json</code>、<code>metrics.csv</code>、<code>diagnostics.json</code> 与 <code>summary.png</code>。</li>
+<li><strong>度量出处：</strong> 每行具有划分、条件、预处理、方法、目标、度量与有限值的唯一标签。</li>
+</ol>
+<p>通过这些检查确立有界数值一致性，而非真实系统是自治振荡器。</p>
+</section>
+<section id="失效情形" class="level2">
+<h2 class="anchored" data-anchor-id="失效情形">失效情形</h2>
+<ul>
+<li><strong>反对称化无限制拟合：</strong> 欧氏矩阵投影一般不构成斜约束导数最小二乘解。</li>
+<li><strong>错误斜符号：</strong> 使用 <span class="math inline">\(\begin{psmallmatrix}0&amp;+\omega\\-\omega&amp;0\end{psmallmatrix}\)</span> 静默反转声明正朝向。</li>
+<li><strong>跨条件导数：</strong> 连接条件端点制造人工速度。</li>
+<li><strong>测试重拟合 PCA 或预处理：</strong> 这是直推式泄漏，不是留出评估。</li>
+<li><strong>按视觉圆度选择平面：</strong> 平面选择必须遵循冻结斜算子规则。</li>
+<li><strong>把快速率误认为高占用：</strong> 频率、数据方差、导数拟合与稳定性是不同量。</li>
+<li><strong>把短切向弧称为振荡：</strong> 不足一个周期不显示回归或周期性。</li>
+<li><strong>给时滞对照赋予潜振荡器：</strong> 有序瞬态可以在没有正自治律的情况下产生旋转。</li>
+<li><strong>把仅状态输入拟合称为自治真值：</strong> 被省略公共驱动可以被吸收进 <span class="math inline">\(M\)</span>。</li>
+<li><strong>把跨条件减法称为无害：</strong> 它改变拟合数据并可以改变显示旋转 <span class="citation" data-cites="LebedevEtAl2019">(<a href="#ref-LebedevEtAl2019" role="doc-biblioref">Lebedev 等 2019年</a>)</span>。</li>
+<li><strong>把平滑称为装饰：</strong> 它改变导数与时间带宽。</li>
+<li><strong>不匹配洗牌：</strong> 同时破坏协方差、光滑性与条件结构产生无信息易零模型。</li>
+<li><strong>把非正交混合与等距合并：</strong> 斜对称性依赖度量，且对任意可逆坐标不变。</li>
+<li><strong>把投影称为后验状态推断：</strong> jPCA 投影不执行概率去噪或状态后验估计 <span class="citation" data-cites="CunninghamYu2014">(<a href="#ref-CunninghamYu2014" role="doc-biblioref">Cunningham 和 Yu 2014年</a>)</span>。</li>
+<li><strong>把旋转称为全局向量场：</strong> 拟合只在采样、已处理条件–时间区域上受支持。</li>
+<li><strong>把旋转称为机制或因果性：</strong> 拟合局部线性关系不识别回路实现或干预效应。</li>
+</ul>
+</section>
+<section id="恢复任务" class="level2">
+<h2 class="anchored" data-anchor-id="恢复任务">恢复任务</h2>
+<section id="秩六-pca" class="level3">
+<h3 class="anchored" data-anchor-id="秩六-pca">秩六 PCA</h3>
+<p>在声明预处理下从训练条件均值拟合 <span class="math inline">\(W\)</span>。PCA 提供所有导数模型被比较的观测表示。它不是旋转方法，不接收角速率估计。</p>
+</section>
+<section id="无限制导数回归" class="level3">
+<h3 class="anchored" data-anchor-id="无限制导数回归">无限制导数回归</h3>
+<p>把中点状态 <span class="math inline">\(X\)</span> 与导数目标 <span class="math inline">\(D\)</span> 作为列堆叠并求解</p>
+<p><span class="math display">\[
+\widehat M_{\mathrm{un}}
+\in\arg\min_M\lVert D-MX\rVert_F^2
+\]</span></p>
+<p>使用 <code>lstsq</code> 或等价稳定求解。报告秩、条件数、训练 SSE 与留出导数误差。</p>
+</section>
+<section id="斜约束最小二乘" class="level3">
+<h3 class="anchored" data-anchor-id="斜约束最小二乘">斜约束最小二乘</h3>
+<p>设 <span class="math inline">\(B_{ij}\)</span>（<span class="math inline">\(i&lt;j\)</span>）在 <span class="math inline">\((i,j)\)</span> 处为 <span class="math inline">\(+1\)</span>、<span class="math inline">\((j,i)\)</span> 处为 <span class="math inline">\(-1\)</span>，其余为零。求解</p>
+<p><span class="math display">\[
+\widehat M_{\mathrm{skew}}
+=
+\sum_{i&lt;j}\theta_{ij}B_{ij},
+\]</span></p>
+<p><span class="math display">\[
+\widehat\theta
+\in
+\arg\min_\theta
+\left\lVert
+\operatorname{vec}(D)-
+\begin{bmatrix}
+\operatorname{vec}(B_{12}X)&amp;\cdots
+\end{bmatrix}
+\theta
+\right\rVert_2^2.
+\]</span></p>
+<p>这是 Churchland 补充推导中描述的实际 jPCA 约束拟合 <span class="citation" data-cites="ChurchlandEtAl2012">(<a href="#ref-ChurchlandEtAl2012" role="doc-biblioref">Churchland 等 2012年</a>)</span>。它不是由反对称化 <span class="math inline">\(\widehat M_{\mathrm{un}}\)</span> 形成。</p>
+</section>
+<section id="对称结构" class="level3">
+<h3 class="anchored" data-anchor-id="对称结构">对称结构</h3>
+<p>拟合匹配约束对称模型</p>
+<p><span class="math display">\[
+\widehat M_{\mathrm{sym}}
+\in\arg\min_{M^\top=M}\lVert D-MX\rVert_F^2
+\]</span></p>
+<p>使用显式对称基。还把代数分解</p>
+<p><span class="math display">\[
+\widehat M_{\mathrm{un}}
+=
+\frac{\widehat M_{\mathrm{un}}+\widehat M_{\mathrm{un}}^\top}{2}
++
+\frac{\widehat M_{\mathrm{un}}-\widehat M_{\mathrm{un}}^\top}{2}
+\]</span></p>
+<p>仅作为无限制算子的诊断报告。两个代数部分都不替代其对应约束回归。</p>
+</section>
+<section id="旋转平面提取" class="level3">
+<h3 class="anchored" data-anchor-id="旋转平面提取">旋转平面提取</h3>
+<p>对拟合实斜矩阵，对角化对称半正定矩阵</p>
+<p><span class="math display">\[
+-\widehat M_{\mathrm{skew}}^2.
+\]</span></p>
+<p>每个正重复特征值 <span class="math inline">\(\omega_j^2\)</span> 定义二维不变平面。分组重复特征空间，定向确定性标准正交基 <span class="math inline">\((q_{j1},q_{j2})\)</span>，并设置手性使</p>
+<p><span class="math display">\[
+q_{j1}^\top\widehat M_{\mathrm{skew}}q_{j2}&lt;0
+\]</span></p>
+<p>对声明 <span class="math inline">\(J(\omega)\)</span> 约定成立，等价于</p>
+<p><span class="math display">\[
+Q_j^\top\widehat M_{\mathrm{skew}}Q_j
+\approx
+\begin{pmatrix}0&amp;-\widehat\omega_j\\\widehat\omega_j&amp;0\end{pmatrix}.
+\]</span></p>
+<p>按递减 <span class="math inline">\(|\widehat\omega_j|\)</span> 排序平面。近重复频率作为组合四维不变子空间比较，而非赋予不稳定平面标签。</p>
+</section>
+<section id="输入感知回归" class="level3">
+<h3 class="anchored" data-anchor-id="输入感知回归">输入感知回归</h3>
+<p>对输入对照，联合最小二乘求解</p>
+<p><span class="math display">\[
+D=MX+GU+E
+\]</span></p>
+<p>比较留出预测与仅状态模型，并在训练 PCA 表示中报告 <span class="math inline">\(M\)</span>、<span class="math inline">\(G\)</span>、秩与系数误差。已知模拟器输入不进入正或其他对照拟合。</p>
+</section>
+<section id="固定与随机平面" class="level3">
+<h3 class="anchored" data-anchor-id="固定与随机平面">固定与随机平面</h3>
+<p>固定基线是前两个训练 PC。在数据生成前于六维 PCA 空间中一次性生成五个随机秩二平面、正交归一化并冻结。它们接收占用、切向/径向、角跨度与条件一致性度量，但除非执行单独命名平面内导数拟合，否则不接收拟合速率。</p>
+</section>
+</section>
+<section id="候选分析方法" class="level2">
+<h2 class="anchored" data-anchor-id="候选分析方法">候选分析方法</h2>
+<ol type="1">
+<li><strong>训练 PCA 秩六。</strong> 每个拟合导数方法的共享表示。</li>
+<li><strong>无限制仅状态线性导数回归。</strong> 最佳线性仅状态训练拟合。</li>
+<li><strong>真实斜约束导数回归。</strong> jPCA 算子与不变平面。</li>
+<li><strong>真实对称约束导数回归。</strong> 扩张/衰减替代。</li>
+<li><strong>无限制矩阵的代数对称/斜部分。</strong> 仅诊断。</li>
+<li><strong>固定前两 PC 平面。</strong> 方差导向基线。</li>
+<li><strong>五个固定随机平面。</strong> 数据无关投影参考。</li>
+<li><strong>输入感知状态加输入回归。</strong> 只适用于声明输入对照。</li>
+<li><strong>协方差匹配条件洗牌。</strong> 结构化零模型，不是拟合动力学方法。</li>
+</ol>
+</section>
+<section id="评估" class="level2">
+<h2 class="anchored" data-anchor-id="评估">评估</h2>
+<section id="留出导数预测" class="level3">
+<h3 class="anchored" data-anchor-id="留出导数预测">留出导数预测</h3>
+<p>对方法 <span class="math inline">\(m\)</span>，报告</p>
+<p><span class="math display">\[
+\operatorname{MSE}_m
+=
+\frac{1}{N_D}\lVert D^{\mathrm{test}}-widehat D_m^{\mathrm{test}}\rVert_F^2
+\]</span></p>
+<p>与</p>
+<p><span class="math display">\[
+R_m^2
+=1-
+\frac{\lVert D^{\mathrm{test}}-widehat D_m^{\mathrm{test}}\rVert_F^2}
+{\lVert D^{\mathrm{test}}-\bar D^{\mathrm{test}}\rVert_F^2}.
+\]</span></p>
+<p>分别报告训练、验证与测试。对前向 Euler 输入对照，<span class="math inline">\(\widehat D=\widehat MX+\widehat GU+\widehat b\)</span> 在左端点；仅状态方法无法访问 <span class="math inline">\(U\)</span>。</p>
+</section>
+<section id="真实平面主角度" class="level3">
+<h3 class="anchored" data-anchor-id="真实平面主角度">真实平面主角度</h3>
+<p>对恢复平面 <span class="math inline">\(Q\)</span> 与真实平面 <span class="math inline">\(T\)</span>，使用标准正交基的奇异值：</p>
+<p><span class="math display">\[
+\theta_1,\theta_2
+=
+\arccos\left(\operatorname{svd}(Q^\top T)\right).
+\]</span></p>
+<p>报告最大角度、RMS 正弦误差与投影器 Frobenius 误差。通过最小总最大角度分配把两个正恢复平面匹配到两个真实平面，然后报告该分配本身。平面度量对符号、轴交换与平面内旋转不变。</p>
+</section>
+<section id="角速率误差" class="level3">
+<h3 class="anchored" data-anchor-id="角速率误差">角速率误差</h3>
+<p>对匹配恢复平面 <span class="math inline">\(Q_j\)</span>，</p>
+<p><span class="math display">\[
+\widehat\omega_j
+=
+\left|q_{j1}^\top\widehat M_{\mathrm{skew}}q_{j2}\right|,
+\]</span></p>
+<p>并对照 <span class="math inline">\(2.0\)</span> 与 <span class="math inline">\(0.7\)</span> 报告绝对与相对误差。除非显式考虑度量变换，不要在非正交压力中把潜速率恢复报告为适用。</p>
+</section>
+<section id="切向与径向能量" class="level3">
+<h3 class="anchored" data-anchor-id="切向与径向能量">切向与径向能量</h3>
+<p>对投影状态 <span class="math inline">\(r=Q^\top x=(r_1,r_2)^\top\)</span> 且 <span class="math inline">\(\lVert r\rVert&gt;10^{-8}\)</span>，定义</p>
+<p><span class="math display">\[
+e_r=\frac{r}{\lVert r\rVert},
+\qquad
+e_\tau=J(1)e_r,
+\]</span></p>
+<p><span class="math display">\[
+v_r=e_r^\top Q^\top\dot x,
+\qquad
+v_\tau=e_\tau^\top Q^\top\dot x.
+\]</span></p>
+<p>报告平均径向能量 <span class="math inline">\(E_r=\operatorname{mean}(v_r^2)\)</span>、切向能量 <span class="math inline">\(E_\tau=\operatorname{mean}(v_\tau^2)\)</span>、其比率、状态–导数角度在预先声明 <span class="math inline">\(\pi/2\)</span> 容差内的比例，以及跨条件带符号旋转方向一致性。高比率可以在短非回归弧上出现。</p>
+</section>
+<section id="平面占用与角跨度" class="level3">
+<h3 class="anchored" data-anchor-id="平面占用与角跨度">平面占用与角跨度</h3>
+<p>平面占用是</p>
+<p><span class="math display">\[
+\operatorname{Occ}(Q)=
+\frac{\sum\lVert Q^\top x\rVert_2^2}
+{\sum\lVert x\rVert_2^2}.
+\]</span></p>
+<p>角跨度按条件分别展开 <span class="math inline">\(\operatorname{atan2}(r_2,r_1)\)</span>，报告每个条件的跨度并概括中位数/范围。永不过跨条件边界展开。</p>
+</section>
+<section id="条件与试次稳定性" class="level3">
+<h3 class="anchored" data-anchor-id="条件与试次稳定性">条件与试次稳定性</h3>
+<p>报告：</p>
+<ul>
+<li>训练对验证与训练对测试独立拟合平面角度；</li>
+<li>留一条件平面角度与速率变化；</li>
+<li>训练拟合平面下逐条件方向一致性与角速率离散；以及</li>
+<li>使用冻结条件均值拟合的单试次投影切向/径向摘要。</li>
+</ul>
+<p>条件均值与单试次是不同噪声机制。稳定均值不蕴含稳定试次级旋转。</p>
+</section>
+<section id="矩阵与预处理诊断" class="level3">
+<h3 class="anchored" data-anchor-id="矩阵与预处理诊断">矩阵与预处理诊断</h3>
+<p>报告预测器秩与条件数、斜/对称约束违反、无限制对约束 SSE 差距、PCA 占用、减法敏感性、平滑敏感性、抖动偏移、洗牌协方差相似性与非正交映射条件数。</p>
+</section>
+<section id="整洁度量-schema" class="level3">
+<h3 class="anchored" data-anchor-id="整洁度量-schema">整洁度量 schema</h3>
+<p>每个 <code>metrics.csv</code> 行精确包含：</p>
+<pre class="text"><code>split,condition,preprocessing,method,target,metric,value</code></pre>
+<p>值为有限。不适用行被省略并在 <code>diagnostics.json</code> 中列出原因；时滞对照永不被赋予零值真实平面误差。</p>
+</section>
+</section>
+<section id="解读" class="level2">
+<h2 class="anchored" data-anchor-id="解读">解读</h2>
+<p>正模拟器确立窄实现与恢复问题：在等距观测映射、已知线性状态方程、被占用初始条件、固定 PCA 秩、声明预处理与有限差分目标下，恢复斜算子是否识别映射旋转平面与速率？有利答案验证该有界管线，而非旋转投影的一般机制性解读。</p>
+<p>对照分离替代。对称衰减检验约束模型比较是否区分收缩。时滞序列检验没有共享自治状态律的有序瞬态。输入对照检验被省略驱动。短弧、抖动、平滑与减法显示预处理与采样定义估计目标。非正交混合显示欧氏斜对称性依赖坐标/度量。</p>
+<div class="callout callout-style-default callout-tip callout-titled" title="LDG 综合">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">提示</span>LDG 综合
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>向量场给声明状态赋予局部速度。jPCA 反而对采样、已处理轨迹拟合一个线性状态到导数关系。这些样本上的一致不确立拟合矩阵全局有效、观测坐标是完整状态，或外部输入不存在。</p>
+</div>
+</div>
+</section>
+<section id="这个玩具模型并不确立" class="level2">
+<h2 class="anchored" data-anchor-id="这个玩具模型并不确立">这个玩具模型并不确立</h2>
+<ul>
+<li>它不证明旋转投影是振荡器或极限环。</li>
+<li>它不确立回归、周期性、相位重置或自持振荡。</li>
+<li>当输入、反馈、时钟时间或被省略状态可能重要时，它不确立自治动力学。</li>
+<li>它不在采样条件–时间区域之外推断全局向量场。</li>
+<li>它不识别因果、神经、物理或生物机制。</li>
+<li>它不使投影条件均值成为后验潜轨迹。</li>
+<li>它不显示一个 PCA/jPCA 平面是唯一状态空间。</li>
+<li>它不使斜对称性对任意特征缩放或非正交坐标不变。</li>
+<li>它不把平滑、对齐、平均或跨条件减法变成中性操作。</li>
+<li>它不使协方差匹配洗牌成为普遍假设检验。</li>
+<li>它不蕴含高平面占用意味着好导数预测，反之亦然。</li>
+<li>它不单独从视觉圆度推断动力学。</li>
+<li>它不确立流形结构、拓扑、本征维数或非线性几何。</li>
+</ul>
+</section>
+<section id="向真实数据的扩展" class="level2">
+<h2 class="anchored" data-anchor-id="向真实数据的扩展">向真实数据的扩展</h2>
+<p>真实数据分析必须定义同时记录对伪群体特征、独立试次/会话/受试者单元、条件平衡、对齐事件、时间窗口、平滑、特征归一化、跨条件减法、PCA 秩、导数估计器、条件边界、输入测量与嵌套选择。试次平均投影应由单试次稳定性与噪声感知分析补充。</p>
+<p>竞争解释需要匹配对照：时滞模型应保留真实时间进程；输入感知模型需要测得输入与声明系统边界；洗牌应保留与所检验假设相关的干扰统计量。如果任意非正交坐标在科学上合理，旋转应相对于被论证度量评估，而非当作与坐标无关。这些添加都不把观测拟合变成因果辨识。</p>
+</section>
+<section id="可复现性" class="level2">
+<h2 class="anchored" data-anchor-id="可复现性">可复现性</h2>
+<section id="有界产物契约" class="level3">
+<h3 class="anchored" data-anchor-id="有界产物契约">有界产物契约</h3>
+<p>实现范围精确是：</p>
+<pre class="text"><code>toy-models/rotational-projection-controls.py
+toy-models/artifacts/rotational-projection-controls/manifest.json
+toy-models/artifacts/rotational-projection-controls/metrics.csv
+toy-models/artifacts/rotational-projection-controls/diagnostics.json
+toy-models/artifacts/rotational-projection-controls/summary.png</code></pre>
+<p>不授权额外产物。脚本只使用捆绑 Python、NumPy 与 Pillow 环境。JSON 顺序、CSV 顺序、浮点格式、绘图尺寸、字体与 PNG 元数据固定，以保证字节比较确定性。</p>
+<p>清单记录：</p>
+<ul>
+<li>精确正、对称、输入、时滞与非正交生成器定义；</li>
+<li>正确 <span class="math inline">\(J(\omega)\)</span> 符号约定；</li>
+<li>已实现初始状态、等距/非正交映射、划分大小、时间网格与所有种子；</li>
+<li>预处理、窗口、平滑、减法、导数构造、PCA 秩、平面朝向与随机平面；</li>
+<li>无限制、斜、对称与输入感知求解约定；</li>
+<li>洗牌提案数、协方差准则、阈值、所选提案与实现相似性；</li>
+<li>适用性规则、容差、运行时版本、命令与 SHA-256 哈希；以及</li>
+<li>精确产物清单。</li>
+</ul>
+<p><code>diagnostics.json</code> 包含生成器、等距、导数、边界、泄漏、PCA、约束求解、平面不变性、真值适用性、输入、抖动、平滑、减法、洗牌、度量依赖、试次稳定性与确定性再生记录。</p>
+<p>预期命令是：</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">/Users/bytedance/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3</span> toy-models/rotational-projection-controls.py</span></code></pre></div><button title="复制到剪贴板" class="code-copy-button"><i class="bi"></i></button></div>
+<p>默认命令应生成并验证产物，若遵循 Phase 3 约定则有显式 <code>--generate</code> 与 <code>--verify</code> 模式。验证包括干净临时再生与字节比较。</p>
+</section>
+<section id="经核查证据" class="level3">
+<h3 class="anchored" data-anchor-id="经核查证据">经核查证据</h3>
+<p>以下来源实际检索并核查。现有 LDG 方法与概念是术语锚点，不是来源核查的替代。</p>
+<ul>
+<li><strong>Churchland 等人（2012）：</strong> 完整公开可访问主文章全文经核查摘要、核心伸手结果、对照、状态–导数角度分析、无限制对斜比较、投影解读与 Methods 预处理/对齐描述。15 页补充 PDF 经核查洗牌描述、平滑与跨条件均值图、PCA 秩/平面对照，以及第 12–14 页补充 jPCA 推导，包括显式斜基约束最小二乘构造与复特征向量平面形成。补充影片、电子表格与源代码未逐帧或逐行核查。补充中 OCR 丢失一些负号；本对象使用上述数学正确的 <span class="math inline">\(M_{\mathrm{skew}}=(M-M^\top)/2\)</span>、<span class="math inline">\(M_{\mathrm{skew}}^\top=-M_{\mathrm{skew}}\)</span> 与 <span class="math inline">\(J(\omega)\)</span> 约定 <span class="citation" data-cites="ChurchlandEtAl2012">(<a href="#ref-ChurchlandEtAl2012" role="doc-biblioref">Churchland 等 2012年</a>)</span>。</li>
+<li><strong>Michaels、Dann 与 Scherberger（2016）：</strong> 22 页 PLOS Computational Biology PDF 经核查摘要与引言；时滞增强表示模拟；jPCA 结果；协方差匹配置换检验理由与结果；条件/神经元数敏感性；讨论；以及定义 jPCA 预处理、旋转度量、时滞模拟与迭代逐条件协方差匹配的 Methods 部分。RNN 训练细节与每个补充图未逐方程检查。该来源支持时滞对照与保协方差条件结构零模型，而非普遍显著性检验 <span class="citation" data-cites="MichaelsEtAl2016">(<a href="#ref-MichaelsEtAl2016" role="doc-biblioref">Michaels 等 2016年</a>)</span>。</li>
+<li><strong>Lebedev 等人（2019）：</strong> 完整开放全文文章经核查摘要；响应峰的时间排序；模拟时滞序列；PCA/jPCA 再分析；条件洗牌；跨条件减法批判；Methods 描述；讨论；以及解读界限。作者代码未被独立重跑，其更强机制结论不被采纳为已定事实。该来源支持把时序响应顺序与减法当作显式替代/敏感性 <span class="citation" data-cites="LebedevEtAl2019">(<a href="#ref-LebedevEtAl2019" role="doc-biblioref">Lebedev 等 2019年</a>)</span>。</li>
+<li><strong>Cunningham 与 Yu（2014）：</strong> 完整 10 页作者 PDF 经核查协方差与时间序列降维概览、动力学模型假设讨论，以及区分直接正交投影与通过概率动力学/噪声权衡推断的轨迹的部分。综述模态示例与参考文献列表未详尽阅读。该来源支持把 jPCA 轨迹称为已处理数据的投影，而非后验潜状态轨迹 <span class="citation" data-cites="CunninghamYu2014">(<a href="#ref-CunninghamYu2014" role="doc-biblioref">Cunningham 和 Yu 2014年</a>)</span>。</li>
+</ul>
+<p>这些来源不提供本玩具模型的维数、矩阵值、嵌入、初始状态、时间网格、试次数、噪声水平、窗口、抖动、随机平面、输入函数、洗牌提案预算或容差。那些是冻结 LDG 设计选择。</p>
+</section>
+<section id="集成状态" class="level3">
+<h3 class="anchored" data-anchor-id="集成状态">集成状态</h3>
+<p>有界实现与确定性产物在独立科学与实现聚焦 PASS、仓库验证、目标/索引/全站渲染与记录的审查决定下机械晋升后，于 L1/stable 与本记录调和。</p>
+</section>
+<section id="历史目标检查职责" class="level3">
+<h3 class="anchored" data-anchor-id="历史目标检查职责">历史目标检查职责</h3>
+<p>执行者运行结构、目标渲染与差异检查；实现所有者运行生成与产物验证；父编排器完成仓库级测试、索引/对照调和、审查集成与稳定晋升。这记录已完成角色分离，而非待办工作。</p>
+</section>
+</section>
+<section id="成熟度检查表" class="level2">
+<h2 class="anchored" data-anchor-id="成熟度检查表">成熟度检查表</h2>
+<ul class="task-list">
+<li><label><input type="checkbox" checked="">完整 L1/stable 玩具模型 schema 与精确五文件实现契约。</label></li>
+<li><label><input type="checkbox" checked="">正六维生成器、正确斜块、等距观测嵌入与独立划分被冻结。</label></li>
+<li><label><input type="checkbox" checked="">观测与 PCA 表示的真实旋转平面目标显式。</label></li>
+<li><label><input type="checkbox" checked="">对称、时滞、输入驱动与非正交对照被分离。</label></li>
+<li><label><input type="checkbox" checked="">定义秩六 PCA、无限制、真实斜约束、对称、固定/随机平面与输入感知方法。</label></li>
+<li><label><input type="checkbox" checked="">全/短窗口、抖动、平滑、减法、匹配洗牌与输入感知压力有界。</label></li>
+<li><label><input type="checkbox" checked="">定义导数、角度、速率、切向/径向、占用与稳定性度量。</label></li>
+<li><label><input type="checkbox" checked="">条件边界、划分泄漏、适用性与确定性神谕显式。</label></li>
+<li><label><input type="checkbox" checked="">投影、振荡器、自治、向量场、因果、度量与机制界限显式。</label></li>
+<li><label><input type="checkbox" checked="">记录外部证据深度与限制。</label></li>
+<li><label><input type="checkbox" checked="">集成确定性经验产物。</label></li>
+<li><label><input type="checkbox" checked="">在聚焦复审输入一致性、度量适用性、洗牌选择与稳定性后，独立科学审查 PASS。</label></li>
+<li><label><input type="checkbox" checked="">在聚焦复审全部八项数值、泄漏、清单与图形发现后，独立实现审查 PASS。</label></li>
+</ul>
+
+
+<!-- -->
+
+
+</section>
+</section>
+
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography" id="quarto-bibliography"><h2 class="anchored quarto-appendix-heading">参考文献</h2><div id="refs" class="references csl-bib-body hanging-indent" role="list">
+<div id="ref-ChurchlandEtAl2012" class="csl-entry" role="listitem">
+Churchland, Mark M., John P. Cunningham, Matthew T. Kaufman, 等. 2012年. <span>《Neural Population Dynamics during Reaching》</span>. <em>Nature</em> 487 (7405): 51～56. <a href="https://doi.org/10.1038/nature11129">https://doi.org/10.1038/nature11129</a>.
+</div>
+<div id="ref-CunninghamYu2014" class="csl-entry" role="listitem">
+Cunningham, John P., 和 Byron M. Yu. 2014年. <span>《Dimensionality Reduction for Large-Scale Neural Recordings》</span>. <em>Nature Neuroscience</em> 17 (11): 1500～1509. <a href="https://doi.org/10.1038/nn.3776">https://doi.org/10.1038/nn.3776</a>.
+</div>
+<div id="ref-LebedevEtAl2019" class="csl-entry" role="listitem">
+Lebedev, Mikhail A., Alexei Ossadtchi, Nil Adell Mill, Núria Armengol Urpí, Maria R. Cervera, 和 Miguel A. L. Nicolelis. 2019年. <span>《Analysis of Neuronal Ensemble Activity Reveals the Pitfalls and Shortcomings of Rotation Dynamics》</span>. <em>Scientific Reports</em> 9 (1): 18978. <a href="https://doi.org/10.1038/s41598-019-54760-4">https://doi.org/10.1038/s41598-019-54760-4</a>.
+</div>
+<div id="ref-MichaelsEtAl2016" class="csl-entry" role="listitem">
+Michaels, Jonathan A., Benjamin Dann, 和 Hansjörg Scherberger. 2016年. <span>《Neural Population Dynamics during Reaching Are Better Explained by a Dynamical System than Representational Tuning》</span>. <em>PLOS Computational Biology</em> 12 (11): e1005175. <a href="https://doi.org/10.1371/journal.pcbi.1005175">https://doi.org/10.1371/journal.pcbi.1005175</a>.
+</div>
+</div></section></div></main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "已复制");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "已复制");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+    const viewSource = window.document.getElementById('quarto-view-source') ||
+                       window.document.getElementById('quarto-code-tools-source');
+    if (viewSource) {
+      const sourceUrl = viewSource.getAttribute("data-quarto-source-url");
+      viewSource.addEventListener("click", function(e) {
+        if (sourceUrl) {
+          // rstudio viewer pane
+          if (/\bcapabilities=\b/.test(window.location)) {
+            window.open(sourceUrl);
+          } else {
+            window.location.href = sourceUrl;
+          }
+        } else {
+          const modal = new bootstrap.Modal(document.getElementById('quarto-embedded-source-code-modal'));
+          modal.show();
+        }
+        return false;
+      });
+    }
+    function toggleCodeHandler(show) {
+      return function(e) {
+        const cellDetails = window.document.querySelectorAll(".cell details.code-fold");
+        for (let i=0; i<cellDetails.length; i++) {
+          const details = cellDetails[i];
+          if (show) {
+            details.open = true;
+          } else {
+            details.removeAttribute("open");
+          }
+        }
+        const cellCodeDivs = window.document.querySelectorAll(".cell div.sourceCode.cell-code");
+        const fromCls = show ? "hidden" : "unhidden";
+        const toCls = show ? "unhidden" : "hidden";
+        for (let i=0; i<cellCodeDivs.length; i++) {
+          const codeDiv = cellCodeDivs[i];
+          if (codeDiv.classList.contains(fromCls)) {
+            codeDiv.classList.remove(fromCls);
+            codeDiv.classList.add(toCls);
+          } 
+        }
+        return false;
+      }
+    }
+    const hideAllCode = window.document.getElementById("quarto-hide-all-code");
+    if (hideAllCode) {
+      hideAllCode.addEventListener("click", toggleCodeHandler(false));
+    }
+    const showAllCode = window.document.getElementById("quarto-show-all-code");
+    if (showAllCode) {
+      showAllCode.addEventListener("click", toggleCodeHandler(true));
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/abelzheng\.github\.io\/latent-dynamics-geometry-public\/");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+            // target, if specified
+            link.setAttribute("target", "_blank");
+            if (link.getAttribute("rel") === null) {
+              link.setAttribute("rel", "noopener");
+            }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">源代码</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4" data-shortcodes="false"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="an">title:</span><span class="co"> "旋转投影与替代方案对照"</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="an">lang:</span><span class="co"> zh-CN</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="an">comments:</span><span class="co"> false</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="an">object_type:</span><span class="co"> toy-model</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="an">maturity:</span><span class="co"> L1</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="an">status:</span><span class="co"> stable</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="an">domain:</span><span class="co"> [dimensionality-reduction, temporal-modeling, dynamical-systems]</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a><span class="an">tags:</span><span class="co"> [jpca, pca, rotation, skew-symmetric, derivative-regression, input-driven, preprocessing]</span></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a><span class="an">prerequisites:</span></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a><span class="co">- knowledge/methods/jpca.qmd</span></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a><span class="co">- knowledge/methods/principal-component-analysis.qmd</span></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a><span class="co">- knowledge/concepts/vector-field.qmd</span></span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a><span class="co">- knowledge/concepts/input-driven-dynamics.qmd</span></span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a><span class="an">related:</span></span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a><span class="co">- toy-models/label-dependent-demixing.qmd</span></span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a><span class="co">- toy-models/two-dimensional-autonomous-dynamics.qmd</span></span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a><span class="an">created:</span><span class="co"> 2026-08-19</span></span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a><span class="an">updated:</span><span class="co"> 2026-08-19</span></span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a><span class="fu"># 旋转投影与替代方案对照</span></span>
+<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a>这个 L1/stable Candidate E 玩具模型检验 jPCA 式斜约束导数拟合何时恢复已知旋转平面，以及视觉旋转投影何时来自衰减、时滞序列、公共输入、预处理、短弧或坐标选择。数值是主种子 <span class="in">`20260819`</span> 下的确定性输出；它们以该模拟器、欧氏度量、预处理与损失为条件。</span>
+<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a>**假定背景：** 中心化 PCA、连续时间线性系统、有限差分导数、最小二乘、实斜对称矩阵、主角度与训练/验证/测试分离。</span>
+<span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a><span class="fu">## 问题</span></span>
+<span id="cb4-29"><a href="#cb4-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-30"><a href="#cb4-30" aria-hidden="true" tabindex="-1"></a>在声明欧氏特征度量与训练拟合秩六 PCA 表示内：</span>
+<span id="cb4-31"><a href="#cb4-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-32"><a href="#cb4-32" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>真实斜约束最小二乘是否在等距嵌入下恢复已知旋转状态平面的观测空间像；</span>
+<span id="cb4-33"><a href="#cb4-33" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>相对于无限制线性回归，斜限制损失多少留出导数预测；</span>
+<span id="cb4-34"><a href="#cb4-34" aria-hidden="true" tabindex="-1"></a><span class="ss">3. </span>对称衰减、延迟瞬态或公共输入能否在没有正自治生成器的情况下产生旋转外观投影；</span>
+<span id="cb4-35"><a href="#cb4-35" aria-hidden="true" tabindex="-1"></a><span class="ss">4. </span>拟合平面对弧长、事件时间抖动、平滑与跨条件均值减法有多敏感；以及</span>
+<span id="cb4-36"><a href="#cb4-36" aria-hidden="true" tabindex="-1"></a><span class="ss">5. </span>非正交观测映射改变欧氏度量时什么会变化？</span>
+<span id="cb4-37"><a href="#cb4-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-38"><a href="#cb4-38" aria-hidden="true" tabindex="-1"></a>旋转投影是对一个拟合平面中已处理轨迹的描述。其本身不是振荡器、自治动力学、回归、全局向量场、因果性或神经/物理机制的证明 <span class="co">[</span><span class="ot">@ChurchlandEtAl2012; @CunninghamYu2014</span><span class="co">]</span>。</span>
+<span id="cb4-39"><a href="#cb4-39" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-40"><a href="#cb4-40" aria-hidden="true" tabindex="-1"></a><span class="fu">## 真值</span></span>
+<span id="cb4-41"><a href="#cb4-41" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-42"><a href="#cb4-42" aria-hidden="true" tabindex="-1"></a><span class="fu">### 正六维状态方程</span></span>
+<span id="cb4-43"><a href="#cb4-43" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-44"><a href="#cb4-44" aria-hidden="true" tabindex="-1"></a>正生成器是连续时间系统</span>
+<span id="cb4-45"><a href="#cb4-45" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-46"><a href="#cb4-46" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb4-47"><a href="#cb4-47" aria-hidden="true" tabindex="-1"></a>\dot z(t)=Az(t),</span>
+<span id="cb4-48"><a href="#cb4-48" aria-hidden="true" tabindex="-1"></a>\qquad z(t)\in\mathbb R^6,</span>
+<span id="cb4-49"><a href="#cb4-49" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb4-50"><a href="#cb4-50" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-51"><a href="#cb4-51" aria-hidden="true" tabindex="-1"></a>其中</span>
+<span id="cb4-52"><a href="#cb4-52" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-53"><a href="#cb4-53" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb4-54"><a href="#cb4-54" aria-hidden="true" tabindex="-1"></a>A=operatorname{blockdiag}</span>
+<span id="cb4-55"><a href="#cb4-55" aria-hidden="true" tabindex="-1"></a>\left(</span>
+<span id="cb4-56"><a href="#cb4-56" aria-hidden="true" tabindex="-1"></a>J(2.0),</span>
+<span id="cb4-57"><a href="#cb4-57" aria-hidden="true" tabindex="-1"></a>J(0.7),</span>
+<span id="cb4-58"><a href="#cb4-58" aria-hidden="true" tabindex="-1"></a>\operatorname{diag}(-0.4,-0.9)</span>
+<span id="cb4-59"><a href="#cb4-59" aria-hidden="true" tabindex="-1"></a>\right),</span>
+<span id="cb4-60"><a href="#cb4-60" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb4-61"><a href="#cb4-61" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-62"><a href="#cb4-62" aria-hidden="true" tabindex="-1"></a>与**精确符号约定**</span>
+<span id="cb4-63"><a href="#cb4-63" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-64"><a href="#cb4-64" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb4-65"><a href="#cb4-65" aria-hidden="true" tabindex="-1"></a>J(\omega)=</span>
+<span id="cb4-66"><a href="#cb4-66" aria-hidden="true" tabindex="-1"></a>\begin{pmatrix}</span>
+<span id="cb4-67"><a href="#cb4-67" aria-hidden="true" tabindex="-1"></a>0&amp;-\omega<span class="sc">\\</span></span>
+<span id="cb4-68"><a href="#cb4-68" aria-hidden="true" tabindex="-1"></a>\omega&amp;0</span>
+<span id="cb4-69"><a href="#cb4-69" aria-hidden="true" tabindex="-1"></a>\end{pmatrix}.</span>
+<span id="cb4-70"><a href="#cb4-70" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb4-71"><a href="#cb4-71" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-72"><a href="#cb4-72" aria-hidden="true" tabindex="-1"></a>因此对列状态，</span>
+<span id="cb4-73"><a href="#cb4-73" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-74"><a href="#cb4-74" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb4-75"><a href="#cb4-75" aria-hidden="true" tabindex="-1"></a>\dot z_1=-2z_2,</span>
+<span id="cb4-76"><a href="#cb4-76" aria-hidden="true" tabindex="-1"></a>\qquad</span>
+<span id="cb4-77"><a href="#cb4-77" aria-hidden="true" tabindex="-1"></a>\dot z_2=2z_1,</span>
+<span id="cb4-78"><a href="#cb4-78" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb4-79"><a href="#cb4-79" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-80"><a href="#cb4-80" aria-hidden="true" tabindex="-1"></a>所以正 $\omega$ 在 $(z_1,z_2)$ 平面中生成逆时针旋转。即使来源的 OCR 或邻近散文丢失负号，该显式块定义也是权威的。</span>
+<span id="cb4-81"><a href="#cb4-81" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-82"><a href="#cb4-82" aria-hidden="true" tabindex="-1"></a>真实旋转平面是</span>
+<span id="cb4-83"><a href="#cb4-83" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-84"><a href="#cb4-84" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb4-85"><a href="#cb4-85" aria-hidden="true" tabindex="-1"></a>\mathcal P_1=\operatorname{span}(e_1,e_2),</span>
+<span id="cb4-86"><a href="#cb4-86" aria-hidden="true" tabindex="-1"></a>\qquad</span>
+<span id="cb4-87"><a href="#cb4-87" aria-hidden="true" tabindex="-1"></a>\mathcal P_2=\operatorname{span}(e_3,e_4),</span>
+<span id="cb4-88"><a href="#cb4-88" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb4-89"><a href="#cb4-89" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-90"><a href="#cb4-90" aria-hidden="true" tabindex="-1"></a>角速率分别为每单位时间 $2.0$ 与 $0.7$ 弧度。坐标五与六单调衰减，不是旋转模态。</span>
+<span id="cb4-91"><a href="#cb4-91" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-92"><a href="#cb4-92" aria-hidden="true" tabindex="-1"></a><span class="fu">### 条件与初始状态</span></span>
+<span id="cb4-93"><a href="#cb4-93" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-94"><a href="#cb4-94" aria-hidden="true" tabindex="-1"></a>有 $C=8$ 个实验条件。用种子词语 <span class="in">`initial_states`</span> 从独立标准正态抽取一个确定性初始状态矩阵</span>
+<span id="cb4-95"><a href="#cb4-95" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-96"><a href="#cb4-96" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb4-97"><a href="#cb4-97" aria-hidden="true" tabindex="-1"></a>Z_0\in\mathbb R^{8\times6}</span>
+<span id="cb4-98"><a href="#cb4-98" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb4-99"><a href="#cb4-99" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-100"><a href="#cb4-100" aria-hidden="true" tabindex="-1"></a>然后将其列乘以</span>
+<span id="cb4-101"><a href="#cb4-101" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-102"><a href="#cb4-102" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb4-103"><a href="#cb4-103" aria-hidden="true" tabindex="-1"></a>(1.2,1.2,0.8,0.8,0.55,0.55).</span>
+<span id="cb4-104"><a href="#cb4-104" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb4-105"><a href="#cb4-105" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-106"><a href="#cb4-106" aria-hidden="true" tabindex="-1"></a>相同八个群体初始状态定义训练、验证与测试条件均值；独立试次只通过观测噪声与声明事件抖动不同。清单存储已实现 $Z_0$、其秩、逐对距离与两个旋转平面中的初始占用。没有初始状态在观察恢复后被选择。</span>
+<span id="cb4-107"><a href="#cb4-107" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-108"><a href="#cb4-108" aria-hidden="true" tabindex="-1"></a><span class="fu">### 等距观测嵌入</span></span>
+<span id="cb4-109"><a href="#cb4-109" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-110"><a href="#cb4-110" aria-hidden="true" tabindex="-1"></a>观测维数是 $p=10$。用种子词语 <span class="in">`isometric_embedding`</span> 抽取固定 $10\times6$ 标准正态矩阵，计算其简化 QR 分解，并定向列使 $R$ 的对角为正。把结果称为 $H$。要求在 $10^{-12}$ 内</span>
+<span id="cb4-111"><a href="#cb4-111" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-112"><a href="#cb4-112" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb4-113"><a href="#cb4-113" aria-hidden="true" tabindex="-1"></a>H^\top H=I_6</span>
+<span id="cb4-114"><a href="#cb4-114" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb4-115"><a href="#cb4-115" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-116"><a href="#cb4-116" aria-hidden="true" tabindex="-1"></a>无噪观测轨迹是</span>
+<span id="cb4-117"><a href="#cb4-117" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-118"><a href="#cb4-118" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb4-119"><a href="#cb4-119" aria-hidden="true" tabindex="-1"></a>y_c(t)=Hz_c(t).</span>
+<span id="cb4-120"><a href="#cb4-120" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb4-121"><a href="#cb4-121" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-122"><a href="#cb4-122" aria-hidden="true" tabindex="-1"></a>因为 $H$ 在六维状态像上是等距，观测空间真实平面是</span>
+<span id="cb4-123"><a href="#cb4-123" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-124"><a href="#cb4-124" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb4-125"><a href="#cb4-125" aria-hidden="true" tabindex="-1"></a>\mathcal Q_1=\operatorname{span}(He_1,He_2),</span>
+<span id="cb4-126"><a href="#cb4-126" aria-hidden="true" tabindex="-1"></a>\qquad</span>
+<span id="cb4-127"><a href="#cb4-127" aria-hidden="true" tabindex="-1"></a>\mathcal Q_2=\operatorname{span}(He_3,He_4).</span>
+<span id="cb4-128"><a href="#cb4-128" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb4-129"><a href="#cb4-129" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-130"><a href="#cb4-130" aria-hidden="true" tabindex="-1"></a>正恢复目标是观测坐标中的 $\mathcal Q_j$，或其在**训练拟合** PCA 基 $W$ 下的像：</span>
+<span id="cb4-131"><a href="#cb4-131" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-132"><a href="#cb4-132" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb4-133"><a href="#cb4-133" aria-hidden="true" tabindex="-1"></a>\mathcal Q_j^{\mathrm{PCA}}=operatorname{col}</span>
+<span id="cb4-134"><a href="#cb4-134" aria-hidden="true" tabindex="-1"></a>\left(W^\top H<span class="co">[</span><span class="ot">e_{2j-1},e_{2j}</span><span class="co">]</span></span>
+<span id="cb4-135"><a href="#cb4-135" aria-hidden="true" tabindex="-1"></a>ight).</span>
+<span id="cb4-136"><a href="#cb4-136" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb4-137"><a href="#cb4-137" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-138"><a href="#cb4-138" aria-hidden="true" tabindex="-1"></a>后者基在主角度评分前被正交归一化。测试数据永不重拟合 $W$。</span>
+<span id="cb4-139"><a href="#cb4-139" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-140"><a href="#cb4-140" aria-hidden="true" tabindex="-1"></a><span class="fu">### 试次观测</span></span>
+<span id="cb4-141"><a href="#cb4-141" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-142"><a href="#cb4-142" aria-hidden="true" tabindex="-1"></a>在每个条件、划分、试次与时间箱，</span>
+<span id="cb4-143"><a href="#cb4-143" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-144"><a href="#cb4-144" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb4-145"><a href="#cb4-145" aria-hidden="true" tabindex="-1"></a>y_{c,r}^{\mathrm{obs}}(t)=y_c(t)+\epsilon_{c,r}(t),</span>
+<span id="cb4-146"><a href="#cb4-146" aria-hidden="true" tabindex="-1"></a>\qquad</span>
+<span id="cb4-147"><a href="#cb4-147" aria-hidden="true" tabindex="-1"></a>\epsilon_{c,r}(t)\sim\mathcal N(0,0.12^2I_{10}),</span>
+<span id="cb4-148"><a href="#cb4-148" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb4-149"><a href="#cb4-149" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-150"><a href="#cb4-150" aria-hidden="true" tabindex="-1"></a>跨试次、时间箱、条件与划分独立，除非显式抖动压力改变采样对齐。</span>
+<span id="cb4-151"><a href="#cb4-151" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-152"><a href="#cb4-152" aria-hidden="true" tabindex="-1"></a><span class="fu">## 生成模型</span></span>
+<span id="cb4-153"><a href="#cb4-153" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-154"><a href="#cb4-154" aria-hidden="true" tabindex="-1"></a>时间网格是</span>
+<span id="cb4-155"><a href="#cb4-155" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-156"><a href="#cb4-156" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb4-157"><a href="#cb4-157" aria-hidden="true" tabindex="-1"></a>t_m=0.04m,qquad m=0,\ldots,60,</span>
+<span id="cb4-158"><a href="#cb4-158" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb4-159"><a href="#cb4-159" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-160"><a href="#cb4-160" aria-hidden="true" tabindex="-1"></a>因此 $T=61$，完整区间是 $<span class="co">[</span><span class="ot">0,2.4</span><span class="co">]</span>$。精确正轨迹使用矩阵指数块公式而非数值积分：</span>
+<span id="cb4-161"><a href="#cb4-161" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-162"><a href="#cb4-162" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb4-163"><a href="#cb4-163" aria-hidden="true" tabindex="-1"></a>\begin{pmatrix}z_1(t)<span class="sc">\\</span>z_2(t)\end{pmatrix}</span>
+<span id="cb4-164"><a href="#cb4-164" aria-hidden="true" tabindex="-1"></a>=</span>
+<span id="cb4-165"><a href="#cb4-165" aria-hidden="true" tabindex="-1"></a>\begin{pmatrix}</span>
+<span id="cb4-166"><a href="#cb4-166" aria-hidden="true" tabindex="-1"></a>\cos(2t)&amp;-\sin(2t)<span class="sc">\\</span></span>
+<span id="cb4-167"><a href="#cb4-167" aria-hidden="true" tabindex="-1"></a>\sin(2t)&amp;\cos(2t)</span>
+<span id="cb4-168"><a href="#cb4-168" aria-hidden="true" tabindex="-1"></a>\end{pmatrix}</span>
+<span id="cb4-169"><a href="#cb4-169" aria-hidden="true" tabindex="-1"></a>\begin{pmatrix}z_1(0)<span class="sc">\\</span>z_2(0)\end{pmatrix},</span>
+<span id="cb4-170"><a href="#cb4-170" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb4-171"><a href="#cb4-171" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-172"><a href="#cb4-172" aria-hidden="true" tabindex="-1"></a>坐标五与六具有类似 $0.7$ 块与指数衰减。</span>
+<span id="cb4-173"><a href="#cb4-173" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-174"><a href="#cb4-174" aria-hidden="true" tabindex="-1"></a>每条件独立试次是：</span>
+<span id="cb4-175"><a href="#cb4-175" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-176"><a href="#cb4-176" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> 划分 <span class="pp">|</span> 每条件试次 <span class="pp">|</span> 总试次 <span class="pp">|</span></span>
+<span id="cb4-177"><a href="#cb4-177" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---:|---:|</span></span>
+<span id="cb4-178"><a href="#cb4-178" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> 训练 <span class="pp">|</span> 10 <span class="pp">|</span> 80 <span class="pp">|</span></span>
+<span id="cb4-179"><a href="#cb4-179" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> 验证 <span class="pp">|</span> 5 <span class="pp">|</span> 40 <span class="pp">|</span></span>
+<span id="cb4-180"><a href="#cb4-180" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> 测试 <span class="pp">|</span> 7 <span class="pp">|</span> 56 <span class="pp">|</span></span>
+<span id="cb4-181"><a href="#cb4-181" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-182"><a href="#cb4-182" aria-hidden="true" tabindex="-1"></a>生成、条件平均、预处理、PCA、导数构造、拟合、平面提取、评分、对照、绘图与验证是独立函数。精确状态、真实矩阵与真实平面只进入生成、最终评分与实现神谕。</span>
+<span id="cb4-183"><a href="#cb4-183" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-184"><a href="#cb4-184" aria-hidden="true" tabindex="-1"></a>主种子是 <span class="in">`20260819`</span>。每个条件、划分、试次、抖动、随机平面、嵌入与洗牌提案接收记录在清单中的显式整数种子词语。</span>
+<span id="cb4-185"><a href="#cb4-185" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-186"><a href="#cb4-186" aria-hidden="true" tabindex="-1"></a><span class="fu">## 参数</span></span>
+<span id="cb4-187"><a href="#cb4-187" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-188"><a href="#cb4-188" aria-hidden="true" tabindex="-1"></a>固定分析契约是：</span>
+<span id="cb4-189"><a href="#cb4-189" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-190"><a href="#cb4-190" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>主表示：在训练条件均值上拟合的秩六协方差 PCA；</span>
+<span id="cb4-191"><a href="#cb4-191" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>除声明中心化外无特征标准化，保留正等距度量；</span>
+<span id="cb4-192"><a href="#cb4-192" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>主导数估计器：条件内中点割线；</span>
+<span id="cb4-193"><a href="#cb4-193" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>主平滑：无；</span>
+<span id="cb4-194"><a href="#cb4-194" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>轻平滑压力：端点不变的中心化三箱移动平均；</span>
+<span id="cb4-195"><a href="#cb4-195" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>主跨条件预处理：在每个时间箱减去每个特征的训练跨条件均值，然后减去一个训练全局特征均值；</span>
+<span id="cb4-196"><a href="#cb4-196" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>替代预处理：省略时变跨条件减法，保留训练全局均值；</span>
+<span id="cb4-197"><a href="#cb4-197" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>五个确定性随机秩二平面加一个固定前两 PC 平面；</span>
+<span id="cb4-198"><a href="#cb4-198" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>矩阵与平面代数容差 $10^{-10}$；</span>
+<span id="cb4-199"><a href="#cb4-199" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>等距与真值变换容差 $10^{-12}$；</span>
+<span id="cb4-200"><a href="#cb4-200" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>有限差分解析检查容差 $3\times10^{-3}$；以及</span>
+<span id="cb4-201"><a href="#cb4-201" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>逐字节相同产物再生。</span>
+<span id="cb4-202"><a href="#cb4-202" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-203"><a href="#cb4-203" aria-hidden="true" tabindex="-1"></a>没有秩、窗口、平滑、减法、对照族或平面使用测试结果选择。</span>
+<span id="cb4-204"><a href="#cb4-204" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-205"><a href="#cb4-205" aria-hidden="true" tabindex="-1"></a><span class="fu">## 模拟</span></span>
+<span id="cb4-206"><a href="#cb4-206" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-207"><a href="#cb4-207" aria-hidden="true" tabindex="-1"></a><span class="fu">### 条件均值与预处理</span></span>
+<span id="cb4-208"><a href="#cb4-208" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-209"><a href="#cb4-209" aria-hidden="true" tabindex="-1"></a>只在相同条件与划分内平均试次。在训练均值上拟合所有预处理。启用跨条件减法时，定义</span>
+<span id="cb4-210"><a href="#cb4-210" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-211"><a href="#cb4-211" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb4-212"><a href="#cb4-212" aria-hidden="true" tabindex="-1"></a>\bar y_{\mathrm{cond}}(t)=\frac1C\sum_c\bar y_c^{\mathrm{train}}(t),</span>
+<span id="cb4-213"><a href="#cb4-213" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb4-214"><a href="#cb4-214" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-215"><a href="#cb4-215" aria-hidden="true" tabindex="-1"></a>并在对应名义时间从训练、验证与测试条件均值减去该冻结函数。然后减去冻结训练全局均值并拟合 PCA。对正齐次系统，跨条件均值在观测噪声前也遵循相同 $A$，因此减法改变条件偏移但不引入不同状态矩阵。该性质在输入驱动或时滞对照中不必成立。</span>
+<span id="cb4-216"><a href="#cb4-216" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-217"><a href="#cb4-217" aria-hidden="true" tabindex="-1"></a><span class="fu">### PCA 表示</span></span>
+<span id="cb4-218"><a href="#cb4-218" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-219"><a href="#cb4-219" aria-hidden="true" tabindex="-1"></a>设 $W\in\mathbb R^{10\times6}$ 包含训练秩六 PCA 基。对每个已处理条件轨迹，</span>
+<span id="cb4-220"><a href="#cb4-220" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-221"><a href="#cb4-221" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb4-222"><a href="#cb4-222" aria-hidden="true" tabindex="-1"></a>x_c(t)=W^\top y_c^{\mathrm{proc}}(t).</span>
+<span id="cb4-223"><a href="#cb4-223" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb4-224"><a href="#cb4-224" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-225"><a href="#cb4-225" aria-hidden="true" tabindex="-1"></a>PCA 子空间是训练拟合观测投影，不是推断潜状态后验。Churchland 等人的 jPC 旋转保留 PCA 基，而 Cunningham 与 Yu 区分此类投影与在数据与概率动力学模型之间权衡的后验轨迹 <span class="co">[</span><span class="ot">@ChurchlandEtAl2012; @CunninghamYu2014</span><span class="co">]</span>。</span>
+<span id="cb4-226"><a href="#cb4-226" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-227"><a href="#cb4-227" aria-hidden="true" tabindex="-1"></a><span class="fu">### 保边界导数</span></span>
+<span id="cb4-228"><a href="#cb4-228" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-229"><a href="#cb4-229" aria-hidden="true" tabindex="-1"></a>对每个条件分别定义</span>
+<span id="cb4-230"><a href="#cb4-230" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-231"><a href="#cb4-231" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb4-232"><a href="#cb4-232" aria-hidden="true" tabindex="-1"></a>x_{c,m+1/2}=\frac{x_c(t_{m+1})+x_c(t_m)}2,</span>
+<span id="cb4-233"><a href="#cb4-233" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb4-234"><a href="#cb4-234" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-235"><a href="#cb4-235" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb4-236"><a href="#cb4-236" aria-hidden="true" tabindex="-1"></a>\dot x_{c,m+1/2}</span>
+<span id="cb4-237"><a href="#cb4-237" aria-hidden="true" tabindex="-1"></a>=\frac{x_c(t_{m+1})-x_c(t_m)}{0.04}.</span>
+<span id="cb4-238"><a href="#cb4-238" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb4-239"><a href="#cb4-239" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-240"><a href="#cb4-240" aria-hidden="true" tabindex="-1"></a>只在微分后堆叠这些对。永不以一个条件或试次的最终样本到另一个的首样本创建导数。抖动观测一致地使用其声明物理或名义样本时间；禁止包裹 <span class="in">`roll`</span> 转移。</span>
+<span id="cb4-241"><a href="#cb4-241" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-242"><a href="#cb4-242" aria-hidden="true" tabindex="-1"></a><span class="fu">### 经验结果</span></span>
+<span id="cb4-243"><a href="#cb4-243" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-244"><a href="#cb4-244" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> 验收项 <span class="pp">|</span> 结果 <span class="pp">|</span></span>
+<span id="cb4-245"><a href="#cb4-245" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|</span></span>
+<span id="cb4-246"><a href="#cb4-246" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> 正恢复平面 1 / 平面 2 最大角度 <span class="pp">|</span> $1.35^\circ / 4.78^\circ$ <span class="pp">|</span></span>
+<span id="cb4-247"><a href="#cb4-247" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> 正带符号速率 <span class="pp">|</span> 1.9944 / 0.6999 <span class="pp">|</span></span>
+<span id="cb4-248"><a href="#cb4-248" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> 正绝对速率误差 <span class="pp">|</span> 0.00557 / 0.000105 <span class="pp">|</span></span>
+<span id="cb4-249"><a href="#cb4-249" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> 训练–验证观测空间平面稳定性 <span class="pp">|</span> $1.02^\circ / 1.36^\circ$ <span class="pp">|</span></span>
+<span id="cb4-250"><a href="#cb4-250" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> 训练–测试观测空间平面稳定性 <span class="pp">|</span> $0.73^\circ / 1.71^\circ$ <span class="pp">|</span></span>
+<span id="cb4-251"><a href="#cb4-251" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> 正测试无限制 / 斜 / 对称导数 $R^2$ <span class="pp">|</span> 0.3381 / 0.3364 / 0.0126 <span class="pp">|</span></span>
+<span id="cb4-252"><a href="#cb4-252" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> 正合并平面占用 <span class="pp">|</span> 0.4001 / 0.4919 <span class="pp">|</span></span>
+<span id="cb4-253"><a href="#cb4-253" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> 正切向/径向导数能量比 <span class="pp">|</span> 3.44 / 1.64 <span class="pp">|</span></span>
+<span id="cb4-254"><a href="#cb4-254" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> 短窗口平面 1 角度 <span class="pp">|</span> $4.98^\circ$ <span class="pp">|</span></span>
+<span id="cb4-255"><a href="#cb4-255" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> 抖动无限制 / 斜 $R^2$ <span class="pp">|</span> 0.3329 / 0.3311 <span class="pp">|</span></span>
+<span id="cb4-256"><a href="#cb4-256" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> 平滑无限制 / 斜 $R^2$ <span class="pp">|</span> 0.8187 / 0.8144 <span class="pp">|</span></span>
+<span id="cb4-257"><a href="#cb4-257" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> 无减法无限制 / 斜 $R^2$ <span class="pp">|</span> 0.4310 / 0.4294 <span class="pp">|</span></span>
+<span id="cb4-258"><a href="#cb4-258" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> 对称衰减无限制 / 斜 / 对称 $R^2$ <span class="pp">|</span> 0.0353 / 0.00175 / 0.0355 <span class="pp">|</span></span>
+<span id="cb4-259"><a href="#cb4-259" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> 时滞序列无限制 / 斜 $R^2$ <span class="pp">|</span> 0.3036 / 0.3005；无自治平面真值目标 <span class="pp">|</span></span>
+<span id="cb4-260"><a href="#cb4-260" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> 同数据输入驱动仅状态仿射 $R^2$ <span class="pp">|</span> 0.0465 <span class="pp">|</span></span>
+<span id="cb4-261"><a href="#cb4-261" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> 同数据输入感知仿射 $R^2$ <span class="pp">|</span> 0.0808 <span class="pp">|</span></span>
+<span id="cb4-262"><a href="#cb4-262" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> 干净 Euler 恒等 / 拟合 $M,G,b$ 误差 <span class="pp">|</span> $2.33\times10^{-14}$ / 2.614 / 0.207 / 0.033 <span class="pp">|</span></span>
+<span id="cb4-263"><a href="#cb4-263" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> 非正交平面 1 角度与无限制/斜 $R^2$ <span class="pp">|</span> $7.29^\circ$，0.4609 / 0.3399 <span class="pp">|</span></span>
+<span id="cb4-264"><a href="#cb4-264" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> 整轨迹洗牌训练/验证/测试协方差相似性 <span class="pp">|</span> 0.746 / 0.750 / 0.730；全部未达 0.95 目标 <span class="pp">|</span></span>
+<span id="cb4-265"><a href="#cb4-265" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> 确定性再生 <span class="pp">|</span> 逐字节相同清单、度量、诊断与 PNG <span class="pp">|</span></span>
+<span id="cb4-266"><a href="#cb4-266" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-267"><a href="#cb4-267" aria-hidden="true" tabindex="-1"></a>两个正平面被联合匹配到两个真实 PCA 空间平面。较慢平面具有更大有限样本角度但准确速率。平滑大幅增加导数预测与切向/径向比，因为差分放大观测噪声；该敏感性不是动力学的独立证据。128 洗牌中的最佳保留每个特征的完整轨迹多重集，但未达预先声明协方差相似阈值，因此被保留为不完全匹配对照而非成功零模型。</span>
+<span id="cb4-268"><a href="#cb4-268" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-269"><a href="#cb4-269" aria-hidden="true" tabindex="-1"></a><span class="fu">## 可视化</span></span>
+<span id="cb4-270"><a href="#cb4-270" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-271"><a href="#cb4-271" aria-hidden="true" tabindex="-1"></a>单一 <span class="in">`summary.png`</span> 至多包含四个面板：</span>
+<span id="cb4-272"><a href="#cb4-272" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-273"><a href="#cb4-273" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>恢复平面 1 中的一条正留出条件轨迹，作为有界投影显示；</span>
+<span id="cb4-274"><a href="#cb4-274" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>跨所有场景的无限制/仅状态仿射与斜约束留出导数 $R^2$；</span>
+<span id="cb4-275"><a href="#cb4-275" aria-hidden="true" tabindex="-1"></a><span class="ss">3. </span>两个正平面匹配/速率、正平面 1 占用/切向/垂直摘要、预处理敏感性，以及带显式阈值未达的已实现整轨迹洗牌相似性；以及</span>
+<span id="cb4-276"><a href="#cb4-276" aria-hidden="true" tabindex="-1"></a><span class="ss">4. </span>等距、有限差分、约束/LS、平面重提取、投毒、适用性与解读检查。</span>
+<span id="cb4-277"><a href="#cb4-277" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-278"><a href="#cb4-278" aria-hidden="true" tabindex="-1"></a>图中文本陈述轨迹是投影而非后验状态估计，时滞与输入驱动对照省略自治平面真值度量，旋转不是振荡器、自治性或机制的证据。对称约束与输入感知导数行、完整固定/随机/阴性对照平面度量与稳定性记录保留在 <span class="in">`metrics.csv`</span> 中；单一 PNG 不是其替代。</span>
+<span id="cb4-279"><a href="#cb4-279" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-280"><a href="#cb4-280" aria-hidden="true" tabindex="-1"></a><span class="fu">## 预期行为</span></span>
+<span id="cb4-281"><a href="#cb4-281" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-282"><a href="#cb4-282" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>在正等距生成器下，秩六 PCA 应恢复六维观测像，约束斜最小二乘应近似恢复两个真实旋转平面，受噪声、有限差分、占用与减法影响。</span>
+<span id="cb4-283"><a href="#cb4-283" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>无限制导数拟合的训练 SSE 不可能大于约束斜拟合。相似留出表现支持该度量下斜主导局部线性关系；它不证明未知数据中的纯旋转生成器。</span>
+<span id="cb4-284"><a href="#cb4-284" aria-hidden="true" tabindex="-1"></a><span class="ss">3. </span>对称衰减对照应偏好对称导数映射，并缺少有效旋转平面真值目标。</span>
+<span id="cb4-285"><a href="#cb4-285" aria-hidden="true" tabindex="-1"></a><span class="ss">4. </span>错开瞬态时滞可以产生弯曲或旋转外观投影，尽管没有共享自治六维状态律 <span class="co">[</span><span class="ot">@MichaelsEtAl2016; @LebedevEtAl2019</span><span class="co">]</span>。</span>
+<span id="cb4-286"><a href="#cb4-286" aria-hidden="true" tabindex="-1"></a><span class="ss">5. </span>输入驱动轨迹可以使仅状态矩阵吸收与 $u(t)$ 的相关。输入感知拟合应由留出导数预测与声明状态/输入系数的恢复评判，而非其投影曲线是否看起来不那么圆。</span>
+<span id="cb4-287"><a href="#cb4-287" aria-hidden="true" tabindex="-1"></a><span class="ss">6. </span>短弧可以在未完成周期的情况下显示强切向关系。事件抖动可以降低条件一致性；轻平滑可以降低导数噪声，同时改变带宽与相位。</span>
+<span id="cb4-288"><a href="#cb4-288" aria-hidden="true" tabindex="-1"></a><span class="ss">7. </span>跨条件减法可以揭示或抑制不同方差模式，并是估计目标的一部分，而非中性清理 <span class="co">[</span><span class="ot">@LebedevEtAl2019</span><span class="co">]</span>。</span>
+<span id="cb4-289"><a href="#cb4-289" aria-hidden="true" tabindex="-1"></a><span class="ss">8. </span>协方差匹配条件洗牌只在它实际保留的干扰结构上比无约束洗牌更有信息量 <span class="co">[</span><span class="ot">@MichaelsEtAl2016</span><span class="co">]</span>。</span>
+<span id="cb4-290"><a href="#cb4-290" aria-hidden="true" tabindex="-1"></a><span class="ss">9. </span>在非正交混合下，潜物理轨迹不变，但欧氏斜对称性一般不保留。这是度量依赖压力，不是失败等距正情形。</span>
+<span id="cb4-291"><a href="#cb4-291" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-292"><a href="#cb4-292" aria-hidden="true" tabindex="-1"></a><span class="fu">## 参数操控</span></span>
+<span id="cb4-293"><a href="#cb4-293" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-294"><a href="#cb4-294" aria-hidden="true" tabindex="-1"></a><span class="fu">### A. 正全窗口等距条件</span></span>
+<span id="cb4-295"><a href="#cb4-295" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-296"><a href="#cb4-296" aria-hidden="true" tabindex="-1"></a>使用声明 $A$、八个初始状态、等距 $H$、完整 $<span class="co">[</span><span class="ot">0,2.4</span><span class="co">]</span>$ 区间、无平滑、正确对齐与主跨条件减法。两个真实旋转平面与速率均适用。</span>
+<span id="cb4-297"><a href="#cb4-297" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-298"><a href="#cb4-298" aria-hidden="true" tabindex="-1"></a>名称 <span class="in">`full_window`</span> 指完整预先声明观测区间，不是每个轨迹完成一个周期的证明。最快理想模态覆盖 $4.8$ 弧度，较慢模态覆盖 $1.68$ 弧度；那些事实被显式报告。</span>
+<span id="cb4-299"><a href="#cb4-299" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-300"><a href="#cb4-300" aria-hidden="true" tabindex="-1"></a><span class="fu">### B. 短弧压力</span></span>
+<span id="cb4-301"><a href="#cb4-301" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-302"><a href="#cb4-302" aria-hidden="true" tabindex="-1"></a>在拟合 PCA 与导数前只保留前 18 个样本，$t\in<span class="co">[</span><span class="ot">0,0.68</span><span class="co">]</span>$。最快理想模态覆盖 $1.36$ 弧度，较慢模态 $0.476$ 弧度。报告角跨度、占用、平面角度、速率误差与拟合稳定性。该窗口上的低导数误差不能确立周期性、回归或闭合轨道。</span>
+<span id="cb4-303"><a href="#cb4-303" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-304"><a href="#cb4-304" aria-hidden="true" tabindex="-1"></a><span class="fu">### C. 事件时间抖动</span></span>
+<span id="cb4-305"><a href="#cb4-305" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-306"><a href="#cb4-306" aria-hidden="true" tabindex="-1"></a>对每个试次独立，用冻结种子从 $<span class="sc">\{</span>-3,-2,\ldots,3<span class="sc">\}</span>$ 箱抽取整数偏移。在加噪声前于移位物理时间生成或重采样解析轨迹，然后对照名义对齐网格分析。$<span class="co">[</span><span class="ot">0,2.4</span><span class="co">]</span>$ 之外的样本使用解析生成器而非循环包裹。存储每个偏移。这建模不完美事件对齐而不在窗口边界发明转移。</span>
+<span id="cb4-307"><a href="#cb4-307" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-308"><a href="#cb4-308" aria-hidden="true" tabindex="-1"></a><span class="fu">### D. 无对轻平滑</span></span>
+<span id="cb4-309"><a href="#cb4-309" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-310"><a href="#cb4-310" aria-hidden="true" tabindex="-1"></a>比较无平滑与在每条条件/试次轨迹内独立应用的冻结三箱移动平均。对两个分支分别只用训练数据拟合预处理、PCA、导数与矩阵。不在一个分支微分后、另一分支微分前平滑而不命名改变的目标。</span>
+<span id="cb4-311"><a href="#cb4-311" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-312"><a href="#cb4-312" aria-hidden="true" tabindex="-1"></a><span class="fu">### E. 跨条件时间均值减法</span></span>
+<span id="cb4-313"><a href="#cb4-313" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-314"><a href="#cb4-314" aria-hidden="true" tabindex="-1"></a>带与不带时变训练跨条件均值减法运行正生成器。保留相同秩、导数估计器与划分。报告平面占用、真实平面角度、导数拟合、角速率与条件一致性如何改变。两个分支都不被声明普遍正确。</span>
+<span id="cb4-315"><a href="#cb4-315" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-316"><a href="#cb4-316" aria-hidden="true" tabindex="-1"></a><span class="fu">### F. 对称衰减对照</span></span>
+<span id="cb4-317"><a href="#cb4-317" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-318"><a href="#cb4-318" aria-hidden="true" tabindex="-1"></a>把正状态矩阵替换为</span>
+<span id="cb4-319"><a href="#cb4-319" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-320"><a href="#cb4-320" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb4-321"><a href="#cb4-321" aria-hidden="true" tabindex="-1"></a>A_{\mathrm{sym}}=operatorname{diag}(-1.2,-0.8,-0.5,-0.35,-0.2,-0.1)</span>
+<span id="cb4-322"><a href="#cb4-322" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb4-323"><a href="#cb4-323" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-324"><a href="#cb4-324" aria-hidden="true" tabindex="-1"></a>在相同等距 $H$、初始状态、噪声与划分下。真实导数映射对称且无非零虚特征值。对无限制、斜约束与对称约束拟合的导数预测评分。不赋予真实旋转平面角度或角速率目标。</span>
+<span id="cb4-325"><a href="#cb4-325" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-326"><a href="#cb4-326" aria-hidden="true" tabindex="-1"></a><span class="fu">### G. 时滞序列瞬态对照</span></span>
+<span id="cb4-327"><a href="#cb4-327" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-328"><a href="#cb4-328" aria-hidden="true" tabindex="-1"></a>该对照直接在观测坐标中定义，没有自治潜状态方程。对观测特征 $j=1,\ldots,10$、条件 $c=0,\ldots,7$ 与时间 $t$，</span>
+<span id="cb4-329"><a href="#cb4-329" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-330"><a href="#cb4-330" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb4-331"><a href="#cb4-331" aria-hidden="true" tabindex="-1"></a>y_{c,j}(t)</span>
+<span id="cb4-332"><a href="#cb4-332" aria-hidden="true" tabindex="-1"></a>=</span>
+<span id="cb4-333"><a href="#cb4-333" aria-hidden="true" tabindex="-1"></a>(-1)^j(1+0.08c)</span>
+<span id="cb4-334"><a href="#cb4-334" aria-hidden="true" tabindex="-1"></a>\exp\left<span class="co">[</span><span class="ot">-\left(\frac{t-\tau_{j,c}}{w_j}\right)^2\right</span><span class="co">]</span>,</span>
+<span id="cb4-335"><a href="#cb4-335" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb4-336"><a href="#cb4-336" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-337"><a href="#cb4-337" aria-hidden="true" tabindex="-1"></a>其中</span>
+<span id="cb4-338"><a href="#cb4-338" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-339"><a href="#cb4-339" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb4-340"><a href="#cb4-340" aria-hidden="true" tabindex="-1"></a>\tau_{j,c}=\operatorname{linspace}(0.35,1.70)_{j}+0.025c,</span>
+<span id="cb4-341"><a href="#cb4-341" aria-hidden="true" tabindex="-1"></a>\qquad</span>
+<span id="cb4-342"><a href="#cb4-342" aria-hidden="true" tabindex="-1"></a>w_j=\operatorname{linspace}(0.13,0.25)_j.</span>
+<span id="cb4-343"><a href="#cb4-343" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb4-344"><a href="#cb4-344" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-345"><a href="#cb4-345" aria-hidden="true" tabindex="-1"></a>添加相同观测噪声与划分结构。这产生有序特征峰序列。可以计算 jPCA 度量，但真实平面与自治矩阵恢复不适用。该对照检验延迟瞬态是否能产生旋转外观投影，正如 Michaels 等人与 Lebedev 等人所激励 <span class="co">[</span><span class="ot">@MichaelsEtAl2016; @LebedevEtAl2019</span><span class="co">]</span>。</span>
+<span id="cb4-346"><a href="#cb4-346" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-347"><a href="#cb4-347" aria-hidden="true" tabindex="-1"></a><span class="fu">### H. 输入驱动脉冲/公共输入对照</span></span>
+<span id="cb4-348"><a href="#cb4-348" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-349"><a href="#cb4-349" aria-hidden="true" tabindex="-1"></a>生成</span>
+<span id="cb4-350"><a href="#cb4-350" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-351"><a href="#cb4-351" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb4-352"><a href="#cb4-352" aria-hidden="true" tabindex="-1"></a>\dot z(t)=A_u z(t)+Bu_c(t),</span>
+<span id="cb4-353"><a href="#cb4-353" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb4-354"><a href="#cb4-354" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-355"><a href="#cb4-355" aria-hidden="true" tabindex="-1"></a>其中</span>
+<span id="cb4-356"><a href="#cb4-356" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-357"><a href="#cb4-357" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb4-358"><a href="#cb4-358" aria-hidden="true" tabindex="-1"></a>A_u=\operatorname{diag}(-0.25,-0.30,-0.35,-0.40,-0.45,-0.50),</span>
+<span id="cb4-359"><a href="#cb4-359" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb4-360"><a href="#cb4-360" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-361"><a href="#cb4-361" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb4-362"><a href="#cb4-362" aria-hidden="true" tabindex="-1"></a>B=</span>
+<span id="cb4-363"><a href="#cb4-363" aria-hidden="true" tabindex="-1"></a>\begin{pmatrix}</span>
+<span id="cb4-364"><a href="#cb4-364" aria-hidden="true" tabindex="-1"></a>0.8&amp;0<span class="sc">\\</span></span>
+<span id="cb4-365"><a href="#cb4-365" aria-hidden="true" tabindex="-1"></a>0&amp;0.7<span class="sc">\\</span></span>
+<span id="cb4-366"><a href="#cb4-366" aria-hidden="true" tabindex="-1"></a>0.5&amp;0.3<span class="sc">\\</span></span>
+<span id="cb4-367"><a href="#cb4-367" aria-hidden="true" tabindex="-1"></a>-0.3&amp;0.5<span class="sc">\\</span></span>
+<span id="cb4-368"><a href="#cb4-368" aria-hidden="true" tabindex="-1"></a>0.2&amp;-0.4<span class="sc">\\</span></span>
+<span id="cb4-369"><a href="#cb4-369" aria-hidden="true" tabindex="-1"></a>0.4&amp;0.25</span>
+<span id="cb4-370"><a href="#cb4-370" aria-hidden="true" tabindex="-1"></a>\end{pmatrix},</span>
+<span id="cb4-371"><a href="#cb4-371" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb4-372"><a href="#cb4-372" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-373"><a href="#cb4-373" aria-hidden="true" tabindex="-1"></a>且</span>
+<span id="cb4-374"><a href="#cb4-374" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-375"><a href="#cb4-375" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb4-376"><a href="#cb4-376" aria-hidden="true" tabindex="-1"></a>u_{c,1}(t)=\sin(1.3t+0.35c),</span>
+<span id="cb4-377"><a href="#cb4-377" aria-hidden="true" tabindex="-1"></a>\qquad</span>
+<span id="cb4-378"><a href="#cb4-378" aria-hidden="true" tabindex="-1"></a>u_{c,2}(t)=</span>
+<span id="cb4-379"><a href="#cb4-379" aria-hidden="true" tabindex="-1"></a>\exp\left<span class="co">[</span><span class="ot">-\left(\frac{t-(0.8+0.04c)}{0.28}\right)^2\right</span><span class="co">]</span>.</span>
+<span id="cb4-380"><a href="#cb4-380" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb4-381"><a href="#cb4-381" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-382"><a href="#cb4-382" aria-hidden="true" tabindex="-1"></a>使用一个冻结数值积分规则与等于观测网格的步长；记录其局部一致性检查。比较：</span>
+<span id="cb4-383"><a href="#cb4-383" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-384"><a href="#cb4-384" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**仅状态仿射：** $\Delta x/\Delta t\approx Mx_i+b$；</span>
+<span id="cb4-385"><a href="#cb4-385" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**输入感知仿射：** $\Delta x/\Delta t\approx Mx_i+Gu_i+b$。</span>
+<span id="cb4-386"><a href="#cb4-386" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-387"><a href="#cb4-387" aria-hidden="true" tabindex="-1"></a>两个拟合使用相同冻结带噪试次、训练中心化、PCA 坐标与左端点预测器，匹配前向 Euler 生成器。该对照不使用时变跨条件减法。已知输入列只提供给输入感知拟合。仅状态拟合的斜分量可以反映被省略驱动。包含 $u$ 是已知模拟器输入下的模型比较，不是观测数据中因果输入辨识的证明 <span class="co">[</span><span class="ot">@CunninghamYu2014</span><span class="co">]</span>。</span>
+<span id="cb4-388"><a href="#cb4-388" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-389"><a href="#cb4-389" aria-hidden="true" tabindex="-1"></a><span class="fu">### I. 非正交混合与度量依赖</span></span>
+<span id="cb4-390"><a href="#cb4-390" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-391"><a href="#cb4-391" aria-hidden="true" tabindex="-1"></a>使用</span>
+<span id="cb4-392"><a href="#cb4-392" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-393"><a href="#cb4-393" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb4-394"><a href="#cb4-394" aria-hidden="true" tabindex="-1"></a>G=HS,</span>
+<span id="cb4-395"><a href="#cb4-395" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb4-396"><a href="#cb4-396" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-397"><a href="#cb4-397" aria-hidden="true" tabindex="-1"></a>其中</span>
+<span id="cb4-398"><a href="#cb4-398" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-399"><a href="#cb4-399" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb4-400"><a href="#cb4-400" aria-hidden="true" tabindex="-1"></a>S=egin{pmatrix}</span>
+<span id="cb4-401"><a href="#cb4-401" aria-hidden="true" tabindex="-1"></a>1&amp;0.35&amp;0&amp;0&amp;0&amp;0<span class="sc">\\</span></span>
+<span id="cb4-402"><a href="#cb4-402" aria-hidden="true" tabindex="-1"></a>0&amp;1.6&amp;0.2&amp;0&amp;0&amp;0<span class="sc">\\</span></span>
+<span id="cb4-403"><a href="#cb4-403" aria-hidden="true" tabindex="-1"></a>0&amp;0&amp;0.7&amp;0.25&amp;0&amp;0<span class="sc">\\</span></span>
+<span id="cb4-404"><a href="#cb4-404" aria-hidden="true" tabindex="-1"></a>0&amp;0&amp;0&amp;1.3&amp;0.2&amp;0<span class="sc">\\</span></span>
+<span id="cb4-405"><a href="#cb4-405" aria-hidden="true" tabindex="-1"></a>0&amp;0&amp;0&amp;0&amp;0.8&amp;0.3<span class="sc">\\</span></span>
+<span id="cb4-406"><a href="#cb4-406" aria-hidden="true" tabindex="-1"></a>0&amp;0&amp;0&amp;0&amp;0&amp;1.8</span>
+<span id="cb4-407"><a href="#cb4-407" aria-hidden="true" tabindex="-1"></a>\end{pmatrix}.</span>
+<span id="cb4-408"><a href="#cb4-408" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb4-409"><a href="#cb4-409" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-410"><a href="#cb4-410" aria-hidden="true" tabindex="-1"></a>从相同正潜轨迹生成 $y=Gz$。映射真实平面 $G\mathcal P_j$ 对角度评分仍为有效几何像，但 $GAG^+$ 在普通观测欧氏度量下一般不斜对称。报告 Gram 矩阵 $G^\top G$、其条件数与平面/速率诊断。不要将该压力与等距正验收准则合并。</span>
+<span id="cb4-411"><a href="#cb4-411" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-412"><a href="#cb4-412" aria-hidden="true" tabindex="-1"></a><span class="fu">### J. 协方差与条件结构匹配洗牌</span></span>
+<span id="cb4-413"><a href="#cb4-413" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-414"><a href="#cb4-414" aria-hidden="true" tabindex="-1"></a>对每个特征独立，在八个条件间置换**整条条件轨迹**，保留每个特征的完整时间进程与边际条件分布，同时破坏跨特征条件身份。为每个划分生成 128 个冻结置换提案。用仅协方差相似性——而非任何旋转度量——选择原始与洗牌展平特征协方差之间相似性最大的提案，并报告</span>
+<span id="cb4-415"><a href="#cb4-415" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-416"><a href="#cb4-416" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb4-417"><a href="#cb4-417" aria-hidden="true" tabindex="-1"></a>\operatorname{sim}(C,C_\pi)</span>
+<span id="cb4-418"><a href="#cb4-418" aria-hidden="true" tabindex="-1"></a>=1-rac{\lVert C-C_\pi\rVert_F^2}{\lVert C\rVert_F^2}.</span>
+<span id="cb4-419"><a href="#cb4-419" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb4-420"><a href="#cb4-420" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-421"><a href="#cb4-421" aria-hidden="true" tabindex="-1"></a>目标阈值是 $0.95$；如果没有提案达到，使用最高相似性提案、记录未达并缩小解读。在所选洗牌训练/验证数据上重拟合完整管线。该有界构造受 Michaels 等人迭代 CMPT 激励，但与其不同 <span class="co">[</span><span class="ot">@MichaelsEtAl2016</span><span class="co">]</span>。破坏每条轨迹的时间方向置换不是可接受匹配对照。</span>
+<span id="cb4-422"><a href="#cb4-422" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-423"><a href="#cb4-423" aria-hidden="true" tabindex="-1"></a><span class="fu">## 健全性检查</span></span>
+<span id="cb4-424"><a href="#cb4-424" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-425"><a href="#cb4-425" aria-hidden="true" tabindex="-1"></a>验证器必须断言以下全部。</span>
+<span id="cb4-426"><a href="#cb4-426" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-427"><a href="#cb4-427" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>**正生成器代数：** 解析导数在浮点容差内等于 $Az(t)$。</span>
+<span id="cb4-428"><a href="#cb4-428" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>**正确斜符号：** 存储 $J(\omega)$ 块右上为 $-\omega$、左下为 $+\omega$，且 $J^\top=-J$。</span>
+<span id="cb4-429"><a href="#cb4-429" aria-hidden="true" tabindex="-1"></a><span class="ss">3. </span>**嵌入等距：** $\lVert H^\top H-I\rVert_{\max}\le10^{-12}$。</span>
+<span id="cb4-430"><a href="#cb4-430" aria-hidden="true" tabindex="-1"></a><span class="ss">4. </span>**划分完整性：** 试次标识符不相交，没有条件均值、预处理、PCA 基、矩阵、平面或超参数使用测试试次。</span>
+<span id="cb4-431"><a href="#cb4-431" aria-hidden="true" tabindex="-1"></a><span class="ss">5. </span>**边界完整性：** 每个导数对属于一个条件与一条试次/条件均值轨迹；精确检查预期对数。</span>
+<span id="cb4-432"><a href="#cb4-432" aria-hidden="true" tabindex="-1"></a><span class="ss">6. </span>**导数神谕：** 无噪正轨迹上的中点有限差分在 $3\times10^{-3}$ 内与解析中点导数一致。</span>
+<span id="cb4-433"><a href="#cb4-433" aria-hidden="true" tabindex="-1"></a><span class="ss">7. </span>**PCA 神谕：** 训练 PCA 投影器在 $10^{-10}$ 内等于独立秩六 SVD 投影器。</span>
+<span id="cb4-434"><a href="#cb4-434" aria-hidden="true" tabindex="-1"></a><span class="ss">8. </span>**无限制 LS：** 正规方程残差正交性或独立最小二乘重算通过容差。</span>
+<span id="cb4-435"><a href="#cb4-435" aria-hidden="true" tabindex="-1"></a><span class="ss">9. </span>**真实约束斜 LS：** $M_{\mathrm{skew}}+M_{\mathrm{skew}}^\top=0$，且从显式斜基重构在 $10^{-10}$ 内一致。</span>
+<span id="cb4-436"><a href="#cb4-436" aria-hidden="true" tabindex="-1"></a><span class="ss">10. </span>**无反对称化替换：** 验证器独立求解斜基最小二乘问题，除非两者数值恰好一致，否则不接受 $(M_{\mathrm{un}}-M_{\mathrm{un}}^\top)/2$ 作为神谕。</span>
+<span id="cb4-437"><a href="#cb4-437" aria-hidden="true" tabindex="-1"></a><span class="ss">11. </span>**对称约束 LS：** $M_{\mathrm{sym}}-M_{\mathrm{sym}}^\top=0$，且对称基解被独立重算。</span>
+<span id="cb4-438"><a href="#cb4-438" aria-hidden="true" tabindex="-1"></a><span class="ss">12. </span>**嵌套训练损失：** 无限制训练 SSE 在数值容差内不大于斜或对称约束 SSE。</span>
+<span id="cb4-439"><a href="#cb4-439" aria-hidden="true" tabindex="-1"></a><span class="ss">13. </span>**平面提取：** 每个恢复平面标准正交且在拟合斜矩阵下不变；存储速率等于 $|q_1^\top M_{\mathrm{skew}}q_2|$。</span>
+<span id="cb4-440"><a href="#cb4-440" aria-hidden="true" tabindex="-1"></a><span class="ss">14. </span>**平面等价：** 平面角度度量对平面内旋转、轴交换与符号变化不变。</span>
+<span id="cb4-441"><a href="#cb4-441" aria-hidden="true" tabindex="-1"></a><span class="ss">15. </span>**真值适用性：** 真实平面/速率行只存在于正条件与单独标记非正交映射平面条件；时滞与对称对照中不存在。</span>
+<span id="cb4-442"><a href="#cb4-442" aria-hidden="true" tabindex="-1"></a><span class="ss">16. </span>**输入设计：** 输入感知预测器包含声明两个输入列、在需要处满秩，且仅状态拟合无法访问它们。</span>
+<span id="cb4-443"><a href="#cb4-443" aria-hidden="true" tabindex="-1"></a><span class="ss">17. </span>**抖动完整性：** 偏移被存储、无循环包裹，物理导数时间被一致处理。</span>
+<span id="cb4-444"><a href="#cb4-444" aria-hidden="true" tabindex="-1"></a><span class="ss">18. </span>**平滑/减法隔离：** 每个分支重拟合训练预处理，只改变其命名操作。</span>
+<span id="cb4-445"><a href="#cb4-445" aria-hidden="true" tabindex="-1"></a><span class="ss">19. </span>**洗牌匹配：** 整条轨迹被置换、协方差相似性在旋转分析前计算，选择永不用 jPCA 度量。</span>
+<span id="cb4-446"><a href="#cb4-446" aria-hidden="true" tabindex="-1"></a><span class="ss">20. </span>**真值与测试投毒：** 替换潜真值与测试观测不能改变训练/验证拟合参数或所选对照。</span>
+<span id="cb4-447"><a href="#cb4-447" aria-hidden="true" tabindex="-1"></a><span class="ss">21. </span>**确定性：** 干净临时重跑产生逐字节相同 <span class="in">`manifest.json`</span>、<span class="in">`metrics.csv`</span>、<span class="in">`diagnostics.json`</span> 与 <span class="in">`summary.png`</span>。</span>
+<span id="cb4-448"><a href="#cb4-448" aria-hidden="true" tabindex="-1"></a><span class="ss">22. </span>**度量出处：** 每行具有划分、条件、预处理、方法、目标、度量与有限值的唯一标签。</span>
+<span id="cb4-449"><a href="#cb4-449" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-450"><a href="#cb4-450" aria-hidden="true" tabindex="-1"></a>通过这些检查确立有界数值一致性，而非真实系统是自治振荡器。</span>
+<span id="cb4-451"><a href="#cb4-451" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-452"><a href="#cb4-452" aria-hidden="true" tabindex="-1"></a><span class="fu">## 失效情形</span></span>
+<span id="cb4-453"><a href="#cb4-453" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-454"><a href="#cb4-454" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**反对称化无限制拟合：** 欧氏矩阵投影一般不构成斜约束导数最小二乘解。</span>
+<span id="cb4-455"><a href="#cb4-455" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**错误斜符号：** 使用 $\begin{psmallmatrix}0&amp;+\omega<span class="sc">\\</span>-\omega&amp;0\end{psmallmatrix}$ 静默反转声明正朝向。</span>
+<span id="cb4-456"><a href="#cb4-456" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**跨条件导数：** 连接条件端点制造人工速度。</span>
+<span id="cb4-457"><a href="#cb4-457" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**测试重拟合 PCA 或预处理：** 这是直推式泄漏，不是留出评估。</span>
+<span id="cb4-458"><a href="#cb4-458" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**按视觉圆度选择平面：** 平面选择必须遵循冻结斜算子规则。</span>
+<span id="cb4-459"><a href="#cb4-459" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**把快速率误认为高占用：** 频率、数据方差、导数拟合与稳定性是不同量。</span>
+<span id="cb4-460"><a href="#cb4-460" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**把短切向弧称为振荡：** 不足一个周期不显示回归或周期性。</span>
+<span id="cb4-461"><a href="#cb4-461" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**给时滞对照赋予潜振荡器：** 有序瞬态可以在没有正自治律的情况下产生旋转。</span>
+<span id="cb4-462"><a href="#cb4-462" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**把仅状态输入拟合称为自治真值：** 被省略公共驱动可以被吸收进 $M$。</span>
+<span id="cb4-463"><a href="#cb4-463" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**把跨条件减法称为无害：** 它改变拟合数据并可以改变显示旋转 <span class="co">[</span><span class="ot">@LebedevEtAl2019</span><span class="co">]</span>。</span>
+<span id="cb4-464"><a href="#cb4-464" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**把平滑称为装饰：** 它改变导数与时间带宽。</span>
+<span id="cb4-465"><a href="#cb4-465" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**不匹配洗牌：** 同时破坏协方差、光滑性与条件结构产生无信息易零模型。</span>
+<span id="cb4-466"><a href="#cb4-466" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**把非正交混合与等距合并：** 斜对称性依赖度量，且对任意可逆坐标不变。</span>
+<span id="cb4-467"><a href="#cb4-467" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**把投影称为后验状态推断：** jPCA 投影不执行概率去噪或状态后验估计 <span class="co">[</span><span class="ot">@CunninghamYu2014</span><span class="co">]</span>。</span>
+<span id="cb4-468"><a href="#cb4-468" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**把旋转称为全局向量场：** 拟合只在采样、已处理条件–时间区域上受支持。</span>
+<span id="cb4-469"><a href="#cb4-469" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**把旋转称为机制或因果性：** 拟合局部线性关系不识别回路实现或干预效应。</span>
+<span id="cb4-470"><a href="#cb4-470" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-471"><a href="#cb4-471" aria-hidden="true" tabindex="-1"></a><span class="fu">## 恢复任务</span></span>
+<span id="cb4-472"><a href="#cb4-472" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-473"><a href="#cb4-473" aria-hidden="true" tabindex="-1"></a><span class="fu">### 秩六 PCA</span></span>
+<span id="cb4-474"><a href="#cb4-474" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-475"><a href="#cb4-475" aria-hidden="true" tabindex="-1"></a>在声明预处理下从训练条件均值拟合 $W$。PCA 提供所有导数模型被比较的观测表示。它不是旋转方法，不接收角速率估计。</span>
+<span id="cb4-476"><a href="#cb4-476" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-477"><a href="#cb4-477" aria-hidden="true" tabindex="-1"></a><span class="fu">### 无限制导数回归</span></span>
+<span id="cb4-478"><a href="#cb4-478" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-479"><a href="#cb4-479" aria-hidden="true" tabindex="-1"></a>把中点状态 $X$ 与导数目标 $D$ 作为列堆叠并求解</span>
+<span id="cb4-480"><a href="#cb4-480" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-481"><a href="#cb4-481" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb4-482"><a href="#cb4-482" aria-hidden="true" tabindex="-1"></a>\widehat M_{\mathrm{un}}</span>
+<span id="cb4-483"><a href="#cb4-483" aria-hidden="true" tabindex="-1"></a>\in\arg\min_M\lVert D-MX\rVert_F^2</span>
+<span id="cb4-484"><a href="#cb4-484" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb4-485"><a href="#cb4-485" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-486"><a href="#cb4-486" aria-hidden="true" tabindex="-1"></a>使用 <span class="in">`lstsq`</span> 或等价稳定求解。报告秩、条件数、训练 SSE 与留出导数误差。</span>
+<span id="cb4-487"><a href="#cb4-487" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-488"><a href="#cb4-488" aria-hidden="true" tabindex="-1"></a><span class="fu">### 斜约束最小二乘</span></span>
+<span id="cb4-489"><a href="#cb4-489" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-490"><a href="#cb4-490" aria-hidden="true" tabindex="-1"></a>设 $B_{ij}$（$i&lt;j$）在 $(i,j)$ 处为 $+1$、$(j,i)$ 处为 $-1$，其余为零。求解</span>
+<span id="cb4-491"><a href="#cb4-491" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-492"><a href="#cb4-492" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb4-493"><a href="#cb4-493" aria-hidden="true" tabindex="-1"></a>\widehat M_{\mathrm{skew}}</span>
+<span id="cb4-494"><a href="#cb4-494" aria-hidden="true" tabindex="-1"></a>=</span>
+<span id="cb4-495"><a href="#cb4-495" aria-hidden="true" tabindex="-1"></a>\sum_{i&lt;j}\theta_{ij}B_{ij},</span>
+<span id="cb4-496"><a href="#cb4-496" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb4-497"><a href="#cb4-497" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-498"><a href="#cb4-498" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb4-499"><a href="#cb4-499" aria-hidden="true" tabindex="-1"></a>\widehat\theta</span>
+<span id="cb4-500"><a href="#cb4-500" aria-hidden="true" tabindex="-1"></a>\in</span>
+<span id="cb4-501"><a href="#cb4-501" aria-hidden="true" tabindex="-1"></a>\arg\min_\theta</span>
+<span id="cb4-502"><a href="#cb4-502" aria-hidden="true" tabindex="-1"></a>\left\lVert</span>
+<span id="cb4-503"><a href="#cb4-503" aria-hidden="true" tabindex="-1"></a>\operatorname{vec}(D)-</span>
+<span id="cb4-504"><a href="#cb4-504" aria-hidden="true" tabindex="-1"></a>\begin{bmatrix}</span>
+<span id="cb4-505"><a href="#cb4-505" aria-hidden="true" tabindex="-1"></a>\operatorname{vec}(B_{12}X)&amp;\cdots</span>
+<span id="cb4-506"><a href="#cb4-506" aria-hidden="true" tabindex="-1"></a>\end{bmatrix}</span>
+<span id="cb4-507"><a href="#cb4-507" aria-hidden="true" tabindex="-1"></a>\theta</span>
+<span id="cb4-508"><a href="#cb4-508" aria-hidden="true" tabindex="-1"></a>\right\rVert_2^2.</span>
+<span id="cb4-509"><a href="#cb4-509" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb4-510"><a href="#cb4-510" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-511"><a href="#cb4-511" aria-hidden="true" tabindex="-1"></a>这是 Churchland 补充推导中描述的实际 jPCA 约束拟合 <span class="co">[</span><span class="ot">@ChurchlandEtAl2012</span><span class="co">]</span>。它不是由反对称化 $\widehat M_{\mathrm{un}}$ 形成。</span>
+<span id="cb4-512"><a href="#cb4-512" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-513"><a href="#cb4-513" aria-hidden="true" tabindex="-1"></a><span class="fu">### 对称结构</span></span>
+<span id="cb4-514"><a href="#cb4-514" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-515"><a href="#cb4-515" aria-hidden="true" tabindex="-1"></a>拟合匹配约束对称模型</span>
+<span id="cb4-516"><a href="#cb4-516" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-517"><a href="#cb4-517" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb4-518"><a href="#cb4-518" aria-hidden="true" tabindex="-1"></a>\widehat M_{\mathrm{sym}}</span>
+<span id="cb4-519"><a href="#cb4-519" aria-hidden="true" tabindex="-1"></a>\in\arg\min_{M^\top=M}\lVert D-MX\rVert_F^2</span>
+<span id="cb4-520"><a href="#cb4-520" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb4-521"><a href="#cb4-521" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-522"><a href="#cb4-522" aria-hidden="true" tabindex="-1"></a>使用显式对称基。还把代数分解</span>
+<span id="cb4-523"><a href="#cb4-523" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-524"><a href="#cb4-524" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb4-525"><a href="#cb4-525" aria-hidden="true" tabindex="-1"></a>\widehat M_{\mathrm{un}}</span>
+<span id="cb4-526"><a href="#cb4-526" aria-hidden="true" tabindex="-1"></a>=</span>
+<span id="cb4-527"><a href="#cb4-527" aria-hidden="true" tabindex="-1"></a>\frac{\widehat M_{\mathrm{un}}+\widehat M_{\mathrm{un}}^\top}{2}</span>
+<span id="cb4-528"><a href="#cb4-528" aria-hidden="true" tabindex="-1"></a>+</span>
+<span id="cb4-529"><a href="#cb4-529" aria-hidden="true" tabindex="-1"></a>\frac{\widehat M_{\mathrm{un}}-\widehat M_{\mathrm{un}}^\top}{2}</span>
+<span id="cb4-530"><a href="#cb4-530" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb4-531"><a href="#cb4-531" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-532"><a href="#cb4-532" aria-hidden="true" tabindex="-1"></a>仅作为无限制算子的诊断报告。两个代数部分都不替代其对应约束回归。</span>
+<span id="cb4-533"><a href="#cb4-533" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-534"><a href="#cb4-534" aria-hidden="true" tabindex="-1"></a><span class="fu">### 旋转平面提取</span></span>
+<span id="cb4-535"><a href="#cb4-535" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-536"><a href="#cb4-536" aria-hidden="true" tabindex="-1"></a>对拟合实斜矩阵，对角化对称半正定矩阵</span>
+<span id="cb4-537"><a href="#cb4-537" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-538"><a href="#cb4-538" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb4-539"><a href="#cb4-539" aria-hidden="true" tabindex="-1"></a>-\widehat M_{\mathrm{skew}}^2.</span>
+<span id="cb4-540"><a href="#cb4-540" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb4-541"><a href="#cb4-541" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-542"><a href="#cb4-542" aria-hidden="true" tabindex="-1"></a>每个正重复特征值 $\omega_j^2$ 定义二维不变平面。分组重复特征空间，定向确定性标准正交基 $(q_{j1},q_{j2})$，并设置手性使</span>
+<span id="cb4-543"><a href="#cb4-543" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-544"><a href="#cb4-544" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb4-545"><a href="#cb4-545" aria-hidden="true" tabindex="-1"></a>q_{j1}^\top\widehat M_{\mathrm{skew}}q_{j2}&lt;0</span>
+<span id="cb4-546"><a href="#cb4-546" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb4-547"><a href="#cb4-547" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-548"><a href="#cb4-548" aria-hidden="true" tabindex="-1"></a>对声明 $J(\omega)$ 约定成立，等价于</span>
+<span id="cb4-549"><a href="#cb4-549" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-550"><a href="#cb4-550" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb4-551"><a href="#cb4-551" aria-hidden="true" tabindex="-1"></a>Q_j^\top\widehat M_{\mathrm{skew}}Q_j</span>
+<span id="cb4-552"><a href="#cb4-552" aria-hidden="true" tabindex="-1"></a>\approx</span>
+<span id="cb4-553"><a href="#cb4-553" aria-hidden="true" tabindex="-1"></a>\begin{pmatrix}0&amp;-\widehat\omega_j<span class="sc">\\</span>\widehat\omega_j&amp;0\end{pmatrix}.</span>
+<span id="cb4-554"><a href="#cb4-554" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb4-555"><a href="#cb4-555" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-556"><a href="#cb4-556" aria-hidden="true" tabindex="-1"></a>按递减 $|\widehat\omega_j|$ 排序平面。近重复频率作为组合四维不变子空间比较，而非赋予不稳定平面标签。</span>
+<span id="cb4-557"><a href="#cb4-557" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-558"><a href="#cb4-558" aria-hidden="true" tabindex="-1"></a><span class="fu">### 输入感知回归</span></span>
+<span id="cb4-559"><a href="#cb4-559" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-560"><a href="#cb4-560" aria-hidden="true" tabindex="-1"></a>对输入对照，联合最小二乘求解</span>
+<span id="cb4-561"><a href="#cb4-561" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-562"><a href="#cb4-562" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb4-563"><a href="#cb4-563" aria-hidden="true" tabindex="-1"></a>D=MX+GU+E</span>
+<span id="cb4-564"><a href="#cb4-564" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb4-565"><a href="#cb4-565" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-566"><a href="#cb4-566" aria-hidden="true" tabindex="-1"></a>比较留出预测与仅状态模型，并在训练 PCA 表示中报告 $M$、$G$、秩与系数误差。已知模拟器输入不进入正或其他对照拟合。</span>
+<span id="cb4-567"><a href="#cb4-567" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-568"><a href="#cb4-568" aria-hidden="true" tabindex="-1"></a><span class="fu">### 固定与随机平面</span></span>
+<span id="cb4-569"><a href="#cb4-569" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-570"><a href="#cb4-570" aria-hidden="true" tabindex="-1"></a>固定基线是前两个训练 PC。在数据生成前于六维 PCA 空间中一次性生成五个随机秩二平面、正交归一化并冻结。它们接收占用、切向/径向、角跨度与条件一致性度量，但除非执行单独命名平面内导数拟合，否则不接收拟合速率。</span>
+<span id="cb4-571"><a href="#cb4-571" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-572"><a href="#cb4-572" aria-hidden="true" tabindex="-1"></a><span class="fu">## 候选分析方法</span></span>
+<span id="cb4-573"><a href="#cb4-573" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-574"><a href="#cb4-574" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>**训练 PCA 秩六。** 每个拟合导数方法的共享表示。</span>
+<span id="cb4-575"><a href="#cb4-575" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>**无限制仅状态线性导数回归。** 最佳线性仅状态训练拟合。</span>
+<span id="cb4-576"><a href="#cb4-576" aria-hidden="true" tabindex="-1"></a><span class="ss">3. </span>**真实斜约束导数回归。** jPCA 算子与不变平面。</span>
+<span id="cb4-577"><a href="#cb4-577" aria-hidden="true" tabindex="-1"></a><span class="ss">4. </span>**真实对称约束导数回归。** 扩张/衰减替代。</span>
+<span id="cb4-578"><a href="#cb4-578" aria-hidden="true" tabindex="-1"></a><span class="ss">5. </span>**无限制矩阵的代数对称/斜部分。** 仅诊断。</span>
+<span id="cb4-579"><a href="#cb4-579" aria-hidden="true" tabindex="-1"></a><span class="ss">6. </span>**固定前两 PC 平面。** 方差导向基线。</span>
+<span id="cb4-580"><a href="#cb4-580" aria-hidden="true" tabindex="-1"></a><span class="ss">7. </span>**五个固定随机平面。** 数据无关投影参考。</span>
+<span id="cb4-581"><a href="#cb4-581" aria-hidden="true" tabindex="-1"></a><span class="ss">8. </span>**输入感知状态加输入回归。** 只适用于声明输入对照。</span>
+<span id="cb4-582"><a href="#cb4-582" aria-hidden="true" tabindex="-1"></a><span class="ss">9. </span>**协方差匹配条件洗牌。** 结构化零模型，不是拟合动力学方法。</span>
+<span id="cb4-583"><a href="#cb4-583" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-584"><a href="#cb4-584" aria-hidden="true" tabindex="-1"></a><span class="fu">## 评估</span></span>
+<span id="cb4-585"><a href="#cb4-585" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-586"><a href="#cb4-586" aria-hidden="true" tabindex="-1"></a><span class="fu">### 留出导数预测</span></span>
+<span id="cb4-587"><a href="#cb4-587" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-588"><a href="#cb4-588" aria-hidden="true" tabindex="-1"></a>对方法 $m$，报告</span>
+<span id="cb4-589"><a href="#cb4-589" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-590"><a href="#cb4-590" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb4-591"><a href="#cb4-591" aria-hidden="true" tabindex="-1"></a>\operatorname{MSE}_m</span>
+<span id="cb4-592"><a href="#cb4-592" aria-hidden="true" tabindex="-1"></a>=</span>
+<span id="cb4-593"><a href="#cb4-593" aria-hidden="true" tabindex="-1"></a>\frac{1}{N_D}\lVert D^{\mathrm{test}}-widehat D_m^{\mathrm{test}}\rVert_F^2</span>
+<span id="cb4-594"><a href="#cb4-594" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb4-595"><a href="#cb4-595" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-596"><a href="#cb4-596" aria-hidden="true" tabindex="-1"></a>与</span>
+<span id="cb4-597"><a href="#cb4-597" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-598"><a href="#cb4-598" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb4-599"><a href="#cb4-599" aria-hidden="true" tabindex="-1"></a>R_m^2</span>
+<span id="cb4-600"><a href="#cb4-600" aria-hidden="true" tabindex="-1"></a>=1-</span>
+<span id="cb4-601"><a href="#cb4-601" aria-hidden="true" tabindex="-1"></a>\frac{\lVert D^{\mathrm{test}}-widehat D_m^{\mathrm{test}}\rVert_F^2}</span>
+<span id="cb4-602"><a href="#cb4-602" aria-hidden="true" tabindex="-1"></a>{\lVert D^{\mathrm{test}}-\bar D^{\mathrm{test}}\rVert_F^2}.</span>
+<span id="cb4-603"><a href="#cb4-603" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb4-604"><a href="#cb4-604" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-605"><a href="#cb4-605" aria-hidden="true" tabindex="-1"></a>分别报告训练、验证与测试。对前向 Euler 输入对照，$\widehat D=\widehat MX+\widehat GU+\widehat b$ 在左端点；仅状态方法无法访问 $U$。</span>
+<span id="cb4-606"><a href="#cb4-606" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-607"><a href="#cb4-607" aria-hidden="true" tabindex="-1"></a><span class="fu">### 真实平面主角度</span></span>
+<span id="cb4-608"><a href="#cb4-608" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-609"><a href="#cb4-609" aria-hidden="true" tabindex="-1"></a>对恢复平面 $Q$ 与真实平面 $T$，使用标准正交基的奇异值：</span>
+<span id="cb4-610"><a href="#cb4-610" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-611"><a href="#cb4-611" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb4-612"><a href="#cb4-612" aria-hidden="true" tabindex="-1"></a>\theta_1,\theta_2</span>
+<span id="cb4-613"><a href="#cb4-613" aria-hidden="true" tabindex="-1"></a>=</span>
+<span id="cb4-614"><a href="#cb4-614" aria-hidden="true" tabindex="-1"></a>\arccos\left(\operatorname{svd}(Q^\top T)\right).</span>
+<span id="cb4-615"><a href="#cb4-615" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb4-616"><a href="#cb4-616" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-617"><a href="#cb4-617" aria-hidden="true" tabindex="-1"></a>报告最大角度、RMS 正弦误差与投影器 Frobenius 误差。通过最小总最大角度分配把两个正恢复平面匹配到两个真实平面，然后报告该分配本身。平面度量对符号、轴交换与平面内旋转不变。</span>
+<span id="cb4-618"><a href="#cb4-618" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-619"><a href="#cb4-619" aria-hidden="true" tabindex="-1"></a><span class="fu">### 角速率误差</span></span>
+<span id="cb4-620"><a href="#cb4-620" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-621"><a href="#cb4-621" aria-hidden="true" tabindex="-1"></a>对匹配恢复平面 $Q_j$，</span>
+<span id="cb4-622"><a href="#cb4-622" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-623"><a href="#cb4-623" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb4-624"><a href="#cb4-624" aria-hidden="true" tabindex="-1"></a>\widehat\omega_j</span>
+<span id="cb4-625"><a href="#cb4-625" aria-hidden="true" tabindex="-1"></a>=</span>
+<span id="cb4-626"><a href="#cb4-626" aria-hidden="true" tabindex="-1"></a>\left|q_{j1}^\top\widehat M_{\mathrm{skew}}q_{j2}\right|,</span>
+<span id="cb4-627"><a href="#cb4-627" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb4-628"><a href="#cb4-628" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-629"><a href="#cb4-629" aria-hidden="true" tabindex="-1"></a>并对照 $2.0$ 与 $0.7$ 报告绝对与相对误差。除非显式考虑度量变换，不要在非正交压力中把潜速率恢复报告为适用。</span>
+<span id="cb4-630"><a href="#cb4-630" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-631"><a href="#cb4-631" aria-hidden="true" tabindex="-1"></a><span class="fu">### 切向与径向能量</span></span>
+<span id="cb4-632"><a href="#cb4-632" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-633"><a href="#cb4-633" aria-hidden="true" tabindex="-1"></a>对投影状态 $r=Q^\top x=(r_1,r_2)^\top$ 且 $\lVert r\rVert&gt;10^{-8}$，定义</span>
+<span id="cb4-634"><a href="#cb4-634" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-635"><a href="#cb4-635" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb4-636"><a href="#cb4-636" aria-hidden="true" tabindex="-1"></a>e_r=\frac{r}{\lVert r\rVert},</span>
+<span id="cb4-637"><a href="#cb4-637" aria-hidden="true" tabindex="-1"></a>\qquad</span>
+<span id="cb4-638"><a href="#cb4-638" aria-hidden="true" tabindex="-1"></a>e_\tau=J(1)e_r,</span>
+<span id="cb4-639"><a href="#cb4-639" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb4-640"><a href="#cb4-640" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-641"><a href="#cb4-641" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb4-642"><a href="#cb4-642" aria-hidden="true" tabindex="-1"></a>v_r=e_r^\top Q^\top\dot x,</span>
+<span id="cb4-643"><a href="#cb4-643" aria-hidden="true" tabindex="-1"></a>\qquad</span>
+<span id="cb4-644"><a href="#cb4-644" aria-hidden="true" tabindex="-1"></a>v_\tau=e_\tau^\top Q^\top\dot x.</span>
+<span id="cb4-645"><a href="#cb4-645" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb4-646"><a href="#cb4-646" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-647"><a href="#cb4-647" aria-hidden="true" tabindex="-1"></a>报告平均径向能量 $E_r=\operatorname{mean}(v_r^2)$、切向能量 $E_\tau=\operatorname{mean}(v_\tau^2)$、其比率、状态–导数角度在预先声明 $\pi/2$ 容差内的比例，以及跨条件带符号旋转方向一致性。高比率可以在短非回归弧上出现。</span>
+<span id="cb4-648"><a href="#cb4-648" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-649"><a href="#cb4-649" aria-hidden="true" tabindex="-1"></a><span class="fu">### 平面占用与角跨度</span></span>
+<span id="cb4-650"><a href="#cb4-650" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-651"><a href="#cb4-651" aria-hidden="true" tabindex="-1"></a>平面占用是</span>
+<span id="cb4-652"><a href="#cb4-652" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-653"><a href="#cb4-653" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb4-654"><a href="#cb4-654" aria-hidden="true" tabindex="-1"></a>\operatorname{Occ}(Q)=</span>
+<span id="cb4-655"><a href="#cb4-655" aria-hidden="true" tabindex="-1"></a>\frac{\sum\lVert Q^\top x\rVert_2^2}</span>
+<span id="cb4-656"><a href="#cb4-656" aria-hidden="true" tabindex="-1"></a>{\sum\lVert x\rVert_2^2}.</span>
+<span id="cb4-657"><a href="#cb4-657" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb4-658"><a href="#cb4-658" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-659"><a href="#cb4-659" aria-hidden="true" tabindex="-1"></a>角跨度按条件分别展开 $\operatorname{atan2}(r_2,r_1)$，报告每个条件的跨度并概括中位数/范围。永不过跨条件边界展开。</span>
+<span id="cb4-660"><a href="#cb4-660" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-661"><a href="#cb4-661" aria-hidden="true" tabindex="-1"></a><span class="fu">### 条件与试次稳定性</span></span>
+<span id="cb4-662"><a href="#cb4-662" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-663"><a href="#cb4-663" aria-hidden="true" tabindex="-1"></a>报告：</span>
+<span id="cb4-664"><a href="#cb4-664" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-665"><a href="#cb4-665" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>训练对验证与训练对测试独立拟合平面角度；</span>
+<span id="cb4-666"><a href="#cb4-666" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>留一条件平面角度与速率变化；</span>
+<span id="cb4-667"><a href="#cb4-667" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>训练拟合平面下逐条件方向一致性与角速率离散；以及</span>
+<span id="cb4-668"><a href="#cb4-668" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>使用冻结条件均值拟合的单试次投影切向/径向摘要。</span>
+<span id="cb4-669"><a href="#cb4-669" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-670"><a href="#cb4-670" aria-hidden="true" tabindex="-1"></a>条件均值与单试次是不同噪声机制。稳定均值不蕴含稳定试次级旋转。</span>
+<span id="cb4-671"><a href="#cb4-671" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-672"><a href="#cb4-672" aria-hidden="true" tabindex="-1"></a><span class="fu">### 矩阵与预处理诊断</span></span>
+<span id="cb4-673"><a href="#cb4-673" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-674"><a href="#cb4-674" aria-hidden="true" tabindex="-1"></a>报告预测器秩与条件数、斜/对称约束违反、无限制对约束 SSE 差距、PCA 占用、减法敏感性、平滑敏感性、抖动偏移、洗牌协方差相似性与非正交映射条件数。</span>
+<span id="cb4-675"><a href="#cb4-675" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-676"><a href="#cb4-676" aria-hidden="true" tabindex="-1"></a><span class="fu">### 整洁度量 schema</span></span>
+<span id="cb4-677"><a href="#cb4-677" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-678"><a href="#cb4-678" aria-hidden="true" tabindex="-1"></a>每个 <span class="in">`metrics.csv`</span> 行精确包含：</span>
+<span id="cb4-679"><a href="#cb4-679" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-680"><a href="#cb4-680" aria-hidden="true" tabindex="-1"></a><span class="in">~~~text</span></span>
+<span id="cb4-681"><a href="#cb4-681" aria-hidden="true" tabindex="-1"></a><span class="in">split,condition,preprocessing,method,target,metric,value</span></span>
+<span id="cb4-682"><a href="#cb4-682" aria-hidden="true" tabindex="-1"></a><span class="in">~~~</span></span>
+<span id="cb4-683"><a href="#cb4-683" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-684"><a href="#cb4-684" aria-hidden="true" tabindex="-1"></a>值为有限。不适用行被省略并在 <span class="in">`diagnostics.json`</span> 中列出原因；时滞对照永不被赋予零值真实平面误差。</span>
+<span id="cb4-685"><a href="#cb4-685" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-686"><a href="#cb4-686" aria-hidden="true" tabindex="-1"></a><span class="fu">## 解读</span></span>
+<span id="cb4-687"><a href="#cb4-687" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-688"><a href="#cb4-688" aria-hidden="true" tabindex="-1"></a>正模拟器确立窄实现与恢复问题：在等距观测映射、已知线性状态方程、被占用初始条件、固定 PCA 秩、声明预处理与有限差分目标下，恢复斜算子是否识别映射旋转平面与速率？有利答案验证该有界管线，而非旋转投影的一般机制性解读。</span>
+<span id="cb4-689"><a href="#cb4-689" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-690"><a href="#cb4-690" aria-hidden="true" tabindex="-1"></a>对照分离替代。对称衰减检验约束模型比较是否区分收缩。时滞序列检验没有共享自治状态律的有序瞬态。输入对照检验被省略驱动。短弧、抖动、平滑与减法显示预处理与采样定义估计目标。非正交混合显示欧氏斜对称性依赖坐标/度量。</span>
+<span id="cb4-691"><a href="#cb4-691" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-692"><a href="#cb4-692" aria-hidden="true" tabindex="-1"></a>::: {.callout-tip title="LDG 综合"}</span>
+<span id="cb4-693"><a href="#cb4-693" aria-hidden="true" tabindex="-1"></a>向量场给声明状态赋予局部速度。jPCA 反而对采样、已处理轨迹拟合一个线性状态到导数关系。这些样本上的一致不确立拟合矩阵全局有效、观测坐标是完整状态，或外部输入不存在。</span>
+<span id="cb4-694"><a href="#cb4-694" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb4-695"><a href="#cb4-695" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-696"><a href="#cb4-696" aria-hidden="true" tabindex="-1"></a><span class="fu">## 这个玩具模型并不确立</span></span>
+<span id="cb4-697"><a href="#cb4-697" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-698"><a href="#cb4-698" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>它不证明旋转投影是振荡器或极限环。</span>
+<span id="cb4-699"><a href="#cb4-699" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>它不确立回归、周期性、相位重置或自持振荡。</span>
+<span id="cb4-700"><a href="#cb4-700" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>当输入、反馈、时钟时间或被省略状态可能重要时，它不确立自治动力学。</span>
+<span id="cb4-701"><a href="#cb4-701" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>它不在采样条件–时间区域之外推断全局向量场。</span>
+<span id="cb4-702"><a href="#cb4-702" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>它不识别因果、神经、物理或生物机制。</span>
+<span id="cb4-703"><a href="#cb4-703" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>它不使投影条件均值成为后验潜轨迹。</span>
+<span id="cb4-704"><a href="#cb4-704" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>它不显示一个 PCA/jPCA 平面是唯一状态空间。</span>
+<span id="cb4-705"><a href="#cb4-705" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>它不使斜对称性对任意特征缩放或非正交坐标不变。</span>
+<span id="cb4-706"><a href="#cb4-706" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>它不把平滑、对齐、平均或跨条件减法变成中性操作。</span>
+<span id="cb4-707"><a href="#cb4-707" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>它不使协方差匹配洗牌成为普遍假设检验。</span>
+<span id="cb4-708"><a href="#cb4-708" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>它不蕴含高平面占用意味着好导数预测，反之亦然。</span>
+<span id="cb4-709"><a href="#cb4-709" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>它不单独从视觉圆度推断动力学。</span>
+<span id="cb4-710"><a href="#cb4-710" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>它不确立流形结构、拓扑、本征维数或非线性几何。</span>
+<span id="cb4-711"><a href="#cb4-711" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-712"><a href="#cb4-712" aria-hidden="true" tabindex="-1"></a><span class="fu">## 向真实数据的扩展</span></span>
+<span id="cb4-713"><a href="#cb4-713" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-714"><a href="#cb4-714" aria-hidden="true" tabindex="-1"></a>真实数据分析必须定义同时记录对伪群体特征、独立试次/会话/受试者单元、条件平衡、对齐事件、时间窗口、平滑、特征归一化、跨条件减法、PCA 秩、导数估计器、条件边界、输入测量与嵌套选择。试次平均投影应由单试次稳定性与噪声感知分析补充。</span>
+<span id="cb4-715"><a href="#cb4-715" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-716"><a href="#cb4-716" aria-hidden="true" tabindex="-1"></a>竞争解释需要匹配对照：时滞模型应保留真实时间进程；输入感知模型需要测得输入与声明系统边界；洗牌应保留与所检验假设相关的干扰统计量。如果任意非正交坐标在科学上合理，旋转应相对于被论证度量评估，而非当作与坐标无关。这些添加都不把观测拟合变成因果辨识。</span>
+<span id="cb4-717"><a href="#cb4-717" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-718"><a href="#cb4-718" aria-hidden="true" tabindex="-1"></a><span class="fu">## 可复现性</span></span>
+<span id="cb4-719"><a href="#cb4-719" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-720"><a href="#cb4-720" aria-hidden="true" tabindex="-1"></a><span class="fu">### 有界产物契约</span></span>
+<span id="cb4-721"><a href="#cb4-721" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-722"><a href="#cb4-722" aria-hidden="true" tabindex="-1"></a>实现范围精确是：</span>
+<span id="cb4-723"><a href="#cb4-723" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-724"><a href="#cb4-724" aria-hidden="true" tabindex="-1"></a><span class="in">~~~text</span></span>
+<span id="cb4-725"><a href="#cb4-725" aria-hidden="true" tabindex="-1"></a><span class="in">toy-models/rotational-projection-controls.py</span></span>
+<span id="cb4-726"><a href="#cb4-726" aria-hidden="true" tabindex="-1"></a><span class="in">toy-models/artifacts/rotational-projection-controls/manifest.json</span></span>
+<span id="cb4-727"><a href="#cb4-727" aria-hidden="true" tabindex="-1"></a><span class="in">toy-models/artifacts/rotational-projection-controls/metrics.csv</span></span>
+<span id="cb4-728"><a href="#cb4-728" aria-hidden="true" tabindex="-1"></a><span class="in">toy-models/artifacts/rotational-projection-controls/diagnostics.json</span></span>
+<span id="cb4-729"><a href="#cb4-729" aria-hidden="true" tabindex="-1"></a><span class="in">toy-models/artifacts/rotational-projection-controls/summary.png</span></span>
+<span id="cb4-730"><a href="#cb4-730" aria-hidden="true" tabindex="-1"></a><span class="in">~~~</span></span>
+<span id="cb4-731"><a href="#cb4-731" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-732"><a href="#cb4-732" aria-hidden="true" tabindex="-1"></a>不授权额外产物。脚本只使用捆绑 Python、NumPy 与 Pillow 环境。JSON 顺序、CSV 顺序、浮点格式、绘图尺寸、字体与 PNG 元数据固定，以保证字节比较确定性。</span>
+<span id="cb4-733"><a href="#cb4-733" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-734"><a href="#cb4-734" aria-hidden="true" tabindex="-1"></a>清单记录：</span>
+<span id="cb4-735"><a href="#cb4-735" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-736"><a href="#cb4-736" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>精确正、对称、输入、时滞与非正交生成器定义；</span>
+<span id="cb4-737"><a href="#cb4-737" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>正确 $J(\omega)$ 符号约定；</span>
+<span id="cb4-738"><a href="#cb4-738" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>已实现初始状态、等距/非正交映射、划分大小、时间网格与所有种子；</span>
+<span id="cb4-739"><a href="#cb4-739" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>预处理、窗口、平滑、减法、导数构造、PCA 秩、平面朝向与随机平面；</span>
+<span id="cb4-740"><a href="#cb4-740" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>无限制、斜、对称与输入感知求解约定；</span>
+<span id="cb4-741"><a href="#cb4-741" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>洗牌提案数、协方差准则、阈值、所选提案与实现相似性；</span>
+<span id="cb4-742"><a href="#cb4-742" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>适用性规则、容差、运行时版本、命令与 SHA-256 哈希；以及</span>
+<span id="cb4-743"><a href="#cb4-743" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>精确产物清单。</span>
+<span id="cb4-744"><a href="#cb4-744" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-745"><a href="#cb4-745" aria-hidden="true" tabindex="-1"></a><span class="in">`diagnostics.json`</span> 包含生成器、等距、导数、边界、泄漏、PCA、约束求解、平面不变性、真值适用性、输入、抖动、平滑、减法、洗牌、度量依赖、试次稳定性与确定性再生记录。</span>
+<span id="cb4-746"><a href="#cb4-746" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-747"><a href="#cb4-747" aria-hidden="true" tabindex="-1"></a>预期命令是：</span>
+<span id="cb4-748"><a href="#cb4-748" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-749"><a href="#cb4-749" aria-hidden="true" tabindex="-1"></a><span class="in">~~~bash</span></span>
+<span id="cb4-750"><a href="#cb4-750" aria-hidden="true" tabindex="-1"></a><span class="ex">/Users/bytedance/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3</span> toy-models/rotational-projection-controls.py</span>
+<span id="cb4-751"><a href="#cb4-751" aria-hidden="true" tabindex="-1"></a><span class="in">~~~</span></span>
+<span id="cb4-752"><a href="#cb4-752" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-753"><a href="#cb4-753" aria-hidden="true" tabindex="-1"></a>默认命令应生成并验证产物，若遵循 Phase 3 约定则有显式 <span class="in">`--generate`</span> 与 <span class="in">`--verify`</span> 模式。验证包括干净临时再生与字节比较。</span>
+<span id="cb4-754"><a href="#cb4-754" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-755"><a href="#cb4-755" aria-hidden="true" tabindex="-1"></a><span class="fu">### 经核查证据</span></span>
+<span id="cb4-756"><a href="#cb4-756" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-757"><a href="#cb4-757" aria-hidden="true" tabindex="-1"></a>以下来源实际检索并核查。现有 LDG 方法与概念是术语锚点，不是来源核查的替代。</span>
+<span id="cb4-758"><a href="#cb4-758" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-759"><a href="#cb4-759" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Churchland 等人（2012）：** 完整公开可访问主文章全文经核查摘要、核心伸手结果、对照、状态–导数角度分析、无限制对斜比较、投影解读与 Methods 预处理/对齐描述。15 页补充 PDF 经核查洗牌描述、平滑与跨条件均值图、PCA 秩/平面对照，以及第 12–14 页补充 jPCA 推导，包括显式斜基约束最小二乘构造与复特征向量平面形成。补充影片、电子表格与源代码未逐帧或逐行核查。补充中 OCR 丢失一些负号；本对象使用上述数学正确的 $M_{\mathrm{skew}}=(M-M^\top)/2$、$M_{\mathrm{skew}}^\top=-M_{\mathrm{skew}}$ 与 $J(\omega)$ 约定 <span class="co">[</span><span class="ot">@ChurchlandEtAl2012</span><span class="co">]</span>。</span>
+<span id="cb4-760"><a href="#cb4-760" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Michaels、Dann 与 Scherberger（2016）：** 22 页 PLOS Computational Biology PDF 经核查摘要与引言；时滞增强表示模拟；jPCA 结果；协方差匹配置换检验理由与结果；条件/神经元数敏感性；讨论；以及定义 jPCA 预处理、旋转度量、时滞模拟与迭代逐条件协方差匹配的 Methods 部分。RNN 训练细节与每个补充图未逐方程检查。该来源支持时滞对照与保协方差条件结构零模型，而非普遍显著性检验 <span class="co">[</span><span class="ot">@MichaelsEtAl2016</span><span class="co">]</span>。</span>
+<span id="cb4-761"><a href="#cb4-761" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Lebedev 等人（2019）：** 完整开放全文文章经核查摘要；响应峰的时间排序；模拟时滞序列；PCA/jPCA 再分析；条件洗牌；跨条件减法批判；Methods 描述；讨论；以及解读界限。作者代码未被独立重跑，其更强机制结论不被采纳为已定事实。该来源支持把时序响应顺序与减法当作显式替代/敏感性 <span class="co">[</span><span class="ot">@LebedevEtAl2019</span><span class="co">]</span>。</span>
+<span id="cb4-762"><a href="#cb4-762" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Cunningham 与 Yu（2014）：** 完整 10 页作者 PDF 经核查协方差与时间序列降维概览、动力学模型假设讨论，以及区分直接正交投影与通过概率动力学/噪声权衡推断的轨迹的部分。综述模态示例与参考文献列表未详尽阅读。该来源支持把 jPCA 轨迹称为已处理数据的投影，而非后验潜状态轨迹 <span class="co">[</span><span class="ot">@CunninghamYu2014</span><span class="co">]</span>。</span>
+<span id="cb4-763"><a href="#cb4-763" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-764"><a href="#cb4-764" aria-hidden="true" tabindex="-1"></a>这些来源不提供本玩具模型的维数、矩阵值、嵌入、初始状态、时间网格、试次数、噪声水平、窗口、抖动、随机平面、输入函数、洗牌提案预算或容差。那些是冻结 LDG 设计选择。</span>
+<span id="cb4-765"><a href="#cb4-765" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-766"><a href="#cb4-766" aria-hidden="true" tabindex="-1"></a><span class="fu">### 集成状态</span></span>
+<span id="cb4-767"><a href="#cb4-767" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-768"><a href="#cb4-768" aria-hidden="true" tabindex="-1"></a>有界实现与确定性产物在独立科学与实现聚焦 PASS、仓库验证、目标/索引/全站渲染与记录的审查决定下机械晋升后，于 L1/stable 与本记录调和。</span>
+<span id="cb4-769"><a href="#cb4-769" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-770"><a href="#cb4-770" aria-hidden="true" tabindex="-1"></a><span class="fu">### 历史目标检查职责</span></span>
+<span id="cb4-771"><a href="#cb4-771" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-772"><a href="#cb4-772" aria-hidden="true" tabindex="-1"></a>执行者运行结构、目标渲染与差异检查；实现所有者运行生成与产物验证；父编排器完成仓库级测试、索引/对照调和、审查集成与稳定晋升。这记录已完成角色分离，而非待办工作。</span>
+<span id="cb4-773"><a href="#cb4-773" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-774"><a href="#cb4-774" aria-hidden="true" tabindex="-1"></a><span class="fu">## 成熟度检查表</span></span>
+<span id="cb4-775"><a href="#cb4-775" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-776"><a href="#cb4-776" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> 完整 L1/stable 玩具模型 schema 与精确五文件实现契约。</span>
+<span id="cb4-777"><a href="#cb4-777" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> 正六维生成器、正确斜块、等距观测嵌入与独立划分被冻结。</span>
+<span id="cb4-778"><a href="#cb4-778" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> 观测与 PCA 表示的真实旋转平面目标显式。</span>
+<span id="cb4-779"><a href="#cb4-779" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> 对称、时滞、输入驱动与非正交对照被分离。</span>
+<span id="cb4-780"><a href="#cb4-780" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> 定义秩六 PCA、无限制、真实斜约束、对称、固定/随机平面与输入感知方法。</span>
+<span id="cb4-781"><a href="#cb4-781" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> 全/短窗口、抖动、平滑、减法、匹配洗牌与输入感知压力有界。</span>
+<span id="cb4-782"><a href="#cb4-782" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> 定义导数、角度、速率、切向/径向、占用与稳定性度量。</span>
+<span id="cb4-783"><a href="#cb4-783" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> 条件边界、划分泄漏、适用性与确定性神谕显式。</span>
+<span id="cb4-784"><a href="#cb4-784" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> 投影、振荡器、自治、向量场、因果、度量与机制界限显式。</span>
+<span id="cb4-785"><a href="#cb4-785" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> 记录外部证据深度与限制。</span>
+<span id="cb4-786"><a href="#cb4-786" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> 集成确定性经验产物。</span>
+<span id="cb4-787"><a href="#cb4-787" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> 在聚焦复审输入一致性、度量适用性、洗牌选择与稳定性后，独立科学审查 PASS。</span>
+<span id="cb4-788"><a href="#cb4-788" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> 在聚焦复审全部八项数值、泄漏、清单与图形发现后，独立实现审查 PASS。</span></code></pre></div><button title="复制到剪贴板" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></div>
+</div></div></div></div></div>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

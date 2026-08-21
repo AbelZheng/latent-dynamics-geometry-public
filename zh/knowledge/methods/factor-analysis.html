@@ -1,0 +1,1442 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="zh-CN" xml:lang="zh-CN"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.10.18">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>因子分析 – Latent Dynamics &amp; Geometry</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="../../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../../">
+<script src="../../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../../site_libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../../site_libs/bootstrap/bootstrap-e3adbaa939bcd423dddc8c8a834270b4.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "没有结果",
+    "search-matching-documents-text": "匹配的文档",
+    "search-copy-link-title": "复制搜索链接",
+    "search-hide-matches-text": "隐藏其它匹配结果",
+    "search-more-match-text": "更多匹配结果",
+    "search-more-matches-text": "更多匹配结果",
+    "search-clear-button-title": "清除",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "取消",
+    "search-submit-button-title": "提交",
+    "search-label": "搜索"
+  }
+}</script>
+<style>
+.ldg-lang{position:fixed;top:72px;right:16px;z-index:2000;display:flex;gap:4px;font-family:system-ui,-apple-system,"Segoe UI",sans-serif;}
+.ldg-lang a{display:inline-block;padding:4px 10px;border:1px solid #c8c8c8;border-radius:999px;background:#fff;color:#333;text-decoration:none;font-size:13px;box-shadow:0 1px 3px rgba(0,0,0,.15);}
+.ldg-lang a.active{background:#2c3e50;color:#fff;border-color:#2c3e50;}
+</style>
+</head><body class="nav-fixed quarto-light"><div class="ldg-lang" id="ldg-lang">
+  <a href="#" id="ldg-lang-en">EN</a>
+  <a href="#" id="ldg-lang-zh">中文</a>
+</div>
+<script>
+(function () {
+  var BASE = '';
+  if (window.location.pathname.indexOf('/latent-dynamics-geometry-public/') === 0) {
+    BASE = 'latent-dynamics-geometry-public';
+  }
+  var IS_FILE = window.location.protocol === 'file:';
+  function pathSegs() {
+    return window.location.pathname.split('/').filter(Boolean);
+  }
+  function zhIdx() {
+    return pathSegs().indexOf('zh');
+  }
+  function segs() {
+    var s = window.location.pathname.split('/').filter(Boolean);
+    if (BASE && s[0] === BASE) s = s.slice(1);
+    return s;
+  }
+  function isZh() { return zhIdx() !== -1; }
+  function fileTarget(lang) {
+    var s = pathSegs();
+    var siteIdx = s.lastIndexOf('_site');
+    var root = siteIdx === -1 ? s.slice(0, -1) : s.slice(0, siteIdx + 1);
+    var page = siteIdx === -1 ? [s[s.length - 1]] : s.slice(siteIdx + 1);
+    if (page[0] === 'zh') page = page.slice(1);
+    if (lang === 'zh') page = ['zh'].concat(page);
+    var rel = page.join('/');
+    if (rel === '' || rel === 'zh') rel = 'index.html';
+    return '/' + root.join('/') + '/' + rel;
+  }
+  function target(lang) {
+    if (IS_FILE) return fileTarget(lang);
+    var s = segs();
+    if (s[0] === 'zh') s = s.slice(1);
+    if (lang === 'zh') s = ['zh'].concat(s);
+    var rel = s.join('/');
+    if (rel === '' || rel === 'zh') rel = (lang === 'zh' ? 'zh/index.html' : 'index.html');
+    return '/' + (BASE ? BASE + '/' : '') + rel;
+  }
+  function go(lang) {
+    try { localStorage.setItem('ldg-lang', lang); } catch (e) {}
+    window.location.href = target(lang);
+  }
+  function mark() {
+    var zh = isZh();
+    var a = document.getElementById('ldg-lang-en');
+    var b = document.getElementById('ldg-lang-zh');
+    if (a) a.className = zh ? '' : 'active';
+    if (b) b.className = zh ? 'active' : '';
+  }
+  function localizeNav() {
+    if (!isZh()) return;
+    var cur = pathSegs();
+    var czi = zhIdx();
+    var dir = (czi === -1 ? cur.slice(0, -1) : cur.slice(czi, -1)).join('/');
+    document.querySelectorAll('nav a').forEach(function (a) {
+      var h = a.getAttribute('href') || '';
+      if (/^(https?:|#|mailto:)/.test(h)) return;
+      if (/\.html?$/.test(h) || /\/$/.test(h) || h === '') {
+        var abs = new URL(h, window.location.href).pathname;
+        var s = abs.split('/').filter(Boolean);
+        if (BASE && s[0] === BASE) s = s.slice(1);
+        var zi = s.indexOf('zh');
+        var rel = zi !== -1 ? s.slice(zi + 1).join('/') : s.slice(czi).join('/');
+        var tgt = 'zh/' + rel;
+        var f = dir.split('/').filter(Boolean);
+        var t = tgt.split('/').filter(Boolean);
+        var i = 0;
+        while (i < f.length && i < t.length && f[i] === t[i]) i++;
+        var rel = '';
+        for (var j = i; j < f.length; j++) rel += '../';
+        rel += t.slice(i).join('/');
+        a.setAttribute('href', rel);
+      }
+    });
+  }
+  document.getElementById('ldg-lang-en').addEventListener('click', function (e) { e.preventDefault(); go('en'); });
+  document.getElementById('ldg-lang-zh').addEventListener('click', function (e) { e.preventDefault(); go('zh'); });
+  mark();
+  localizeNav();
+})();
+</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-chtml.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+
+
+
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../../../index.html">
+    <span class="navbar-title">Latent Dynamics &amp; Geometry</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="搜索"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="展开或折叠导航栏" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../../index.html"> 
+<span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../../knowledge/concepts/index.html"> 
+<span class="menu-text">Concepts</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../../knowledge/methods/index.html"> 
+<span class="menu-text">Methods</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../../knowledge/math/index.html"> 
+<span class="menu-text">Math</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../../knowledge/papers/index.html"> 
+<span class="menu-text">Papers</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../../toy-models/index.html"> 
+<span class="menu-text">Toy Models</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../../research-questions/index.html"> 
+<span class="menu-text">Research Questions</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../../benchmarks/index.html"> 
+<span class="menu-text">Benchmarks</span></a>
+  </li>  
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/AbelZheng/latent-dynamics-geometry-public"> <i class="bi bi-github" role="img" aria-label="GitHub repository">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="https://github.com/AbelZheng/latent-dynamics-geometry-public/discussions"> 
+<span class="menu-text">Discussions</span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">该页面内容</h2>
+   
+  <ul>
+  <li><a href="#因子分析" id="toc-因子分析" class="nav-link active" data-scroll-target="#因子分析">因子分析</a>
+  <ul class="collapse">
+  <li><a href="#问题" id="toc-问题" class="nav-link" data-scroll-target="#问题">问题</a></li>
+  <li><a href="#输入" id="toc-输入" class="nav-link" data-scroll-target="#输入">输入</a></li>
+  <li><a href="#输出" id="toc-输出" class="nav-link" data-scroll-target="#输出">输出</a></li>
+  <li><a href="#核心思想" id="toc-核心思想" class="nav-link" data-scroll-target="#核心思想">核心思想</a></li>
+  <li><a href="#生成-建模假设" id="toc-生成-建模假设" class="nav-link" data-scroll-target="#生成-建模假设">生成 / 建模假设</a></li>
+  <li><a href="#数学表述" id="toc-数学表述" class="nav-link" data-scroll-target="#数学表述">数学表述</a></li>
+  <li><a href="#学习得到了什么" id="toc-学习得到了什么" class="nav-link" data-scroll-target="#学习得到了什么">学习得到了什么？</a></li>
+  <li><a href="#什么是固定的" id="toc-什么是固定的" class="nav-link" data-scroll-target="#什么是固定的">什么是固定的？</a></li>
+  <li><a href="#时序假设" id="toc-时序假设" class="nav-link" data-scroll-target="#时序假设">时序假设</a></li>
+  <li><a href="#几何假设" id="toc-几何假设" class="nav-link" data-scroll-target="#几何假设">几何假设</a></li>
+  <li><a href="#监督" id="toc-监督" class="nav-link" data-scroll-target="#监督">监督</a></li>
+  <li><a href="#优化-推断" id="toc-优化-推断" class="nav-link" data-scroll-target="#优化-推断">优化 / 推断</a></li>
+  <li><a href="#优点" id="toc-优点" class="nav-link" data-scroll-target="#优点">优点</a></li>
+  <li><a href="#失效模式" id="toc-失效模式" class="nav-link" data-scroll-target="#失效模式">失效模式</a></li>
+  <li><a href="#可辨识性问题" id="toc-可辨识性问题" class="nav-link" data-scroll-target="#可辨识性问题">可辨识性问题</a></li>
+  <li><a href="#与更简单方法的比较" id="toc-与更简单方法的比较" class="nav-link" data-scroll-target="#与更简单方法的比较">与更简单方法的比较</a></li>
+  <li><a href="#评估准则" id="toc-评估准则" class="nav-link" data-scroll-target="#评估准则">评估准则</a></li>
+  <li><a href="#最小玩具模型" id="toc-最小玩具模型" class="nav-link" data-scroll-target="#最小玩具模型">最小玩具模型</a></li>
+  <li><a href="#对-ldg-的意义" id="toc-对-ldg-的意义" class="nav-link" data-scroll-target="#对-ldg-的意义">对 LDG 的意义</a>
+  <ul class="collapse">
+  <li><a href="#小鼠轨迹" id="toc-小鼠轨迹" class="nav-link" data-scroll-target="#小鼠轨迹">小鼠轨迹</a></li>
+  <li><a href="#眼动" id="toc-眼动" class="nav-link" data-scroll-target="#眼动">眼动</a></li>
+  <li><a href="#eeg" id="toc-eeg" class="nav-link" data-scroll-target="#eeg">EEG</a></li>
+  <li><a href="#meg-神经群体数据" id="toc-meg-神经群体数据" class="nav-link" data-scroll-target="#meg-神经群体数据">MEG / 神经群体数据</a></li>
+  </ul></li>
+  <li><a href="#主要来源" id="toc-主要来源" class="nav-link" data-scroll-target="#主要来源">主要来源</a></li>
+  <li><a href="#综述-次级来源" id="toc-综述-次级来源" class="nav-link" data-scroll-target="#综述-次级来源">综述 / 次级来源</a></li>
+  <li><a href="#开放方法学问题" id="toc-开放方法学问题" class="nav-link" data-scroll-target="#开放方法学问题">开放方法学问题</a></li>
+  <li><a href="#成熟度检查表" id="toc-成熟度检查表" class="nav-link" data-scroll-target="#成熟度检查表">成熟度检查表</a></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<div class="quarto-title-block"><div><h1 class="title">因子分析</h1><button type="button" class="btn code-tools-button" id="quarto-code-tools-source"><i class="bi"></i> 代码</button></div></div>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="因子分析" class="level1">
+<h1>因子分析</h1>
+<section id="问题" class="level2">
+<h2 class="anchored" data-anchor-id="问题">问题</h2>
+<p>因子分析（FA）用 <span class="math inline">\(q&lt;p\)</span> 个高斯潜因子加上变量特定残差变异解释 <span class="math inline">\(p\)</span> 个观测变量之间的协方差。本对象的分析单元是单个实值观测向量。FA 是概率协方差模型，而不仅仅是投影规则：它在显式分布假设下给观测赋予似然、给因子赋予后验分布 <span class="citation" data-cites="GhahramaniHinton1997 RoweisGhahramani1999">(<a href="#ref-GhahramaniHinton1997" role="doc-biblioref">Ghahramani 和 Hinton 1997年</a>; <a href="#ref-RoweisGhahramani1999" role="doc-biblioref">Roweis 和 Ghahramani 1999年</a>)</span>。</p>
+<p>这里的有界范围是<strong>探索性最大似然高斯因子分析</strong>，残差协方差对角且内部参数空间 <span class="math inline">\(\psi_j&gt;0\)</span>。零唯一性边界被排除在本模型之外，但仍相关，因为似然上确界可以接近它。验证性载荷约束、序数或非高斯因子模型、混合、稳健变体、贝叶斯先验与时序扩展需要单独对象。</p>
+</section>
+<section id="输入" class="level2">
+<h2 class="anchored" data-anchor-id="输入">输入</h2>
+<p>设 <span class="math inline">\(x_i\in\mathbb R^p\)</span>，<span class="math inline">\(i=1,\ldots,n\)</span>，表示所选完整观测向量。可复现分析必须声明：</p>
+<ul>
+<li>观测单元以及行是独立单元、重复测量、时间样本、试次、受试者还是条件摘要；</li>
+<li>变量、单位、变换、排除规则与缺失数据策略；</li>
+<li>模型是拟合到协方差矩阵、训练拟合标准化后的相关矩阵，还是通过等价高斯似然拟合到原始观测；</li>
+<li>候选因子数 <span class="math inline">\(q\)</span> 及其选择规程；以及</li>
+<li>拟合后引入的任何载荷零、等式约束、旋转或得分约定。</li>
+</ul>
+<p>规范表述假设观测向量在共同参数条件下独立同分布。把相关重复或时序样本当作独立会改变似然及其不确定性解读。</p>
+</section>
+<section id="输出" class="level2">
+<h2 class="anchored" data-anchor-id="输出">输出</h2>
+<p>对所选 <span class="math inline">\(q\)</span>，最大似然 FA 估计：</p>
+<ul>
+<li>均值 <span class="math inline">\(\mu\in\mathbb R^p\)</span>；</li>
+<li>载荷矩阵 <span class="math inline">\(\Lambda\in\mathbb R^{p\times q}\)</span>；</li>
+<li>对角唯一性协方差 <span class="math inline">\(\Psi=\operatorname{diag}(\psi_1,\ldots,\psi_p)\)</span>，其中 <span class="math inline">\(\psi_j&gt;0\)</span>；以及</li>
+<li>模型协方差 <span class="math inline">\(C=\Lambda\Lambda^\top+\Psi\)</span>。</li>
+</ul>
+<p>对每个观测它还定义其潜因子向量上的高斯后验分布。因此报告的「因子得分」是所选后验摘要或评分规则，不是观测量，也不是与 PCA 投影得分相同的对象。</p>
+</section>
+<section id="核心思想" class="level2">
+<h2 class="anchored" data-anchor-id="核心思想">核心思想</h2>
+<p>FA 把跨变量协方差归因于共享潜因子，同时为每个观测坐标保留单独残差方差。在因子条件下，观测坐标只因 <span class="math inline">\(\Psi\)</span> 被假设对角而独立。边际上，它们可以通过 <span class="math inline">\(\Lambda\Lambda^\top\)</span> 相关 <span class="citation" data-cites="TippingBishop1999 RoweisGhahramani1999">(<a href="#ref-TippingBishop1999" role="doc-biblioref">Tipping 和 Bishop 1999年</a>, sec.&nbsp;2.1; <a href="#ref-RoweisGhahramani1999" role="doc-biblioref">Roweis 和 Ghahramani 1999年</a>, sec.&nbsp;5.2)</span>。</p>
+<p>当异质逐坐标噪声或唯一变异在科学上站得住脚时，这种分离有用。它也有局限：相关残差、未建模组、时间滤波与共享伪迹违反对角唯一性假设，并可能被强迫进入因子。</p>
+</section>
+<section id="生成-建模假设" class="level2">
+<h2 class="anchored" data-anchor-id="生成-建模假设">生成 / 建模假设</h2>
+<p>规范模型是</p>
+<p><span class="math display">\[
+z_i\sim\mathcal N(0,I_q),\qquad
+\epsilon_i\sim\mathcal N(0,\Psi),\qquad
+x_i=\mu+\Lambda z_i+\epsilon_i,
+\]</span></p>
+<p>其中 <span class="math inline">\(z_i\perp\!\!\!\perp\epsilon_i\)</span> 且跨 <span class="math inline">\(i\)</span> 独立。因此</p>
+<p><span class="math display">\[
+x_i\sim\mathcal N(\mu,C),\qquad C=\Lambda\Lambda^\top+\Psi.
+\]</span></p>
+<p>这种低秩加对角协方差表述，连同除选择因子数之外还需要额外辨识条件，是经典统计因子分析问题的一部分 <span class="citation" data-cites="AndersonRubin1956">(<a href="#ref-AndersonRubin1956" role="doc-biblioref">Anderson 和 Rubin 1956年</a>)</span>。</p>
+<p>这些假设是实质性的：</p>
+<ul>
+<li>共享结构在所选观测坐标中是线性的；</li>
+<li>因子与残差是高斯的；</li>
+<li>潜协方差被固定为 <span class="math inline">\(I_q\)</span> 作为尺度约定；</li>
+<li>残差协方差是对角且严格正的；</li>
+<li>一个全局载荷矩阵与一个全局唯一性矩阵适用于所有观测；以及</li>
+<li>声明样本由来自一个平稳边际分布的独立抽样表示。</li>
+</ul>
+<p>对角 <span class="math inline">\(\Psi\)</span> 使条件独立依赖坐标系。旋转观测轴通常会破坏对角性，而逐分量单位变化可以被相应行与唯一性重标吸收 <span class="citation" data-cites="RoweisGhahramani1999">(<a href="#ref-RoweisGhahramani1999" role="doc-biblioref">Roweis 和 Ghahramani 1999年</a>, sec.&nbsp;5.2)</span>。因此标准化变量是建模选择，不是到达相同答案的中性路径。</p>
+</section>
+<section id="数学表述" class="level2">
+<h2 class="anchored" data-anchor-id="数学表述">数学表述</h2>
+<p>用样本均值 <span class="math inline">\(\bar x\)</span> 与除数 <span class="math inline">\(n\)</span> 样本协方差</p>
+<p><span class="math display">\[
+S=\frac1n\sum_{i=1}^n(x_i-\bar x)(x_i-\bar x)^\top,
+\]</span></p>
+<p>在 <span class="math inline">\(\widehat\mu=\bar x\)</span> 处的高斯对数似然，忽略加性常数，是</p>
+<p><span class="math display">\[
+\ell(\Lambda,\Psi)
+=-\frac n2\left\{\log|C|+\operatorname{tr}(C^{-1}S)\right\},
+\qquad C=\Lambda\Lambda^\top+\Psi.
+\]</span></p>
+<p>与普通 PCA 不同，一般 FA 没有给出其最大似然载荷与唯一性估计的单一特征分解。需要数值优化或潜变量算法 <span class="citation" data-cites="TippingBishop1999">(<a href="#ref-TippingBishop1999" role="doc-biblioref">Tipping 和 Bishop 1999年</a>, sec.&nbsp;2.1)</span>。</p>
+<p>对固定参数，设</p>
+<p><span class="math display">\[
+M=I_q+\Lambda^\top\Psi^{-1}\Lambda.
+\]</span></p>
+<p>高斯条件化给出</p>
+<p><span class="math display">\[
+z_i\mid x_i\sim\mathcal N\!\left(
+M^{-1}\Lambda^\top\Psi^{-1}(x_i-\mu),\ M^{-1}
+\right).
+\]</span></p>
+<p>后验协方差显式记录观测 <span class="math inline">\(x_i\)</span> 后剩余的不确定性；点得分丢弃这部分信息 <span class="citation" data-cites="GhahramaniHinton1997">(<a href="#ref-GhahramaniHinton1997" role="doc-biblioref">Ghahramani 和 Hinton 1997年</a>)</span>。</p>
+</section>
+<section id="学习得到了什么" class="level2">
+<h2 class="anchored" data-anchor-id="学习得到了什么">学习得到了什么？</h2>
+<p>给定 <span class="math inline">\(q\)</span>、模型类与预处理，拟合返回 <span class="math inline">\(\mu\)</span> 的估计与候选分解 <span class="math inline">\(\widehat C=\widehat\Lambda
+\widehat\Lambda^\top+\widehat\Psi\)</span>。可观测协方差分布是主要似然目标；特定载荷–唯一性分解受采样误差、误设、边界行为、正交等价与任何额外辨识失败的影响。拟合参数还确定观测或新案例因子的模型条件后验分布。</p>
+<p>似然最直接辨识的是可观测分布，尤其 <span class="math inline">\(C\)</span>，而非唯一朝向的一组潜轴。即使恢复 <span class="math inline">\(C\)</span> 也不表明拟合因子对应物理、心理或神经原因。</p>
+</section>
+<section id="什么是固定的" class="level2">
+<h2 class="anchored" data-anchor-id="什么是固定的">什么是固定的？</h2>
+<p>分析者固定观测表示、样本包含与依赖处理、高斯线性模型类、对角残差结构、潜均值零与协方差 <span class="math inline">\(I_q\)</span>、因子数或选择规则，以及任何结构载荷约束。在评估留出数据之前必须固定仅训练的中心化与缩放。</p>
+<p>选择 <span class="math inline">\(\operatorname{Cov}(z)=I_q\)</span> 固定潜尺度但不固定潜朝向。如果潜协方差改为自由对角矩阵，除了符号与置换约定外，尺度可以在每个因子方差与其载荷列之间转移。如果估计完全无约束潜协方差 <span class="math inline">\(\Phi\)</span>，任何可逆坐标变换 <span class="math inline">\(z'=Az\)</span>、<span class="math inline">\(\Lambda'=\Lambda A^{-1}\)</span> 与 <span class="math inline">\(\Phi'=A\Phi A^\top\)</span> 都保留可观测协方差。这些更宽歧义需要相应更宽参数化；它们不是规范 <span class="math inline">\(\operatorname{Cov}(z)=I_q\)</span> 模型的不变性。</p>
+</section>
+<section id="时序假设" class="level2">
+<h2 class="anchored" data-anchor-id="时序假设">时序假设</h2>
+<p>规范 FA 是静态且对顺序无感的。置换观测使 <span class="math inline">\(S\)</span> 与似然不变。如果行是时间点，模型不表示转移、自相关、过程噪声、时滞或轨迹；它只拟合它们的边际分布，而在忽略依赖时常常高估有效样本量 <span class="citation" data-cites="RoweisGhahramani1999">(<a href="#ref-RoweisGhahramani1999" role="doc-biblioref">Roweis 和 Ghahramani 1999年</a>, sec.&nbsp;5.1)</span>。</p>
+<p>离散时间线性高斯状态空间模型在相关线性高斯观测层上增加转移分布与过程噪声。该时序扩展在 FA 中并不隐含。</p>
+</section>
+<section id="几何假设" class="level2">
+<h2 class="anchored" data-anchor-id="几何假设">几何假设</h2>
+<p>FA 设定嵌入 <span class="math inline">\(\mathbb R^p\)</span> 的线性潜到观测映射与高斯协方差椭球 <span class="math inline">\(C\)</span>。<span class="math inline">\(\Psi\)</span> 的对角条目定义逐坐标残差尺度，因此被特权的观测坐标系是模型的一部分。后验均值根据载荷与唯一性两者收缩观测；它们一般不是正交欧氏投影。</p>
+<p>这是所选表示下的协方差几何。它不确立非线性流形、不恢复黎曼度量、不保留拓扑，也不确定与模型无关的本征维数。</p>
+</section>
+<section id="监督" class="level2">
+<h2 class="anchored" data-anchor-id="监督">监督</h2>
+<p>探索性 FA 对结果与标签无监督：其似然只使用所选观测向量。依赖标签的变量选择、预处理、秩选择或子群构造仍可以在设计层面引入监督与泄漏。</p>
+</section>
+<section id="优化-推断" class="level2">
+<h2 class="anchored" data-anchor-id="优化-推断">优化 / 推断</h2>
+<p>参数学习在积分掉潜因子后最大化边际似然。EM 在 <span class="math inline">\(z_i\)</span> 的后验矩与 <span class="math inline">\(\Lambda\)</span> 和对角 <span class="math inline">\(\Psi\)</span> 的更新之间交替；对角约束在唯一性更新中执行 <span class="citation" data-cites="GhahramaniHinton1997">(<a href="#ref-GhahramaniHinton1997" role="doc-biblioref">Ghahramani 和 Hinton 1997年</a>)</span>。EM 在精确步骤下单调改善似然，但可能收敛缓慢，且单调性不蕴含到达唯一全局最优。ECME 与直接/拟牛顿方法是替代数值策略；Liu 与 Rubin 记录完整与不完整高斯 FA 的 ECME 构造，并强调收敛评估 <span class="citation" data-cites="LiuRubin1998">(<a href="#ref-LiuRubin1998" role="doc-biblioref">Liu 和 Rubin 1998年</a>)</span>。</p>
+<p>用拟合参数推断计算条件高斯分布 <span class="math inline">\(p(z_i\mid x_i)\)</span>。参数学习与因子推断是不同任务。必须报告初始化、收敛容差、正性约束与多次启动，因为似然在因子化参数中非凸。在严格内点约定 <span class="math inline">\(\psi_j&gt;0\)</span> 下，优化器可以接近 <span class="math inline">\(\psi_j=0\)</span>，使似然上确界不被内点 MLE 达到；允许 <span class="math inline">\(\psi_j\geq 0\)</span> 的实现可以把零报告为达到的边界解。</p>
+</section>
+<section id="优点" class="level2">
+<h2 class="anchored" data-anchor-id="优点">优点</h2>
+<ul>
+<li>FA 为潜因子提供显式概率模型、似然与后验不确定性。</li>
+<li>对角唯一性允许异质残差方差，而非强制单一各向同性噪声水平。</li>
+<li>模型在清晰假设下把共享协方差与逐坐标残差方差分开。</li>
+<li>它是后续时序潜模型的紧凑静态基线。</li>
+<li>因为模型定义归一化密度，留出对数似然与后验预测检查可用。</li>
+</ul>
+</section>
+<section id="失效模式" class="level2">
+<h2 class="anchored" data-anchor-id="失效模式">失效模式</h2>
+<ul>
+<li><strong>相关残差：</strong> 共享伪迹、耦合、空间泄漏或被省略组违反对角 <span class="math inline">\(\Psi\)</span>，并可能表现为虚假因子。</li>
+<li><strong>非线性或非高斯性：</strong> 弯曲结构、重尾、偏斜、多模态与离群值可以扭曲载荷与唯一性。</li>
+<li><strong>错误因子数：</strong> 因子太少留下结构化残差协方差；太多可以过拟合、变得不稳定或接近边界唯一性。</li>
+<li><strong>Heywood 或边界行为：</strong> 一个或多个唯一性估计可以接近零。在严格 <span class="math inline">\(\psi_j&gt;0\)</span> 参数空间下这可能意味着未达到的边界上确界；在非负实现下可以是达到的边界解。任一情形都提示误设、弱辨识或数值困难，而非科学上无噪声的变量。</li>
+<li><strong>把依赖当作重复：</strong> 把时间点、重复测量或试次当作独立拟合会使似然比较与不确定性主张乐观。</li>
+<li><strong>预处理敏感性：</strong> 基于协方差与基于相关的 FA 回答不同问题；单位变化与标准化改变分解。</li>
+<li><strong>局部优化与慢收敛：</strong> 不同启动可以产生不同代表或局部解，小似然变化可以隐藏不完整收敛 <span class="citation" data-cites="LiuRubin1998">(<a href="#ref-LiuRubin1998" role="doc-biblioref">Liu 和 Rubin 1998年</a>)</span>。</li>
+<li><strong>因子得分过度解读：</strong> 后验均值是依赖模型的不确定估计，不是测量状态。</li>
+<li><strong>因果命名：</strong> 诸如「记忆」「唤醒」或「运动驱动」的标签不把协方差因子变成原因。</li>
+</ul>
+</section>
+<section id="可辨识性问题" class="level2">
+<h2 class="anchored" data-anchor-id="可辨识性问题">可辨识性问题</h2>
+<p>对每个正交 <span class="math inline">\(Q\in\mathbb R^{q\times q}\)</span>，</p>
+<p><span class="math display">\[
+\Lambda z=(\Lambda Q)(Q^\top z),
+\qquad
+(\Lambda Q)(\Lambda Q)^\top=\Lambda\Lambda^\top.
+\]</span></p>
+<p>因此似然无法区分载荷矩阵的正交旋转。符号翻转与因子置换是特殊情形。事后旋转可以选择更可解读的代表，但它不创造所选轴在数据中被唯一呈现的证据。</p>
+<p>在 <span class="math inline">\(\operatorname{Cov}(z)=I_q\)</span> 下，任意因子重标不是不变性：在固定潜协方差中不作补偿地重标一个载荷列会改变 <span class="math inline">\(C\)</span>。自由对角潜方差增加单独因子尺度歧义，而一般可逆坐标歧义需要上述完全无约束潜协方差。这一区分防止在规范归一化已固定尺度处断言「尺度歧义」。</p>
+<p>除旋转等价外，某些维数、因子数、协方差模式与边界情形下唯一性和载荷恢复可能弱或非唯一；因此经典辨识结果施加额外秩或载荷模式条件，而不是把旋转当作唯一可能歧义 <span class="citation" data-cites="AndersonRubin1956">(<a href="#ref-AndersonRubin1956" role="doc-biblioref">Anderson 和 Rubin 1956年</a>)</span>。即使在协方差参数被良好估计时，后验因子得分仍不确定。这些是统计可辨识性界限，不是竞争因果机制。</p>
+</section>
+<section id="与更简单方法的比较" class="level2">
+<h2 class="anchored" data-anchor-id="与更简单方法的比较">与更简单方法的比较</h2>
+<ul>
+<li><strong>均值加对角高斯（<span class="math inline">\(q=0\)</span>）：</strong> 不估计共享因子。在共享潜结构被归功之前，FA 应改善留出似然或减少可复现的非对角协方差残差。</li>
+<li><strong>PCA：</strong> 寻找最大化方差或最小化欧氏重构误差的正交子空间。它没有似然或变量特定噪声模型。FA 载荷不必张成 PCA 子空间，不同 <span class="math inline">\(q\)</span> 的因子解也不必嵌套 <span class="citation" data-cites="TippingBishop1999 RoweisGhahramani1999">(<a href="#ref-TippingBishop1999" role="doc-biblioref">Tipping 和 Bishop 1999年</a>; <a href="#ref-RoweisGhahramani1999" role="doc-biblioref">Roweis 和 Ghahramani 1999年</a>)</span>。</li>
+<li><strong>概率 PCA（PPCA）：</strong> 把对角 <span class="math inline">\(\Psi\)</span> 替换为 <span class="math inline">\(\sigma^2I\)</span>。其最大似然载荷空间是主子空间，而 FA 的异质唯一性通常改变拟合载荷空间 <span class="citation" data-cites="TippingBishop1999">(<a href="#ref-TippingBishop1999" role="doc-biblioref">Tipping 和 Bishop 1999年</a>)</span>。PPCA 是检验是否需要变量特定残差方差的有用秩匹配检验。</li>
+<li><strong>全协方差高斯：</strong> 可以拟合无约束协方差，但不是低参数潜解释。比较预测似然（经惩罚或样本外验证）检验 FA 的结构是否值其限制。</li>
+<li><strong>离散时间线性高斯状态空间模型：</strong> 增加潜演化、过程噪声与时间条件推断。只有序列结构在适当分块预测或似然上改善时才应被优先，而不是因为 FA 得分看起来光滑。</li>
+</ul>
+</section>
+<section id="评估准则" class="level2">
+<h2 class="anchored" data-anchor-id="评估准则">评估准则</h2>
+<p>只在训练单元上拟合预处理与参数。评估应包括：</p>
+<ol type="1">
+<li>在 <span class="math inline">\(\mathcal N(\widehat\mu,\widehat C)\)</span> 下的留出负对数似然，与 <span class="math inline">\(q=0\)</span>、秩匹配 PPCA 与声明协方差基线比较；</li>
+<li>残差协方差 <span class="math inline">\(S_{\text{test}}-\widehat C\)</span>，尤其是违背对角条件残差的可复现非对角结构；</li>
+<li>对边际方差、相关、尾部以及子群或时序残差模式的后验预测检查；</li>
+<li>跨重采样的拟合公共协方差或载荷子空间的秩敏感性与稳定性，在比较载荷代表前进行正交对齐；以及</li>
+<li>收敛诊断、唯一性正性、多次启动一致性以及对缩放与排除规则的敏感性。</li>
+</ol>
+<p>划分必须保留真实依赖单元：当观测内部依赖时，留出整个受试者、会话、试次、轨迹或时间块。因子恢复不能仅靠视觉分离验证。如果已知潜变量只存在于模拟中，在允许对齐后比较后验估计，并分别对协方差恢复评分。信息准则可以补充，但不应取代留出与误设检查。</p>
+</section>
+<section id="最小玩具模型" class="level2">
+<h2 class="anchored" data-anchor-id="最小玩具模型">最小玩具模型</h2>
+<p>解析示例使用 <span class="math inline">\(p=3\)</span>、<span class="math inline">\(q=1\)</span>，</p>
+<p><span class="math display">\[
+\Lambda=\begin{pmatrix}2\\1\\0.5\end{pmatrix},
+\qquad
+\Psi=\operatorname{diag}(0.25,1,4),
+\]</span></p>
+<p>给出</p>
+<p><span class="math display">\[
+C=\begin{pmatrix}
+4.25&amp;2&amp;1\\
+2&amp;2&amp;0.5\\
+1&amp;0.5&amp;4.25
+\end{pmatrix}.
+\]</span></p>
+<p>非对角协方差完全来自公共因子，而第三个变量尽管共享因子仍具有大唯一方差。后验方差是</p>
+<p><span class="math display">\[
+\left(1+\Lambda^\top\Psi^{-1}\Lambda\right)^{-1}=\frac{1}{18.0625},
+\]</span></p>
+<p>把 <span class="math inline">\(\Lambda\)</span> 替换为 <span class="math inline">\(-\Lambda\)</span> 使 <span class="math inline">\(C\)</span> 不变，同时反转因子得分符号。</p>
+<p>未来的可执行玩具契约会从这个已知模型生成独立训练与测试样本；从多次启动拟合 <span class="math inline">\(q=0\)</span>、单因子 FA 与单因子 PPCA；比较留出似然、<span class="math inline">\(\lVert\widehat C-C\rVert_F\)</span>、唯一性恢复与对齐因子后验均值；然后用刻意相关的残差协方差作为阴性对照重复。预期教训是有条件的：数据足够时，正确模型 FA 应比其受限基线更好地恢复协方差结构，而残差相关应产生系统性误设。本方法对象不包含执行、基准结果或经验主张。</p>
+</section>
+<section id="对-ldg-的意义" class="level2">
+<h2 class="anchored" data-anchor-id="对-ldg-的意义">对 LDG 的意义</h2>
+<p>FA 是 LDG 的规范静态概率潜因子基线。它把站得住脚的主张——「高斯低秩加对角协方差模型预测这些观测」——与关于本征维数、非线性几何、时序动力学、机制或因果性的更强主张分开。它还提供离散时间线性高斯状态空间模型与高斯过程因子分析之前所需的观测层词汇。</p>
+<div class="callout callout-style-default callout-warning callout-titled" title="这并不蕴含">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">警告</span>这并不蕴含
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>好的 FA 拟合不证明因子是原因、不辨识唯一潜轴、不确立与模型无关的本征维数、不演示流形，也不发现动力学。对角唯一性是要检验的假设，而非测量事实；外观光滑的因子得分不增加转移律。</p>
+</div>
+</div>
+<section id="小鼠轨迹" class="level3">
+<h3 class="anchored" data-anchor-id="小鼠轨迹">小鼠轨迹</h3>
+<p>FA 可以建模声明轨迹特征或对齐样本之间的协方差，但它忽略排序，无法推断运动动力学。当依赖要求时，按完整动物或轨迹划分评估。此处不作模态特定表现主张。</p>
+</section>
+<section id="眼动" class="level3">
+<h3 class="anchored" data-anchor-id="眼动">眼动</h3>
+<p>FA 可以为声明的眼位、速度、事件或窗口特征提供静态共享对逐坐标协方差基线。双眼耦合、滤波与序列依赖可能违反对角与独立观测假设。此处不作模态特定表现主张。</p>
+</section>
+<section id="eeg" class="level3">
+<h3 class="anchored" data-anchor-id="eeg">EEG</h3>
+<p>FA 可以概括声明传感器、谱或试次特征表示中的协方差。重参考、容积传导、共享伪迹与预处理可以诱导相关残差，因此没有单独观测模型与证据，因子不得被称为神经源。此处不作模态特定表现主张。</p>
+</section>
+<section id="meg-神经群体数据" class="level3">
+<h3 class="anchored" data-anchor-id="meg-神经群体数据">MEG / 神经群体数据</h3>
+<p>FA 可以作为同时通道或单元的静态观测模型，但时间样本与重复试次默认不独立。时序模型必须在分块数据上挣得其附加结构。此处不作模态特定表现主张。</p>
+</section>
+</section>
+<section id="主要来源" class="level2">
+<h2 class="anchored" data-anchor-id="主要来源">主要来源</h2>
+<ul>
+<li>Anderson 与 Rubin 表述经典因子模型的统计推断，包括对角残差协方差、旋转不确定性、辨识条件、估计与检验 <span class="citation" data-cites="AndersonRubin1956">(<a href="#ref-AndersonRubin1956" role="doc-biblioref">Anderson 和 Rubin 1956年</a>)</span>。</li>
+<li>Ghahramani 与 Hinton 在技术报告中给出高斯 FA 生成模型、对角唯一性假设、条件因子分布与 EM 更新，其主要贡献把模型扩展到混合 <span class="citation" data-cites="GhahramaniHinton1997">(<a href="#ref-GhahramaniHinton1997" role="doc-biblioref">Ghahramani 和 Hinton 1997年</a>)</span>。</li>
+<li>Tipping 与 Bishop 把 PPCA 定义为密切相关高斯潜变量模型的各向同性噪声限制，并明确把它与普通对角唯一性 FA 对照 <span class="citation" data-cites="TippingBishop1999">(<a href="#ref-TippingBishop1999" role="doc-biblioref">Tipping 和 Bishop 1999年</a>)</span>。</li>
+<li>Liu 与 Rubin 发展并评估完整与不完整高斯 FA 的 ECME 最大似然拟合，包括收敛考量 <span class="citation" data-cites="LiuRubin1998">(<a href="#ref-LiuRubin1998" role="doc-biblioref">Liu 和 Rubin 1998年</a>)</span>。</li>
+</ul>
+</section>
+<section id="综述-次级来源" class="level2">
+<h2 class="anchored" data-anchor-id="综述-次级来源">综述 / 次级来源</h2>
+<ul>
+<li>Roweis 与 Ghahramani 把静态 FA、PCA/PPCA 与动态线性高斯模型放入一个技术框架，并陈述此处使用的对角残差、尺度、坐标系、推断与时序区分 <span class="citation" data-cites="RoweisGhahramani1999">(<a href="#ref-RoweisGhahramani1999" role="doc-biblioref">Roweis 和 Ghahramani 1999年</a>)</span>。</li>
+</ul>
+</section>
+<section id="开放方法学问题" class="level2">
+<h2 class="anchored" data-anchor-id="开放方法学问题">开放方法学问题</h2>
+<ul>
+<li>在 LDG 预期的数据机制下，哪个因子数准则在小样本、弱因子与近边界唯一性时仍可靠？</li>
+<li>哪些残差协方差检查最好地区分有用的低秩加对角近似与被强迫进因子的伪迹？</li>
+<li>何时应标准化观测表示，哪个科学噪声模型论证该选择？</li>
+<li>用 PPCA 或结构化残差协方差替换 FA 观测层时，下游时序结论有多稳定？</li>
+</ul>
+</section>
+<section id="成熟度检查表" class="level2">
+<h2 class="anchored" data-anchor-id="成熟度检查表">成熟度检查表</h2>
+<ul class="task-list">
+<li><label><input type="checkbox" checked="">Schema 完整的方法对象，状态为 <code>L2/review</code>。</label></li>
+<li><label><input type="checkbox" checked="">陈述高斯潜因子、对角唯一性、独立性与正性假设。</label></li>
+<li><label><input type="checkbox" checked="">区分学习得到与固定的量。</label></li>
+<li><label><input type="checkbox" checked="">陈述边际似然、后验推断、优化与收敛边界。</label></li>
+<li><label><input type="checkbox" checked="">陈述时间、几何、监督、数据与预处理假设。</label></li>
+<li><label><input type="checkbox" checked="">区分旋转、符号、置换、尺度约定与因子得分歧义。</label></li>
+<li><label><input type="checkbox" checked="">包含 PCA、PPCA、对角高斯、全协方差与线性高斯状态空间比较。</label></li>
+<li><label><input type="checkbox" checked="">包含失效模式、基线、评估准则与解析/散文玩具契约。</label></li>
+<li><label><input type="checkbox" checked="">不作出因果、流形、动力学或与模型无关本征维数主张。</label></li>
+<li><label><input type="checkbox" checked="">保留来源经核查且书目元数据已验证；未保留模态特定经验结果。</label></li>
+<li><label><input type="checkbox" checked="">在两轮有界修正轮次后完成独立混合审查；聚焦复审返回 PASS。</label></li>
+<li><label><input type="checkbox" checked="">在发布站点审查后，人类所有者根据记录的审查决定授权稳定晋升。</label></li>
+</ul>
+
+
+<!-- -->
+
+
+</section>
+</section>
+
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography" id="quarto-bibliography"><h2 class="anchored quarto-appendix-heading">参考文献</h2><div id="refs" class="references csl-bib-body hanging-indent" role="list">
+<div id="ref-AndersonRubin1956" class="csl-entry" role="listitem">
+Anderson, T. W., 和 Herman Rubin. 1956年. <span>《Statistical Inference in Factor Analysis》</span>. 收入 <em>Proceedings of the Third Berkeley Symposium on Mathematical Statistics and Probability, Volume 5: Contributions to Econometrics, Industrial Research, and Psychometry</em>, 编辑 Jerzy Neyman. University of California Press. <a href="https://projecteuclid.org/euclid.bsmsp/1200511860">https://projecteuclid.org/euclid.bsmsp/1200511860</a>.
+</div>
+<div id="ref-GhahramaniHinton1997" class="csl-entry" role="listitem">
+Ghahramani, Zoubin, 和 Geoffrey E. Hinton. 1997年. <em>The <span>EM</span> Algorithm for Mixtures of Factor Analyzers</em>. CRG-TR-96-1. Department of Computer Science, University of Toronto. <a href="https://www.cs.toronto.edu/~hinton/absps/tr-96-1.pdf">https://www.cs.toronto.edu/~hinton/absps/tr-96-1.pdf</a>.
+</div>
+<div id="ref-LiuRubin1998" class="csl-entry" role="listitem">
+Liu, Chuanhai, 和 Donald B. Rubin. 1998年. <span>《Maximum Likelihood Estimation of Factor Analysis Using the <span>ECME</span> Algorithm with Complete and Incomplete Data》</span>. <em>Statistica Sinica</em> 8 (3): 729～47. <a href="https://www3.stat.sinica.edu.tw/statistica/oldpdf/A8n23.pdf">https://www3.stat.sinica.edu.tw/statistica/oldpdf/A8n23.pdf</a>.
+</div>
+<div id="ref-RoweisGhahramani1999" class="csl-entry" role="listitem">
+Roweis, Sam, 和 Zoubin Ghahramani. 1999年. <span>《A Unifying Review of Linear Gaussian Models》</span>. <em>Neural Computation</em> 11 (2): 305～45. <a href="https://doi.org/10.1162/089976699300016674">https://doi.org/10.1162/089976699300016674</a>.
+</div>
+<div id="ref-TippingBishop1999" class="csl-entry" role="listitem">
+Tipping, Michael E., 和 Christopher M. Bishop. 1999年. <span>《Probabilistic Principal Component Analysis》</span>. <em>Journal of the Royal Statistical Society: Series B (Statistical Methodology)</em> 61 (3): 611～22. <a href="https://doi.org/10.1111/1467-9868.00196">https://doi.org/10.1111/1467-9868.00196</a>.
+</div>
+</div></section></div></main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "已复制");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "已复制");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+    const viewSource = window.document.getElementById('quarto-view-source') ||
+                       window.document.getElementById('quarto-code-tools-source');
+    if (viewSource) {
+      const sourceUrl = viewSource.getAttribute("data-quarto-source-url");
+      viewSource.addEventListener("click", function(e) {
+        if (sourceUrl) {
+          // rstudio viewer pane
+          if (/\bcapabilities=\b/.test(window.location)) {
+            window.open(sourceUrl);
+          } else {
+            window.location.href = sourceUrl;
+          }
+        } else {
+          const modal = new bootstrap.Modal(document.getElementById('quarto-embedded-source-code-modal'));
+          modal.show();
+        }
+        return false;
+      });
+    }
+    function toggleCodeHandler(show) {
+      return function(e) {
+        const cellDetails = window.document.querySelectorAll(".cell details.code-fold");
+        for (let i=0; i<cellDetails.length; i++) {
+          const details = cellDetails[i];
+          if (show) {
+            details.open = true;
+          } else {
+            details.removeAttribute("open");
+          }
+        }
+        const cellCodeDivs = window.document.querySelectorAll(".cell div.sourceCode.cell-code");
+        const fromCls = show ? "hidden" : "unhidden";
+        const toCls = show ? "unhidden" : "hidden";
+        for (let i=0; i<cellCodeDivs.length; i++) {
+          const codeDiv = cellCodeDivs[i];
+          if (codeDiv.classList.contains(fromCls)) {
+            codeDiv.classList.remove(fromCls);
+            codeDiv.classList.add(toCls);
+          } 
+        }
+        return false;
+      }
+    }
+    const hideAllCode = window.document.getElementById("quarto-hide-all-code");
+    if (hideAllCode) {
+      hideAllCode.addEventListener("click", toggleCodeHandler(false));
+    }
+    const showAllCode = window.document.getElementById("quarto-show-all-code");
+    if (showAllCode) {
+      showAllCode.addEventListener("click", toggleCodeHandler(true));
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/abelzheng\.github\.io\/latent-dynamics-geometry-public\/");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+            // target, if specified
+            link.setAttribute("target", "_blank");
+            if (link.getAttribute("rel") === null) {
+              link.setAttribute("rel", "noopener");
+            }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">源代码</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1" data-shortcodes="false"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="an">title:</span><span class="co"> "因子分析"</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="an">lang:</span><span class="co"> zh-CN</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="an">comments:</span><span class="co"> false</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="an">object_type:</span><span class="co"> method</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="an">maturity:</span><span class="co"> L2</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="an">status:</span><span class="co"> stable</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="an">domain:</span><span class="co"> [latent-modeling, dimensionality-reduction, statistics]</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="an">tags:</span><span class="co"> [factor-analysis, latent-factor, covariance-model, gaussian-model]</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="an">prerequisites:</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="co">- knowledge/methods/principal-component-analysis.qmd</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="co">- knowledge/concepts/latent-variable.qmd</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="co">- knowledge/concepts/observation-model.qmd</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="co">- knowledge/concepts/observation-noise.qmd</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="co">- knowledge/concepts/identifiability.qmd</span></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="an">related:</span></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="co">- knowledge/concepts/ambient-dimension.qmd</span></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a><span class="co">- knowledge/concepts/intrinsic-dimension.qmd</span></span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a><span class="an">created:</span><span class="co"> 2026-08-19</span></span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a><span class="an">updated:</span><span class="co"> 2026-08-19</span></span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a><span class="fu"># 因子分析</span></span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a><span class="fu">## 问题</span></span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>因子分析（FA）用 $q&lt;p$ 个高斯潜因子加上变量特定残差变异解释 $p$ 个观测变量之间的协方差。本对象的分析单元是单个实值观测向量。FA 是概率协方差模型，而不仅仅是投影规则：它在显式分布假设下给观测赋予似然、给因子赋予后验分布 <span class="co">[</span><span class="ot">@GhahramaniHinton1997; @RoweisGhahramani1999</span><span class="co">]</span>。</span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>这里的有界范围是**探索性最大似然高斯因子分析**，残差协方差对角且内部参数空间 $\psi_j&gt;0$。零唯一性边界被排除在本模型之外，但仍相关，因为似然上确界可以接近它。验证性载荷约束、序数或非高斯因子模型、混合、稳健变体、贝叶斯先验与时序扩展需要单独对象。</span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a><span class="fu">## 输入</span></span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a>设 $x_i\in\mathbb R^p$，$i=1,\ldots,n$，表示所选完整观测向量。可复现分析必须声明：</span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>观测单元以及行是独立单元、重复测量、时间样本、试次、受试者还是条件摘要；</span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>变量、单位、变换、排除规则与缺失数据策略；</span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>模型是拟合到协方差矩阵、训练拟合标准化后的相关矩阵，还是通过等价高斯似然拟合到原始观测；</span>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>候选因子数 $q$ 及其选择规程；以及</span>
+<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>拟合后引入的任何载荷零、等式约束、旋转或得分约定。</span>
+<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a>规范表述假设观测向量在共同参数条件下独立同分布。把相关重复或时序样本当作独立会改变似然及其不确定性解读。</span>
+<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a><span class="fu">## 输出</span></span>
+<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a>对所选 $q$，最大似然 FA 估计：</span>
+<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>均值 $\mu\in\mathbb R^p$；</span>
+<span id="cb1-48"><a href="#cb1-48" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>载荷矩阵 $\Lambda\in\mathbb R^{p\times q}$；</span>
+<span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>对角唯一性协方差 $\Psi=\operatorname{diag}(\psi_1,\ldots,\psi_p)$，其中 $\psi_j&gt;0$；以及</span>
+<span id="cb1-50"><a href="#cb1-50" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>模型协方差 $C=\Lambda\Lambda^\top+\Psi$。</span>
+<span id="cb1-51"><a href="#cb1-51" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-52"><a href="#cb1-52" aria-hidden="true" tabindex="-1"></a>对每个观测它还定义其潜因子向量上的高斯后验分布。因此报告的「因子得分」是所选后验摘要或评分规则，不是观测量，也不是与 PCA 投影得分相同的对象。</span>
+<span id="cb1-53"><a href="#cb1-53" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-54"><a href="#cb1-54" aria-hidden="true" tabindex="-1"></a><span class="fu">## 核心思想</span></span>
+<span id="cb1-55"><a href="#cb1-55" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-56"><a href="#cb1-56" aria-hidden="true" tabindex="-1"></a>FA 把跨变量协方差归因于共享潜因子，同时为每个观测坐标保留单独残差方差。在因子条件下，观测坐标只因 $\Psi$ 被假设对角而独立。边际上，它们可以通过 $\Lambda\Lambda^\top$ 相关 <span class="co">[</span><span class="ot">@TippingBishop1999, sec. 2.1; @RoweisGhahramani1999, sec. 5.2</span><span class="co">]</span>。</span>
+<span id="cb1-57"><a href="#cb1-57" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-58"><a href="#cb1-58" aria-hidden="true" tabindex="-1"></a>当异质逐坐标噪声或唯一变异在科学上站得住脚时，这种分离有用。它也有局限：相关残差、未建模组、时间滤波与共享伪迹违反对角唯一性假设，并可能被强迫进入因子。</span>
+<span id="cb1-59"><a href="#cb1-59" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-60"><a href="#cb1-60" aria-hidden="true" tabindex="-1"></a><span class="fu">## 生成 / 建模假设</span></span>
+<span id="cb1-61"><a href="#cb1-61" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-62"><a href="#cb1-62" aria-hidden="true" tabindex="-1"></a>规范模型是</span>
+<span id="cb1-63"><a href="#cb1-63" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-64"><a href="#cb1-64" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-65"><a href="#cb1-65" aria-hidden="true" tabindex="-1"></a>z_i\sim\mathcal N(0,I_q),\qquad</span>
+<span id="cb1-66"><a href="#cb1-66" aria-hidden="true" tabindex="-1"></a>\epsilon_i\sim\mathcal N(0,\Psi),\qquad</span>
+<span id="cb1-67"><a href="#cb1-67" aria-hidden="true" tabindex="-1"></a>x_i=\mu+\Lambda z_i+\epsilon_i,</span>
+<span id="cb1-68"><a href="#cb1-68" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-69"><a href="#cb1-69" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-70"><a href="#cb1-70" aria-hidden="true" tabindex="-1"></a>其中 $z_i\perp<span class="sc">\!\!\!</span>\perp\epsilon_i$ 且跨 $i$ 独立。因此</span>
+<span id="cb1-71"><a href="#cb1-71" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-72"><a href="#cb1-72" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-73"><a href="#cb1-73" aria-hidden="true" tabindex="-1"></a>x_i\sim\mathcal N(\mu,C),\qquad C=\Lambda\Lambda^\top+\Psi.</span>
+<span id="cb1-74"><a href="#cb1-74" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-75"><a href="#cb1-75" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-76"><a href="#cb1-76" aria-hidden="true" tabindex="-1"></a>这种低秩加对角协方差表述，连同除选择因子数之外还需要额外辨识条件，是经典统计因子分析问题的一部分 <span class="co">[</span><span class="ot">@AndersonRubin1956</span><span class="co">]</span>。</span>
+<span id="cb1-77"><a href="#cb1-77" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-78"><a href="#cb1-78" aria-hidden="true" tabindex="-1"></a>这些假设是实质性的：</span>
+<span id="cb1-79"><a href="#cb1-79" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-80"><a href="#cb1-80" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>共享结构在所选观测坐标中是线性的；</span>
+<span id="cb1-81"><a href="#cb1-81" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>因子与残差是高斯的；</span>
+<span id="cb1-82"><a href="#cb1-82" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>潜协方差被固定为 $I_q$ 作为尺度约定；</span>
+<span id="cb1-83"><a href="#cb1-83" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>残差协方差是对角且严格正的；</span>
+<span id="cb1-84"><a href="#cb1-84" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>一个全局载荷矩阵与一个全局唯一性矩阵适用于所有观测；以及</span>
+<span id="cb1-85"><a href="#cb1-85" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>声明样本由来自一个平稳边际分布的独立抽样表示。</span>
+<span id="cb1-86"><a href="#cb1-86" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-87"><a href="#cb1-87" aria-hidden="true" tabindex="-1"></a>对角 $\Psi$ 使条件独立依赖坐标系。旋转观测轴通常会破坏对角性，而逐分量单位变化可以被相应行与唯一性重标吸收 <span class="co">[</span><span class="ot">@RoweisGhahramani1999, sec. 5.2</span><span class="co">]</span>。因此标准化变量是建模选择，不是到达相同答案的中性路径。</span>
+<span id="cb1-88"><a href="#cb1-88" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-89"><a href="#cb1-89" aria-hidden="true" tabindex="-1"></a><span class="fu">## 数学表述</span></span>
+<span id="cb1-90"><a href="#cb1-90" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-91"><a href="#cb1-91" aria-hidden="true" tabindex="-1"></a>用样本均值 $\bar x$ 与除数 $n$ 样本协方差</span>
+<span id="cb1-92"><a href="#cb1-92" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-93"><a href="#cb1-93" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-94"><a href="#cb1-94" aria-hidden="true" tabindex="-1"></a>S=\frac1n\sum_{i=1}^n(x_i-\bar x)(x_i-\bar x)^\top,</span>
+<span id="cb1-95"><a href="#cb1-95" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-96"><a href="#cb1-96" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-97"><a href="#cb1-97" aria-hidden="true" tabindex="-1"></a>在 $\widehat\mu=\bar x$ 处的高斯对数似然，忽略加性常数，是</span>
+<span id="cb1-98"><a href="#cb1-98" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-99"><a href="#cb1-99" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-100"><a href="#cb1-100" aria-hidden="true" tabindex="-1"></a>\ell(\Lambda,\Psi)</span>
+<span id="cb1-101"><a href="#cb1-101" aria-hidden="true" tabindex="-1"></a>=-\frac n2\left<span class="sc">\{</span>\log|C|+\operatorname{tr}(C^{-1}S)\right<span class="sc">\}</span>,</span>
+<span id="cb1-102"><a href="#cb1-102" aria-hidden="true" tabindex="-1"></a>\qquad C=\Lambda\Lambda^\top+\Psi.</span>
+<span id="cb1-103"><a href="#cb1-103" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-104"><a href="#cb1-104" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-105"><a href="#cb1-105" aria-hidden="true" tabindex="-1"></a>与普通 PCA 不同，一般 FA 没有给出其最大似然载荷与唯一性估计的单一特征分解。需要数值优化或潜变量算法 <span class="co">[</span><span class="ot">@TippingBishop1999, sec. 2.1</span><span class="co">]</span>。</span>
+<span id="cb1-106"><a href="#cb1-106" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-107"><a href="#cb1-107" aria-hidden="true" tabindex="-1"></a>对固定参数，设</span>
+<span id="cb1-108"><a href="#cb1-108" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-109"><a href="#cb1-109" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-110"><a href="#cb1-110" aria-hidden="true" tabindex="-1"></a>M=I_q+\Lambda^\top\Psi^{-1}\Lambda.</span>
+<span id="cb1-111"><a href="#cb1-111" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-112"><a href="#cb1-112" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-113"><a href="#cb1-113" aria-hidden="true" tabindex="-1"></a>高斯条件化给出</span>
+<span id="cb1-114"><a href="#cb1-114" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-115"><a href="#cb1-115" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-116"><a href="#cb1-116" aria-hidden="true" tabindex="-1"></a>z_i\mid x_i\sim\mathcal N<span class="sc">\!</span>\left(</span>
+<span id="cb1-117"><a href="#cb1-117" aria-hidden="true" tabindex="-1"></a>M^{-1}\Lambda^\top\Psi^{-1}(x_i-\mu),\ M^{-1}</span>
+<span id="cb1-118"><a href="#cb1-118" aria-hidden="true" tabindex="-1"></a>\right).</span>
+<span id="cb1-119"><a href="#cb1-119" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-120"><a href="#cb1-120" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-121"><a href="#cb1-121" aria-hidden="true" tabindex="-1"></a>后验协方差显式记录观测 $x_i$ 后剩余的不确定性；点得分丢弃这部分信息 <span class="co">[</span><span class="ot">@GhahramaniHinton1997</span><span class="co">]</span>。</span>
+<span id="cb1-122"><a href="#cb1-122" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-123"><a href="#cb1-123" aria-hidden="true" tabindex="-1"></a><span class="fu">## 学习得到了什么？</span></span>
+<span id="cb1-124"><a href="#cb1-124" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-125"><a href="#cb1-125" aria-hidden="true" tabindex="-1"></a>给定 $q$、模型类与预处理，拟合返回 $\mu$ 的估计与候选分解 $\widehat C=\widehat\Lambda</span>
+<span id="cb1-126"><a href="#cb1-126" aria-hidden="true" tabindex="-1"></a>\widehat\Lambda^\top+\widehat\Psi$。可观测协方差分布是主要似然目标；特定载荷–唯一性分解受采样误差、误设、边界行为、正交等价与任何额外辨识失败的影响。拟合参数还确定观测或新案例因子的模型条件后验分布。</span>
+<span id="cb1-127"><a href="#cb1-127" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-128"><a href="#cb1-128" aria-hidden="true" tabindex="-1"></a>似然最直接辨识的是可观测分布，尤其 $C$，而非唯一朝向的一组潜轴。即使恢复 $C$ 也不表明拟合因子对应物理、心理或神经原因。</span>
+<span id="cb1-129"><a href="#cb1-129" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-130"><a href="#cb1-130" aria-hidden="true" tabindex="-1"></a><span class="fu">## 什么是固定的？</span></span>
+<span id="cb1-131"><a href="#cb1-131" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-132"><a href="#cb1-132" aria-hidden="true" tabindex="-1"></a>分析者固定观测表示、样本包含与依赖处理、高斯线性模型类、对角残差结构、潜均值零与协方差 $I_q$、因子数或选择规则，以及任何结构载荷约束。在评估留出数据之前必须固定仅训练的中心化与缩放。</span>
+<span id="cb1-133"><a href="#cb1-133" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-134"><a href="#cb1-134" aria-hidden="true" tabindex="-1"></a>选择 $\operatorname{Cov}(z)=I_q$ 固定潜尺度但不固定潜朝向。如果潜协方差改为自由对角矩阵，除了符号与置换约定外，尺度可以在每个因子方差与其载荷列之间转移。如果估计完全无约束潜协方差 $\Phi$，任何可逆坐标变换</span>
+<span id="cb1-135"><a href="#cb1-135" aria-hidden="true" tabindex="-1"></a>$z'=Az$、$\Lambda'=\Lambda A^{-1}$ 与 $\Phi'=A\Phi A^\top$ 都保留可观测协方差。这些更宽歧义需要相应更宽参数化；它们不是规范 $\operatorname{Cov}(z)=I_q$ 模型的不变性。</span>
+<span id="cb1-136"><a href="#cb1-136" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-137"><a href="#cb1-137" aria-hidden="true" tabindex="-1"></a><span class="fu">## 时序假设</span></span>
+<span id="cb1-138"><a href="#cb1-138" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-139"><a href="#cb1-139" aria-hidden="true" tabindex="-1"></a>规范 FA 是静态且对顺序无感的。置换观测使 $S$ 与似然不变。如果行是时间点，模型不表示转移、自相关、过程噪声、时滞或轨迹；它只拟合它们的边际分布，而在忽略依赖时常常高估有效样本量 <span class="co">[</span><span class="ot">@RoweisGhahramani1999, sec. 5.1</span><span class="co">]</span>。</span>
+<span id="cb1-140"><a href="#cb1-140" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-141"><a href="#cb1-141" aria-hidden="true" tabindex="-1"></a>离散时间线性高斯状态空间模型在相关线性高斯观测层上增加转移分布与过程噪声。该时序扩展在 FA 中并不隐含。</span>
+<span id="cb1-142"><a href="#cb1-142" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-143"><a href="#cb1-143" aria-hidden="true" tabindex="-1"></a><span class="fu">## 几何假设</span></span>
+<span id="cb1-144"><a href="#cb1-144" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-145"><a href="#cb1-145" aria-hidden="true" tabindex="-1"></a>FA 设定嵌入 $\mathbb R^p$ 的线性潜到观测映射与高斯协方差椭球 $C$。$\Psi$ 的对角条目定义逐坐标残差尺度，因此被特权的观测坐标系是模型的一部分。后验均值根据载荷与唯一性两者收缩观测；它们一般不是正交欧氏投影。</span>
+<span id="cb1-146"><a href="#cb1-146" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-147"><a href="#cb1-147" aria-hidden="true" tabindex="-1"></a>这是所选表示下的协方差几何。它不确立非线性流形、不恢复黎曼度量、不保留拓扑，也不确定与模型无关的本征维数。</span>
+<span id="cb1-148"><a href="#cb1-148" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-149"><a href="#cb1-149" aria-hidden="true" tabindex="-1"></a><span class="fu">## 监督</span></span>
+<span id="cb1-150"><a href="#cb1-150" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-151"><a href="#cb1-151" aria-hidden="true" tabindex="-1"></a>探索性 FA 对结果与标签无监督：其似然只使用所选观测向量。依赖标签的变量选择、预处理、秩选择或子群构造仍可以在设计层面引入监督与泄漏。</span>
+<span id="cb1-152"><a href="#cb1-152" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-153"><a href="#cb1-153" aria-hidden="true" tabindex="-1"></a><span class="fu">## 优化 / 推断</span></span>
+<span id="cb1-154"><a href="#cb1-154" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-155"><a href="#cb1-155" aria-hidden="true" tabindex="-1"></a>参数学习在积分掉潜因子后最大化边际似然。EM 在 $z_i$ 的后验矩与 $\Lambda$ 和对角 $\Psi$ 的更新之间交替；对角约束在唯一性更新中执行 <span class="co">[</span><span class="ot">@GhahramaniHinton1997</span><span class="co">]</span>。EM 在精确步骤下单调改善似然，但可能收敛缓慢，且单调性不蕴含到达唯一全局最优。ECME 与直接/拟牛顿方法是替代数值策略；Liu 与 Rubin 记录完整与不完整高斯 FA 的 ECME 构造，并强调收敛评估 <span class="co">[</span><span class="ot">@LiuRubin1998</span><span class="co">]</span>。</span>
+<span id="cb1-156"><a href="#cb1-156" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-157"><a href="#cb1-157" aria-hidden="true" tabindex="-1"></a>用拟合参数推断计算条件高斯分布 $p(z_i\mid x_i)$。参数学习与因子推断是不同任务。必须报告初始化、收敛容差、正性约束与多次启动，因为似然在因子化参数中非凸。在严格内点约定 $\psi_j&gt;0$ 下，优化器可以接近 $\psi_j=0$，使似然上确界不被内点 MLE 达到；允许 $\psi_j\geq 0$ 的实现可以把零报告为达到的边界解。</span>
+<span id="cb1-158"><a href="#cb1-158" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-159"><a href="#cb1-159" aria-hidden="true" tabindex="-1"></a><span class="fu">## 优点</span></span>
+<span id="cb1-160"><a href="#cb1-160" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-161"><a href="#cb1-161" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>FA 为潜因子提供显式概率模型、似然与后验不确定性。</span>
+<span id="cb1-162"><a href="#cb1-162" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>对角唯一性允许异质残差方差，而非强制单一各向同性噪声水平。</span>
+<span id="cb1-163"><a href="#cb1-163" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>模型在清晰假设下把共享协方差与逐坐标残差方差分开。</span>
+<span id="cb1-164"><a href="#cb1-164" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>它是后续时序潜模型的紧凑静态基线。</span>
+<span id="cb1-165"><a href="#cb1-165" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>因为模型定义归一化密度，留出对数似然与后验预测检查可用。</span>
+<span id="cb1-166"><a href="#cb1-166" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-167"><a href="#cb1-167" aria-hidden="true" tabindex="-1"></a><span class="fu">## 失效模式</span></span>
+<span id="cb1-168"><a href="#cb1-168" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-169"><a href="#cb1-169" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**相关残差：** 共享伪迹、耦合、空间泄漏或被省略组违反对角 $\Psi$，并可能表现为虚假因子。</span>
+<span id="cb1-170"><a href="#cb1-170" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**非线性或非高斯性：** 弯曲结构、重尾、偏斜、多模态与离群值可以扭曲载荷与唯一性。</span>
+<span id="cb1-171"><a href="#cb1-171" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**错误因子数：** 因子太少留下结构化残差协方差；太多可以过拟合、变得不稳定或接近边界唯一性。</span>
+<span id="cb1-172"><a href="#cb1-172" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Heywood 或边界行为：** 一个或多个唯一性估计可以接近零。在严格 $\psi_j&gt;0$ 参数空间下这可能意味着未达到的边界上确界；在非负实现下可以是达到的边界解。任一情形都提示误设、弱辨识或数值困难，而非科学上无噪声的变量。</span>
+<span id="cb1-173"><a href="#cb1-173" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**把依赖当作重复：** 把时间点、重复测量或试次当作独立拟合会使似然比较与不确定性主张乐观。</span>
+<span id="cb1-174"><a href="#cb1-174" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**预处理敏感性：** 基于协方差与基于相关的 FA 回答不同问题；单位变化与标准化改变分解。</span>
+<span id="cb1-175"><a href="#cb1-175" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**局部优化与慢收敛：** 不同启动可以产生不同代表或局部解，小似然变化可以隐藏不完整收敛 <span class="co">[</span><span class="ot">@LiuRubin1998</span><span class="co">]</span>。</span>
+<span id="cb1-176"><a href="#cb1-176" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**因子得分过度解读：** 后验均值是依赖模型的不确定估计，不是测量状态。</span>
+<span id="cb1-177"><a href="#cb1-177" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**因果命名：** 诸如「记忆」「唤醒」或「运动驱动」的标签不把协方差因子变成原因。</span>
+<span id="cb1-178"><a href="#cb1-178" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-179"><a href="#cb1-179" aria-hidden="true" tabindex="-1"></a><span class="fu">## 可辨识性问题</span></span>
+<span id="cb1-180"><a href="#cb1-180" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-181"><a href="#cb1-181" aria-hidden="true" tabindex="-1"></a>对每个正交 $Q\in\mathbb R^{q\times q}$，</span>
+<span id="cb1-182"><a href="#cb1-182" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-183"><a href="#cb1-183" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-184"><a href="#cb1-184" aria-hidden="true" tabindex="-1"></a>\Lambda z=(\Lambda Q)(Q^\top z),</span>
+<span id="cb1-185"><a href="#cb1-185" aria-hidden="true" tabindex="-1"></a>\qquad</span>
+<span id="cb1-186"><a href="#cb1-186" aria-hidden="true" tabindex="-1"></a>(\Lambda Q)(\Lambda Q)^\top=\Lambda\Lambda^\top.</span>
+<span id="cb1-187"><a href="#cb1-187" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-188"><a href="#cb1-188" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-189"><a href="#cb1-189" aria-hidden="true" tabindex="-1"></a>因此似然无法区分载荷矩阵的正交旋转。符号翻转与因子置换是特殊情形。事后旋转可以选择更可解读的代表，但它不创造所选轴在数据中被唯一呈现的证据。</span>
+<span id="cb1-190"><a href="#cb1-190" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-191"><a href="#cb1-191" aria-hidden="true" tabindex="-1"></a>在 $\operatorname{Cov}(z)=I_q$ 下，任意因子重标不是不变性：在固定潜协方差中不作补偿地重标一个载荷列会改变 $C$。自由对角潜方差增加单独因子尺度歧义，而一般可逆坐标歧义需要上述完全无约束潜协方差。这一区分防止在规范归一化已固定尺度处断言「尺度歧义」。</span>
+<span id="cb1-192"><a href="#cb1-192" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-193"><a href="#cb1-193" aria-hidden="true" tabindex="-1"></a>除旋转等价外，某些维数、因子数、协方差模式与边界情形下唯一性和载荷恢复可能弱或非唯一；因此经典辨识结果施加额外秩或载荷模式条件，而不是把旋转当作唯一可能歧义 <span class="co">[</span><span class="ot">@AndersonRubin1956</span><span class="co">]</span>。即使在协方差参数被良好估计时，后验因子得分仍不确定。这些是统计可辨识性界限，不是竞争因果机制。</span>
+<span id="cb1-194"><a href="#cb1-194" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-195"><a href="#cb1-195" aria-hidden="true" tabindex="-1"></a><span class="fu">## 与更简单方法的比较</span></span>
+<span id="cb1-196"><a href="#cb1-196" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-197"><a href="#cb1-197" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**均值加对角高斯（$q=0$）：** 不估计共享因子。在共享潜结构被归功之前，FA 应改善留出似然或减少可复现的非对角协方差残差。</span>
+<span id="cb1-198"><a href="#cb1-198" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**PCA：** 寻找最大化方差或最小化欧氏重构误差的正交子空间。它没有似然或变量特定噪声模型。FA 载荷不必张成 PCA 子空间，不同 $q$ 的因子解也不必嵌套 <span class="co">[</span><span class="ot">@TippingBishop1999; @RoweisGhahramani1999</span><span class="co">]</span>。</span>
+<span id="cb1-199"><a href="#cb1-199" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**概率 PCA（PPCA）：** 把对角 $\Psi$ 替换为 $\sigma^2I$。其最大似然载荷空间是主子空间，而 FA 的异质唯一性通常改变拟合载荷空间 <span class="co">[</span><span class="ot">@TippingBishop1999</span><span class="co">]</span>。PPCA 是检验是否需要变量特定残差方差的有用秩匹配检验。</span>
+<span id="cb1-200"><a href="#cb1-200" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**全协方差高斯：** 可以拟合无约束协方差，但不是低参数潜解释。比较预测似然（经惩罚或样本外验证）检验 FA 的结构是否值其限制。</span>
+<span id="cb1-201"><a href="#cb1-201" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**离散时间线性高斯状态空间模型：** 增加潜演化、过程噪声与时间条件推断。只有序列结构在适当分块预测或似然上改善时才应被优先，而不是因为 FA 得分看起来光滑。</span>
+<span id="cb1-202"><a href="#cb1-202" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-203"><a href="#cb1-203" aria-hidden="true" tabindex="-1"></a><span class="fu">## 评估准则</span></span>
+<span id="cb1-204"><a href="#cb1-204" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-205"><a href="#cb1-205" aria-hidden="true" tabindex="-1"></a>只在训练单元上拟合预处理与参数。评估应包括：</span>
+<span id="cb1-206"><a href="#cb1-206" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-207"><a href="#cb1-207" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>在 $\mathcal N(\widehat\mu,\widehat C)$ 下的留出负对数似然，与 $q=0$、秩匹配 PPCA 与声明协方差基线比较；</span>
+<span id="cb1-208"><a href="#cb1-208" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>残差协方差 $S_{\text{test}}-\widehat C$，尤其是违背对角条件残差的可复现非对角结构；</span>
+<span id="cb1-209"><a href="#cb1-209" aria-hidden="true" tabindex="-1"></a><span class="ss">3. </span>对边际方差、相关、尾部以及子群或时序残差模式的后验预测检查；</span>
+<span id="cb1-210"><a href="#cb1-210" aria-hidden="true" tabindex="-1"></a><span class="ss">4. </span>跨重采样的拟合公共协方差或载荷子空间的秩敏感性与稳定性，在比较载荷代表前进行正交对齐；以及</span>
+<span id="cb1-211"><a href="#cb1-211" aria-hidden="true" tabindex="-1"></a><span class="ss">5. </span>收敛诊断、唯一性正性、多次启动一致性以及对缩放与排除规则的敏感性。</span>
+<span id="cb1-212"><a href="#cb1-212" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-213"><a href="#cb1-213" aria-hidden="true" tabindex="-1"></a>划分必须保留真实依赖单元：当观测内部依赖时，留出整个受试者、会话、试次、轨迹或时间块。因子恢复不能仅靠视觉分离验证。如果已知潜变量只存在于模拟中，在允许对齐后比较后验估计，并分别对协方差恢复评分。信息准则可以补充，但不应取代留出与误设检查。</span>
+<span id="cb1-214"><a href="#cb1-214" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-215"><a href="#cb1-215" aria-hidden="true" tabindex="-1"></a><span class="fu">## 最小玩具模型</span></span>
+<span id="cb1-216"><a href="#cb1-216" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-217"><a href="#cb1-217" aria-hidden="true" tabindex="-1"></a>解析示例使用 $p=3$、$q=1$，</span>
+<span id="cb1-218"><a href="#cb1-218" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-219"><a href="#cb1-219" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-220"><a href="#cb1-220" aria-hidden="true" tabindex="-1"></a>\Lambda=\begin{pmatrix}2<span class="sc">\\</span>1<span class="sc">\\</span>0.5\end{pmatrix},</span>
+<span id="cb1-221"><a href="#cb1-221" aria-hidden="true" tabindex="-1"></a>\qquad</span>
+<span id="cb1-222"><a href="#cb1-222" aria-hidden="true" tabindex="-1"></a>\Psi=\operatorname{diag}(0.25,1,4),</span>
+<span id="cb1-223"><a href="#cb1-223" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-224"><a href="#cb1-224" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-225"><a href="#cb1-225" aria-hidden="true" tabindex="-1"></a>给出</span>
+<span id="cb1-226"><a href="#cb1-226" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-227"><a href="#cb1-227" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-228"><a href="#cb1-228" aria-hidden="true" tabindex="-1"></a>C=\begin{pmatrix}</span>
+<span id="cb1-229"><a href="#cb1-229" aria-hidden="true" tabindex="-1"></a>4.25&amp;2&amp;1<span class="sc">\\</span></span>
+<span id="cb1-230"><a href="#cb1-230" aria-hidden="true" tabindex="-1"></a>2&amp;2&amp;0.5<span class="sc">\\</span></span>
+<span id="cb1-231"><a href="#cb1-231" aria-hidden="true" tabindex="-1"></a>1&amp;0.5&amp;4.25</span>
+<span id="cb1-232"><a href="#cb1-232" aria-hidden="true" tabindex="-1"></a>\end{pmatrix}.</span>
+<span id="cb1-233"><a href="#cb1-233" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-234"><a href="#cb1-234" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-235"><a href="#cb1-235" aria-hidden="true" tabindex="-1"></a>非对角协方差完全来自公共因子，而第三个变量尽管共享因子仍具有大唯一方差。后验方差是</span>
+<span id="cb1-236"><a href="#cb1-236" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-237"><a href="#cb1-237" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-238"><a href="#cb1-238" aria-hidden="true" tabindex="-1"></a>\left(1+\Lambda^\top\Psi^{-1}\Lambda\right)^{-1}=\frac{1}{18.0625},</span>
+<span id="cb1-239"><a href="#cb1-239" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-240"><a href="#cb1-240" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-241"><a href="#cb1-241" aria-hidden="true" tabindex="-1"></a>把 $\Lambda$ 替换为 $-\Lambda$ 使 $C$ 不变，同时反转因子得分符号。</span>
+<span id="cb1-242"><a href="#cb1-242" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-243"><a href="#cb1-243" aria-hidden="true" tabindex="-1"></a>未来的可执行玩具契约会从这个已知模型生成独立训练与测试样本；从多次启动拟合 $q=0$、单因子 FA 与单因子 PPCA；比较留出似然、$\lVert\widehat C-C\rVert_F$、唯一性恢复与对齐因子后验均值；然后用刻意相关的残差协方差作为阴性对照重复。预期教训是有条件的：数据足够时，正确模型 FA 应比其受限基线更好地恢复协方差结构，而残差相关应产生系统性误设。本方法对象不包含执行、基准结果或经验主张。</span>
+<span id="cb1-244"><a href="#cb1-244" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-245"><a href="#cb1-245" aria-hidden="true" tabindex="-1"></a><span class="fu">## 对 LDG 的意义</span></span>
+<span id="cb1-246"><a href="#cb1-246" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-247"><a href="#cb1-247" aria-hidden="true" tabindex="-1"></a>FA 是 LDG 的规范静态概率潜因子基线。它把站得住脚的主张——「高斯低秩加对角协方差模型预测这些观测」——与关于本征维数、非线性几何、时序动力学、机制或因果性的更强主张分开。它还提供离散时间线性高斯状态空间模型与高斯过程因子分析之前所需的观测层词汇。</span>
+<span id="cb1-248"><a href="#cb1-248" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-249"><a href="#cb1-249" aria-hidden="true" tabindex="-1"></a>::: {.callout-warning title="这并不蕴含"}</span>
+<span id="cb1-250"><a href="#cb1-250" aria-hidden="true" tabindex="-1"></a>好的 FA 拟合不证明因子是原因、不辨识唯一潜轴、不确立与模型无关的本征维数、不演示流形，也不发现动力学。对角唯一性是要检验的假设，而非测量事实；外观光滑的因子得分不增加转移律。</span>
+<span id="cb1-251"><a href="#cb1-251" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb1-252"><a href="#cb1-252" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-253"><a href="#cb1-253" aria-hidden="true" tabindex="-1"></a><span class="fu">### 小鼠轨迹</span></span>
+<span id="cb1-254"><a href="#cb1-254" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-255"><a href="#cb1-255" aria-hidden="true" tabindex="-1"></a>FA 可以建模声明轨迹特征或对齐样本之间的协方差，但它忽略排序，无法推断运动动力学。当依赖要求时，按完整动物或轨迹划分评估。此处不作模态特定表现主张。</span>
+<span id="cb1-256"><a href="#cb1-256" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-257"><a href="#cb1-257" aria-hidden="true" tabindex="-1"></a><span class="fu">### 眼动</span></span>
+<span id="cb1-258"><a href="#cb1-258" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-259"><a href="#cb1-259" aria-hidden="true" tabindex="-1"></a>FA 可以为声明的眼位、速度、事件或窗口特征提供静态共享对逐坐标协方差基线。双眼耦合、滤波与序列依赖可能违反对角与独立观测假设。此处不作模态特定表现主张。</span>
+<span id="cb1-260"><a href="#cb1-260" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-261"><a href="#cb1-261" aria-hidden="true" tabindex="-1"></a><span class="fu">### EEG</span></span>
+<span id="cb1-262"><a href="#cb1-262" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-263"><a href="#cb1-263" aria-hidden="true" tabindex="-1"></a>FA 可以概括声明传感器、谱或试次特征表示中的协方差。重参考、容积传导、共享伪迹与预处理可以诱导相关残差，因此没有单独观测模型与证据，因子不得被称为神经源。此处不作模态特定表现主张。</span>
+<span id="cb1-264"><a href="#cb1-264" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-265"><a href="#cb1-265" aria-hidden="true" tabindex="-1"></a><span class="fu">### MEG / 神经群体数据</span></span>
+<span id="cb1-266"><a href="#cb1-266" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-267"><a href="#cb1-267" aria-hidden="true" tabindex="-1"></a>FA 可以作为同时通道或单元的静态观测模型，但时间样本与重复试次默认不独立。时序模型必须在分块数据上挣得其附加结构。此处不作模态特定表现主张。</span>
+<span id="cb1-268"><a href="#cb1-268" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-269"><a href="#cb1-269" aria-hidden="true" tabindex="-1"></a><span class="fu">## 主要来源</span></span>
+<span id="cb1-270"><a href="#cb1-270" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-271"><a href="#cb1-271" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Anderson 与 Rubin 表述经典因子模型的统计推断，包括对角残差协方差、旋转不确定性、辨识条件、估计与检验 <span class="co">[</span><span class="ot">@AndersonRubin1956</span><span class="co">]</span>。</span>
+<span id="cb1-272"><a href="#cb1-272" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Ghahramani 与 Hinton 在技术报告中给出高斯 FA 生成模型、对角唯一性假设、条件因子分布与 EM 更新，其主要贡献把模型扩展到混合 <span class="co">[</span><span class="ot">@GhahramaniHinton1997</span><span class="co">]</span>。</span>
+<span id="cb1-273"><a href="#cb1-273" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Tipping 与 Bishop 把 PPCA 定义为密切相关高斯潜变量模型的各向同性噪声限制，并明确把它与普通对角唯一性 FA 对照 <span class="co">[</span><span class="ot">@TippingBishop1999</span><span class="co">]</span>。</span>
+<span id="cb1-274"><a href="#cb1-274" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Liu 与 Rubin 发展并评估完整与不完整高斯 FA 的 ECME 最大似然拟合，包括收敛考量 <span class="co">[</span><span class="ot">@LiuRubin1998</span><span class="co">]</span>。</span>
+<span id="cb1-275"><a href="#cb1-275" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-276"><a href="#cb1-276" aria-hidden="true" tabindex="-1"></a><span class="fu">## 综述 / 次级来源</span></span>
+<span id="cb1-277"><a href="#cb1-277" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-278"><a href="#cb1-278" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Roweis 与 Ghahramani 把静态 FA、PCA/PPCA 与动态线性高斯模型放入一个技术框架，并陈述此处使用的对角残差、尺度、坐标系、推断与时序区分 <span class="co">[</span><span class="ot">@RoweisGhahramani1999</span><span class="co">]</span>。</span>
+<span id="cb1-279"><a href="#cb1-279" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-280"><a href="#cb1-280" aria-hidden="true" tabindex="-1"></a><span class="fu">## 开放方法学问题</span></span>
+<span id="cb1-281"><a href="#cb1-281" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-282"><a href="#cb1-282" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>在 LDG 预期的数据机制下，哪个因子数准则在小样本、弱因子与近边界唯一性时仍可靠？</span>
+<span id="cb1-283"><a href="#cb1-283" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>哪些残差协方差检查最好地区分有用的低秩加对角近似与被强迫进因子的伪迹？</span>
+<span id="cb1-284"><a href="#cb1-284" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>何时应标准化观测表示，哪个科学噪声模型论证该选择？</span>
+<span id="cb1-285"><a href="#cb1-285" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>用 PPCA 或结构化残差协方差替换 FA 观测层时，下游时序结论有多稳定？</span>
+<span id="cb1-286"><a href="#cb1-286" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-287"><a href="#cb1-287" aria-hidden="true" tabindex="-1"></a><span class="fu">## 成熟度检查表</span></span>
+<span id="cb1-288"><a href="#cb1-288" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-289"><a href="#cb1-289" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> Schema 完整的方法对象，状态为 <span class="in">`L2/review`</span>。</span>
+<span id="cb1-290"><a href="#cb1-290" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> 陈述高斯潜因子、对角唯一性、独立性与正性假设。</span>
+<span id="cb1-291"><a href="#cb1-291" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> 区分学习得到与固定的量。</span>
+<span id="cb1-292"><a href="#cb1-292" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> 陈述边际似然、后验推断、优化与收敛边界。</span>
+<span id="cb1-293"><a href="#cb1-293" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> 陈述时间、几何、监督、数据与预处理假设。</span>
+<span id="cb1-294"><a href="#cb1-294" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> 区分旋转、符号、置换、尺度约定与因子得分歧义。</span>
+<span id="cb1-295"><a href="#cb1-295" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> 包含 PCA、PPCA、对角高斯、全协方差与线性高斯状态空间比较。</span>
+<span id="cb1-296"><a href="#cb1-296" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> 包含失效模式、基线、评估准则与解析/散文玩具契约。</span>
+<span id="cb1-297"><a href="#cb1-297" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> 不作出因果、流形、动力学或与模型无关本征维数主张。</span>
+<span id="cb1-298"><a href="#cb1-298" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> 保留来源经核查且书目元数据已验证；未保留模态特定经验结果。</span>
+<span id="cb1-299"><a href="#cb1-299" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> 在两轮有界修正轮次后完成独立混合审查；聚焦复审返回 PASS。</span>
+<span id="cb1-300"><a href="#cb1-300" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> 在发布站点审查后，人类所有者根据记录的审查决定授权稳定晋升。</span></code></pre></div><button title="复制到剪贴板" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></div>
+</div></div></div></div></div>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

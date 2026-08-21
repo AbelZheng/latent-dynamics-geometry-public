@@ -1,0 +1,1757 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="zh-CN" xml:lang="zh-CN"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.10.18">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>固定区间卡尔曼平滑 – Latent Dynamics &amp; Geometry</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="../../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../../">
+<script src="../../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../../site_libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../../site_libs/bootstrap/bootstrap-e3adbaa939bcd423dddc8c8a834270b4.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "没有结果",
+    "search-matching-documents-text": "匹配的文档",
+    "search-copy-link-title": "复制搜索链接",
+    "search-hide-matches-text": "隐藏其它匹配结果",
+    "search-more-match-text": "更多匹配结果",
+    "search-more-matches-text": "更多匹配结果",
+    "search-clear-button-title": "清除",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "取消",
+    "search-submit-button-title": "提交",
+    "search-label": "搜索"
+  }
+}</script>
+<style>
+.ldg-lang{position:fixed;top:72px;right:16px;z-index:2000;display:flex;gap:4px;font-family:system-ui,-apple-system,"Segoe UI",sans-serif;}
+.ldg-lang a{display:inline-block;padding:4px 10px;border:1px solid #c8c8c8;border-radius:999px;background:#fff;color:#333;text-decoration:none;font-size:13px;box-shadow:0 1px 3px rgba(0,0,0,.15);}
+.ldg-lang a.active{background:#2c3e50;color:#fff;border-color:#2c3e50;}
+</style>
+</head><body class="nav-fixed quarto-light"><div class="ldg-lang" id="ldg-lang">
+  <a href="#" id="ldg-lang-en">EN</a>
+  <a href="#" id="ldg-lang-zh">中文</a>
+</div>
+<script>
+(function () {
+  var BASE = '';
+  if (window.location.pathname.indexOf('/latent-dynamics-geometry-public/') === 0) {
+    BASE = 'latent-dynamics-geometry-public';
+  }
+  var IS_FILE = window.location.protocol === 'file:';
+  function pathSegs() {
+    return window.location.pathname.split('/').filter(Boolean);
+  }
+  function zhIdx() {
+    return pathSegs().indexOf('zh');
+  }
+  function segs() {
+    var s = window.location.pathname.split('/').filter(Boolean);
+    if (BASE && s[0] === BASE) s = s.slice(1);
+    return s;
+  }
+  function isZh() { return zhIdx() !== -1; }
+  function fileTarget(lang) {
+    var s = pathSegs();
+    var siteIdx = s.lastIndexOf('_site');
+    var root = siteIdx === -1 ? s.slice(0, -1) : s.slice(0, siteIdx + 1);
+    var page = siteIdx === -1 ? [s[s.length - 1]] : s.slice(siteIdx + 1);
+    if (page[0] === 'zh') page = page.slice(1);
+    if (lang === 'zh') page = ['zh'].concat(page);
+    var rel = page.join('/');
+    if (rel === '' || rel === 'zh') rel = 'index.html';
+    return '/' + root.join('/') + '/' + rel;
+  }
+  function target(lang) {
+    if (IS_FILE) return fileTarget(lang);
+    var s = segs();
+    if (s[0] === 'zh') s = s.slice(1);
+    if (lang === 'zh') s = ['zh'].concat(s);
+    var rel = s.join('/');
+    if (rel === '' || rel === 'zh') rel = (lang === 'zh' ? 'zh/index.html' : 'index.html');
+    return '/' + (BASE ? BASE + '/' : '') + rel;
+  }
+  function go(lang) {
+    try { localStorage.setItem('ldg-lang', lang); } catch (e) {}
+    window.location.href = target(lang);
+  }
+  function mark() {
+    var zh = isZh();
+    var a = document.getElementById('ldg-lang-en');
+    var b = document.getElementById('ldg-lang-zh');
+    if (a) a.className = zh ? '' : 'active';
+    if (b) b.className = zh ? 'active' : '';
+  }
+  function localizeNav() {
+    if (!isZh()) return;
+    var cur = pathSegs();
+    var czi = zhIdx();
+    var dir = (czi === -1 ? cur.slice(0, -1) : cur.slice(czi, -1)).join('/');
+    document.querySelectorAll('nav a').forEach(function (a) {
+      var h = a.getAttribute('href') || '';
+      if (/^(https?:|#|mailto:)/.test(h)) return;
+      if (/\.html?$/.test(h) || /\/$/.test(h) || h === '') {
+        var abs = new URL(h, window.location.href).pathname;
+        var s = abs.split('/').filter(Boolean);
+        if (BASE && s[0] === BASE) s = s.slice(1);
+        var zi = s.indexOf('zh');
+        var rel = zi !== -1 ? s.slice(zi + 1).join('/') : s.slice(czi).join('/');
+        var tgt = 'zh/' + rel;
+        var f = dir.split('/').filter(Boolean);
+        var t = tgt.split('/').filter(Boolean);
+        var i = 0;
+        while (i < f.length && i < t.length && f[i] === t[i]) i++;
+        var rel = '';
+        for (var j = i; j < f.length; j++) rel += '../';
+        rel += t.slice(i).join('/');
+        a.setAttribute('href', rel);
+      }
+    });
+  }
+  document.getElementById('ldg-lang-en').addEventListener('click', function (e) { e.preventDefault(); go('en'); });
+  document.getElementById('ldg-lang-zh').addEventListener('click', function (e) { e.preventDefault(); go('zh'); });
+  mark();
+  localizeNav();
+})();
+</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-chtml.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+
+
+
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../../../index.html">
+    <span class="navbar-title">Latent Dynamics &amp; Geometry</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="搜索"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="展开或折叠导航栏" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../../index.html"> 
+<span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../../knowledge/concepts/index.html"> 
+<span class="menu-text">Concepts</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../../knowledge/methods/index.html"> 
+<span class="menu-text">Methods</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../../knowledge/math/index.html"> 
+<span class="menu-text">Math</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../../knowledge/papers/index.html"> 
+<span class="menu-text">Papers</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../../toy-models/index.html"> 
+<span class="menu-text">Toy Models</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../../research-questions/index.html"> 
+<span class="menu-text">Research Questions</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../../benchmarks/index.html"> 
+<span class="menu-text">Benchmarks</span></a>
+  </li>  
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/AbelZheng/latent-dynamics-geometry-public"> <i class="bi bi-github" role="img" aria-label="GitHub repository">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="https://github.com/AbelZheng/latent-dynamics-geometry-public/discussions"> 
+<span class="menu-text">Discussions</span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">该页面内容</h2>
+   
+  <ul>
+  <li><a href="#固定区间卡尔曼平滑" id="toc-固定区间卡尔曼平滑" class="nav-link active" data-scroll-target="#固定区间卡尔曼平滑">固定区间卡尔曼平滑</a>
+  <ul class="collapse">
+  <li><a href="#问题" id="toc-问题" class="nav-link" data-scroll-target="#问题">问题</a></li>
+  <li><a href="#输入" id="toc-输入" class="nav-link" data-scroll-target="#输入">输入</a></li>
+  <li><a href="#输出" id="toc-输出" class="nav-link" data-scroll-target="#输出">输出</a></li>
+  <li><a href="#核心思想" id="toc-核心思想" class="nav-link" data-scroll-target="#核心思想">核心思想</a></li>
+  <li><a href="#生成-建模假设" id="toc-生成-建模假设" class="nav-link" data-scroll-target="#生成-建模假设">生成 / 建模假设</a></li>
+  <li><a href="#数学表述" id="toc-数学表述" class="nav-link" data-scroll-target="#数学表述">数学表述</a>
+  <ul class="collapse">
+  <li><a href="#向后条件" id="toc-向后条件" class="nav-link" data-scroll-target="#向后条件">向后条件</a></li>
+  <li><a href="#终端条件" id="toc-终端条件" class="nav-link" data-scroll-target="#终端条件">终端条件</a></li>
+  <li><a href="#rts-向后递推" id="toc-rts-向后递推" class="nav-link" data-scroll-target="#rts-向后递推">RTS 向后递推</a></li>
+  <li><a href="#相邻状态协方差与完整路径后验" id="toc-相邻状态协方差与完整路径后验" class="nav-link" data-scroll-target="#相邻状态协方差与完整路径后验">相邻状态协方差与完整路径后验</a></li>
+  <li><a href="#缺失观测" id="toc-缺失观测" class="nav-link" data-scroll-target="#缺失观测">缺失观测</a></li>
+  <li><a href="#奇异或病态预测协方差" id="toc-奇异或病态预测协方差" class="nav-link" data-scroll-target="#奇异或病态预测协方差">奇异或病态预测协方差</a></li>
+  </ul></li>
+  <li><a href="#学习得到了什么" id="toc-学习得到了什么" class="nav-link" data-scroll-target="#学习得到了什么">学习得到了什么？</a></li>
+  <li><a href="#什么是固定的" id="toc-什么是固定的" class="nav-link" data-scroll-target="#什么是固定的">什么是固定的？</a></li>
+  <li><a href="#时序假设" id="toc-时序假设" class="nav-link" data-scroll-target="#时序假设">时序假设</a></li>
+  <li><a href="#几何假设" id="toc-几何假设" class="nav-link" data-scroll-target="#几何假设">几何假设</a></li>
+  <li><a href="#监督" id="toc-监督" class="nav-link" data-scroll-target="#监督">监督</a></li>
+  <li><a href="#优化-推断" id="toc-优化-推断" class="nav-link" data-scroll-target="#优化-推断">优化 / 推断</a></li>
+  <li><a href="#优点" id="toc-优点" class="nav-link" data-scroll-target="#优点">优点</a></li>
+  <li><a href="#失效模式" id="toc-失效模式" class="nav-link" data-scroll-target="#失效模式">失效模式</a></li>
+  <li><a href="#可辨识性问题" id="toc-可辨识性问题" class="nav-link" data-scroll-target="#可辨识性问题">可辨识性问题</a></li>
+  <li><a href="#与更简单方法的比较" id="toc-与更简单方法的比较" class="nav-link" data-scroll-target="#与更简单方法的比较">与更简单方法的比较</a></li>
+  <li><a href="#评估准则" id="toc-评估准则" class="nav-link" data-scroll-target="#评估准则">评估准则</a></li>
+  <li><a href="#最小玩具模型" id="toc-最小玩具模型" class="nav-link" data-scroll-target="#最小玩具模型">最小玩具模型</a></li>
+  <li><a href="#对-ldg-的意义" id="toc-对-ldg-的意义" class="nav-link" data-scroll-target="#对-ldg-的意义">对 LDG 的意义</a>
+  <ul class="collapse">
+  <li><a href="#小鼠轨迹" id="toc-小鼠轨迹" class="nav-link" data-scroll-target="#小鼠轨迹">小鼠轨迹</a></li>
+  <li><a href="#眼动" id="toc-眼动" class="nav-link" data-scroll-target="#眼动">眼动</a></li>
+  <li><a href="#eeg" id="toc-eeg" class="nav-link" data-scroll-target="#eeg">EEG</a></li>
+  <li><a href="#meg-神经群体数据" id="toc-meg-神经群体数据" class="nav-link" data-scroll-target="#meg-神经群体数据">MEG / 神经群体数据</a></li>
+  </ul></li>
+  <li><a href="#主要来源" id="toc-主要来源" class="nav-link" data-scroll-target="#主要来源">主要来源</a></li>
+  <li><a href="#综述-次级来源" id="toc-综述-次级来源" class="nav-link" data-scroll-target="#综述-次级来源">综述 / 次级来源</a></li>
+  <li><a href="#开放方法学问题" id="toc-开放方法学问题" class="nav-link" data-scroll-target="#开放方法学问题">开放方法学问题</a></li>
+  <li><a href="#成熟度检查表" id="toc-成熟度检查表" class="nav-link" data-scroll-target="#成熟度检查表">成熟度检查表</a></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<div class="quarto-title-block"><div><h1 class="title">固定区间卡尔曼平滑</h1><button type="button" class="btn code-tools-button" id="quarto-code-tools-source"><i class="bi"></i> 代码</button></div></div>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="固定区间卡尔曼平滑" class="level1">
+<h1>固定区间卡尔曼平滑</h1>
+<section id="问题" class="level2">
+<h2 class="anchored" data-anchor-id="问题">问题</h2>
+<p>固定区间卡尔曼平滑在该区间内所有观测可用后，回顾性推断已完成有限区间上的潜状态。对 <span class="math inline">\(1\le t\le T\)</span>，其边际目标是</p>
+<p><span class="math display">\[
+p(z_t\mid x_{1:T},u_{1:T}),
+\]</span></p>
+<p>联合目标是完整路径后验</p>
+<p><span class="math display">\[
+p(z_{1:T}\mid x_{1:T},u_{1:T}).
+\]</span></p>
+<p>当 <span class="math inline">\(t&lt;T\)</span> 时，该分布刻意使用晚于被估计状态的观测。因此它区别于滤波分布 <span class="math inline">\(p(z_t\mid x_{1:t},u_{1:t})\)</span>，不是在线或因果估计。Rauch、Tung 与 Striebel 发展线性动力系统的基础向后平滑递推；现代贝叶斯呈现给出线性高斯模型的闭式固定区间解 <span class="citation" data-cites="RauchTungStriebel1965 Sarkka2013">(<a href="#ref-RauchTungStriebel1965" role="doc-biblioref">Rauch 等 1965年</a>; <a href="#ref-Sarkka2013" role="doc-biblioref">Särkkä 2013年</a>, ch.&nbsp;8)</span>。</p>
+<p>本方法在推断前固定 LGSSM 参数与区间端点。模型规格、参数学习、滤波、平滑与预测保持分离任务。</p>
+</section>
+<section id="输入" class="level2">
+<h2 class="anchored" data-anchor-id="输入">输入</h2>
+<p>平滑器使用与前置滤波方法相同的时间不变输入驱动 LGSSM：</p>
+<p><span class="math display">\[
+z_1\sim\mathcal N(m_1,P_1),
+\]</span></p>
+<p><span class="math display">\[
+z_{t+1}=Az_t+Bu_t+w_t,
+\qquad
+w_t\sim\mathcal N(0,Q),
+\]</span></p>
+<p><span class="math display">\[
+x_t=Cz_t+Du_t+v_t,
+\qquad
+v_t\sim\mathcal N(0,R).
+\]</span></p>
+<p>第一项必需计算是对 <span class="math inline">\(t=1,\ldots,T\)</span> 的完整前向卡尔曼滤波遍历。对每个向后步骤，保留或可复现地重算：</p>
+<ul>
+<li>滤波矩 <span class="math inline">\(m_{t\mid t},P_{t\mid t}\)</span>；</li>
+<li>一步预测矩 <span class="math inline">\(m_{t+1\mid t},P_{t+1\mid t}\)</span>；</li>
+<li>该步骤使用的转移矩阵与过程协方差；以及</li>
+<li>在 <span class="math inline">\(m_{t+1\mid t}=Am_{t\mid t}+Bu_t\)</span> 中使用的已知输入 <span class="math inline">\(u_t\)</span>。</li>
+</ul>
+<p>可复现平滑分析还必须声明：</p>
+<ul>
+<li>有限区间及其端点 <span class="math inline">\(T\)</span> 为何在推断时可用；</li>
+<li>序列边界以及区间是独立还是连接；</li>
+<li>参数出处以及滤波与平滑是否使用相同参数；</li>
+<li>状态、观测与输入单位及坐标约定；</li>
+<li>从前向遍历继承的初始化、缺失观测处理与输入时序；</li>
+<li>存储对重算前向量；</li>
+<li>数值精度、分解与奇异协方差策略；以及</li>
+<li>只需要边际矩、相邻状态矩，还是完整路径后验的表示/样本。</li>
+</ul>
+<p>跨受试者、试次、会话、重置或干预边界平滑断言转移模型跨该边界继续。独立区间必须分别滤波与平滑。</p>
+</section>
+<section id="输出" class="level2">
+<h2 class="anchored" data-anchor-id="输出">输出</h2>
+<p>标准 Rauch–Tung–Striebel（RTS）递推对每个 <span class="math inline">\(t\)</span> 返回</p>
+<p><span class="math display">\[
+p(z_t\mid x_{1:T},u_{1:T})
+=\mathcal N(m_{t\mid T},P_{t\mid T}).
+\]</span></p>
+<p>它还可以提供相邻状态互协方差</p>
+<p><span class="math display">\[
+P_{t,t+1\mid T}
+=\operatorname{Cov}(z_t,z_{t+1}\mid x_{1:T},u_{1:T}),
+\]</span></p>
+<p>以及表示或采样完整路径后验所需的高斯向后条件。单独边际均值不指定路径不确定性；下游使用必须保留所需协方差或条件因子。</p>
+<p>输出以固定模型、观测区间、所选缺失假设与插件参数值为条件。它不是观测轨迹，除非不确定性被单独建模，否则不包含参数不确定性。</p>
+</section>
+<section id="核心思想" class="level2">
+<h2 class="anchored" data-anchor-id="核心思想">核心思想</h2>
+<p>前向滤波器在每个时间概括过去证据。向后遍历询问 <span class="math inline">\(z_{t+1}\)</span> 的全数据估计应如何修正已滤波的 <span class="math inline">\(z_t\)</span> 估计。在马尔可夫模型下，一旦 <span class="math inline">\(z_{t+1}\)</span> 已知，<span class="math inline">\(t\)</span> 之后的观测除了通过 <span class="math inline">\(z_{t+1}\)</span> 的效应外不携带关于 <span class="math inline">\(z_t\)</span> 的额外信息。这产生向后高斯条件与对滤波矩的线性修正 <span class="citation" data-cites="Sarkka2013">(<a href="#ref-Sarkka2013" role="doc-biblioref">Särkkä 2013年</a>, secs. 8.1–8.2)</span>。</p>
+<p>平滑器不施加第二个转移模型。它复用相同 <span class="math inline">\(A,Q\)</span> 与前向预测。因此表观光滑的后验路径可以主要反映声明的较小 <span class="math inline">\(Q\)</span>、强转移耦合或边界条件，而非新发现的动力学定律。</p>
+</section>
+<section id="生成-建模假设" class="level2">
+<h2 class="anchored" data-anchor-id="生成-建模假设">生成 / 建模假设</h2>
+<p>固定区间卡尔曼平滑继承声明 LGSSM 与前向滤波器的所有假设：</p>
+<ul>
+<li>高斯初始状态；</li>
+<li>所选坐标中线性转移与观测映射；</li>
+<li>高斯过程与观测噪声；</li>
+<li>声明的时间独立与过程/观测噪声独立；</li>
+<li>区间内参数固定；</li>
+<li>与前向滤波器所用时序一致的非预期已知输入路径；</li>
+<li>有效一阶马尔可夫状态；以及</li>
+<li>当缺失观测行只是被跳过时缺失无信息。</li>
+</ul>
+<p>在这些假设与精确算术下，后验路径联合高斯，RTS 递推给出精确边际平滑矩。精确性以模型为条件。它不表明线性、高斯性、所选状态维数、<span class="math inline">\(A\)</span>、<span class="math inline">\(Q\)</span>、<span class="math inline">\(C\)</span>、<span class="math inline">\(R\)</span> 或区间边界在科学上正确。</p>
+</section>
+<section id="数学表述" class="level2">
+<h2 class="anchored" data-anchor-id="数学表述">数学表述</h2>
+<p>设</p>
+<p><span class="math display">\[
+m_{t\mid t}=\mathbb E[z_t\mid x_{1:t},u_{1:t}],
+\qquad
+P_{t\mid t}=\operatorname{Cov}(z_t\mid x_{1:t},u_{1:t})
+\]</span></p>
+<p>是前向滤波矩。存储的一步预测是</p>
+<p><span class="math display">\[
+m_{t+1\mid t}=A m_{t\mid t}+Bu_t,
+\]</span></p>
+<p><span class="math display">\[
+P_{t+1\mid t}=A P_{t\mid t}A^\top+Q.
+\]</span></p>
+<p>平滑器通过 <span class="math inline">\(m_{t+1\mid T}\)</span> 与 <span class="math inline">\(P_{t+1\mid T}\)</span> 使用相对时间 <span class="math inline">\(t\)</span> 的未来观测。</p>
+<section id="向后条件" class="level3">
+<h3 class="anchored" data-anchor-id="向后条件">向后条件</h3>
+<p>给定到 <span class="math inline">\(t\)</span> 为止的观测，相邻状态的联合分布为高斯：</p>
+<p><span class="math display">\[
+\begin{pmatrix}z_t\\z_{t+1}\end{pmatrix}
+\Bigm|x_{1:t},u_{1:t}
+\sim
+\mathcal N\!\left(
+\begin{pmatrix}m_{t\mid t}\\m_{t+1\mid t}\end{pmatrix},
+\begin{pmatrix}
+P_{t\mid t} &amp; P_{t\mid t}A^\top\\
+AP_{t\mid t} &amp; P_{t+1\mid t}
+\end{pmatrix}
+\right).
+\]</span></p>
+<p>当 <span class="math inline">\(P_{t+1\mid t}\)</span> 非奇异时，定义 RTS 平滑增益</p>
+<p><span class="math display">\[
+J_t=P_{t\mid t}A^\top P_{t+1\mid t}^{-1}.
+\]</span></p>
+<p>则</p>
+<p><span class="math display">\[
+p(z_t\mid z_{t+1},x_{1:t},u_{1:t})
+=\mathcal N\!\left(
+m_{t\mid t}+J_t(z_{t+1}-m_{t+1\mid t}),
+P_{t\mid t}-J_tP_{t+1\mid t}J_t^\top
+\right).
+\]</span></p>
+<p>输入 <span class="math inline">\(Bu_t\)</span> 出现在预测均值中。它不出现在协方差或增益中，因为输入被视为已知而非随机。</p>
+</section>
+<section id="终端条件" class="level3">
+<h3 class="anchored" data-anchor-id="终端条件">终端条件</h3>
+<p>在已完成区间端点，滤波与固定区间平滑以相同观测为条件，因此</p>
+<p><span class="math display">\[
+m_{T\mid T}^{(s)}=m_{T\mid T},
+\qquad
+P_{T\mid T}^{(s)}=P_{T\mid T}.
+\]</span></p>
+<p>下文把这些终端量简写为 <span class="math inline">\(m_{T\mid T}\)</span> 与 <span class="math inline">\(P_{T\mid T}\)</span>。<span class="math inline">\(T\)</span> 处没有向后修正，因为声明区间内不存在更晚观测。</p>
+</section>
+<section id="rts-向后递推" class="level3">
+<h3 class="anchored" data-anchor-id="rts-向后递推">RTS 向后递推</h3>
+<p>对 <span class="math inline">\(t=T-1,T-2,\ldots,1\)</span>，计算</p>
+<p><span class="math display">\[
+J_t=P_{t\mid t}A^\top P_{t+1\mid t}^{-1},
+\]</span></p>
+<p><span class="math display">\[
+m_{t\mid T}
+=m_{t\mid t}
++J_t\left(m_{t+1\mid T}-m_{t+1\mid t}\right),
+\]</span></p>
+<p><span class="math display">\[
+P_{t\mid T}
+=P_{t\mid t}
++J_t\left(P_{t+1\mid T}-P_{t+1\mid t}\right)J_t^\top.
+\]</span></p>
+<p>这些是闭式 RTS 边际递推 <span class="citation" data-cites="Sarkka2013">(<a href="#ref-Sarkka2013" role="doc-biblioref">Särkkä 2013年</a>, theorem 8.2)</span>。在精确正则模型下，</p>
+<p><span class="math display">\[
+P_{t\mid T}\preceq P_{t\mid t},
+\]</span></p>
+<p>因为对额外观测条件化不能增加高斯条件协方差。该协方差排序是模型条件的；数值非正定结果是实现警告，而非负不确定性。</p>
+</section>
+<section id="相邻状态协方差与完整路径后验" class="level3">
+<h3 class="anchored" data-anchor-id="相邻状态协方差与完整路径后验">相邻状态协方差与完整路径后验</h3>
+<p>相邻状态平滑协方差是</p>
+<p><span class="math display">\[
+P_{t,t+1\mid T}=J_tP_{t+1\mid T},
+\]</span></p>
+<p>转置为 <span class="math inline">\(P_{t+1,t\mid T}=P_{t+1\mid T}J_t^\top\)</span>。这来自 RTS 推导中的联合平滑高斯构造 <span class="citation" data-cites="Sarkka2013">(<a href="#ref-Sarkka2013" role="doc-biblioref">Särkkä 2013年</a>, sec.&nbsp;8.2)</span>。它允许诸如</p>
+<p><span class="math display">\[
+\mathbb E[z_tz_{t+1}^\top\mid x_{1:T},u_{1:T}]
+=P_{t,t+1\mid T}+m_{t\mid T}m_{t+1\mid T}^\top.
+\]</span></p>
+<p>的矩。某些参数学习规程需要此类矩，包括 LGSSM EM E 步 <span class="citation" data-cites="GhahramaniHinton1996">(<a href="#ref-GhahramaniHinton1996" role="doc-biblioref">Ghahramani 和 Hinton 1996年</a>)</span>。它们可用不使平滑本身成为学习算法。</p>
+<p>完整路径后验承认反向分解</p>
+<p><span class="math display">\[
+p(z_{1:T}\mid x_{1:T},u_{1:T})
+=p(z_T\mid x_{1:T},u_{1:T})
+\prod_{t=1}^{T-1}
+p(z_t\mid z_{t+1},x_{1:t},u_{1:t}).
+\]</span></p>
+<p>终端平滑分布与存储向后条件因此定义联合高斯路径后验，并可以支持向后路径采样。只返回 <span class="math inline">\(m_{t\mid T}\)</span> 会省略该联合依赖。</p>
+</section>
+<section id="缺失观测" class="level3">
+<h3 class="anchored" data-anchor-id="缺失观测">缺失观测</h3>
+<p>缺失通道处理发生在前向遍历中。在时间 <span class="math inline">\(t\)</span>，滤波器选择可用观测行，或当没有分量被观测时跳过更新。平滑器随后使用所得存储滤波与预测矩，而不在缺失时间发明观测。</p>
+<p>因为平滑器是回顾性的，较晚观测时间可以跨缺失块修正较早状态。这只有在与滤波器相同的无信息缺失假设下才精确。状态依赖缺失、删失、饱和、事件触发记录或未知序列终止需要显式缺失/观测模型。</p>
+</section>
+<section id="奇异或病态预测协方差" class="level3">
+<h3 class="anchored" data-anchor-id="奇异或病态预测协方差">奇异或病态预测协方差</h3>
+<p>教科书增益公式要求在 <span class="math inline">\(P_{t+1\mid t}\)</span> 中求解。如果 <span class="math inline">\(P_{t+1\mid t}\succ0\)</span>，用 Cholesky 或其他稳定线性求解计算 <span class="math inline">\(J_t\)</span>；不要显式形成逆。复用产生或检查前向预测的同一存储分解可以改善一致性。</p>
+<p>因为 <span class="math inline">\(P_{t\mid t}\)</span> 与 <span class="math inline">\(Q\)</span> 可以只半正定，<span class="math inline">\(P_{t+1\mid t}\)</span> 可以奇异。此时普通全密度逆公式未定义。精确确定性约束需要支持感知退化高斯条件、带兼容性检查的秩揭示分解/广义逆，或为该模型设计的平方根/信息形式平滑器。添加任意抖动会改变 <span class="math inline">\(Q\)</span> 或预测律，必须报告为模型修改，而非中性数值修复。</p>
+<p>如果矩阵理论上正定但病态，检查缩放、近确定性状态方向、弱激励模态以及从前向协方差继承的消去。对输出对称化可以移除微小反对称舍入，但不能修复实质性非正定协方差。因子化前向与向后算法是相同后验目标的计算变体；其详细推导在本有界对象之外。</p>
+</section>
+</section>
+<section id="学习得到了什么" class="level2">
+<h2 class="anchored" data-anchor-id="学习得到了什么">学习得到了什么？</h2>
+<p>模型参数固定时，平滑器不学习任何参数。它在看到完整区间后计算条件分布与路径矩。</p>
+<p>EM 算法可以在其 E 步使用平滑均值、协方差与相邻状态矩，然后在单独 M 步更新参数 <span class="citation" data-cites="GhahramaniHinton1996">(<a href="#ref-GhahramaniHinton1996" role="doc-biblioref">Ghahramani 和 Hinton 1996年</a>)</span>。重复这两个操作是参数学习；单次 RTS 遍历不是。把平滑均值当作普通回归中的无误差状态观测会丢弃后验协方差，并可能偏差不确定性主张。</p>
+</section>
+<section id="什么是固定的" class="level2">
+<h2 class="anchored" data-anchor-id="什么是固定的">什么是固定的？</h2>
+<p>分析者固定 LGSSM 结构与参数、状态维数、输入路径与时序、区间端点、序列边界、初始化、缺失假设、坐标约定、数值表示、存储前向量与请求的后验摘要。</p>
+<p>端点 <span class="math inline">\(T\)</span> 是推断问题的一部分。延长区间可以改变较早 <span class="math inline">\(t\)</span> 的 <span class="math inline">\(m_{t\mid T}\)</span>。在检查所需轨迹特征后选择端点是分析选择，不是平滑器发现的性质。</p>
+</section>
+<section id="时序假设" class="level2">
+<h2 class="anchored" data-anchor-id="时序假设">时序假设</h2>
+<p>固定区间平滑显式是回顾性的。对 <span class="math inline">\(t&lt;T\)</span>，估计可以依赖每个较晚观测 <span class="math inline">\(x_{t+1:T}\)</span>。它不得被描述为时间 <span class="math inline">\(t\)</span> 在线控制器、实时解码器或前瞻决策可用的信息。</p>
+<p>固定滞后平滑、固定点平滑、在线滤波与乱序测量更新求解不同时序问题。每当新数据到达就重跑 RTS 平滑器可以产生一系列回顾性修订，但不使先前修订状态成为过去可用的因果估计。</p>
+<p>等步假设、时变转移与边界重置继承自 LGSSM。不规则间隙需要正确的依赖间隙 <span class="math inline">\(A_t,Q_t\)</span>；缺失观测本身不改变经过时间。</p>
+</section>
+<section id="几何假设" class="level2">
+<h2 class="anchored" data-anchor-id="几何假设">几何假设</h2>
+<p>平滑器在与 LGSSM 相同的有限维状态向量空间中操作。均值、协方差椭球、平滑增益与相邻状态互协方差依赖所选状态坐标。</p>
+<p>在可逆状态变换 <span class="math inline">\(z'_t=Tz_t\)</span> 下，所有模型与后验量必须一致变换：</p>
+<p><span class="math display">\[
+m'_{t\mid T}=Tm_{t\mid T},
+\qquad
+P'_{t\mid T}=TP_{t\mid T}T^\top,
+\]</span></p>
+<p><span class="math display">\[
+P'_{t,t+1\mid T}=TP_{t,t+1\mid T}T^\top.
+\]</span></p>
+<p>因此相同可观测分布可以承认不同潜轴与视觉上不同坐标轨迹。光滑后验曲线不是流形、黎曼度量、本征维数或特权生物坐标系的证明。</p>
+</section>
+<section id="监督" class="level2">
+<h2 class="anchored" data-anchor-id="监督">监督</h2>
+<p>不需要外部结果标签。完整区间上的观测条件化后验；它们不是普通监督学习意义上的标签。已知输入在其声明时序下保持条件变量。</p>
+<p>用于定义区间、选择状态维数、调优 <span class="math inline">\(Q/R\)</span>、选择参数化或选择报告哪些平滑特征的标签或结果会引入任务依赖。评估表现时，这些决定需要防泄漏训练/验证分离。</p>
+</section>
+<section id="优化-推断" class="level2">
+<h2 class="anchored" data-anchor-id="优化-推断">优化 / 推断</h2>
+<p>对固定参数与正则协方差表示，RTS 平滑是确定性前向–向后高斯推断算法。它不是非凸优化规程。向后遍历对固定状态维数在时间步数上线性，但需要存储/重算前向矩与稳定矩阵求解。</p>
+<p>实现正确性应通过短序列上完整联合高斯分布的直接条件化检查。边际均值、协方差、相邻互协方差与向后样本应在声明数值容差内一致。合理光滑图不是数值验证。</p>
+</section>
+<section id="优点" class="level2">
+<h2 class="anchored" data-anchor-id="优点">优点</h2>
+<ul>
+<li>声明固定线性高斯模型下精确固定区间状态边际。</li>
+<li>使用已完成区间内所有观测，同时传播后验不确定性。</li>
+<li>复用标准前向卡尔曼滤波器与有界向后递推。</li>
+<li>为路径不确定性与 EM E 步提供相邻状态矩与向后条件。</li>
+<li>在模型下跨缺失观测修正状态，无需确定性插值。</li>
+<li>在非线性、非高斯或高斯过程轨迹方法之前提供规范回顾性基线。</li>
+</ul>
+</section>
+<section id="失效模式" class="level2">
+<h2 class="anchored" data-anchor-id="失效模式">失效模式</h2>
+<ul>
+<li><strong>未来数据泄漏：</strong> 把 <span class="math inline">\(m_{t\mid T}\)</span> 报告为时间 <span class="math inline">\(t\)</span> 可用会使在线或前瞻主张无效。</li>
+<li><strong>模型误设：</strong> 非线性动力学、非高斯尾部、有色噪声、被省略输入、时间变化或相关过程/观测噪声产生模型失配后验。</li>
+<li><strong>小 <span class="math inline">\(Q\)</span> 过度平滑：</strong> 模型可以抑制真实快速变化，使后验看起来比过程更规则。</li>
+<li><strong>大 <span class="math inline">\(Q\)</span> 欠平滑：</strong> 弱转移耦合可以留下很少回顾性修正。</li>
+<li><strong>错误边界：</strong> 跨重置或独立序列平滑会发明连续性。</li>
+<li><strong>端点依赖：</strong> 较晚观测或改变 <span class="math inline">\(T\)</span> 可以实质修正较早状态。</li>
+<li><strong>初始化效应：</strong> 短区间或弱观测可能使早期平滑状态对先验敏感。</li>
+<li><strong>有信息缺失：</strong> 当缺失本身依赖状态或测量值时，跳过观测无效。</li>
+<li><strong>离群值：</strong> 高斯观测模型可以把一个非典型测量向后传播到许多状态。</li>
+<li><strong>奇异/病态预测：</strong> 不稳定求解可以损坏增益并产生不对称或非正定协方差。</li>
+<li><strong>参数插件确定性：</strong> 以估计参数为条件的后验协方差可以低估总不确定性。</li>
+<li><strong>存储/重算失配：</strong> 使用来自不同参数集或数值约定的前向量会使向后遍历无效。</li>
+<li><strong>解读越界：</strong> 光滑后验均值可能被误认为已发现动力学、机制、因果性或唯一潜轨迹。</li>
+</ul>
+</section>
+<section id="可辨识性问题" class="level2">
+<h2 class="anchored" data-anchor-id="可辨识性问题">可辨识性问题</h2>
+<p>平滑不辨识从观测非可辨识的 LGSSM。观测等价状态坐标参数化可以产生相同观测律，而其平滑坐标、增益、转移条目与后验互协方差相应变换。</p>
+<p>在单一固定模型下使用未来观测可以降低一个状态的条件不确定性。它不选择唯一模型规格、不证明另一设计下的可观测性，也不把坐标约定变成科学身份。小 <span class="math inline">\(P_{t\mid T}\)</span> 意味着模型条件集中，而非结构辨识或机制确定性。</p>
+</section>
+<section id="与更简单方法的比较" class="level2">
+<h2 class="anchored" data-anchor-id="与更简单方法的比较">与更简单方法的比较</h2>
+<ul>
+<li><strong>卡尔曼滤波：</strong> 所需主基线。它只使用到 <span class="math inline">\(t\)</span> 为止的观测，适合在线使用。平滑可以通过使用更晚数据降低模型条件状态不确定性，但信息集不同。</li>
+<li><strong>开环传播：</strong> 忽略所有测量更新，检验后验对观测的依赖程度。</li>
+<li><strong>仅测量或线性插值：</strong> 对直接观测坐标或间隙的简单回顾性基线；它们一般缺少声明状态转移不确定性模型。</li>
+<li><strong>双侧移动平均：</strong> 使用未来观测，但不表示潜转移/观测模型或校准状态协方差。</li>
+<li><strong>静态因子分析：</strong> 无转移律推断每个时间点，检验时间耦合是否增加价值。</li>
+<li><strong>直接批量高斯条件化：</strong> 短序列正确性神谕，从单个联合高斯系统计算相同后验，无需 RTS 分解。</li>
+</ul>
+<p>不应仅仅因为平滑器可访问更多数据就声称它优于滤波器。比较必须陈述预期任务是回顾性重构还是在线推断。</p>
+</section>
+<section id="评估准则" class="level2">
+<h2 class="anchored" data-anchor-id="评估准则">评估准则</h2>
+<ol type="1">
+<li><strong>批量等价检验：</strong> 在小问题上，把所有平滑均值、边际协方差与相邻互协方差与直接联合高斯条件化比较。</li>
+<li><strong>已知状态模拟：</strong> 当潜真值真正可用时，报告时间分辨状态 RMSE 或马氏误差与区间/路径覆盖。</li>
+<li><strong>滤波比较：</strong> 在相同参数下比较滤波器与平滑器，同时显式承认其不同信息集。</li>
+<li><strong>掩蔽观测评估：</strong> 从前向与后向遍历都扣留声明观测，然后对其条件预测分布评分。已同化观测不能作为独立测试目标。</li>
+<li><strong>缺失块压力检验：</strong> 变化间隙长度与位置，包括靠近区间端点的间隙。</li>
+<li><strong>边界敏感性：</strong> 变化初始化与科学上合理的区间边界，而不跨越真正重置。</li>
+<li><strong>参数失配检验：</strong> 在受控模拟中扰动 <span class="math inline">\(A,Q,C,R\)</span> 或输入，检查偏差、覆盖与误差的回顾性传播。</li>
+<li><strong>数值检查：</strong> 监控协方差对称性、半正定容差、分解失败、缩放敏感性以及协方差与因子化实现之间的一致性。</li>
+<li><strong>序列级划分：</strong> 在训练序列上估计参数，并在声称泛化时评估留出试次、会话、受试者或条件。</li>
+</ol>
+<p>观测序列似然由前向预测密度计算；对相同序列平滑不会创造更好似然。已知模拟器真值下更好的状态重构支持该模型/任务组合，而非一般模型有效性。</p>
+</section>
+<section id="最小玩具模型" class="level2">
+<h2 class="anchored" data-anchor-id="最小玩具模型">最小玩具模型</h2>
+<p>考虑标量随机游走</p>
+<p><span class="math display">\[
+z_1\sim\mathcal N(m_1,p_1),
+\qquad
+z_{t+1}=z_t+w_t,
+\quad w_t\sim\mathcal N(0,q),
+\]</span></p>
+<p><span class="math display">\[
+x_t=z_t+v_t,
+\quad v_t\sim\mathcal N(0,r),
+\]</span></p>
+<p>其中 <span class="math inline">\(q\ge0\)</span>、<span class="math inline">\(r&gt;0\)</span>。假设前向滤波器已产生 <span class="math inline">\(m_{t\mid t},p_{t\mid t}\)</span> 且</p>
+<p><span class="math display">\[
+m_{t+1\mid t}=m_{t\mid t},
+\qquad
+p_{t+1\mid t}=p_{t\mid t}+q.
+\]</span></p>
+<p>标量平滑增益与向后递推是</p>
+<p><span class="math display">\[
+j_t=\frac{p_{t\mid t}}{p_{t\mid t}+q},
+\]</span></p>
+<p><span class="math display">\[
+m_{t\mid T}
+=m_{t\mid t}
++j_t\left(m_{t+1\mid T}-m_{t\mid t}\right),
+\]</span></p>
+<p><span class="math display">\[
+p_{t\mid T}
+=p_{t\mid t}
++j_t^2\left(p_{t+1\mid T}-p_{t\mid t}-q\right).
+\]</span></p>
+<p>终端状态与滤波不变。较早状态可以被较晚观测修正，修正强度由模型条件不确定性比控制。如果 <span class="math inline">\(q\)</span> 非常小，较晚证据强向后传播；该行为反映假设的近常值过程。</p>
+<p>未来的非可执行玩具契约应生成保留潜真值的有限标量序列，并比较开环传播、仅测量、滤波、RTS 平滑、双侧平均与直接批量条件化。必需压力情形是中央缺失块、错误 <span class="math inline">\(q/r\)</span>、<span class="math inline">\(T\)</span> 附近离群值、被错误当作连续的重置、错误初始先验与确定性或近确定性状态方向。只对照保留模拟器真值对状态 RMSE 与覆盖评分，只对未同化掩蔽观测评分，并对照批量条件化验证相邻状态矩。本方法对象不创建代码、数据、图或结果。</p>
+</section>
+<section id="对-ldg-的意义" class="level2">
+<h2 class="anchored" data-anchor-id="对-ldg-的意义">对 LDG 的意义</h2>
+<p>固定区间卡尔曼平滑是 LDG 的规范回顾性潜轨迹推断基线。它阐明全区间证据如何改变状态不确定性，同时保持模型规格、滤波、平滑与参数学习分离。它还在 GPFA 或带显式时间光滑性先验的其他方法之前提供合适比较语境。</p>
+<div class="callout callout-style-default callout-warning callout-titled" title="这并不蕴含">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">警告</span>这并不蕴含
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>光滑后验均值不是已发现动力学、向量场、机制、因果路径、流形或唯一辨识潜轨迹。平滑路径的形状与不确定性是声明 LGSSM、参数、区间、缺失假设与到 <span class="math inline">\(T\)</span> 为止所有观测的推论。固定区间平滑是回顾性的，不得被报告为较早时间可用的在线估计。</p>
+</div>
+</div>
+<section id="小鼠轨迹" class="level3">
+<h3 class="anchored" data-anchor-id="小鼠轨迹">小鼠轨迹</h3>
+<p>不保留模态特定经验主张。回顾性运动状态重构依赖采样、边界、输入、过程噪声与测量假设，不是在线行为状态估计。</p>
+</section>
+<section id="眼动" class="level3">
+<h3 class="anchored" data-anchor-id="眼动">眼动</h3>
+<p>不保留模态特定经验主张。眨眼、事件触发区间、饱和与状态依赖缺失可以使普通跳行平滑失效。</p>
+</section>
+<section id="eeg" class="level3">
+<h3 class="anchored" data-anchor-id="eeg">EEG</h3>
+<p>不保留模态特定经验主张。重参考、传感器混合、伪迹、非平稳性与时间预处理必须被表示或当作模型失配处理；光滑潜坐标不自动是神经源。</p>
+</section>
+<section id="meg-神经群体数据" class="level3">
+<h3 class="anchored" data-anchor-id="meg-神经群体数据">MEG / 神经群体数据</h3>
+<p>不保留模态特定经验主张。试次边界、条件对齐、单元/通道缺失、观测噪声相关与参数共享定义后验。回顾性光滑性不确立群体动力学或机制。</p>
+</section>
+</section>
+<section id="主要来源" class="level2">
+<h2 class="anchored" data-anchor-id="主要来源">主要来源</h2>
+<ul>
+<li>Rauch、Tung 与 Striebel 作为向后全区间平滑方法的基础历史归因被保留 <span class="citation" data-cites="RauchTungStriebel1965">(<a href="#ref-RauchTungStriebel1965" role="doc-biblioref">Rauch 等 1965年</a>)</span>。本次运行核查已验证发布元数据与摘要，而非完整方程级推导；因此显示递推由下方完全核查的现代推导支持。</li>
+<li>Ghahramani 与 Hinton 给出经核查的 LGSSM 参数估计处理，其中前向滤波与向后平滑为单独 EM E 步提供后验状态与相邻状态矩 <span class="citation" data-cites="GhahramaniHinton1996">(<a href="#ref-GhahramaniHinton1996" role="doc-biblioref">Ghahramani 和 Hinton 1996年</a>)</span>。</li>
+</ul>
+</section>
+<section id="综述-次级来源" class="level2">
+<h2 class="anchored" data-anchor-id="综述-次级来源">综述 / 次级来源</h2>
+<ul>
+<li>Särkkä 给出经核查的贝叶斯固定区间平滑方程、RTS 增益、终端条件、边际协方差递推、联合相邻状态构造与对滤波的区分 <span class="citation" data-cites="Sarkka2013">(<a href="#ref-Sarkka2013" role="doc-biblioref">Särkkä 2013年</a>, ch.&nbsp;8)</span>。</li>
+</ul>
+</section>
+<section id="开放方法学问题" class="level2">
+<h2 class="anchored" data-anchor-id="开放方法学问题">开放方法学问题</h2>
+<ul>
+<li>何时应把参数不确定性积分进路径不确定性，而非使用插件 LGSSM 参数？</li>
+<li>对奇异过程模型与精确状态约束，哪个因子化或约束平滑器合适？</li>
+<li>应如何选择区间端点，而不把回顾性轨迹调到偏好特征？</li>
+<li>哪些缺失机制需要联合状态–缺失推断，而非跳行前向遍历？</li>
+<li>应如何跨观测等价坐标系比较平滑轨迹？</li>
+<li>何时固定区间平滑掩盖切换或鲁棒模型应表示的科学上有意义的间断？</li>
+</ul>
+</section>
+<section id="成熟度检查表" class="level2">
+<h2 class="anchored" data-anchor-id="成熟度检查表">成熟度检查表</h2>
+<ul class="task-list">
+<li><label><input type="checkbox" checked="">使用完整方法 schema 与稳定 LGSSM/卡尔曼滤波记号。</label></li>
+<li><label><input type="checkbox" checked="">定义边际与完整路径固定区间后验目标。</label></li>
+<li><label><input type="checkbox" checked="">使回顾性未来数据边界显式，并拒绝在线解读。</label></li>
+<li><label><input type="checkbox" checked="">要求完整前向滤波器并陈述终端条件。</label></li>
+<li><label><input type="checkbox" checked="">给出 RTS 增益与向后均值/协方差递推。</label></li>
+<li><label><input type="checkbox" checked="">给出来源准确的相邻状态协方差与完整路径向后分解。</label></li>
+<li><label><input type="checkbox" checked="">覆盖奇异/病态预测协方差与因子化解边界。</label></li>
+<li><label><input type="checkbox" checked="">从前向遍历继承缺失观测处理并陈述有信息缺失界限。</label></li>
+<li><label><input type="checkbox" checked="">把平滑推断与模型规格、似然计算和 EM 学习分开。</label></li>
+<li><label><input type="checkbox" checked="">陈述学习/固定量、时间、几何、监督与继承可辨识性。</label></li>
+<li><label><input type="checkbox" checked="">包含失效、基线、评估准则与解析/仅散文玩具契约。</label></li>
+<li><label><input type="checkbox" checked="">不保留模态特定经验主张。</label></li>
+<li><label><input type="checkbox" checked="">基础、权威贝叶斯与 LGSSM 学习来源经核查与验证。</label></li>
+<li><label><input type="checkbox" checked="">在一轮有界引文范围修正后完成独立混合审查；聚焦复审返回 PASS。</label></li>
+<li><label><input type="checkbox" checked="">在对象特定 PASS 与验证后，根据记录的审查决定授权稳定晋升。</label></li>
+</ul>
+
+
+<!-- -->
+
+
+</section>
+</section>
+
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography" id="quarto-bibliography"><h2 class="anchored quarto-appendix-heading">参考文献</h2><div id="refs" class="references csl-bib-body hanging-indent" role="list">
+<div id="ref-GhahramaniHinton1996" class="csl-entry" role="listitem">
+Ghahramani, Zoubin, 和 Geoffrey E. Hinton. 1996年. <em>Parameter Estimation for Linear Dynamical Systems</em>. CRG-TR-96-2. Department of Computer Science, University of Toronto. <a href="https://www.cs.toronto.edu/~hinton/absps/tr-96-2.pdf">https://www.cs.toronto.edu/~hinton/absps/tr-96-2.pdf</a>.
+</div>
+<div id="ref-RauchTungStriebel1965" class="csl-entry" role="listitem">
+Rauch, H. E., F. Tung, 和 C. T. Striebel. 1965年. <span>《Maximum Likelihood Estimates of Linear Dynamic Systems》</span>. <em>AIAA Journal</em> 3 (8): 1445～50. <a href="https://doi.org/10.2514/3.3166">https://doi.org/10.2514/3.3166</a>.
+</div>
+<div id="ref-Sarkka2013" class="csl-entry" role="listitem">
+Särkkä, Simo. 2013年. <em>Bayesian Filtering and Smoothing</em>. 卷 3. Institute of Mathematical Statistics Textbooks. Cambridge University Press. <a href="https://doi.org/10.1017/CBO9781139344203">https://doi.org/10.1017/CBO9781139344203</a>.
+</div>
+</div></section></div></main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "已复制");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "已复制");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+    const viewSource = window.document.getElementById('quarto-view-source') ||
+                       window.document.getElementById('quarto-code-tools-source');
+    if (viewSource) {
+      const sourceUrl = viewSource.getAttribute("data-quarto-source-url");
+      viewSource.addEventListener("click", function(e) {
+        if (sourceUrl) {
+          // rstudio viewer pane
+          if (/\bcapabilities=\b/.test(window.location)) {
+            window.open(sourceUrl);
+          } else {
+            window.location.href = sourceUrl;
+          }
+        } else {
+          const modal = new bootstrap.Modal(document.getElementById('quarto-embedded-source-code-modal'));
+          modal.show();
+        }
+        return false;
+      });
+    }
+    function toggleCodeHandler(show) {
+      return function(e) {
+        const cellDetails = window.document.querySelectorAll(".cell details.code-fold");
+        for (let i=0; i<cellDetails.length; i++) {
+          const details = cellDetails[i];
+          if (show) {
+            details.open = true;
+          } else {
+            details.removeAttribute("open");
+          }
+        }
+        const cellCodeDivs = window.document.querySelectorAll(".cell div.sourceCode.cell-code");
+        const fromCls = show ? "hidden" : "unhidden";
+        const toCls = show ? "unhidden" : "hidden";
+        for (let i=0; i<cellCodeDivs.length; i++) {
+          const codeDiv = cellCodeDivs[i];
+          if (codeDiv.classList.contains(fromCls)) {
+            codeDiv.classList.remove(fromCls);
+            codeDiv.classList.add(toCls);
+          } 
+        }
+        return false;
+      }
+    }
+    const hideAllCode = window.document.getElementById("quarto-hide-all-code");
+    if (hideAllCode) {
+      hideAllCode.addEventListener("click", toggleCodeHandler(false));
+    }
+    const showAllCode = window.document.getElementById("quarto-show-all-code");
+    if (showAllCode) {
+      showAllCode.addEventListener("click", toggleCodeHandler(true));
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/abelzheng\.github\.io\/latent-dynamics-geometry-public\/");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+            // target, if specified
+            link.setAttribute("target", "_blank");
+            if (link.getAttribute("rel") === null) {
+              link.setAttribute("rel", "noopener");
+            }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">源代码</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1" data-shortcodes="false"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="an">title:</span><span class="co"> "固定区间卡尔曼平滑"</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="an">lang:</span><span class="co"> zh-CN</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="an">comments:</span><span class="co"> false</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="an">object_type:</span><span class="co"> method</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="an">maturity:</span><span class="co"> L2</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="an">status:</span><span class="co"> stable</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="an">domain:</span><span class="co"> [latent-modeling, temporal-modeling, state-estimation, statistics]</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="an">tags:</span><span class="co"> [kalman-smoother, rts-smoother, linear-gaussian, retrospective-inference]</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="an">prerequisites:</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="co">- knowledge/methods/kalman-filtering.qmd</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="co">- knowledge/methods/linear-gaussian-state-space-model.qmd</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="co">- knowledge/concepts/latent-trajectory.qmd</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="co">- knowledge/concepts/observation-model.qmd</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="an">related:</span></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="co">- knowledge/concepts/identifiability.qmd</span></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="co">- knowledge/methods/factor-analysis.qmd</span></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a><span class="an">created:</span><span class="co"> 2026-08-19</span></span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a><span class="an">updated:</span><span class="co"> 2026-08-19</span></span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a><span class="fu"># 固定区间卡尔曼平滑</span></span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a><span class="fu">## 问题</span></span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>固定区间卡尔曼平滑在该区间内所有观测可用后，回顾性推断已完成有限区间上的潜状态。对 $1\le t\le T$，其边际目标是</span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>p(z_t\mid x_{1:T},u_{1:T}),</span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>联合目标是完整路径后验</span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a>p(z_{1:T}\mid x_{1:T},u_{1:T}).</span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a>当 $t&lt;T$ 时，该分布刻意使用晚于被估计状态的观测。因此它区别于滤波分布 $p(z_t\mid x_{1:t},u_{1:t})$，不是在线或因果估计。Rauch、Tung 与 Striebel 发展线性动力系统的基础向后平滑递推；现代贝叶斯呈现给出线性高斯模型的闭式固定区间解 <span class="co">[</span><span class="ot">@RauchTungStriebel1965; @Sarkka2013, ch. 8</span><span class="co">]</span>。</span>
+<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a>本方法在推断前固定 LGSSM 参数与区间端点。模型规格、参数学习、滤波、平滑与预测保持分离任务。</span>
+<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a><span class="fu">## 输入</span></span>
+<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a>平滑器使用与前置滤波方法相同的时间不变输入驱动 LGSSM：</span>
+<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a>z_1\sim\mathcal N(m_1,P_1),</span>
+<span id="cb1-48"><a href="#cb1-48" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-50"><a href="#cb1-50" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-51"><a href="#cb1-51" aria-hidden="true" tabindex="-1"></a>z_{t+1}=Az_t+Bu_t+w_t,</span>
+<span id="cb1-52"><a href="#cb1-52" aria-hidden="true" tabindex="-1"></a>\qquad</span>
+<span id="cb1-53"><a href="#cb1-53" aria-hidden="true" tabindex="-1"></a>w_t\sim\mathcal N(0,Q),</span>
+<span id="cb1-54"><a href="#cb1-54" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-55"><a href="#cb1-55" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-56"><a href="#cb1-56" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-57"><a href="#cb1-57" aria-hidden="true" tabindex="-1"></a>x_t=Cz_t+Du_t+v_t,</span>
+<span id="cb1-58"><a href="#cb1-58" aria-hidden="true" tabindex="-1"></a>\qquad</span>
+<span id="cb1-59"><a href="#cb1-59" aria-hidden="true" tabindex="-1"></a>v_t\sim\mathcal N(0,R).</span>
+<span id="cb1-60"><a href="#cb1-60" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-61"><a href="#cb1-61" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-62"><a href="#cb1-62" aria-hidden="true" tabindex="-1"></a>第一项必需计算是对 $t=1,\ldots,T$ 的完整前向卡尔曼滤波遍历。对每个向后步骤，保留或可复现地重算：</span>
+<span id="cb1-63"><a href="#cb1-63" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-64"><a href="#cb1-64" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>滤波矩 $m_{t\mid t},P_{t\mid t}$；</span>
+<span id="cb1-65"><a href="#cb1-65" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>一步预测矩 $m_{t+1\mid t},P_{t+1\mid t}$；</span>
+<span id="cb1-66"><a href="#cb1-66" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>该步骤使用的转移矩阵与过程协方差；以及</span>
+<span id="cb1-67"><a href="#cb1-67" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>在 $m_{t+1\mid t}=Am_{t\mid t}+Bu_t$ 中使用的已知输入 $u_t$。</span>
+<span id="cb1-68"><a href="#cb1-68" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-69"><a href="#cb1-69" aria-hidden="true" tabindex="-1"></a>可复现平滑分析还必须声明：</span>
+<span id="cb1-70"><a href="#cb1-70" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-71"><a href="#cb1-71" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>有限区间及其端点 $T$ 为何在推断时可用；</span>
+<span id="cb1-72"><a href="#cb1-72" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>序列边界以及区间是独立还是连接；</span>
+<span id="cb1-73"><a href="#cb1-73" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>参数出处以及滤波与平滑是否使用相同参数；</span>
+<span id="cb1-74"><a href="#cb1-74" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>状态、观测与输入单位及坐标约定；</span>
+<span id="cb1-75"><a href="#cb1-75" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>从前向遍历继承的初始化、缺失观测处理与输入时序；</span>
+<span id="cb1-76"><a href="#cb1-76" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>存储对重算前向量；</span>
+<span id="cb1-77"><a href="#cb1-77" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>数值精度、分解与奇异协方差策略；以及</span>
+<span id="cb1-78"><a href="#cb1-78" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>只需要边际矩、相邻状态矩，还是完整路径后验的表示/样本。</span>
+<span id="cb1-79"><a href="#cb1-79" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-80"><a href="#cb1-80" aria-hidden="true" tabindex="-1"></a>跨受试者、试次、会话、重置或干预边界平滑断言转移模型跨该边界继续。独立区间必须分别滤波与平滑。</span>
+<span id="cb1-81"><a href="#cb1-81" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-82"><a href="#cb1-82" aria-hidden="true" tabindex="-1"></a><span class="fu">## 输出</span></span>
+<span id="cb1-83"><a href="#cb1-83" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-84"><a href="#cb1-84" aria-hidden="true" tabindex="-1"></a>标准 Rauch–Tung–Striebel（RTS）递推对每个 $t$ 返回</span>
+<span id="cb1-85"><a href="#cb1-85" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-86"><a href="#cb1-86" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-87"><a href="#cb1-87" aria-hidden="true" tabindex="-1"></a>p(z_t\mid x_{1:T},u_{1:T})</span>
+<span id="cb1-88"><a href="#cb1-88" aria-hidden="true" tabindex="-1"></a>=\mathcal N(m_{t\mid T},P_{t\mid T}).</span>
+<span id="cb1-89"><a href="#cb1-89" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-90"><a href="#cb1-90" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-91"><a href="#cb1-91" aria-hidden="true" tabindex="-1"></a>它还可以提供相邻状态互协方差</span>
+<span id="cb1-92"><a href="#cb1-92" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-93"><a href="#cb1-93" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-94"><a href="#cb1-94" aria-hidden="true" tabindex="-1"></a>P_{t,t+1\mid T}</span>
+<span id="cb1-95"><a href="#cb1-95" aria-hidden="true" tabindex="-1"></a>=\operatorname{Cov}(z_t,z_{t+1}\mid x_{1:T},u_{1:T}),</span>
+<span id="cb1-96"><a href="#cb1-96" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-97"><a href="#cb1-97" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-98"><a href="#cb1-98" aria-hidden="true" tabindex="-1"></a>以及表示或采样完整路径后验所需的高斯向后条件。单独边际均值不指定路径不确定性；下游使用必须保留所需协方差或条件因子。</span>
+<span id="cb1-99"><a href="#cb1-99" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-100"><a href="#cb1-100" aria-hidden="true" tabindex="-1"></a>输出以固定模型、观测区间、所选缺失假设与插件参数值为条件。它不是观测轨迹，除非不确定性被单独建模，否则不包含参数不确定性。</span>
+<span id="cb1-101"><a href="#cb1-101" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-102"><a href="#cb1-102" aria-hidden="true" tabindex="-1"></a><span class="fu">## 核心思想</span></span>
+<span id="cb1-103"><a href="#cb1-103" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-104"><a href="#cb1-104" aria-hidden="true" tabindex="-1"></a>前向滤波器在每个时间概括过去证据。向后遍历询问 $z_{t+1}$ 的全数据估计应如何修正已滤波的 $z_t$ 估计。在马尔可夫模型下，一旦 $z_{t+1}$ 已知，$t$ 之后的观测除了通过 $z_{t+1}$ 的效应外不携带关于 $z_t$ 的额外信息。这产生向后高斯条件与对滤波矩的线性修正 <span class="co">[</span><span class="ot">@Sarkka2013, secs. 8.1--8.2</span><span class="co">]</span>。</span>
+<span id="cb1-105"><a href="#cb1-105" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-106"><a href="#cb1-106" aria-hidden="true" tabindex="-1"></a>平滑器不施加第二个转移模型。它复用相同 $A,Q$ 与前向预测。因此表观光滑的后验路径可以主要反映声明的较小 $Q$、强转移耦合或边界条件，而非新发现的动力学定律。</span>
+<span id="cb1-107"><a href="#cb1-107" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-108"><a href="#cb1-108" aria-hidden="true" tabindex="-1"></a><span class="fu">## 生成 / 建模假设</span></span>
+<span id="cb1-109"><a href="#cb1-109" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-110"><a href="#cb1-110" aria-hidden="true" tabindex="-1"></a>固定区间卡尔曼平滑继承声明 LGSSM 与前向滤波器的所有假设：</span>
+<span id="cb1-111"><a href="#cb1-111" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-112"><a href="#cb1-112" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>高斯初始状态；</span>
+<span id="cb1-113"><a href="#cb1-113" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>所选坐标中线性转移与观测映射；</span>
+<span id="cb1-114"><a href="#cb1-114" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>高斯过程与观测噪声；</span>
+<span id="cb1-115"><a href="#cb1-115" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>声明的时间独立与过程/观测噪声独立；</span>
+<span id="cb1-116"><a href="#cb1-116" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>区间内参数固定；</span>
+<span id="cb1-117"><a href="#cb1-117" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>与前向滤波器所用时序一致的非预期已知输入路径；</span>
+<span id="cb1-118"><a href="#cb1-118" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>有效一阶马尔可夫状态；以及</span>
+<span id="cb1-119"><a href="#cb1-119" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>当缺失观测行只是被跳过时缺失无信息。</span>
+<span id="cb1-120"><a href="#cb1-120" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-121"><a href="#cb1-121" aria-hidden="true" tabindex="-1"></a>在这些假设与精确算术下，后验路径联合高斯，RTS 递推给出精确边际平滑矩。精确性以模型为条件。它不表明线性、高斯性、所选状态维数、$A$、$Q$、$C$、$R$ 或区间边界在科学上正确。</span>
+<span id="cb1-122"><a href="#cb1-122" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-123"><a href="#cb1-123" aria-hidden="true" tabindex="-1"></a><span class="fu">## 数学表述</span></span>
+<span id="cb1-124"><a href="#cb1-124" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-125"><a href="#cb1-125" aria-hidden="true" tabindex="-1"></a>设</span>
+<span id="cb1-126"><a href="#cb1-126" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-127"><a href="#cb1-127" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-128"><a href="#cb1-128" aria-hidden="true" tabindex="-1"></a>m_{t\mid t}=\mathbb E<span class="co">[</span><span class="ot">z_t\mid x_{1:t},u_{1:t}</span><span class="co">]</span>,</span>
+<span id="cb1-129"><a href="#cb1-129" aria-hidden="true" tabindex="-1"></a>\qquad</span>
+<span id="cb1-130"><a href="#cb1-130" aria-hidden="true" tabindex="-1"></a>P_{t\mid t}=\operatorname{Cov}(z_t\mid x_{1:t},u_{1:t})</span>
+<span id="cb1-131"><a href="#cb1-131" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-132"><a href="#cb1-132" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-133"><a href="#cb1-133" aria-hidden="true" tabindex="-1"></a>是前向滤波矩。存储的一步预测是</span>
+<span id="cb1-134"><a href="#cb1-134" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-135"><a href="#cb1-135" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-136"><a href="#cb1-136" aria-hidden="true" tabindex="-1"></a>m_{t+1\mid t}=A m_{t\mid t}+Bu_t,</span>
+<span id="cb1-137"><a href="#cb1-137" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-138"><a href="#cb1-138" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-139"><a href="#cb1-139" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-140"><a href="#cb1-140" aria-hidden="true" tabindex="-1"></a>P_{t+1\mid t}=A P_{t\mid t}A^\top+Q.</span>
+<span id="cb1-141"><a href="#cb1-141" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-142"><a href="#cb1-142" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-143"><a href="#cb1-143" aria-hidden="true" tabindex="-1"></a>平滑器通过 $m_{t+1\mid T}$ 与 $P_{t+1\mid T}$ 使用相对时间 $t$ 的未来观测。</span>
+<span id="cb1-144"><a href="#cb1-144" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-145"><a href="#cb1-145" aria-hidden="true" tabindex="-1"></a><span class="fu">### 向后条件</span></span>
+<span id="cb1-146"><a href="#cb1-146" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-147"><a href="#cb1-147" aria-hidden="true" tabindex="-1"></a>给定到 $t$ 为止的观测，相邻状态的联合分布为高斯：</span>
+<span id="cb1-148"><a href="#cb1-148" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-149"><a href="#cb1-149" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-150"><a href="#cb1-150" aria-hidden="true" tabindex="-1"></a>\begin{pmatrix}z_t<span class="sc">\\</span>z_{t+1}\end{pmatrix}</span>
+<span id="cb1-151"><a href="#cb1-151" aria-hidden="true" tabindex="-1"></a>\Bigm|x_{1:t},u_{1:t}</span>
+<span id="cb1-152"><a href="#cb1-152" aria-hidden="true" tabindex="-1"></a>\sim</span>
+<span id="cb1-153"><a href="#cb1-153" aria-hidden="true" tabindex="-1"></a>\mathcal N<span class="sc">\!</span>\left(</span>
+<span id="cb1-154"><a href="#cb1-154" aria-hidden="true" tabindex="-1"></a>\begin{pmatrix}m_{t\mid t}<span class="sc">\\</span>m_{t+1\mid t}\end{pmatrix},</span>
+<span id="cb1-155"><a href="#cb1-155" aria-hidden="true" tabindex="-1"></a>\begin{pmatrix}</span>
+<span id="cb1-156"><a href="#cb1-156" aria-hidden="true" tabindex="-1"></a>P_{t\mid t} &amp; P_{t\mid t}A^\top<span class="sc">\\</span></span>
+<span id="cb1-157"><a href="#cb1-157" aria-hidden="true" tabindex="-1"></a>AP_{t\mid t} &amp; P_{t+1\mid t}</span>
+<span id="cb1-158"><a href="#cb1-158" aria-hidden="true" tabindex="-1"></a>\end{pmatrix}</span>
+<span id="cb1-159"><a href="#cb1-159" aria-hidden="true" tabindex="-1"></a>\right).</span>
+<span id="cb1-160"><a href="#cb1-160" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-161"><a href="#cb1-161" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-162"><a href="#cb1-162" aria-hidden="true" tabindex="-1"></a>当 $P_{t+1\mid t}$ 非奇异时，定义 RTS 平滑增益</span>
+<span id="cb1-163"><a href="#cb1-163" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-164"><a href="#cb1-164" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-165"><a href="#cb1-165" aria-hidden="true" tabindex="-1"></a>J_t=P_{t\mid t}A^\top P_{t+1\mid t}^{-1}.</span>
+<span id="cb1-166"><a href="#cb1-166" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-167"><a href="#cb1-167" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-168"><a href="#cb1-168" aria-hidden="true" tabindex="-1"></a>则</span>
+<span id="cb1-169"><a href="#cb1-169" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-170"><a href="#cb1-170" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-171"><a href="#cb1-171" aria-hidden="true" tabindex="-1"></a>p(z_t\mid z_{t+1},x_{1:t},u_{1:t})</span>
+<span id="cb1-172"><a href="#cb1-172" aria-hidden="true" tabindex="-1"></a>=\mathcal N<span class="sc">\!</span>\left(</span>
+<span id="cb1-173"><a href="#cb1-173" aria-hidden="true" tabindex="-1"></a>m_{t\mid t}+J_t(z_{t+1}-m_{t+1\mid t}),</span>
+<span id="cb1-174"><a href="#cb1-174" aria-hidden="true" tabindex="-1"></a>P_{t\mid t}-J_tP_{t+1\mid t}J_t^\top</span>
+<span id="cb1-175"><a href="#cb1-175" aria-hidden="true" tabindex="-1"></a>\right).</span>
+<span id="cb1-176"><a href="#cb1-176" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-177"><a href="#cb1-177" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-178"><a href="#cb1-178" aria-hidden="true" tabindex="-1"></a>输入 $Bu_t$ 出现在预测均值中。它不出现在协方差或增益中，因为输入被视为已知而非随机。</span>
+<span id="cb1-179"><a href="#cb1-179" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-180"><a href="#cb1-180" aria-hidden="true" tabindex="-1"></a><span class="fu">### 终端条件</span></span>
+<span id="cb1-181"><a href="#cb1-181" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-182"><a href="#cb1-182" aria-hidden="true" tabindex="-1"></a>在已完成区间端点，滤波与固定区间平滑以相同观测为条件，因此</span>
+<span id="cb1-183"><a href="#cb1-183" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-184"><a href="#cb1-184" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-185"><a href="#cb1-185" aria-hidden="true" tabindex="-1"></a>m_{T\mid T}^{(s)}=m_{T\mid T},</span>
+<span id="cb1-186"><a href="#cb1-186" aria-hidden="true" tabindex="-1"></a>\qquad</span>
+<span id="cb1-187"><a href="#cb1-187" aria-hidden="true" tabindex="-1"></a>P_{T\mid T}^{(s)}=P_{T\mid T}.</span>
+<span id="cb1-188"><a href="#cb1-188" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-189"><a href="#cb1-189" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-190"><a href="#cb1-190" aria-hidden="true" tabindex="-1"></a>下文把这些终端量简写为 $m_{T\mid T}$ 与 $P_{T\mid T}$。$T$ 处没有向后修正，因为声明区间内不存在更晚观测。</span>
+<span id="cb1-191"><a href="#cb1-191" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-192"><a href="#cb1-192" aria-hidden="true" tabindex="-1"></a><span class="fu">### RTS 向后递推</span></span>
+<span id="cb1-193"><a href="#cb1-193" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-194"><a href="#cb1-194" aria-hidden="true" tabindex="-1"></a>对 $t=T-1,T-2,\ldots,1$，计算</span>
+<span id="cb1-195"><a href="#cb1-195" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-196"><a href="#cb1-196" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-197"><a href="#cb1-197" aria-hidden="true" tabindex="-1"></a>J_t=P_{t\mid t}A^\top P_{t+1\mid t}^{-1},</span>
+<span id="cb1-198"><a href="#cb1-198" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-199"><a href="#cb1-199" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-200"><a href="#cb1-200" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-201"><a href="#cb1-201" aria-hidden="true" tabindex="-1"></a>m_{t\mid T}</span>
+<span id="cb1-202"><a href="#cb1-202" aria-hidden="true" tabindex="-1"></a>=m_{t\mid t}</span>
+<span id="cb1-203"><a href="#cb1-203" aria-hidden="true" tabindex="-1"></a>+J_t\left(m_{t+1\mid T}-m_{t+1\mid t}\right),</span>
+<span id="cb1-204"><a href="#cb1-204" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-205"><a href="#cb1-205" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-206"><a href="#cb1-206" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-207"><a href="#cb1-207" aria-hidden="true" tabindex="-1"></a>P_{t\mid T}</span>
+<span id="cb1-208"><a href="#cb1-208" aria-hidden="true" tabindex="-1"></a>=P_{t\mid t}</span>
+<span id="cb1-209"><a href="#cb1-209" aria-hidden="true" tabindex="-1"></a>+J_t\left(P_{t+1\mid T}-P_{t+1\mid t}\right)J_t^\top.</span>
+<span id="cb1-210"><a href="#cb1-210" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-211"><a href="#cb1-211" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-212"><a href="#cb1-212" aria-hidden="true" tabindex="-1"></a>这些是闭式 RTS 边际递推 <span class="co">[</span><span class="ot">@Sarkka2013, theorem 8.2</span><span class="co">]</span>。在精确正则模型下，</span>
+<span id="cb1-213"><a href="#cb1-213" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-214"><a href="#cb1-214" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-215"><a href="#cb1-215" aria-hidden="true" tabindex="-1"></a>P_{t\mid T}\preceq P_{t\mid t},</span>
+<span id="cb1-216"><a href="#cb1-216" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-217"><a href="#cb1-217" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-218"><a href="#cb1-218" aria-hidden="true" tabindex="-1"></a>因为对额外观测条件化不能增加高斯条件协方差。该协方差排序是模型条件的；数值非正定结果是实现警告，而非负不确定性。</span>
+<span id="cb1-219"><a href="#cb1-219" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-220"><a href="#cb1-220" aria-hidden="true" tabindex="-1"></a><span class="fu">### 相邻状态协方差与完整路径后验</span></span>
+<span id="cb1-221"><a href="#cb1-221" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-222"><a href="#cb1-222" aria-hidden="true" tabindex="-1"></a>相邻状态平滑协方差是</span>
+<span id="cb1-223"><a href="#cb1-223" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-224"><a href="#cb1-224" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-225"><a href="#cb1-225" aria-hidden="true" tabindex="-1"></a>P_{t,t+1\mid T}=J_tP_{t+1\mid T},</span>
+<span id="cb1-226"><a href="#cb1-226" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-227"><a href="#cb1-227" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-228"><a href="#cb1-228" aria-hidden="true" tabindex="-1"></a>转置为 $P_{t+1,t\mid T}=P_{t+1\mid T}J_t^\top$。这来自 RTS 推导中的联合平滑高斯构造 <span class="co">[</span><span class="ot">@Sarkka2013, sec. 8.2</span><span class="co">]</span>。它允许诸如</span>
+<span id="cb1-229"><a href="#cb1-229" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-230"><a href="#cb1-230" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-231"><a href="#cb1-231" aria-hidden="true" tabindex="-1"></a>\mathbb E<span class="co">[</span><span class="ot">z_tz_{t+1}^\top\mid x_{1:T},u_{1:T}</span><span class="co">]</span></span>
+<span id="cb1-232"><a href="#cb1-232" aria-hidden="true" tabindex="-1"></a>=P_{t,t+1\mid T}+m_{t\mid T}m_{t+1\mid T}^\top.</span>
+<span id="cb1-233"><a href="#cb1-233" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-234"><a href="#cb1-234" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-235"><a href="#cb1-235" aria-hidden="true" tabindex="-1"></a>的矩。某些参数学习规程需要此类矩，包括 LGSSM EM E 步 <span class="co">[</span><span class="ot">@GhahramaniHinton1996</span><span class="co">]</span>。它们可用不使平滑本身成为学习算法。</span>
+<span id="cb1-236"><a href="#cb1-236" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-237"><a href="#cb1-237" aria-hidden="true" tabindex="-1"></a>完整路径后验承认反向分解</span>
+<span id="cb1-238"><a href="#cb1-238" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-239"><a href="#cb1-239" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-240"><a href="#cb1-240" aria-hidden="true" tabindex="-1"></a>p(z_{1:T}\mid x_{1:T},u_{1:T})</span>
+<span id="cb1-241"><a href="#cb1-241" aria-hidden="true" tabindex="-1"></a>=p(z_T\mid x_{1:T},u_{1:T})</span>
+<span id="cb1-242"><a href="#cb1-242" aria-hidden="true" tabindex="-1"></a>\prod_{t=1}^{T-1}</span>
+<span id="cb1-243"><a href="#cb1-243" aria-hidden="true" tabindex="-1"></a>p(z_t\mid z_{t+1},x_{1:t},u_{1:t}).</span>
+<span id="cb1-244"><a href="#cb1-244" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-245"><a href="#cb1-245" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-246"><a href="#cb1-246" aria-hidden="true" tabindex="-1"></a>终端平滑分布与存储向后条件因此定义联合高斯路径后验，并可以支持向后路径采样。只返回 $m_{t\mid T}$ 会省略该联合依赖。</span>
+<span id="cb1-247"><a href="#cb1-247" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-248"><a href="#cb1-248" aria-hidden="true" tabindex="-1"></a><span class="fu">### 缺失观测</span></span>
+<span id="cb1-249"><a href="#cb1-249" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-250"><a href="#cb1-250" aria-hidden="true" tabindex="-1"></a>缺失通道处理发生在前向遍历中。在时间 $t$，滤波器选择可用观测行，或当没有分量被观测时跳过更新。平滑器随后使用所得存储滤波与预测矩，而不在缺失时间发明观测。</span>
+<span id="cb1-251"><a href="#cb1-251" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-252"><a href="#cb1-252" aria-hidden="true" tabindex="-1"></a>因为平滑器是回顾性的，较晚观测时间可以跨缺失块修正较早状态。这只有在与滤波器相同的无信息缺失假设下才精确。状态依赖缺失、删失、饱和、事件触发记录或未知序列终止需要显式缺失/观测模型。</span>
+<span id="cb1-253"><a href="#cb1-253" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-254"><a href="#cb1-254" aria-hidden="true" tabindex="-1"></a><span class="fu">### 奇异或病态预测协方差</span></span>
+<span id="cb1-255"><a href="#cb1-255" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-256"><a href="#cb1-256" aria-hidden="true" tabindex="-1"></a>教科书增益公式要求在 $P_{t+1\mid t}$ 中求解。如果 $P_{t+1\mid t}\succ0$，用 Cholesky 或其他稳定线性求解计算 $J_t$；不要显式形成逆。复用产生或检查前向预测的同一存储分解可以改善一致性。</span>
+<span id="cb1-257"><a href="#cb1-257" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-258"><a href="#cb1-258" aria-hidden="true" tabindex="-1"></a>因为 $P_{t\mid t}$ 与 $Q$ 可以只半正定，$P_{t+1\mid t}$ 可以奇异。此时普通全密度逆公式未定义。精确确定性约束需要支持感知退化高斯条件、带兼容性检查的秩揭示分解/广义逆，或为该模型设计的平方根/信息形式平滑器。添加任意抖动会改变 $Q$ 或预测律，必须报告为模型修改，而非中性数值修复。</span>
+<span id="cb1-259"><a href="#cb1-259" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-260"><a href="#cb1-260" aria-hidden="true" tabindex="-1"></a>如果矩阵理论上正定但病态，检查缩放、近确定性状态方向、弱激励模态以及从前向协方差继承的消去。对输出对称化可以移除微小反对称舍入，但不能修复实质性非正定协方差。因子化前向与向后算法是相同后验目标的计算变体；其详细推导在本有界对象之外。</span>
+<span id="cb1-261"><a href="#cb1-261" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-262"><a href="#cb1-262" aria-hidden="true" tabindex="-1"></a><span class="fu">## 学习得到了什么？</span></span>
+<span id="cb1-263"><a href="#cb1-263" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-264"><a href="#cb1-264" aria-hidden="true" tabindex="-1"></a>模型参数固定时，平滑器不学习任何参数。它在看到完整区间后计算条件分布与路径矩。</span>
+<span id="cb1-265"><a href="#cb1-265" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-266"><a href="#cb1-266" aria-hidden="true" tabindex="-1"></a>EM 算法可以在其 E 步使用平滑均值、协方差与相邻状态矩，然后在单独 M 步更新参数 <span class="co">[</span><span class="ot">@GhahramaniHinton1996</span><span class="co">]</span>。重复这两个操作是参数学习；单次 RTS 遍历不是。把平滑均值当作普通回归中的无误差状态观测会丢弃后验协方差，并可能偏差不确定性主张。</span>
+<span id="cb1-267"><a href="#cb1-267" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-268"><a href="#cb1-268" aria-hidden="true" tabindex="-1"></a><span class="fu">## 什么是固定的？</span></span>
+<span id="cb1-269"><a href="#cb1-269" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-270"><a href="#cb1-270" aria-hidden="true" tabindex="-1"></a>分析者固定 LGSSM 结构与参数、状态维数、输入路径与时序、区间端点、序列边界、初始化、缺失假设、坐标约定、数值表示、存储前向量与请求的后验摘要。</span>
+<span id="cb1-271"><a href="#cb1-271" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-272"><a href="#cb1-272" aria-hidden="true" tabindex="-1"></a>端点 $T$ 是推断问题的一部分。延长区间可以改变较早 $t$ 的 $m_{t\mid T}$。在检查所需轨迹特征后选择端点是分析选择，不是平滑器发现的性质。</span>
+<span id="cb1-273"><a href="#cb1-273" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-274"><a href="#cb1-274" aria-hidden="true" tabindex="-1"></a><span class="fu">## 时序假设</span></span>
+<span id="cb1-275"><a href="#cb1-275" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-276"><a href="#cb1-276" aria-hidden="true" tabindex="-1"></a>固定区间平滑显式是回顾性的。对 $t&lt;T$，估计可以依赖每个较晚观测 $x_{t+1:T}$。它不得被描述为时间 $t$ 在线控制器、实时解码器或前瞻决策可用的信息。</span>
+<span id="cb1-277"><a href="#cb1-277" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-278"><a href="#cb1-278" aria-hidden="true" tabindex="-1"></a>固定滞后平滑、固定点平滑、在线滤波与乱序测量更新求解不同时序问题。每当新数据到达就重跑 RTS 平滑器可以产生一系列回顾性修订，但不使先前修订状态成为过去可用的因果估计。</span>
+<span id="cb1-279"><a href="#cb1-279" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-280"><a href="#cb1-280" aria-hidden="true" tabindex="-1"></a>等步假设、时变转移与边界重置继承自 LGSSM。不规则间隙需要正确的依赖间隙 $A_t,Q_t$；缺失观测本身不改变经过时间。</span>
+<span id="cb1-281"><a href="#cb1-281" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-282"><a href="#cb1-282" aria-hidden="true" tabindex="-1"></a><span class="fu">## 几何假设</span></span>
+<span id="cb1-283"><a href="#cb1-283" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-284"><a href="#cb1-284" aria-hidden="true" tabindex="-1"></a>平滑器在与 LGSSM 相同的有限维状态向量空间中操作。均值、协方差椭球、平滑增益与相邻状态互协方差依赖所选状态坐标。</span>
+<span id="cb1-285"><a href="#cb1-285" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-286"><a href="#cb1-286" aria-hidden="true" tabindex="-1"></a>在可逆状态变换 $z'_t=Tz_t$ 下，所有模型与后验量必须一致变换：</span>
+<span id="cb1-287"><a href="#cb1-287" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-288"><a href="#cb1-288" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-289"><a href="#cb1-289" aria-hidden="true" tabindex="-1"></a>m'_{t\mid T}=Tm_{t\mid T},</span>
+<span id="cb1-290"><a href="#cb1-290" aria-hidden="true" tabindex="-1"></a>\qquad</span>
+<span id="cb1-291"><a href="#cb1-291" aria-hidden="true" tabindex="-1"></a>P'_{t\mid T}=TP_{t\mid T}T^\top,</span>
+<span id="cb1-292"><a href="#cb1-292" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-293"><a href="#cb1-293" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-294"><a href="#cb1-294" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-295"><a href="#cb1-295" aria-hidden="true" tabindex="-1"></a>P'_{t,t+1\mid T}=TP_{t,t+1\mid T}T^\top.</span>
+<span id="cb1-296"><a href="#cb1-296" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-297"><a href="#cb1-297" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-298"><a href="#cb1-298" aria-hidden="true" tabindex="-1"></a>因此相同可观测分布可以承认不同潜轴与视觉上不同坐标轨迹。光滑后验曲线不是流形、黎曼度量、本征维数或特权生物坐标系的证明。</span>
+<span id="cb1-299"><a href="#cb1-299" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-300"><a href="#cb1-300" aria-hidden="true" tabindex="-1"></a><span class="fu">## 监督</span></span>
+<span id="cb1-301"><a href="#cb1-301" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-302"><a href="#cb1-302" aria-hidden="true" tabindex="-1"></a>不需要外部结果标签。完整区间上的观测条件化后验；它们不是普通监督学习意义上的标签。已知输入在其声明时序下保持条件变量。</span>
+<span id="cb1-303"><a href="#cb1-303" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-304"><a href="#cb1-304" aria-hidden="true" tabindex="-1"></a>用于定义区间、选择状态维数、调优 $Q/R$、选择参数化或选择报告哪些平滑特征的标签或结果会引入任务依赖。评估表现时，这些决定需要防泄漏训练/验证分离。</span>
+<span id="cb1-305"><a href="#cb1-305" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-306"><a href="#cb1-306" aria-hidden="true" tabindex="-1"></a><span class="fu">## 优化 / 推断</span></span>
+<span id="cb1-307"><a href="#cb1-307" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-308"><a href="#cb1-308" aria-hidden="true" tabindex="-1"></a>对固定参数与正则协方差表示，RTS 平滑是确定性前向–向后高斯推断算法。它不是非凸优化规程。向后遍历对固定状态维数在时间步数上线性，但需要存储/重算前向矩与稳定矩阵求解。</span>
+<span id="cb1-309"><a href="#cb1-309" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-310"><a href="#cb1-310" aria-hidden="true" tabindex="-1"></a>实现正确性应通过短序列上完整联合高斯分布的直接条件化检查。边际均值、协方差、相邻互协方差与向后样本应在声明数值容差内一致。合理光滑图不是数值验证。</span>
+<span id="cb1-311"><a href="#cb1-311" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-312"><a href="#cb1-312" aria-hidden="true" tabindex="-1"></a><span class="fu">## 优点</span></span>
+<span id="cb1-313"><a href="#cb1-313" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-314"><a href="#cb1-314" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>声明固定线性高斯模型下精确固定区间状态边际。</span>
+<span id="cb1-315"><a href="#cb1-315" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>使用已完成区间内所有观测，同时传播后验不确定性。</span>
+<span id="cb1-316"><a href="#cb1-316" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>复用标准前向卡尔曼滤波器与有界向后递推。</span>
+<span id="cb1-317"><a href="#cb1-317" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>为路径不确定性与 EM E 步提供相邻状态矩与向后条件。</span>
+<span id="cb1-318"><a href="#cb1-318" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>在模型下跨缺失观测修正状态，无需确定性插值。</span>
+<span id="cb1-319"><a href="#cb1-319" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>在非线性、非高斯或高斯过程轨迹方法之前提供规范回顾性基线。</span>
+<span id="cb1-320"><a href="#cb1-320" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-321"><a href="#cb1-321" aria-hidden="true" tabindex="-1"></a><span class="fu">## 失效模式</span></span>
+<span id="cb1-322"><a href="#cb1-322" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-323"><a href="#cb1-323" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**未来数据泄漏：** 把 $m_{t\mid T}$ 报告为时间 $t$ 可用会使在线或前瞻主张无效。</span>
+<span id="cb1-324"><a href="#cb1-324" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**模型误设：** 非线性动力学、非高斯尾部、有色噪声、被省略输入、时间变化或相关过程/观测噪声产生模型失配后验。</span>
+<span id="cb1-325"><a href="#cb1-325" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**小 $Q$ 过度平滑：** 模型可以抑制真实快速变化，使后验看起来比过程更规则。</span>
+<span id="cb1-326"><a href="#cb1-326" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**大 $Q$ 欠平滑：** 弱转移耦合可以留下很少回顾性修正。</span>
+<span id="cb1-327"><a href="#cb1-327" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**错误边界：** 跨重置或独立序列平滑会发明连续性。</span>
+<span id="cb1-328"><a href="#cb1-328" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**端点依赖：** 较晚观测或改变 $T$ 可以实质修正较早状态。</span>
+<span id="cb1-329"><a href="#cb1-329" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**初始化效应：** 短区间或弱观测可能使早期平滑状态对先验敏感。</span>
+<span id="cb1-330"><a href="#cb1-330" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**有信息缺失：** 当缺失本身依赖状态或测量值时，跳过观测无效。</span>
+<span id="cb1-331"><a href="#cb1-331" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**离群值：** 高斯观测模型可以把一个非典型测量向后传播到许多状态。</span>
+<span id="cb1-332"><a href="#cb1-332" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**奇异/病态预测：** 不稳定求解可以损坏增益并产生不对称或非正定协方差。</span>
+<span id="cb1-333"><a href="#cb1-333" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**参数插件确定性：** 以估计参数为条件的后验协方差可以低估总不确定性。</span>
+<span id="cb1-334"><a href="#cb1-334" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**存储/重算失配：** 使用来自不同参数集或数值约定的前向量会使向后遍历无效。</span>
+<span id="cb1-335"><a href="#cb1-335" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**解读越界：** 光滑后验均值可能被误认为已发现动力学、机制、因果性或唯一潜轨迹。</span>
+<span id="cb1-336"><a href="#cb1-336" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-337"><a href="#cb1-337" aria-hidden="true" tabindex="-1"></a><span class="fu">## 可辨识性问题</span></span>
+<span id="cb1-338"><a href="#cb1-338" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-339"><a href="#cb1-339" aria-hidden="true" tabindex="-1"></a>平滑不辨识从观测非可辨识的 LGSSM。观测等价状态坐标参数化可以产生相同观测律，而其平滑坐标、增益、转移条目与后验互协方差相应变换。</span>
+<span id="cb1-340"><a href="#cb1-340" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-341"><a href="#cb1-341" aria-hidden="true" tabindex="-1"></a>在单一固定模型下使用未来观测可以降低一个状态的条件不确定性。它不选择唯一模型规格、不证明另一设计下的可观测性，也不把坐标约定变成科学身份。小 $P_{t\mid T}$ 意味着模型条件集中，而非结构辨识或机制确定性。</span>
+<span id="cb1-342"><a href="#cb1-342" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-343"><a href="#cb1-343" aria-hidden="true" tabindex="-1"></a><span class="fu">## 与更简单方法的比较</span></span>
+<span id="cb1-344"><a href="#cb1-344" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-345"><a href="#cb1-345" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**卡尔曼滤波：** 所需主基线。它只使用到 $t$ 为止的观测，适合在线使用。平滑可以通过使用更晚数据降低模型条件状态不确定性，但信息集不同。</span>
+<span id="cb1-346"><a href="#cb1-346" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**开环传播：** 忽略所有测量更新，检验后验对观测的依赖程度。</span>
+<span id="cb1-347"><a href="#cb1-347" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**仅测量或线性插值：** 对直接观测坐标或间隙的简单回顾性基线；它们一般缺少声明状态转移不确定性模型。</span>
+<span id="cb1-348"><a href="#cb1-348" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**双侧移动平均：** 使用未来观测，但不表示潜转移/观测模型或校准状态协方差。</span>
+<span id="cb1-349"><a href="#cb1-349" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**静态因子分析：** 无转移律推断每个时间点，检验时间耦合是否增加价值。</span>
+<span id="cb1-350"><a href="#cb1-350" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**直接批量高斯条件化：** 短序列正确性神谕，从单个联合高斯系统计算相同后验，无需 RTS 分解。</span>
+<span id="cb1-351"><a href="#cb1-351" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-352"><a href="#cb1-352" aria-hidden="true" tabindex="-1"></a>不应仅仅因为平滑器可访问更多数据就声称它优于滤波器。比较必须陈述预期任务是回顾性重构还是在线推断。</span>
+<span id="cb1-353"><a href="#cb1-353" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-354"><a href="#cb1-354" aria-hidden="true" tabindex="-1"></a><span class="fu">## 评估准则</span></span>
+<span id="cb1-355"><a href="#cb1-355" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-356"><a href="#cb1-356" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>**批量等价检验：** 在小问题上，把所有平滑均值、边际协方差与相邻互协方差与直接联合高斯条件化比较。</span>
+<span id="cb1-357"><a href="#cb1-357" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>**已知状态模拟：** 当潜真值真正可用时，报告时间分辨状态 RMSE 或马氏误差与区间/路径覆盖。</span>
+<span id="cb1-358"><a href="#cb1-358" aria-hidden="true" tabindex="-1"></a><span class="ss">3. </span>**滤波比较：** 在相同参数下比较滤波器与平滑器，同时显式承认其不同信息集。</span>
+<span id="cb1-359"><a href="#cb1-359" aria-hidden="true" tabindex="-1"></a><span class="ss">4. </span>**掩蔽观测评估：** 从前向与后向遍历都扣留声明观测，然后对其条件预测分布评分。已同化观测不能作为独立测试目标。</span>
+<span id="cb1-360"><a href="#cb1-360" aria-hidden="true" tabindex="-1"></a><span class="ss">5. </span>**缺失块压力检验：** 变化间隙长度与位置，包括靠近区间端点的间隙。</span>
+<span id="cb1-361"><a href="#cb1-361" aria-hidden="true" tabindex="-1"></a><span class="ss">6. </span>**边界敏感性：** 变化初始化与科学上合理的区间边界，而不跨越真正重置。</span>
+<span id="cb1-362"><a href="#cb1-362" aria-hidden="true" tabindex="-1"></a><span class="ss">7. </span>**参数失配检验：** 在受控模拟中扰动 $A,Q,C,R$ 或输入，检查偏差、覆盖与误差的回顾性传播。</span>
+<span id="cb1-363"><a href="#cb1-363" aria-hidden="true" tabindex="-1"></a><span class="ss">8. </span>**数值检查：** 监控协方差对称性、半正定容差、分解失败、缩放敏感性以及协方差与因子化实现之间的一致性。</span>
+<span id="cb1-364"><a href="#cb1-364" aria-hidden="true" tabindex="-1"></a><span class="ss">9. </span>**序列级划分：** 在训练序列上估计参数，并在声称泛化时评估留出试次、会话、受试者或条件。</span>
+<span id="cb1-365"><a href="#cb1-365" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-366"><a href="#cb1-366" aria-hidden="true" tabindex="-1"></a>观测序列似然由前向预测密度计算；对相同序列平滑不会创造更好似然。已知模拟器真值下更好的状态重构支持该模型/任务组合，而非一般模型有效性。</span>
+<span id="cb1-367"><a href="#cb1-367" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-368"><a href="#cb1-368" aria-hidden="true" tabindex="-1"></a><span class="fu">## 最小玩具模型</span></span>
+<span id="cb1-369"><a href="#cb1-369" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-370"><a href="#cb1-370" aria-hidden="true" tabindex="-1"></a>考虑标量随机游走</span>
+<span id="cb1-371"><a href="#cb1-371" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-372"><a href="#cb1-372" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-373"><a href="#cb1-373" aria-hidden="true" tabindex="-1"></a>z_1\sim\mathcal N(m_1,p_1),</span>
+<span id="cb1-374"><a href="#cb1-374" aria-hidden="true" tabindex="-1"></a>\qquad</span>
+<span id="cb1-375"><a href="#cb1-375" aria-hidden="true" tabindex="-1"></a>z_{t+1}=z_t+w_t,</span>
+<span id="cb1-376"><a href="#cb1-376" aria-hidden="true" tabindex="-1"></a>\quad w_t\sim\mathcal N(0,q),</span>
+<span id="cb1-377"><a href="#cb1-377" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-378"><a href="#cb1-378" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-379"><a href="#cb1-379" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-380"><a href="#cb1-380" aria-hidden="true" tabindex="-1"></a>x_t=z_t+v_t,</span>
+<span id="cb1-381"><a href="#cb1-381" aria-hidden="true" tabindex="-1"></a>\quad v_t\sim\mathcal N(0,r),</span>
+<span id="cb1-382"><a href="#cb1-382" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-383"><a href="#cb1-383" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-384"><a href="#cb1-384" aria-hidden="true" tabindex="-1"></a>其中 $q\ge0$、$r&gt;0$。假设前向滤波器已产生 $m_{t\mid t},p_{t\mid t}$ 且</span>
+<span id="cb1-385"><a href="#cb1-385" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-386"><a href="#cb1-386" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-387"><a href="#cb1-387" aria-hidden="true" tabindex="-1"></a>m_{t+1\mid t}=m_{t\mid t},</span>
+<span id="cb1-388"><a href="#cb1-388" aria-hidden="true" tabindex="-1"></a>\qquad</span>
+<span id="cb1-389"><a href="#cb1-389" aria-hidden="true" tabindex="-1"></a>p_{t+1\mid t}=p_{t\mid t}+q.</span>
+<span id="cb1-390"><a href="#cb1-390" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-391"><a href="#cb1-391" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-392"><a href="#cb1-392" aria-hidden="true" tabindex="-1"></a>标量平滑增益与向后递推是</span>
+<span id="cb1-393"><a href="#cb1-393" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-394"><a href="#cb1-394" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-395"><a href="#cb1-395" aria-hidden="true" tabindex="-1"></a>j_t=\frac{p_{t\mid t}}{p_{t\mid t}+q},</span>
+<span id="cb1-396"><a href="#cb1-396" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-397"><a href="#cb1-397" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-398"><a href="#cb1-398" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-399"><a href="#cb1-399" aria-hidden="true" tabindex="-1"></a>m_{t\mid T}</span>
+<span id="cb1-400"><a href="#cb1-400" aria-hidden="true" tabindex="-1"></a>=m_{t\mid t}</span>
+<span id="cb1-401"><a href="#cb1-401" aria-hidden="true" tabindex="-1"></a>+j_t\left(m_{t+1\mid T}-m_{t\mid t}\right),</span>
+<span id="cb1-402"><a href="#cb1-402" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-403"><a href="#cb1-403" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-404"><a href="#cb1-404" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-405"><a href="#cb1-405" aria-hidden="true" tabindex="-1"></a>p_{t\mid T}</span>
+<span id="cb1-406"><a href="#cb1-406" aria-hidden="true" tabindex="-1"></a>=p_{t\mid t}</span>
+<span id="cb1-407"><a href="#cb1-407" aria-hidden="true" tabindex="-1"></a>+j_t^2\left(p_{t+1\mid T}-p_{t\mid t}-q\right).</span>
+<span id="cb1-408"><a href="#cb1-408" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-409"><a href="#cb1-409" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-410"><a href="#cb1-410" aria-hidden="true" tabindex="-1"></a>终端状态与滤波不变。较早状态可以被较晚观测修正，修正强度由模型条件不确定性比控制。如果 $q$ 非常小，较晚证据强向后传播；该行为反映假设的近常值过程。</span>
+<span id="cb1-411"><a href="#cb1-411" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-412"><a href="#cb1-412" aria-hidden="true" tabindex="-1"></a>未来的非可执行玩具契约应生成保留潜真值的有限标量序列，并比较开环传播、仅测量、滤波、RTS 平滑、双侧平均与直接批量条件化。必需压力情形是中央缺失块、错误 $q/r$、$T$ 附近离群值、被错误当作连续的重置、错误初始先验与确定性或近确定性状态方向。只对照保留模拟器真值对状态 RMSE 与覆盖评分，只对未同化掩蔽观测评分，并对照批量条件化验证相邻状态矩。本方法对象不创建代码、数据、图或结果。</span>
+<span id="cb1-413"><a href="#cb1-413" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-414"><a href="#cb1-414" aria-hidden="true" tabindex="-1"></a><span class="fu">## 对 LDG 的意义</span></span>
+<span id="cb1-415"><a href="#cb1-415" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-416"><a href="#cb1-416" aria-hidden="true" tabindex="-1"></a>固定区间卡尔曼平滑是 LDG 的规范回顾性潜轨迹推断基线。它阐明全区间证据如何改变状态不确定性，同时保持模型规格、滤波、平滑与参数学习分离。它还在 GPFA 或带显式时间光滑性先验的其他方法之前提供合适比较语境。</span>
+<span id="cb1-417"><a href="#cb1-417" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-418"><a href="#cb1-418" aria-hidden="true" tabindex="-1"></a>::: {.callout-warning title="这并不蕴含"}</span>
+<span id="cb1-419"><a href="#cb1-419" aria-hidden="true" tabindex="-1"></a>光滑后验均值不是已发现动力学、向量场、机制、因果路径、流形或唯一辨识潜轨迹。平滑路径的形状与不确定性是声明 LGSSM、参数、区间、缺失假设与到 $T$ 为止所有观测的推论。固定区间平滑是回顾性的，不得被报告为较早时间可用的在线估计。</span>
+<span id="cb1-420"><a href="#cb1-420" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb1-421"><a href="#cb1-421" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-422"><a href="#cb1-422" aria-hidden="true" tabindex="-1"></a><span class="fu">### 小鼠轨迹</span></span>
+<span id="cb1-423"><a href="#cb1-423" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-424"><a href="#cb1-424" aria-hidden="true" tabindex="-1"></a>不保留模态特定经验主张。回顾性运动状态重构依赖采样、边界、输入、过程噪声与测量假设，不是在线行为状态估计。</span>
+<span id="cb1-425"><a href="#cb1-425" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-426"><a href="#cb1-426" aria-hidden="true" tabindex="-1"></a><span class="fu">### 眼动</span></span>
+<span id="cb1-427"><a href="#cb1-427" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-428"><a href="#cb1-428" aria-hidden="true" tabindex="-1"></a>不保留模态特定经验主张。眨眼、事件触发区间、饱和与状态依赖缺失可以使普通跳行平滑失效。</span>
+<span id="cb1-429"><a href="#cb1-429" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-430"><a href="#cb1-430" aria-hidden="true" tabindex="-1"></a><span class="fu">### EEG</span></span>
+<span id="cb1-431"><a href="#cb1-431" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-432"><a href="#cb1-432" aria-hidden="true" tabindex="-1"></a>不保留模态特定经验主张。重参考、传感器混合、伪迹、非平稳性与时间预处理必须被表示或当作模型失配处理；光滑潜坐标不自动是神经源。</span>
+<span id="cb1-433"><a href="#cb1-433" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-434"><a href="#cb1-434" aria-hidden="true" tabindex="-1"></a><span class="fu">### MEG / 神经群体数据</span></span>
+<span id="cb1-435"><a href="#cb1-435" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-436"><a href="#cb1-436" aria-hidden="true" tabindex="-1"></a>不保留模态特定经验主张。试次边界、条件对齐、单元/通道缺失、观测噪声相关与参数共享定义后验。回顾性光滑性不确立群体动力学或机制。</span>
+<span id="cb1-437"><a href="#cb1-437" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-438"><a href="#cb1-438" aria-hidden="true" tabindex="-1"></a><span class="fu">## 主要来源</span></span>
+<span id="cb1-439"><a href="#cb1-439" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-440"><a href="#cb1-440" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Rauch、Tung 与 Striebel 作为向后全区间平滑方法的基础历史归因被保留 <span class="co">[</span><span class="ot">@RauchTungStriebel1965</span><span class="co">]</span>。本次运行核查已验证发布元数据与摘要，而非完整方程级推导；因此显示递推由下方完全核查的现代推导支持。</span>
+<span id="cb1-441"><a href="#cb1-441" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Ghahramani 与 Hinton 给出经核查的 LGSSM 参数估计处理，其中前向滤波与向后平滑为单独 EM E 步提供后验状态与相邻状态矩 <span class="co">[</span><span class="ot">@GhahramaniHinton1996</span><span class="co">]</span>。</span>
+<span id="cb1-442"><a href="#cb1-442" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-443"><a href="#cb1-443" aria-hidden="true" tabindex="-1"></a><span class="fu">## 综述 / 次级来源</span></span>
+<span id="cb1-444"><a href="#cb1-444" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-445"><a href="#cb1-445" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Särkkä 给出经核查的贝叶斯固定区间平滑方程、RTS 增益、终端条件、边际协方差递推、联合相邻状态构造与对滤波的区分 <span class="co">[</span><span class="ot">@Sarkka2013, ch. 8</span><span class="co">]</span>。</span>
+<span id="cb1-446"><a href="#cb1-446" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-447"><a href="#cb1-447" aria-hidden="true" tabindex="-1"></a><span class="fu">## 开放方法学问题</span></span>
+<span id="cb1-448"><a href="#cb1-448" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-449"><a href="#cb1-449" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>何时应把参数不确定性积分进路径不确定性，而非使用插件 LGSSM 参数？</span>
+<span id="cb1-450"><a href="#cb1-450" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>对奇异过程模型与精确状态约束，哪个因子化或约束平滑器合适？</span>
+<span id="cb1-451"><a href="#cb1-451" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>应如何选择区间端点，而不把回顾性轨迹调到偏好特征？</span>
+<span id="cb1-452"><a href="#cb1-452" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>哪些缺失机制需要联合状态–缺失推断，而非跳行前向遍历？</span>
+<span id="cb1-453"><a href="#cb1-453" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>应如何跨观测等价坐标系比较平滑轨迹？</span>
+<span id="cb1-454"><a href="#cb1-454" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>何时固定区间平滑掩盖切换或鲁棒模型应表示的科学上有意义的间断？</span>
+<span id="cb1-455"><a href="#cb1-455" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-456"><a href="#cb1-456" aria-hidden="true" tabindex="-1"></a><span class="fu">## 成熟度检查表</span></span>
+<span id="cb1-457"><a href="#cb1-457" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-458"><a href="#cb1-458" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> 使用完整方法 schema 与稳定 LGSSM/卡尔曼滤波记号。</span>
+<span id="cb1-459"><a href="#cb1-459" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> 定义边际与完整路径固定区间后验目标。</span>
+<span id="cb1-460"><a href="#cb1-460" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> 使回顾性未来数据边界显式，并拒绝在线解读。</span>
+<span id="cb1-461"><a href="#cb1-461" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> 要求完整前向滤波器并陈述终端条件。</span>
+<span id="cb1-462"><a href="#cb1-462" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> 给出 RTS 增益与向后均值/协方差递推。</span>
+<span id="cb1-463"><a href="#cb1-463" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> 给出来源准确的相邻状态协方差与完整路径向后分解。</span>
+<span id="cb1-464"><a href="#cb1-464" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> 覆盖奇异/病态预测协方差与因子化解边界。</span>
+<span id="cb1-465"><a href="#cb1-465" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> 从前向遍历继承缺失观测处理并陈述有信息缺失界限。</span>
+<span id="cb1-466"><a href="#cb1-466" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> 把平滑推断与模型规格、似然计算和 EM 学习分开。</span>
+<span id="cb1-467"><a href="#cb1-467" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> 陈述学习/固定量、时间、几何、监督与继承可辨识性。</span>
+<span id="cb1-468"><a href="#cb1-468" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> 包含失效、基线、评估准则与解析/仅散文玩具契约。</span>
+<span id="cb1-469"><a href="#cb1-469" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> 不保留模态特定经验主张。</span>
+<span id="cb1-470"><a href="#cb1-470" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> 基础、权威贝叶斯与 LGSSM 学习来源经核查与验证。</span>
+<span id="cb1-471"><a href="#cb1-471" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> 在一轮有界引文范围修正后完成独立混合审查；聚焦复审返回 PASS。</span>
+<span id="cb1-472"><a href="#cb1-472" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="va">[x]</span> 在对象特定 PASS 与验证后，根据记录的审查决定授权稳定晋升。</span></code></pre></div><button title="复制到剪贴板" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></div>
+</div></div></div></div></div>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
